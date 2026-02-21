@@ -50,6 +50,8 @@ export interface Partner {
   name: string;
   email: string;
   phone?: string; // Optional for backward compatibility
+  city?: string;
+  categories?: string[];
   password?: string;
   status: 'available' | 'busy';
   earnings: number;

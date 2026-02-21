@@ -41,6 +41,7 @@ export const PartnerPanel: React.FC = () => {
     gender: 'Male',
     experience: '',
     address: '',
+    city: '',
     pincode: '',
     categories: [] as string[],
     subCategories: [] as string[]
@@ -85,6 +86,7 @@ export const PartnerPanel: React.FC = () => {
                name: `${data.first_name} ${data.last_name}`,
                email: data.email,
                phone: data.phone,
+               city: data.city,
                status: data.status,
                earnings: data.earnings || 0,
                completedJobs: data.completed_jobs || 0
@@ -150,7 +152,9 @@ export const PartnerPanel: React.FC = () => {
       if (msg.includes("rate limit") || msg.includes("too many requests")) {
         setAuthError("System busy. Please wait a minute before trying again.");
       } else if (msg.includes("already registered") || msg.includes("user already exists")) {
-        setAuthError("Account already exists. Please sign in instead.");
+        setAuthMode('signin');
+        setAuthMessage("Account already exists. Please sign in with your password.");
+        setAuthError(null);
       } else if (msg.includes("invalid login credentials") || msg.includes("invalid_grant")) {
         setAuthError("Incorrect email or password. Please check your credentials.");
       } else {
@@ -216,6 +220,7 @@ export const PartnerPanel: React.FC = () => {
                    sub_categories: regData.subCategories, 
                    experience: regData.experience,
                    address: regData.address,
+                   city: regData.city,
                    pincode: regData.pincode,
                    status: 'available',
                    earnings: 0,
@@ -667,6 +672,17 @@ export const PartnerPanel: React.FC = () => {
                     <div>
                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Location Details</h3>
                        <div className="space-y-3">
+                          <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
+                              <input 
+                                type="text" 
+                                placeholder="e.g. Mumbai, Delhi" 
+                                required 
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                value={regData.city}
+                                onChange={(e) => setRegData({...regData, city: e.target.value})}
+                              />
+                          </div>
                           <input 
                             type="number" 
                             placeholder="Area Pincode" 

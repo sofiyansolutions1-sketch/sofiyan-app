@@ -50,7 +50,14 @@ export const AdminPanel: React.FC = () => {
       status: 'cancelled',
       assignedPartnerId: undefined // Remove assignment
     };
+    
+    // Optimistic update to hide from list immediately
     updateBooking(updatedBooking);
+    
+    // Force refresh to ensure list is filtered correctly
+    setTimeout(() => {
+        window.location.reload(); 
+    }, 500);
   };
 
   const openRescheduleModal = (booking: Booking) => {
@@ -85,11 +92,11 @@ export const AdminPanel: React.FC = () => {
     setPartnerSearchResults([]);
 
     try {
-        // Query Supabase: Search in 'pincode' OR 'address'
+        // Query Supabase: Search in 'pincode' OR 'address' OR 'city'
         const { data, error } = await supabase
             .from('partners')
             .select('*')
-            .or(`pincode.ilike.%${query}%,address.ilike.%${query}%`);
+            .or(`pincode.ilike.%${query}%,address.ilike.%${query}%,city.ilike.%${query}%`);
 
         if (error) throw error;
         setPartnerSearchResults(data || []);
@@ -273,7 +280,7 @@ export const AdminPanel: React.FC = () => {
                              <Send size={16} />
                           </button>
                         )}
-                        {booking.status !== 'completed' && booking.status !== 'cancelled' && (
+                        {booking.status !== 'completed' && (
                           <>
                             <button 
                               onClick={() => openRescheduleModal(booking)}
@@ -324,8 +331,18 @@ export const AdminPanel: React.FC = () => {
               <tbody>
                 {partners.map(partner => (
                   <tr key={partner.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium">{partner.name}</td>
-                    <td className="px-6 py-4 text-gray-600 font-mono text-xs">{partner.phone || '-'}</td>
+                    <td className="px-6 py-4">
+                        <div className="font-medium text-gray-900">{partner.name}</div>
+                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                            <MapPin size={10} className="text-red-400"/> {partner.city || 'City N/A'}
+                        </div>
+                    </td>
+                    <td className="px-6 py-4">
+                        <div className="text-gray-600 font-mono text-xs">{partner.phone || '-'}</div>
+                        <div className="text-xs text-indigo-600 mt-1 font-medium">
+                            {partner.categories ? (Array.isArray(partner.categories) ? partner.categories.join(', ') : partner.categories) : 'N/A'}
+                        </div>
+                    </td>
                     <td className="px-6 py-4 text-gray-500">{partner.email}</td>
                     <td className="px-6 py-4">
                        <span className={`px-2 py-1 rounded-full text-xs font-semibold
@@ -464,7 +481,7 @@ export const AdminPanel: React.FC = () => {
                                 <p className="text-sm font-bold text-gray-800">{partner.first_name} {partner.last_name || ''} <span className="text-xs font-normal text-indigo-600">({cats})</span></p>
                                 <p className="text-xs text-gray-600 flex items-center gap-1 mt-0.5">
                                     <MapPin size={10} className="text-red-400"/> 
-                                    {partner.address ? (partner.address.length > 25 ? partner.address.substring(0, 25) + '...' : partner.address) : 'Location NA'} - {partner.pincode}
+                                    {partner.city ? partner.city + ', ' : ''}{partner.address ? (partner.address.length > 25 ? partner.address.substring(0, 25) + '...' : partner.address) : 'Location NA'} - {partner.pincode}
                                 </p>
                             </div>
                             <div className="flex space-x-2">

@@ -32,13 +32,19 @@ export const useStore = () => {
     name: `${data.first_name} ${data.last_name}`,
     email: data.email,
     phone: data.phone,
+    city: data.city,
+    categories: data.categories,
     status: data.status,
     earnings: data.earnings || 0,
     completedJobs: data.completed_jobs || 0
   });
 
   const fetchBookings = async () => {
-    const { data } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase
+      .from('bookings')
+      .select('*')
+      .neq('status', 'cancelled')
+      .order('created_at', { ascending: false });
     if (data) setBookings(data.map(mapBookingFromDB));
   };
 
