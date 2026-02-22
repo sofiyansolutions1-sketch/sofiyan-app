@@ -13,6 +13,7 @@ export const useStore = () => {
     customerName: data.customer_name,
     contactNumber: data.customer_phone,
     address: data.customer_address,
+    city: data.city,
     pinCode: data.pincode,
     description: data.notes,
     date: data.service_date,

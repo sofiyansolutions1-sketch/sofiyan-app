@@ -111,6 +111,7 @@ export const CustomerPanel: React.FC = () => {
     name: '',
     contact: '',
     address: '',
+    city: '',
     pincode: '',
     description: '',
     date: '',
@@ -233,6 +234,7 @@ export const CustomerPanel: React.FC = () => {
             customer_name: formData.name,
             customer_phone: formData.contact,
             customer_address: formData.address,
+            city: formData.city,
             location: localStorage.getItem('savedCustomerLocation') || '',
             pincode: formData.pincode,
             cart_items: cart,
@@ -266,7 +268,7 @@ export const CustomerPanel: React.FC = () => {
   const resetFlow = () => {
     setIsBookingModalOpen(false);
     setSelectedService(null);
-    setFormData({ name: '', contact: '', address: '', pincode: '', description: '', date: '', time: '' });
+    setFormData({ name: '', contact: '', address: '', city: '', pincode: '', description: '', date: '', time: '' });
   };
 
   return (
@@ -711,6 +713,20 @@ export const CustomerPanel: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">City <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                        <input
+                          required
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                          placeholder="e.g. Mumbai"
+                        />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode</label>
                     <div className="relative">
                         <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
@@ -724,7 +740,8 @@ export const CustomerPanel: React.FC = () => {
                         />
                     </div>
                   </div>
-                  <div className="space-y-1">
+
+                <div className="space-y-1">
                       <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Date</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-3.5 text-gray-400" size={18} />

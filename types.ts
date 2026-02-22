@@ -31,6 +31,7 @@ export interface Booking {
   customerName: string;
   contactNumber: string;
   address: string;
+  city: string; // Added city field
   pinCode: string;
   description: string;
   date: string;

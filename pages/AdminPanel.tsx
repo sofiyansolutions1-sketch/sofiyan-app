@@ -3,7 +3,7 @@ import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, CalendarDays, Phone, Search, Send, MapPin, Loader2 } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, CalendarDays, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 export const AdminPanel: React.FC = () => {
@@ -78,6 +78,31 @@ export const AdminPanel: React.FC = () => {
     setRescheduleData({ booking: null, date: '', time: '' });
   };
 
+  const handleRevertToPending = async (booking: Booking) => {
+    if (!window.confirm("Are you sure you want to revert this lead to 'Pending'? The current partner will be unassigned and you can assign a new one.")) {
+        return;
+    }
+
+    try {
+        // Update Supabase: Set status back to Pending and remove the assigned partner
+        const { error } = await supabase
+            .from('bookings')
+            .update({ status: 'pending', assigned_partner_id: null })
+            .eq('id', booking.id);
+            
+        if (error) throw error;
+        
+        alert('Lead is now Pending again! You can now search for a new partner.');
+        
+        // Force refresh to ensure list is filtered correctly
+        window.location.reload();
+        
+    } catch (error) {
+        console.error('Error reverting lead:', error);
+        alert('Failed to update lead. Please check the console.');
+    }
+  };
+
   // Real Supabase Partner Search Logic
   const handlePartnerSearch = async () => {
     const query = partnerSearchQuery.trim();
@@ -108,7 +133,33 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  // Generate WhatsApp Message
+  // Generate WhatsApp Message for Admin
+  const getAdminWhatsAppLink = (booking: Booking) => {
+      // 1. Format Services Text
+      let servicesText = "Services";
+      if (booking.cartItems && booking.cartItems.length > 0) {
+        servicesText = booking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
+      } else {
+          servicesText = booking.subServiceName;
+      }
+
+      // 2. Create Attractive WhatsApp Message Template
+      let waText = `🚨 *NEW LEAD ALERT - Sofiyan Home Service* 🚨\n\n`;
+      waText += `👤 *Customer:* ${booking.customerName}\n`;
+      waText += `📞 *Phone:* ${booking.contactNumber}\n`;
+      waText += `📍 *City:* ${booking.city || 'N/A'}\n`;
+      waText += `🏠 *Address:* ${booking.address} (${booking.pinCode})\n\n`;
+      waText += `🛠️ *Services:* ${servicesText}\n`;
+      waText += `💰 *Total Value:* ₹${booking.price}\n`;
+      waText += `⏰ *Schedule:* ${booking.date} | ${booking.time}\n\n`;
+      waText += `📌 *Current Status:* ${booking.status}`;
+
+      // Encode for URL
+      let encodedWaText = encodeURIComponent(waText);
+      // Admin's specific WhatsApp Number link
+      return `https://wa.me/919219345455?text=${encodedWaText}`;
+  };
+
   const getWhatsAppLink = (partner: any) => {
       // WhatsApp Message Template (Encoded for URL)
       const waMessage = encodeURIComponent(`📢 प्रिय पार्टनर,\nआपके nearby area से एक नई लीड आई है।\nतुरंत sofiyan.com पर जाकर लीड Accept करें और ग्राहक से संपर्क करें।\n⏰ ध्यान दें:\n5 मिनट के अंदर लीड Accept नहीं की गई तो यह किसी दूसरे पार्टनर को दे दी जाएगी。\n✔ Quality service mandatory\n💰 Service ke baad 25% commission immediate\n❌ Commission delay = Future leads STOP.`);
@@ -215,100 +266,105 @@ export const AdminPanel: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-8">
-        {/* Lead Management Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Lead Management Cards */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
             <h3 className="font-bold text-gray-800">Lead Management</h3>
             <span className="text-xs text-gray-500 bg-white border border-gray-200 px-3 py-1 rounded-full">
               {bookings.length} Total Records
             </span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-gray-500 uppercase bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3">Customer</th>
-                  <th className="px-6 py-3">Service Details</th>
-                  <th className="px-6 py-3">Assigned To</th>
-                  <th className="px-6 py-3">Schedule</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map(booking => (
-                  <tr key={booking.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{booking.customerName}</div>
-                      <div className="text-xs text-gray-500 mb-2">{booking.address}</div>
-                      <a 
-                        href={`tel:${booking.contactNumber}`} 
-                        className="inline-flex items-center gap-1.5 text-xs text-green-600 font-medium hover:text-white hover:bg-green-600 bg-green-50 px-2.5 py-1.5 rounded-md border border-green-100 transition-all shadow-sm"
-                      >
-                         <Phone size={12} className="fill-current" /> Call Customer
-                      </a>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-indigo-600 font-medium">{booking.serviceCategory}</div>
-                      <div className="text-xs text-gray-500 truncate max-w-[200px]">{booking.subServiceName}</div>
-                      <div className="text-xs font-bold text-gray-700 mt-1">₹{booking.price}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {renderPartnerCell(booking)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1"><CalendarDays size={12}/> {booking.date}</div>
-                      <div className="flex items-center gap-1 text-gray-500"><Clock size={12}/> {booking.time}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                        ${booking.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                          booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' : 
-                          booking.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                          'bg-yellow-100 text-yellow-700'}`}>
-                        {booking.status.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        {booking.status === 'pending' && (
-                          <button
-                            onClick={() => { setDispatchBooking(booking); setPartnerSearchQuery(''); setPartnerSearchResults([]); setHasSearched(false); }}
-                            className="p-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm"
-                            title="Assign Partner"
-                          >
-                             <Send size={16} />
-                          </button>
+          <div className="p-4 bg-gray-50">
+            {bookings.map(booking => {
+               const waLink = getAdminWhatsAppLink(booking);
+               let servicesText = "Services";
+               if (booking.cartItems && booking.cartItems.length > 0) {
+                 servicesText = booking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
+               } else {
+                   servicesText = booking.subServiceName;
+               }
+
+               return (
+                <div key={booking.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-4">
+                    <div className="flex justify-between items-center border-b pb-2 mb-2">
+                        <span className="font-bold text-gray-800">#{booking.id.substring(0,6).toUpperCase()} - ₹{booking.price}</span>
+                        <div className="flex space-x-2">
+                            <span className={`px-2 py-1 rounded text-xs font-bold flex items-center
+                                ${booking.status === 'completed' ? 'bg-green-100 text-green-700' : 
+                                booking.status === 'accepted' ? 'bg-blue-100 text-blue-700' : 
+                                booking.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                'bg-yellow-100 text-yellow-700'}`}>
+                                {booking.status.toUpperCase()}
+                            </span>
+                            <a href={waLink} target="_blank" rel="noopener noreferrer" title="Forward to Admin WhatsApp" className="text-xs bg-green-50 text-green-600 px-3 py-1 rounded border border-green-200 hover:bg-green-100 font-bold flex items-center transition">
+                                <Send size={14} className="mr-1" /> Forward
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div className="mb-3 text-sm text-gray-700 space-y-1">
+                        <p><User size={14} className="inline text-indigo-500 w-5 mr-1"/> <strong>Customer:</strong> {booking.customerName} <a href={`tel:${booking.contactNumber}`} className="text-blue-500 ml-1"><Phone size={12} className="inline"/></a></p>
+                        <p><MapPin size={14} className="inline text-red-500 w-5 mr-1"/> <strong>Address:</strong> {booking.address}, {booking.city || ''} ({booking.pinCode})</p>
+                        <p><Clock size={14} className="inline text-blue-500 w-5 mr-1"/> <strong>Time:</strong> {booking.date} | {booking.time}</p>
+                        <p><Activity size={14} className="inline text-gray-500 w-5 mr-1"/> <strong>Job:</strong> {servicesText}</p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                        {booking.status === 'pending' ? (
+                            <>
+                                <p className="text-xs font-bold text-red-500">Action Required: Assign Partner</p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { setDispatchBooking(booking); setPartnerSearchQuery(''); setPartnerSearchResults([]); setHasSearched(false); }}
+                                        className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded border border-indigo-200 hover:bg-indigo-100 font-bold transition"
+                                        title="Assign Partner"
+                                    >
+                                        Assign
+                                    </button>
+                                    <button 
+                                        onClick={() => openRescheduleModal(booking)}
+                                        className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 font-bold transition"
+                                        title="Reschedule"
+                                    >
+                                        Reschedule
+                                    </button>
+                                    <button onClick={() => handleCancelBooking(booking)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded border border-red-200 hover:bg-red-100 font-bold transition">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </>
+                        ) : (booking.status === 'accepted') ? (
+                            <>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-xs font-bold text-green-600 flex items-center"><CheckCircle size={14} className="mr-1"/> Partner Assigned</p>
+                                    <div className="ml-4">{renderPartnerCell(booking)}</div>
+                                </div>
+                                <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                    <div className="flex gap-2 w-full justify-end">
+                                        <button 
+                                            onClick={() => handleRevertToPending(booking)}
+                                            className="text-xs bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded border border-yellow-200 hover:bg-yellow-100 font-bold transition flex items-center"
+                                            title="Unassign partner and make pending"
+                                        >
+                                            <Undo size={14} className="mr-1" /> Make Pending
+                                        </button>
+                                        <button onClick={() => handleCancelBooking(booking)} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded border border-red-200 hover:bg-red-100 font-bold transition flex items-center">
+                                            <Trash2 size={14} className="mr-1" /> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <span className="text-xs text-gray-400">No actions available</span>
                         )}
-                        {booking.status !== 'completed' && (
-                          <>
-                            <button 
-                              onClick={() => openRescheduleModal(booking)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Reschedule"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button 
-                              onClick={() => handleCancelBooking(booking)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Cancel Lead"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {bookings.length === 0 && (
-                   <tr>
-                     <td colSpan={6} className="px-6 py-8 text-center text-gray-400">No bookings yet</td>
-                   </tr>
-                )}
-              </tbody>
-            </table>
+                    </div>
+                </div>
+               );
+            })}
+            {bookings.length === 0 && (
+                <div className="text-center py-8 text-gray-400">No bookings yet</div>
+            )}
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { useStore } from '../hooks/useStore';
 import { Partner, Booking } from '../types';
 import { DB_DATA } from '../constants';
 import { Modal } from '../components/Modal';
-import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2 } from 'lucide-react';
+import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
@@ -25,6 +25,7 @@ export const PartnerPanel: React.FC = () => {
   // App Logic State
   const [currentUser, setCurrentUser] = useState<Partner | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [leadToAccept, setLeadToAccept] = useState<Booking | null>(null);
   
   // Billing Modal State
   const [paymentModal, setPaymentModal] = useState<Booking | null>(null);
@@ -250,15 +251,42 @@ export const PartnerPanel: React.FC = () => {
       alert("🚫 You have an ongoing job! Please complete your current task before accepting a new one.");
       return;
     }
-    const updatedBooking: Booking = { ...booking, status: 'accepted', assignedPartnerId: currentUser.id };
-    const updatedPartner: Partner = { ...currentUser, status: 'busy' };
+    setLeadToAccept(booking);
+  };
+
+  const confirmLeadAcceptance = async () => {
+    if (!leadToAccept || !currentUser) return;
     
-    // Optimistic UI updates
-    setCurrentUser(updatedPartner);
-    updateBooking(updatedBooking);
-    updatePartner(updatedPartner);
+    setIsSubmitting(true);
     
-    setNotification(`Lead accepted! Complete the service to receive payment.`);
+    try {
+        const { error } = await supabase
+             .from('bookings')
+             .update({ 
+                 status: 'accepted', 
+                 assigned_partner_id: currentUser.id 
+             })
+             .eq('id', leadToAccept.id);
+
+         if (error) throw error;
+
+         // Optimistic UI updates
+         const updatedBooking: Booking = { ...leadToAccept, status: 'accepted', assignedPartnerId: currentUser.id };
+         const updatedPartner: Partner = { ...currentUser, status: 'busy' };
+         
+         setCurrentUser(updatedPartner);
+         updateBooking(updatedBooking);
+         updatePartner(updatedPartner);
+         
+         setNotification(`Lead accepted! Contact the customer now.`);
+         setLeadToAccept(null);
+
+    } catch (error) {
+         console.error('Error accepting lead:', error);
+         alert('Failed to accept lead. Someone else might have taken it.');
+    } finally {
+         setIsSubmitting(false);
+    }
   };
 
   const handleCompleteService = (booking: Booking) => {
@@ -522,24 +550,27 @@ export const PartnerPanel: React.FC = () => {
                      New Lead
                   </div>
                   <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-md mb-2">
-                        {lead.serviceCategory}
-                      </span>
-                      <h3 className="font-bold text-gray-900 text-lg">
-                        {lead.cartItems ? `${lead.cartItems.length} Items` : lead.subServiceName.split(',')[0]}
+                    <div className="w-full">
+                      <div className="flex justify-between items-center mb-2">
+                          <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded uppercase">
+                            {lead.city || 'City N/A'}
+                          </span>
+                          <span className="text-2xl font-bold text-green-600">₹{lead.price}</span>
+                      </div>
+                      
+                      <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <Briefcase size={16} className="text-gray-400" />
+                        {lead.cartItems ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
                       </h3>
-                      {lead.cartItems && (
-                        <p className="text-xs text-gray-500 truncate max-w-[200px]">{lead.subServiceName}</p>
-                      )}
+                      <p className="text-xs text-gray-500 mb-2">{lead.serviceCategory}</p>
                     </div>
                   </div>
-                  <div className="flex items-baseline gap-1 mb-4">
-                     <span className="text-2xl font-bold text-green-600">₹{lead.price}</span>
-                     <span className="text-xs text-gray-400">Est. Total</span>
-                  </div>
+
                   <div className="space-y-2 text-sm text-gray-600 mb-6 border-t border-gray-50 pt-3">
-                    <p className="flex items-center gap-2"><MapPin size={14} className="text-indigo-400" /> {lead.address}</p>
+                    <p className="flex items-center gap-2 font-medium">
+                        <MapPin size={16} className="text-red-400" /> 
+                        {lead.address} - {lead.pinCode}
+                    </p>
                     <p className="flex items-center gap-2"><Clock size={14} className="text-indigo-400" /> {lead.date} | {lead.time}</p>
                   </div>
                   <button
@@ -866,6 +897,46 @@ export const PartnerPanel: React.FC = () => {
           </div>
         )}
       </Modal>
+
+      {leadToAccept && (
+            <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex justify-center items-center px-4 animate-fadeIn">
+                <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all animate-scaleIn">
+                    <div className="bg-indigo-600 p-4 text-center">
+                        <h3 className="text-white text-lg font-bold flex items-center justify-center gap-2">
+                            <AlertTriangle className="text-yellow-300" /> Confirm Lead Acceptance
+                        </h3>
+                    </div>
+                    <div className="p-6">
+                        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-4 text-sm text-gray-700 space-y-2">
+                            <p><strong>📍 City:</strong> {leadToAccept.city || 'N/A'}</p>
+                            <p><strong>🛠️ Category:</strong> {leadToAccept.serviceCategory}</p>
+                            <p><strong>🏠 Address:</strong> {leadToAccept.address}</p>
+                        </div>
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                            <p className="text-red-700 font-semibold text-sm leading-relaxed">
+                                "यह लीड कम्पलीट करने के बाद ही आप नेक्स्ट लीड एक्सेप्ट कर सकते हैं。<br/>ध्यान दें: हम सर्विस चार्ज का 25% कमीशन चार्ज करते हैं。"
+                            </p>
+                        </div>
+                        <div className="flex space-x-3">
+                            <button 
+                                onClick={() => setLeadToAccept(null)} 
+                                className="flex-1 bg-gray-200 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-300 transition"
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={confirmLeadAcceptance} 
+                                disabled={isSubmitting}
+                                className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-700 transition flex justify-center items-center gap-2"
+                            >
+                                {isSubmitting ? <Loader2 className="animate-spin" /> : <><CheckCircle size={18} /> Confirmed</>}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
     </div>
   );
 };
