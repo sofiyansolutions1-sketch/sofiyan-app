@@ -43,6 +43,7 @@ export const PartnerPanel: React.FC = () => {
     experience: '',
     address: '',
     city: '',
+    customCity: '',
     pincode: '',
     categories: [] as string[],
     subCategories: [] as string[]
@@ -204,6 +205,18 @@ export const PartnerPanel: React.FC = () => {
       e.preventDefault();
       if (!session?.user?.email) return;
 
+      let finalCityValue = regData.city;
+      
+      // If 'Others' is selected, override it with the typed text
+      if (finalCityValue === 'Others') {
+          finalCityValue = regData.customCity.trim();
+          // Basic validation to ensure they didn't leave the "Others" box blank
+          if (!finalCityValue) {
+              alert("Please type your city name in the box provided.");
+              return; // Stop form submission
+          }
+      }
+
       setIsSubmitting(true);
 
       try {
@@ -221,7 +234,7 @@ export const PartnerPanel: React.FC = () => {
                    sub_categories: regData.subCategories, 
                    experience: regData.experience,
                    address: regData.address,
-                   city: regData.city,
+                   city: finalCityValue,
                    pincode: regData.pincode,
                    status: 'available',
                    earnings: 0,
@@ -233,6 +246,7 @@ export const PartnerPanel: React.FC = () => {
 
         // Force sync after insertion
         await syncUserWithStore(session.user.email);
+        
         setIsRegistrationOpen(false);
         setNotification("Registration Successful! Welcome to Sofiyan Home Service.");
 
@@ -446,7 +460,14 @@ export const PartnerPanel: React.FC = () => {
   }
 
   const myActiveJob = currentUser ? bookings.find(b => b.status === 'accepted' && b.assignedPartnerId === currentUser.id) : null;
-  const availableLeads = bookings.filter(b => b.status === 'pending');
+  
+  // Filter leads by city as requested
+  const availableLeads = bookings.filter(b => {
+      const partnerCity = currentUser?.city || localStorage.getItem('loggedInPartnerCity');
+      if (!partnerCity) return false;
+      return b.status === 'pending' && b.city?.toLowerCase() === partnerCity.toLowerCase();
+  });
+
   const { total: modalTotal, commission: modalCommission } = paymentModal ? { total: paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0), commission: (paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0)) * 0.25 } : { total: 0, commission: 0 };
 
   return (
@@ -704,15 +725,50 @@ export const PartnerPanel: React.FC = () => {
                        <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Location Details</h3>
                        <div className="space-y-3">
                           <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
-                              <input 
-                                type="text" 
-                                placeholder="e.g. Mumbai, Delhi" 
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Select Your City <span className="text-red-500">*</span></label>
+                              <select 
+                                id="partner-city" 
                                 required 
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none bg-white cursor-pointer appearance-none"
                                 value={regData.city}
                                 onChange={(e) => setRegData({...regData, city: e.target.value})}
-                              />
+                              >
+                                  <option value="" disabled>Tap to select your city...</option>
+                                  <option value="Ahmedabad">Ahmedabad</option>
+                                  <option value="Bangalore">Bangalore</option>
+                                  <option value="Bhubaneswar">Bhubaneswar</option>
+                                  <option value="Chennai">Chennai</option>
+                                  <option value="Delhi">Delhi</option>
+                                  <option value="Faridabad">Faridabad</option>
+                                  <option value="Ghaziabad">Ghaziabad</option>
+                                  <option value="Gurgaon">Gurgaon</option>
+                                  <option value="Hyderabad">Hyderabad</option>
+                                  <option value="Kochi">Kochi</option>
+                                  <option value="Kolkata">Kolkata</option>
+                                  <option value="Lucknow">Lucknow</option>
+                                  <option value="Mysore">Mysore</option>
+                                  <option value="NCR">NCR</option>
+                                  <option value="Noida">Noida</option>
+                                  <option value="Patna">Patna</option>
+                                  <option value="Pune">Pune</option>
+                                  <option value="Mumbai">Mumbai</option>
+                                  <option value="Surat">Surat</option>
+                                  <option value="Vadodara">Vadodara</option>
+                                  <option value="Vizag">Vizag</option>
+                                  <option value="Others" className="font-bold text-indigo-600">Others (Please specify)</option>
+                              </select>
+                              
+                              {regData.city === 'Others' && (
+                                <input 
+                                    type="text" 
+                                    id="other-city-input" 
+                                    placeholder="Type your city name" 
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
+                                    value={regData.customCity}
+                                    onChange={(e) => setRegData({...regData, customCity: e.target.value})}
+                                    required
+                                />
+                              )}
                           </div>
                           <input 
                             type="number" 

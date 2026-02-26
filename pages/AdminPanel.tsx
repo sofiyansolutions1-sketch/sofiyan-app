@@ -23,6 +23,8 @@ export const AdminPanel: React.FC = () => {
   const [isSearchingPartners, setIsSearchingPartners] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
@@ -132,6 +134,8 @@ export const AdminPanel: React.FC = () => {
         setIsSearchingPartners(false);
     }
   };
+
+
 
   // Generate WhatsApp Message for Admin
   const getAdminWhatsAppLink = (booking: Booking) => {
@@ -342,6 +346,13 @@ export const AdminPanel: React.FC = () => {
                                 </div>
                                 <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                     <div className="flex gap-2 w-full justify-end">
+                                        <button 
+                                            onClick={() => openRescheduleModal(booking)}
+                                            className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 font-bold transition flex items-center"
+                                            title="Reschedule"
+                                        >
+                                            <Edit2 size={14} className="mr-1" /> Reschedule
+                                        </button>
                                         <button 
                                             onClick={() => handleRevertToPending(booking)}
                                             className="text-xs bg-yellow-50 text-yellow-700 px-3 py-1.5 rounded border border-yellow-200 hover:bg-yellow-100 font-bold transition flex items-center"
@@ -566,6 +577,8 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+
     </div>
   );
 };

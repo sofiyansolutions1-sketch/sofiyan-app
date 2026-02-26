@@ -116,7 +116,13 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+      // Initialize Supabase Client
+      const supabaseUrl = 'https://bvtqginkszmzzmetdjdm.supabase.co';
+      const supabaseKey = 'sb_publishable_F0wwfftZVcsHQhoNStUQqw_UgPaOyYq';
+      const supabaseInstance = window.supabase.createClient(supabaseUrl, supabaseKey);
+
       (function() {
         const modal = document.getElementById('location-modal');
         const manualInput = document.getElementById('manual-location-input');
