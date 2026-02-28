@@ -82,17 +82,7 @@ const featuredServicesData = [
     { name: "Water Tank Cleaning (1000L)", price: 749, img: "https://i.postimg.cc/fy2xJB6v/Chat-GPT-Image-Jan-13-2026-12-44-47-AM.jpg", desc: "Anti-bacterial water tank cleaning & treatment." }
 ];
 
-const TIME_SLOTS = [
-  '09:00 AM - 10:00 AM',
-  '10:00 AM - 11:00 AM',
-  '11:00 AM - 12:00 PM',
-  '12:00 PM - 01:00 PM',
-  '01:00 PM - 02:00 PM',
-  '02:00 PM - 03:00 PM',
-  '03:00 PM - 04:00 PM',
-  '04:00 PM - 05:00 PM',
-  '05:00 PM - 06:00 PM'
-];
+
 
 export const CustomerPanel: React.FC = () => {
   const { addBooking } = useStore();
@@ -208,9 +198,79 @@ export const CustomerPanel: React.FC = () => {
       setBookingStep('form');
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  // Time Slot Logic
+  const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
+  const [minDate, setMinDate] = useState('');
+
+  const formatAMPM = (hours: number) => {
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    let strTime = hours.toString().padStart(2, '0') + ':00 ' + ampm;
+    return strTime;
   };
+
+  const updateAvailableTimeSlots = (dateInput: string) => {
+    if (!dateInput) {
+      setAvailableTimeSlots([]);
+      return;
+    }
+
+    const selectedDate = new Date(dateInput);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare just dates
+
+    // Business Hours: 9 AM (9) to 8 PM (20)
+    const openHour = 9;
+    const closeHour = 20;
+    let startHourForSlots = openHour;
+
+    // If the selected date is TODAY
+    if (selectedDate.toDateString() === today.toDateString()) {
+        const currentHour = new Date().getHours();
+        // Add a 2-hour buffer so partners have time to reach
+        startHourForSlots = Math.max(openHour, currentHour + 2); 
+    }
+
+    const slots = [];
+    if (startHourForSlots >= closeHour) {
+        // No slots left for today
+    } else {
+        for (let i = startHourForSlots; i < closeHour; i++) {
+            slots.push(`${formatAMPM(i)} - ${formatAMPM(i + 1)}`);
+        }
+    }
+    setAvailableTimeSlots(slots);
+  };
+
+  // Run this whenever the checkout modal is opened to block past dates
+  useEffect(() => {
+    if (isBookingModalOpen) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        
+        const minDateStr = `${yyyy}-${mm}-${dd}`;
+        setMinDate(minDateStr);
+        
+        // Clear previous selections
+        setFormData(prev => ({ ...prev, date: '', time: '' }));
+        setAvailableTimeSlots([]);
+    }
+  }, [isBookingModalOpen]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'date') {
+        updateAvailableTimeSlots(value);
+        setFormData(prev => ({ ...prev, time: '' }));
+    }
+  };
+
 
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -627,7 +687,7 @@ export const CustomerPanel: React.FC = () => {
           )}
 
           {bookingStep === 'form' && (
-            <form onSubmit={handleSubmitBooking} className="space-y-6">
+            <form id="checkout-modal" onSubmit={handleSubmitBooking} className="space-y-6">
               
               {/* Trust Banner */}
               <div className="bg-green-50 text-green-700 p-3 rounded-lg flex items-center gap-2 text-sm border border-green-100">
@@ -741,40 +801,41 @@ export const CustomerPanel: React.FC = () => {
                     </div>
                   </div>
 
-                <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Date</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                          required
-                          type="date"
-                          name="date"
-                          value={formData.date}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        />
-                      </div>
-                  </div>
                 </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Select Time Slot ⏰</label>
-                  <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar pr-1 bg-gray-50 p-2 rounded-xl border border-gray-200">
-                    {TIME_SLOTS.map((slot) => (
-                      <button
-                        key={slot}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, time: slot })}
-                        className={`py-3 px-2 rounded-lg text-xs font-bold transition-all border-2 ${
-                          formData.time === slot
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-sm'
-                            : 'border-transparent bg-white text-gray-600 hover:border-indigo-200 shadow-sm'
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    ))}
-                  </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Date <span className="text-red-500">*</span></label>
+                        <input 
+                            type="date" 
+                            id="service-date" 
+                            name="date"
+                            value={formData.date}
+                            onChange={handleInputChange}
+                            min={minDate}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none" 
+                            required 
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Time <span className="text-red-500">*</span></label>
+                        <select 
+                            id="selected-time-slot" 
+                            name="time"
+                            value={formData.time}
+                            onChange={handleInputChange}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 bg-white outline-none" 
+                            required
+                        >
+                            <option value="" disabled>Select Date First</option>
+                            {availableTimeSlots.length === 0 && formData.date ? (
+                                <option value="" disabled>No slots available</option>
+                            ) : (
+                                availableTimeSlots.map(slot => (
+                                    <option key={slot} value={slot}>{slot}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="space-y-1">
