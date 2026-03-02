@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Twitter, Instagram, Linkedin, MapPin, ChevronRight, Youtube } from 'lucide-react';
+import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube } from 'lucide-react';
 import { BUSINESS_NAME, EMAIL, HELPLINE } from '../constants';
 
 const siteContent = {

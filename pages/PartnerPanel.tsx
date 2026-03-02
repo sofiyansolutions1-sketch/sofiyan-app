@@ -10,7 +10,7 @@ import { Session } from '@supabase/supabase-js';
 
 export const PartnerPanel: React.FC = () => {
   const navigate = useNavigate();
-  const { bookings, updateBooking, partners, addPartner, updatePartner } = useStore();
+  const { bookings, updateBooking, updatePartner } = useStore();
   
   // Auth State
   const [session, setSession] = useState<Session | null>(null);
@@ -76,7 +76,7 @@ export const PartnerPanel: React.FC = () => {
 
   const syncUserWithStore = async (email: string) => {
     try {
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('partners')
             .select('*')
             .eq('email', email)
@@ -140,7 +140,7 @@ export const PartnerPanel: React.FC = () => {
         }
 
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: authData.email,
           password: authData.password,
         });
@@ -201,6 +201,14 @@ export const PartnerPanel: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    if (isRegistrationOpen) {
+      if ((window as any).captureLocationSilent) {
+        (window as any).captureLocationSilent();
+      }
+    }
+  }, [isRegistrationOpen]);
+
   const submitPartnerRegistration = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!session?.user?.email) return;
@@ -220,6 +228,9 @@ export const PartnerPanel: React.FC = () => {
       setIsSubmitting(true);
 
       try {
+        const currentLat = (window as any).currentLat;
+        const currentLng = (window as any).currentLng;
+
         const { error } = await supabase
            .from('partners')
            .insert([
@@ -235,6 +246,9 @@ export const PartnerPanel: React.FC = () => {
                    experience: regData.experience,
                    address: regData.address,
                    city: finalCityValue,
+                   location: currentLat && currentLng ? `POINT(${currentLng} ${currentLat})` : null,
+                   lat: currentLat,
+                   lng: currentLng,
                    pincode: regData.pincode,
                    status: 'available',
                    earnings: 0,

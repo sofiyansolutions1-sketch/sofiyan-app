@@ -3,7 +3,7 @@ import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, CalendarDays, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 export const AdminPanel: React.FC = () => {
@@ -159,7 +159,7 @@ export const AdminPanel: React.FC = () => {
       waText += `📌 *Current Status:* ${booking.status}`;
 
       // Encode for URL
-      let encodedWaText = encodeURIComponent(waText);
+      const encodedWaText = encodeURIComponent(waText);
       // Admin's specific WhatsApp Number link
       return `https://wa.me/919219345455?text=${encodedWaText}`;
   };
@@ -318,14 +318,14 @@ export const AdminPanel: React.FC = () => {
                         {booking.status === 'pending' ? (
                             <>
                                 <p className="text-xs font-bold text-red-500">Action Required: Assign Partner</p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => { setDispatchBooking(booking); setPartnerSearchQuery(''); setPartnerSearchResults([]); setHasSearched(false); }}
-                                        className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded border border-indigo-200 hover:bg-indigo-100 font-bold transition"
-                                        title="Assign Partner"
-                                    >
-                                        Assign
-                                    </button>
+                                <button 
+                                    onClick={() => (window as any).findPartners10km(booking.id, booking.lat || null, booking.lng || null, encodeURIComponent(JSON.stringify(booking)))} 
+                                    className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center mt-3"
+                                >
+                                    <i className="fas fa-radar text-white mr-2"></i> Find Partners (10 KM)
+                                </button>
+                                <div id={`nearby-partners-${booking.id}`} className="mt-3 hidden bg-gray-50 rounded p-2 border border-gray-200"></div>
+                                <div className="flex gap-2 mt-2">
                                     <button 
                                         onClick={() => openRescheduleModal(booking)}
                                         className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 font-bold transition"

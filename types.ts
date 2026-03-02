@@ -32,6 +32,9 @@ export interface Booking {
   contactNumber: string;
   address: string;
   city: string; // Added city field
+  location?: string;
+  lat?: number;
+  lng?: number;
   pinCode: string;
   description: string;
   date: string;

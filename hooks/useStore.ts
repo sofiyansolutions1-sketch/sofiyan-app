@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Booking, Partner } from '../types';
 import { supabase } from '../supabaseClient';
 
@@ -40,19 +40,19 @@ export const useStore = () => {
     completedJobs: data.completed_jobs || 0
   });
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     const { data } = await supabase
       .from('bookings')
       .select('*')
       .neq('status', 'cancelled')
       .order('created_at', { ascending: false });
     if (data) setBookings(data.map(mapBookingFromDB));
-  };
+  }, []);
 
-  const fetchPartners = async () => {
+  const fetchPartners = useCallback(async () => {
     const { data } = await supabase.from('partners').select('*');
     if (data) setPartners(data.map(mapPartnerFromDB));
-  };
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -74,9 +74,9 @@ export const useStore = () => {
       supabase.removeChannel(bookingsSub);
       supabase.removeChannel(partnersSub);
     };
-  }, []);
+  }, [fetchBookings, fetchPartners]);
 
-  const addBooking = async (booking: Booking) => {
+  const addBooking = async () => {
       // Logic handled by components via direct insert mostly, but refetching ensures sync
       await fetchBookings(); 
   };
@@ -99,7 +99,7 @@ export const useStore = () => {
     }
   };
 
-  const addPartner = async (partner: Partner) => {
+  const addPartner = async () => {
      await fetchPartners();
   };
 

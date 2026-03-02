@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { SERVICES } from '../constants';
-import { Service, SubService, Booking, CartItem } from '../types';
+import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
-import { useStore } from '../hooks/useStore';
-import { Loader2, CheckCircle, Calendar, MapPin, User, Phone, FileText, Star, Search, ChevronRight, Plus, Minus, Shield, ArrowRight, Trash2 } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, Plus, Minus, Shield, ArrowRight, Trash2, FileText } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -85,7 +84,6 @@ const featuredServicesData = [
 
 
 export const CustomerPanel: React.FC = () => {
-  const { addBooking } = useStore();
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
   // Advanced Cart State
@@ -115,8 +113,12 @@ export const CustomerPanel: React.FC = () => {
       if (savedLocation && !formData.address) {
         setFormData(prev => ({ ...prev, address: savedLocation }));
       }
+      // Trigger silent GPS capture
+      if ((window as any).captureLocationSilent) {
+        (window as any).captureLocationSilent();
+      }
     }
-  }, [isBookingModalOpen]);
+  }, [isBookingModalOpen, formData.address]);
 
   // 1. Flatten all sub-services for Global Search & Featured Section
   const allSubServices = useMemo(() => {
@@ -204,10 +206,10 @@ export const CustomerPanel: React.FC = () => {
   const [minDate, setMinDate] = useState('');
 
   const formatAMPM = (hours: number) => {
-    let ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
-    let strTime = hours.toString().padStart(2, '0') + ':00 ' + ampm;
+    const strTime = hours.toString().padStart(2, '0') + ':00 ' + ampm;
     return strTime;
   };
 
@@ -287,6 +289,9 @@ export const CustomerPanel: React.FC = () => {
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
       // Insert into Supabase
+      const currentLat = (window as any).currentLat;
+      const currentLng = (window as any).currentLng;
+
       const { error } = await supabase
         .from('bookings')
         .insert([
@@ -295,7 +300,9 @@ export const CustomerPanel: React.FC = () => {
             customer_phone: formData.contact,
             customer_address: formData.address,
             city: formData.city,
-            location: localStorage.getItem('savedCustomerLocation') || '',
+            location: currentLat && currentLng ? `POINT(${currentLng} ${currentLat})` : null,
+            lat: currentLat,
+            lng: currentLng,
             pincode: formData.pincode,
             cart_items: cart,
             total_price: cartTotal,
