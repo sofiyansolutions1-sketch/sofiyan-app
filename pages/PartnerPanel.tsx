@@ -22,6 +22,8 @@ export const PartnerPanel: React.FC = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   // App Logic State
   const [currentUser, setCurrentUser] = useState<Partner | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
@@ -53,6 +55,22 @@ export const PartnerPanel: React.FC = () => {
   const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
 
   useEffect(() => {
+    // Check Supabase Connection
+    const checkConnection = async () => {
+        try {
+            const { error } = await supabase.from('partners').select('count', { count: 'exact', head: true });
+            if (error) {
+                console.error("Supabase Connection Error:", error);
+                if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.code === '401') {
+                    setAuthError("Database Connection Failed: Invalid API Key. Please verify your Supabase credentials.");
+                }
+            }
+        } catch (err) {
+            console.error("Connection check failed:", err);
+        }
+    };
+    checkConnection();
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user?.email) {
@@ -73,6 +91,29 @@ export const PartnerPanel: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleForgotPassword = async () => {
+    if (!authData.email) {
+        setAuthError("Please enter your email address to reset password.");
+        return;
+    }
+    setIsSubmitting(true);
+    setAuthError(null);
+    setAuthMessage(null);
+    
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(authData.email, {
+            redirectTo: window.location.origin + '/partner',
+        });
+        if (error) throw error;
+        setAuthMessage("Password reset link sent! Check your email.");
+    } catch (error: any) {
+        console.error("Reset Password Error:", error);
+        setAuthError(error.message || "Failed to send reset link.");
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
 
   const syncUserWithStore = async (email: string) => {
     try {
@@ -148,19 +189,25 @@ export const PartnerPanel: React.FC = () => {
         if (error) throw error;
       }
     } catch (error: any) {
-      console.error("Auth Error:", error);
-      const msg = error.message?.toLowerCase() || "";
-      
-      if (msg.includes("rate limit") || msg.includes("too many requests")) {
-        setAuthError("System busy. Please wait a minute before trying again.");
-      } else if (msg.includes("already registered") || msg.includes("user already exists")) {
+      const errorMessage = error?.message || (typeof error === 'string' ? error : 'Unknown error');
+      const msg = errorMessage.toLowerCase();
+
+      // Handle "User already registered" specifically without logging as error
+      if (msg.includes("already registered") || msg.includes("user already exists")) {
         setAuthMode('signin');
         setAuthMessage("Account already exists. Please sign in with your password.");
         setAuthError(null);
+        return;
+      }
+
+      console.error("Auth Error:", error);
+      
+      if (msg.includes("rate limit") || msg.includes("too many requests")) {
+        setAuthError("System busy. Please wait a minute before trying again.");
       } else if (msg.includes("invalid login credentials") || msg.includes("invalid_grant")) {
-        setAuthError("Incorrect email or password. Please check your credentials.");
+        setAuthError("Incorrect email or password. If you just signed up, please confirm your email.");
       } else {
-        setAuthError(error.message || "Authentication failed. Please try again.");
+        setAuthError(errorMessage || "Authentication failed. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -202,11 +249,7 @@ export const PartnerPanel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (isRegistrationOpen) {
-      if ((window as any).captureLocationSilent) {
-        (window as any).captureLocationSilent();
-      }
-    }
+    // No longer need silent GPS capture
   }, [isRegistrationOpen]);
 
   const submitPartnerRegistration = async (e: React.FormEvent) => {
@@ -228,9 +271,6 @@ export const PartnerPanel: React.FC = () => {
       setIsSubmitting(true);
 
       try {
-        const currentLat = (window as any).currentLat;
-        const currentLng = (window as any).currentLng;
-
         const { error } = await supabase
            .from('partners')
            .insert([
@@ -246,9 +286,6 @@ export const PartnerPanel: React.FC = () => {
                    experience: regData.experience,
                    address: regData.address,
                    city: finalCityValue,
-                   location: currentLat && currentLng ? `POINT(${currentLng} ${currentLat})` : null,
-                   lat: currentLat,
-                   lng: currentLng,
                    pincode: regData.pincode,
                    status: 'available',
                    earnings: 0,
@@ -423,16 +460,40 @@ export const PartnerPanel: React.FC = () => {
               required
               disabled={isSubmitting}
             />
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-              value={authData.password}
-              onChange={e => setAuthData({...authData, password: e.target.value})}
-              required
-              disabled={isSubmitting}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                value={authData.password}
+                onChange={e => setAuthData({...authData, password: e.target.value})}
+                required
+                disabled={isSubmitting}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
+            </div>
             
+            <div className="flex justify-between items-center text-sm">
+              <button 
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-indigo-600 hover:text-indigo-800 font-medium"
+                disabled={isSubmitting}
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             {authError && (
               <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100 text-center animate-fadeIn">
                 {authError}

@@ -318,13 +318,17 @@ export const AdminPanel: React.FC = () => {
                         {booking.status === 'pending' ? (
                             <>
                                 <p className="text-xs font-bold text-red-500">Action Required: Assign Partner</p>
+                                <div className="mt-3">
+                                    <a href={waLink} target="_blank" className="w-full bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition flex justify-center items-center">
+                                        <i className="fab fa-whatsapp text-white mr-2"></i> Forward to Admin WhatsApp
+                                    </a>
+                                </div>
                                 <button 
-                                    onClick={() => (window as any).findPartners10km(booking.id, booking.lat || null, booking.lng || null, encodeURIComponent(JSON.stringify(booking)))} 
-                                    className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center mt-3"
+                                    onClick={() => setDispatchBooking(booking)}
+                                    className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center mt-2"
                                 >
-                                    <i className="fas fa-radar text-white mr-2"></i> Find Partners (10 KM)
+                                    <Search className="mr-2" size={16} /> Find Partner (Database)
                                 </button>
-                                <div id={`nearby-partners-${booking.id}`} className="mt-3 hidden bg-gray-50 rounded p-2 border border-gray-200"></div>
                                 <div className="flex gap-2 mt-2">
                                     <button 
                                         onClick={() => openRescheduleModal(booking)}

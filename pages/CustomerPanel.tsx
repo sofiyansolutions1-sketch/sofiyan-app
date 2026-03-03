@@ -113,10 +113,6 @@ export const CustomerPanel: React.FC = () => {
       if (savedLocation && !formData.address) {
         setFormData(prev => ({ ...prev, address: savedLocation }));
       }
-      // Trigger silent GPS capture
-      if ((window as any).captureLocationSilent) {
-        (window as any).captureLocationSilent();
-      }
     }
   }, [isBookingModalOpen, formData.address]);
 
@@ -288,10 +284,6 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
-      // Insert into Supabase
-      const currentLat = (window as any).currentLat;
-      const currentLng = (window as any).currentLng;
-
       const { error } = await supabase
         .from('bookings')
         .insert([
@@ -300,9 +292,6 @@ export const CustomerPanel: React.FC = () => {
             customer_phone: formData.contact,
             customer_address: formData.address,
             city: formData.city,
-            location: currentLat && currentLng ? `POINT(${currentLng} ${currentLat})` : null,
-            lat: currentLat,
-            lng: currentLng,
             pincode: formData.pincode,
             cart_items: cart,
             total_price: cartTotal,
