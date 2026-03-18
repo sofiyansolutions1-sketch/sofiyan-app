@@ -171,6 +171,43 @@ export const CustomerPanel: React.FC = () => {
   const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const cartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  // Coupon Logic
+  const validCoupons: Record<string, number> = {
+      'SAVE10': 10, 'EASY10': 10, 'QUICK10': 10,
+      'SOFIYAN15': 15, 'CLEAN15': 15, 'SMART15': 15,
+      'SUPER20': 20, 'MUMBAI20': 20, 'RELAX20': 20,
+      'MEGA30': 30, 'VIP30': 30, 'FESTIVAL30': 30,
+      'WELCOME40': 40, 'FIRST40': 40, 'BUMPER40': 40
+  };
+
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponMessage, setCouponMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null);
+
+  const discountAmount = appliedCoupon ? Math.round((cartTotal * validCoupons[appliedCoupon]) / 100) : 0;
+  const finalTotal = cartTotal - discountAmount;
+
+  const handleApplyCoupon = (codeToApply?: string) => {
+      const code = (codeToApply || couponCode).trim().toUpperCase();
+      if (!code) return;
+
+      if (validCoupons[code]) {
+          setAppliedCoupon(code);
+          setCouponCode(code);
+          const discount = Math.round((cartTotal * validCoupons[code]) / 100);
+          setCouponMessage({ text: `🎉 Yay! Coupon applied. You saved ₹${discount}!`, type: 'success' });
+      } else {
+          setAppliedCoupon(null);
+          setCouponMessage({ text: "❌ Invalid coupon code.", type: 'error' });
+      }
+  };
+
+  const removeCoupon = () => {
+      setAppliedCoupon(null);
+      setCouponCode('');
+      setCouponMessage(null);
+  };
+
   const handleBookService = (sub: SubService) => {
     addToCart(sub, selectedService?.name || 'General');
     // We don't open modal immediately anymore, we add to cart
@@ -294,7 +331,7 @@ export const CustomerPanel: React.FC = () => {
             city: formData.city,
             pincode: formData.pincode,
             cart_items: cart,
-            total_price: cartTotal,
+            total_price: finalTotal,
             service_date: formData.date,
             service_time: formData.time,
             notes: formData.description,
@@ -302,7 +339,9 @@ export const CustomerPanel: React.FC = () => {
             // Additional fields for admin tracking
             service_category: categoryName,
             sub_service_name: subServiceName,
-            commission_paid: false
+            commission_paid: false,
+            coupon_used: appliedCoupon || 'None',
+            discount_amount: discountAmount
           }
         ]);
 
@@ -605,33 +644,65 @@ export const CustomerPanel: React.FC = () => {
             <div className="grid gap-3 max-h-[60vh] overflow-y-auto pr-2">
               {selectedService?.subServices
                 .filter(sub => !searchQuery || sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || selectedService.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map((sub) => {
+                .map((sub, index) => {
                   const cartItem = cart.find(c => c.id === sub.id);
+                  
+                  // Psychological Pricing Logic
+                  const hash = sub.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + index;
+                  const discounts = [20, 25, 30, 40];
+                  const discountPercentage = discounts[hash % discounts.length];
+                  const fakeMRP = Math.round(sub.price / (1 - (discountPercentage / 100)));
+                  const savings = fakeMRP - sub.price;
+                  
+                  const tags = [
+                      { text: "🔥 Bestseller", classes: "bg-yellow-400 text-yellow-900" },
+                      { text: "⚡ Limited Time Offer", classes: "bg-red-500 text-white" },
+                      { text: "⭐ Top Rated", classes: "bg-blue-500 text-white" },
+                      null
+                  ];
+                  const tag = tags[hash % tags.length];
+
                   return (
                     <div
                       key={sub.id}
-                      className="p-4 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all flex justify-between items-center group"
+                      className="relative p-4 pt-6 border border-gray-100 rounded-xl bg-white shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center group overflow-hidden"
                     >
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{sub.name}</h4>
-                        <p className="text-sm text-gray-500 font-medium">₹{sub.price}</p>
+                      {tag && (
+                        <div className={`absolute top-0 left-0 ${tag.classes} text-[10px] font-bold px-2 py-1 rounded-br-lg shadow-sm z-10`}>
+                          {tag.text}
+                        </div>
+                      )}
+                      
+                      <div className="flex-1 w-full mb-3 sm:mb-0 pr-2">
+                        <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mt-1 sm:mt-0">{sub.name}</h4>
+                        
+                        <div className="flex items-center flex-wrap gap-1 mt-1">
+                          <span className="text-lg font-bold text-gray-900">₹{sub.price}</span>
+                          <span className="text-xs text-gray-400 line-through ml-1">₹{fakeMRP}</span>
+                          <span className="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-200 ml-1">
+                            {discountPercentage}% OFF
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-green-600 font-semibold mt-0.5">You save ₹{savings}!</p>
                       </div>
                       
-                      {cartItem ? (
-                        <div className="flex items-center gap-3 bg-white rounded-lg border border-indigo-100 px-2 py-1 shadow-sm">
-                            <button onClick={() => updateQuantity(cartItem.id, -1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Minus size={16}/></button>
-                            <span className="font-bold text-indigo-900 w-4 text-center">{cartItem.quantity}</span>
-                            <button onClick={() => updateQuantity(cartItem.id, 1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Plus size={16}/></button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleBookService(sub)}
-                          className="ml-4 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-indigo-700 hover:shadow-md transition-all active:scale-95 flex items-center gap-2"
-                        >
-                          <Plus size={16} />
-                          Add
-                        </button>
-                      )}
+                      <div className="w-full sm:w-auto flex justify-end">
+                        {cartItem ? (
+                          <div className="flex items-center gap-3 bg-white rounded-lg border border-indigo-200 px-2 py-1.5 shadow-sm">
+                              <button onClick={() => updateQuantity(cartItem.id, -1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Minus size={16}/></button>
+                              <span className="font-bold text-indigo-900 w-4 text-center">{cartItem.quantity}</span>
+                              <button onClick={() => updateQuantity(cartItem.id, 1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Plus size={16}/></button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleBookService(sub)}
+                            className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all active:scale-95 flex items-center gap-2"
+                          >
+                            <Plus size={16} />
+                            Add
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
               })}
@@ -710,9 +781,62 @@ export const CustomerPanel: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                  <span className="text-gray-600 font-medium">Total to Pay</span>
-                  <span className="text-xl font-extrabold text-indigo-700">₹{cartTotal}</span>
+
+                {/* Coupon Section */}
+                <div className="mt-4 mb-4 bg-white p-3 rounded-lg border border-dashed border-gray-300">
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Have a Coupon Code?</label>
+                    <div className="flex space-x-2">
+                        <input 
+                            type="text" 
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            placeholder="Enter code here" 
+                            className="flex-1 border rounded-lg px-3 py-2 text-sm uppercase outline-none focus:border-indigo-500"
+                            disabled={!!appliedCoupon}
+                        />
+                        {appliedCoupon ? (
+                            <button type="button" onClick={removeCoupon} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200">REMOVE</button>
+                        ) : (
+                            <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">APPLY</button>
+                        )}
+                    </div>
+                    {couponMessage && (
+                        <p className={`text-xs mt-1 font-semibold ${couponMessage.type === 'success' ? 'text-green-600' : 'text-red-500'} block`}>
+                            {couponMessage.text}
+                        </p>
+                    )}
+                    
+                    {!appliedCoupon && (
+                        <div className="mt-2">
+                            <p className="text-[10px] text-gray-500 mb-1">Available Offers (Tap to apply):</p>
+                            <div className="flex flex-wrap gap-1">
+                                <span onClick={() => handleApplyCoupon('SAVE10')} className="cursor-pointer bg-green-100 text-green-700 border border-green-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-green-200 transition">
+                                    SAVE10 (10% OFF)
+                                </span>
+                                
+                                <span onClick={() => handleApplyCoupon('SOFIYAN15')} className="cursor-pointer bg-yellow-100 text-yellow-700 border border-yellow-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-yellow-200 transition">
+                                    SOFIYAN15 (15% OFF)
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="flex justify-between items-center mt-2">
+                        <span className="font-bold text-gray-700">Subtotal:</span>
+                        <span className="font-bold text-gray-700">₹{cartTotal}</span>
+                    </div>
+                    {discountAmount > 0 && (
+                        <div className="flex justify-between items-center mt-1">
+                            <span className="font-bold text-green-600">Discount applied ({appliedCoupon}):</span>
+                            <span className="font-bold text-green-600">-₹{discountAmount}</span>
+                        </div>
+                    )}
+                    <div className="flex justify-between items-center mt-1 text-lg">
+                        <span className="font-black text-gray-900">Final Total:</span>
+                        <span className="font-black text-indigo-700">₹{finalTotal}</span>
+                    </div>
                 </div>
               </div>
 

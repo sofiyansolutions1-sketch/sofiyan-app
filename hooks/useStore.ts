@@ -25,7 +25,9 @@ export const useStore = () => {
     status: data.status,
     assignedPartnerId: data.assigned_partner_id,
     commissionPaid: data.commission_paid,
-    createdAt: data.created_at
+    createdAt: data.created_at,
+    couponUsed: data.coupon_used,
+    discountAmount: data.discount_amount
   });
 
   const mapPartnerFromDB = (data: any): Partner => ({

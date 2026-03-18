@@ -49,7 +49,9 @@ create table public.bookings (
   service_category text, -- Primary category for filtering
   sub_service_name text, -- Summary of services
   commission_paid boolean default false,
-  assigned_partner_id uuid references public.partners(id)
+  assigned_partner_id uuid references public.partners(id),
+  coupon_used text,
+  discount_amount numeric default 0
 );
 
 -- Indexes for Bookings Filtering and Retrieval

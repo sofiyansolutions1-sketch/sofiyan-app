@@ -47,6 +47,8 @@ export interface Booking {
   assignedPartnerId?: string;
   commissionPaid: boolean;
   createdAt: string;
+  couponUsed?: string;
+  discountAmount?: number;
 }
 
 export interface Partner {
