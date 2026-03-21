@@ -480,6 +480,72 @@ export const AdminPanel: React.FC = () => {
 
 
 
+  useEffect(() => {
+    (window as any).assignPartnerToLead = async (leadId: string, partnerId: string, partnerName: string, partnerPhone: string) => {
+      const booking = bookings.find(b => b.id === leadId);
+      if (!booking) return;
+
+      try {
+          const cleanPhone = partnerPhone.replace(/[^0-9]/g, '');
+
+          // 1. Generate Professional WhatsApp Message
+          let waText = `🚨 *NEW BOOKING ASSIGNED* 🚨\n\n`;
+          waText += `Hello *${partnerName}*, a new service request has been assigned to you:\n\n`;
+          waText += `👤 *Customer Name:* ${booking.customerName}\n`;
+          waText += `📞 *Contact:* ${booking.contactNumber}\n`;
+          waText += `🏠 *Address:* ${booking.address}, ${booking.city || ''} - ${booking.pinCode}\n`;
+          waText += `📅 *Date & Time:* ${booking.date} at ${booking.time}\n`;
+          
+          if(booking.discountAmount && booking.discountAmount > 0) {
+              waText += `💰 *To Collect:* ₹${booking.price} (After ₹${booking.discountAmount} Discount)\n\n`;
+          } else {
+              waText += `💰 *To Collect:* ₹${booking.price}\n\n`;
+          }
+
+          waText += `🛠️ *Services Required:*\n`;
+          if (booking.cartItems && booking.cartItems.length > 0) {
+              booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
+          } else {
+              waText += `👉 ${booking.subServiceName}\n`;
+          }
+          
+          waText += `\n*Please call the customer immediately to confirm!*`;
+
+          // 2. Generate the WhatsApp Deep Link
+          const whatsappUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waText)}`;
+
+          // 3. Update Database in Background
+          supabase.from('bookings').update({
+              status: 'Forwarded',
+              assigned_partner_name: partnerName,
+              assigned_partner_phone: cleanPhone
+          }).eq('id', booking.id).then(({error}) => {
+              if(error) console.error("DB Update Failed:", error);
+          });
+
+          // 4. Update UI and Open WhatsApp
+          if ((window as any).closeRadarModal) {
+              (window as any).closeRadarModal();
+          }
+          
+          // Optimistic update
+          updateBooking({
+              ...booking,
+              status: 'Forwarded',
+              assignedPartnerName: partnerName,
+              assignedPartnerPhone: cleanPhone
+          });
+          
+          // Open WhatsApp in a new tab
+          window.open(whatsappUrl, '_blank');
+
+      } catch (e: any) {
+          console.error("Format Error:", e);
+          alert("Something went wrong while formatting the lead data.");
+      }
+    };
+  }, [bookings, updateBooking]);
+
   // Generate WhatsApp Message for Admin
   const getAdminWhatsAppLink = (booking: Booking) => {
       // 1. Format Services Text
@@ -733,10 +799,14 @@ export const AdminPanel: React.FC = () => {
                                         <Send className="mr-2" size={16} /> Assign & Forward (Manual)
                                     </button>
                                     <button 
-                                        onClick={() => setDispatchBooking(booking)}
+                                        onClick={() => {
+                                            if ((window as any).openRadarModal) {
+                                                (window as any).openRadarModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
+                                            }
+                                        }}
                                         className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center"
                                     >
-                                        <Search className="mr-2" size={16} /> Find & Assign Partners (10km)
+                                        <Search className="mr-2" size={16} /> Hyper-Local Category Radar
                                     </button>
                                 </div>
                                 <div className="flex gap-2 mt-2">
@@ -761,7 +831,11 @@ export const AdminPanel: React.FC = () => {
                                 <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                     <div className="flex gap-2 w-full justify-end">
                                         <button 
-                                            onClick={() => setDispatchBooking(booking)}
+                                            onClick={() => {
+                                                if ((window as any).openRadarModal) {
+                                                    (window as any).openRadarModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
+                                                }
+                                            }}
                                             className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded border border-red-200 hover:bg-red-100 font-bold transition flex items-center"
                                             title="Remove & Re-assign Partner"
                                         >

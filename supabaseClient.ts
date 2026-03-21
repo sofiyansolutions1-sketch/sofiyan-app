@@ -6,6 +6,9 @@ const SUPABASE_ANON_KEY = ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY || "
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Expose to window for inline scripts
+(window as any).supabase = supabase;
+
 // Attach to window object so inline onclick="" can access it anywhere
 (window as any).cancelLeadByAdmin = async function(bookingId: string) {
     if(!confirm("Are you sure you want to CANCEL this lead? It will be removed from the active list.")) {
