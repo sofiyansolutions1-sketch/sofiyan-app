@@ -43,8 +43,10 @@ export interface Booking {
   subServiceName: string; // Summary string for backward compatibility
   cartItems?: CartItem[]; // Full cart details
   price: number;
-  status: 'pending' | 'accepted' | 'completed' | 'cancelled';
+  status: 'pending' | 'accepted' | 'completed' | 'cancelled' | 'Forwarded';
   assignedPartnerId?: string;
+  assignedPartnerName?: string;
+  assignedPartnerPhone?: string;
   commissionPaid: boolean;
   createdAt: string;
   couponUsed?: string;
@@ -54,9 +56,16 @@ export interface Booking {
 export interface Partner {
   id: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
   phone?: string; // Optional for backward compatibility
+  address?: string;
+  pincode?: string;
   city?: string;
+  lat?: number;
+  lng?: number;
+  partner_type?: 'Primary' | 'Secondary';
   categories?: string[];
   password?: string;
   status: 'available' | 'busy';

@@ -54,6 +54,120 @@
   <body>
     <div id="root"></div>
 
+    <!-- Premium Location Picker Modal -->
+    <div id="location-picker-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-indigo-500 p-5 text-white relative">
+                <button onclick="closeLocationModal()" class="absolute top-4 right-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-3 mb-1">
+                    <div class="bg-white bg-opacity-20 p-2 rounded-full">
+                        <i class="fas fa-map-marker-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Choose your Location</h3>
+                </div>
+                <p class="text-indigo-100 text-xs ml-11">Search for your location or use current location</p>
+            </div>
+            
+            <div class="p-6">
+                <div class="relative mb-5">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                    <input type="text" id="location-search-input" placeholder="Choose your Location" class="w-full border-2 border-indigo-100 rounded-xl pl-10 pr-4 py-3 text-sm outline-none focus:border-indigo-500 transition-colors font-medium text-gray-700" oninput="handleLocationSearch(this.value)">
+                    
+                    <div id="location-suggestions" class="absolute z-10 w-full bg-white border border-gray-100 shadow-lg rounded-xl mt-1 hidden max-h-48 overflow-y-auto"></div>
+                </div>
+                
+                <button onclick="autoDetectGPS()" class="w-full bg-gray-50 hover:bg-indigo-50 border border-gray-100 rounded-xl p-4 flex items-center space-x-4 transition-colors group">
+                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                        <i class="fas fa-location-arrow"></i>
+                    </div>
+                    <div class="text-left">
+                        <h4 class="font-bold text-gray-800 group-hover:text-indigo-700">Get Current Location</h4>
+                        <p class="text-xs text-gray-500">Using GPS</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          // Check sessionStorage instead of localStorage
+          const hasSeenLocationModal = sessionStorage.getItem('locationModalSeen');
+          
+          if (!hasSeenLocationModal) {
+              // Add a small delay for a smooth effect
+              setTimeout(() => {
+                  openLocationModal();
+              }, 500);
+          }
+      });
+
+      window.openLocationModal = function() {
+          document.getElementById('location-picker-modal').classList.remove('hidden');
+      };
+
+      window.closeLocationModal = function() {
+          document.getElementById('location-picker-modal').classList.add('hidden');
+          // Mark as seen for this specific browsing session only
+          sessionStorage.setItem('locationModalSeen', 'true');
+      };
+
+      window.handleLocationSearch = function(value) {
+          const suggestionsBox = document.getElementById('location-suggestions');
+          if (value.length > 2) {
+              // Mocking search suggestions based on input
+              suggestionsBox.innerHTML = `
+                  <div class="p-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-50 text-sm text-gray-700" onclick="selectLocation('${value}, City')">
+                      <i class="fas fa-map-marker-alt text-indigo-400 mr-2"></i> ${value}, City
+                  </div>
+                  <div class="p-3 hover:bg-indigo-50 cursor-pointer text-sm text-gray-700" onclick="selectLocation('${value} Area')">
+                      <i class="fas fa-map-marker-alt text-indigo-400 mr-2"></i> ${value} Area
+                  </div>
+              `;
+              suggestionsBox.classList.remove('hidden');
+          } else {
+              suggestionsBox.classList.add('hidden');
+          }
+      };
+
+      window.selectLocation = function(locationName) {
+          sessionStorage.setItem('userLocation', locationName);
+          window.dispatchEvent(new Event('locationUpdated'));
+          closeLocationModal();
+          
+          // Hide suggestions box and clear input
+          document.getElementById('location-suggestions').classList.add('hidden');
+          document.getElementById('location-search-input').value = '';
+      };
+
+      window.autoDetectGPS = function() {
+          if (navigator.geolocation) {
+              const btnHeader = document.querySelector('button[onclick="autoDetectGPS()"] h4');
+              const originalText = btnHeader.innerText;
+              btnHeader.innerText = "Detecting...";
+              
+              navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                      // Success
+                      const loc = "Current Location (GPS)";
+                      sessionStorage.setItem('userLocation', loc);
+                      window.dispatchEvent(new Event('locationUpdated'));
+                      closeLocationModal();
+                      btnHeader.innerText = originalText;
+                  },
+                  (error) => {
+                      // Error
+                      alert("Unable to retrieve your location. Please search manually.");
+                      btnHeader.innerText = originalText;
+                  }
+              );
+          } else {
+              alert("Geolocation is not supported by this browser.");
+          }
+      };
+    </script>
 
     <script type="module" src="./index.tsx"></script>
   </body>

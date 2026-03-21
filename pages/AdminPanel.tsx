@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+
+const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+};
 
 export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners, updatePartner } = useStore();
@@ -22,6 +34,300 @@ export const AdminPanel: React.FC = () => {
   const [partnerSearchResults, setPartnerSearchResults] = useState<any[]>([]);
   const [isSearchingPartners, setIsSearchingPartners] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Mini-CRM State
+  const [currentAdminTab, setCurrentAdminTab] = useState<'Pending' | 'Forwarded'>('Pending');
+  const [assignModalData, setAssignModalData] = useState<{ booking: Booking | null, partnerName: string, partnerPhone: string }>({ booking: null, partnerName: '', partnerPhone: '' });
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  // Add GMB Partner State
+  const [isAddPartnerModalOpen, setIsAddPartnerModalOpen] = useState(false);
+  const [newPartner, setNewPartner] = useState({
+    name: '',
+    phone: '',
+    services: '',
+    address: '',
+    pincode: ''
+  });
+  const [isSavingPartner, setIsSavingPartner] = useState(false);
+
+  const getCoordinatesFromAddress = async (address: string) => {
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error("Geocoding error:", error);
+      return null;
+    }
+  };
+
+  const saveSecondaryPartner = async () => {
+    const { name, phone, services, address, pincode } = newPartner;
+
+    if (!name.trim() || !phone.trim() || !address.trim() || !pincode.trim()) {
+        alert("Please fill all required fields (Name, Phone, Address, Pincode).");
+        return;
+    }
+
+    setIsSavingPartner(true);
+
+    try {
+        // 1. Convert Address to GPS Coordinates
+        const fullAddressQuery = `${address.trim()}, ${pincode.trim()}, Mumbai`;
+        const coords = await getCoordinatesFromAddress(fullAddressQuery);
+
+        // 2. Prepare Payload
+        const partnerData = {
+            name: name.trim(),
+            phone: phone.trim(),
+            city: 'Mumbai',
+            status: 'available', // Auto-active for manual entries
+            categories: services.split(',').map(s => s.trim()).filter(Boolean),
+            address: address.trim(),
+            pincode: pincode.trim(),
+            lat: coords ? coords.lat : null,
+            lng: coords ? coords.lng : null,
+            email: `${phone.trim()}@partner.com`, // Dummy email
+            earnings: 0,
+            completed_jobs: 0
+        };
+
+        // 3. Save to Supabase
+        const { error } = await supabase.from('secondary_partners').insert([partnerData]);
+
+        if (error) throw error;
+
+        alert(`✅ Secondary Partner '${name}' saved successfully! Location mapped: ${coords ? 'YES' : 'NO (Check Address)'}`);
+        
+        // Reset form
+        setNewPartner({ name: '', phone: '', services: '', address: '', pincode: '' });
+        setIsAddPartnerModalOpen(false);
+
+    } catch (e: any) {
+        console.error("Save Error:", e);
+        alert("Error saving partner: " + e.message);
+    } finally {
+        setIsSavingPartner(false);
+    }
+  };
+
+  // Bulk Upload State
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
+  const [bulkUploadProgress, setBulkUploadProgress] = useState({
+    total: 0,
+    processed: 0,
+    success: 0,
+    errors: [] as string[],
+    isComplete: false,
+    currentName: ''
+  });
+
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const text = e.target?.result as string;
+        await processCSVData(text);
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    event.target.value = '';
+  };
+
+  const processCSVData = async (csvText: string) => {
+    // Basic CSV parser (splits by newline, then comma)
+    const rows = csvText.split('\n').filter(row => row.trim().length > 0);
+    if (rows.length < 2) { 
+        alert("CSV is empty or missing data."); 
+        return; 
+    }
+
+    // Show Modal
+    setIsBulkUploadModalOpen(true);
+    
+    // Assuming Row 0 is headers. Start from Row 1.
+    const totalRows = rows.length - 1;
+    let successCount = 0;
+    const currentErrors: string[] = [];
+
+    setBulkUploadProgress({
+        total: totalRows,
+        processed: 0,
+        success: 0,
+        errors: [],
+        isComplete: false,
+        currentName: ''
+    });
+
+    for (let i = 1; i <= totalRows; i++) {
+        // Basic comma split (Note: won't handle commas inside quotes perfectly, keep CSV simple)
+        const cols = rows[i].split(',').map(c => c.trim()); 
+        
+        // Expected Format: Name, Phone, Service Types, Address, Pincode
+        if (cols.length >= 5) {
+            const name = cols[0];
+            const phone = cols[1];
+            const services = cols[2];
+            const address = cols[3];
+            const pincode = cols[4];
+
+            setBulkUploadProgress(prev => ({ ...prev, currentName: name }));
+
+            try {
+                // 1. Convert Address to GPS
+                const query = `${address}, ${pincode}, Mumbai`;
+                const coords = await getCoordinatesFromAddress(query);
+
+                // 2. Prepare Payload
+                const partnerData = {
+                    name: name,
+                    phone: phone,
+                    city: 'Mumbai',
+                    status: 'available',
+                    categories: services.split(',').map(s => s.trim()).filter(Boolean),
+                    address: address,
+                    pincode: pincode,
+                    lat: coords ? coords.lat : null,
+                    lng: coords ? coords.lng : null,
+                    email: `${phone}@partner.com`, // Dummy email
+                    earnings: 0,
+                    completed_jobs: 0
+                };
+
+                // 3. Save to Supabase
+                const { error } = await supabase.from('secondary_partners').insert([partnerData]);
+                if (error) throw error;
+                
+                successCount++;
+
+            } catch (err: any) {
+                currentErrors.push(`Row ${i} (${name}): ${err.message || 'Failed'}`);
+            }
+        } else {
+            currentErrors.push(`Row ${i}: Invalid format. Needs 5 columns.`);
+        }
+
+        // Update Progress Bar
+        setBulkUploadProgress(prev => ({
+            ...prev,
+            processed: i,
+            success: successCount,
+            errors: [...currentErrors]
+        }));
+
+        // CRITICAL: 1.5 Second delay to protect free Geocoding API
+        await sleep(1500); 
+    }
+
+    setBulkUploadProgress(prev => ({ ...prev, isComplete: true }));
+  };
+
+  const closeProgressModal = () => {
+    setIsBulkUploadModalOpen(false);
+    setBulkUploadProgress({
+        total: 0,
+        processed: 0,
+        success: 0,
+        errors: [],
+        isComplete: false,
+        currentName: ''
+    });
+  };
+
+  const openAssignModal = (booking: Booking) => {
+      setAssignModalData({
+          booking,
+          partnerName: booking.assignedPartnerName || '',
+          partnerPhone: booking.assignedPartnerPhone || ''
+      });
+  };
+
+  const closeAssignModal = () => {
+      setAssignModalData({ booking: null, partnerName: '', partnerPhone: '' });
+  };
+
+  const submitLeadAssignment = async () => {
+      const { booking, partnerName, partnerPhone } = assignModalData;
+      if (!booking) return;
+      
+      if (!partnerName || !partnerPhone || partnerPhone.length < 10) {
+          alert("❌ Please enter a valid Partner Name and a 10-digit Phone Number.");
+          return;
+      }
+
+      setIsAssigning(true);
+
+      try {
+          const cleanPhone = partnerPhone.replace(/[^0-9]/g, '');
+
+          // 1. Generate Professional WhatsApp Message
+          let waText = `🚨 *NEW BOOKING ASSIGNED* 🚨\n\n`;
+          waText += `Hello *${partnerName}*, a new service request has been assigned to you:\n\n`;
+          waText += `👤 *Customer Name:* ${booking.customerName}\n`;
+          waText += `📞 *Contact:* ${booking.contactNumber}\n`;
+          waText += `🏠 *Address:* ${booking.address}, ${booking.city || ''} - ${booking.pinCode}\n`;
+          waText += `📅 *Date & Time:* ${booking.date} at ${booking.time}\n`;
+          
+          if(booking.discountAmount && booking.discountAmount > 0) {
+              waText += `💰 *To Collect:* ₹${booking.price} (After ₹${booking.discountAmount} Discount)\n\n`;
+          } else {
+              waText += `💰 *To Collect:* ₹${booking.price}\n\n`;
+          }
+
+          waText += `🛠️ *Services Required:*\n`;
+          if (booking.cartItems && booking.cartItems.length > 0) {
+              booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
+          } else {
+              waText += `👉 ${booking.subServiceName}\n`;
+          }
+          
+          waText += `\n*Please call the customer immediately to confirm!*`;
+
+          // 2. Generate the WhatsApp Deep Link
+          const whatsappUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waText)}`;
+
+          // 3. Update Database in Background
+          supabase.from('bookings').update({
+              status: 'Forwarded',
+              assigned_partner_name: partnerName,
+              assigned_partner_phone: cleanPhone
+          }).eq('id', booking.id).then(({error}) => {
+              if(error) console.error("DB Update Failed:", error);
+          });
+
+          // 4. Update UI and Open WhatsApp
+          closeAssignModal();
+          
+          // Optimistic update
+          updateBooking({
+              ...booking,
+              status: 'Forwarded',
+              assignedPartnerName: partnerName,
+              assignedPartnerPhone: cleanPhone
+          });
+          
+          // Open WhatsApp in a new tab
+          window.open(whatsappUrl, '_blank');
+
+      } catch (e: any) {
+          console.error("Format Error:", e);
+          alert("Something went wrong while formatting the lead data.");
+      } finally {
+          setIsAssigning(false);
+      }
+  };
 
 
 
@@ -107,26 +413,56 @@ export const AdminPanel: React.FC = () => {
 
   // Real Supabase Partner Search Logic
   const handlePartnerSearch = async () => {
-    const query = partnerSearchQuery.trim();
-    if (!query) {
-        setPartnerSearchResults([]);
-        setHasSearched(false);
-        return;
-    }
-
     setIsSearchingPartners(true);
     setHasSearched(true);
     setPartnerSearchResults([]);
 
     try {
-        // Query Supabase: Search in 'pincode' OR 'address' OR 'city'
-        const { data, error } = await supabase
-            .from('partners')
-            .select('*')
-            .or(`pincode.ilike.%${query}%,address.ilike.%${query}%,city.ilike.%${query}%`);
+        const query = partnerSearchQuery.trim();
+        
+        let primaryQuery = supabase.from('primary_partners').select('*');
+        let secondaryQuery = supabase.from('secondary_partners').select('*');
+        
+        if (query) {
+            primaryQuery = primaryQuery.or(`pincode.ilike.%${query}%,address.ilike.%${query}%,city.ilike.%${query}%`);
+            secondaryQuery = secondaryQuery.or(`pincode.ilike.%${query}%,address.ilike.%${query}%,city.ilike.%${query}%`);
+        }
 
-        if (error) throw error;
-        setPartnerSearchResults(data || []);
+        const [primaryRes, secondaryRes] = await Promise.all([primaryQuery, secondaryQuery]);
+        
+        if (primaryRes.error) throw primaryRes.error;
+        if (secondaryRes.error) throw secondaryRes.error;
+
+        const primaryData = (primaryRes.data || []).map((p: any) => ({ ...p, partner_type: 'Primary' }));
+        const secondaryData = (secondaryRes.data || []).map((p: any) => ({ ...p, partner_type: 'Secondary' }));
+
+        let results = [...primaryData, ...secondaryData];
+
+        // If we have a booking with lat/lng, calculate distance and sort
+        if (dispatchBooking?.lat && dispatchBooking?.lng) {
+            results = results.map(partner => {
+                if (partner.lat && partner.lng) {
+                    const distance = calculateDistanceKM(dispatchBooking.lat!, dispatchBooking.lng!, partner.lat, partner.lng);
+                    return { ...partner, distance };
+                }
+                return { ...partner, distance: Infinity };
+            });
+
+            // Filter within 10km if no manual query is provided
+            if (!query) {
+                results = results.filter(p => p.distance <= 10);
+            }
+
+            // Sort: Primary first, then by distance
+            results.sort((a, b) => {
+                const aType = a.partner_type === 'Primary' ? 0 : 1;
+                const bType = b.partner_type === 'Primary' ? 0 : 1;
+                if (aType !== bType) return aType - bType;
+                return (a.distance || Infinity) - (b.distance || Infinity);
+            });
+        }
+
+        setPartnerSearchResults(results);
     } catch (error) {
         console.error('Error searching partners:', error);
         alert('Failed to search partners. Please check connection.');
@@ -134,6 +470,13 @@ export const AdminPanel: React.FC = () => {
         setIsSearchingPartners(false);
     }
   };
+
+  useEffect(() => {
+    if (dispatchBooking) {
+        handlePartnerSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatchBooking]);
 
 
 
@@ -164,13 +507,27 @@ export const AdminPanel: React.FC = () => {
       return `https://wa.me/919219345455?text=${encodedWaText}`;
   };
 
-  const getWhatsAppLink = (partner: any) => {
-      // WhatsApp Message Template (Encoded for URL)
-      const waMessage = encodeURIComponent(`📢 प्रिय पार्टनर,\nआपके nearby area से एक नई लीड आई है।\nतुरंत sofiyan.com पर जाकर लीड Accept करें और ग्राहक से संपर्क करें।\n⏰ ध्यान दें:\n5 मिनट के अंदर लीड Accept नहीं की गई तो यह किसी दूसरे पार्टनर को दे दी जाएगी。\n✔ Quality service mandatory\n💰 Service ke baad 25% commission immediate\n❌ Commission delay = Future leads STOP.`);
-      return `https://wa.me/91${partner.phone}?text=${waMessage}`;
-  };
-
   const renderPartnerCell = (booking: Booking) => {
+    if (booking.assignedPartnerName) {
+      return (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-indigo-700 font-medium text-sm">
+             <User size={14} /> {booking.assignedPartnerName}
+          </div>
+          {booking.assignedPartnerPhone ? (
+             <a 
+               href={`tel:${booking.assignedPartnerPhone}`} 
+               className="inline-flex items-center gap-1.5 text-xs text-blue-600 font-medium hover:text-white hover:bg-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-md border border-blue-100 transition-all shadow-sm"
+             >
+               <Phone size={12} className="fill-current" /> Call Partner
+             </a>
+          ) : (
+             <span className="text-xs text-gray-400">No contact info</span>
+          )}
+        </div>
+      );
+    }
+
     if (!booking.assignedPartnerId) {
       return <span className="text-gray-400 italic text-xs">Waiting for partner...</span>;
     }
@@ -234,11 +591,40 @@ export const AdminPanel: React.FC = () => {
   const pendingJobs = bookings.filter(b => b.status === 'pending').length;
   const completedJobs = bookings.filter(b => b.status === 'completed').length;
 
+  const displayedBookings = bookings.filter(b => {
+    if (currentAdminTab === 'Pending') return b.status === 'pending';
+    if (currentAdminTab === 'Forwarded') return b.status === 'Forwarded' || b.status === 'accepted' || b.status === 'completed';
+    return false;
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Founder Dashboard</h1>
-        <p className="text-gray-500">Overview of business performance</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Founder Dashboard</h1>
+          <p className="text-gray-500">Overview of business performance</p>
+        </div>
+        <div className="flex gap-2">
+            <button 
+              onClick={() => setIsAddPartnerModalOpen(true)} 
+              className="bg-indigo-800 text-white text-sm font-bold py-2 px-4 rounded hover:bg-indigo-900 flex items-center"
+            >
+              <UserPlus className="mr-2" size={16} /> Add GMB Partner
+            </button>
+            <input 
+              type="file" 
+              id="csv-upload-file" 
+              accept=".csv" 
+              className="hidden" 
+              onChange={handleCSVUpload} 
+            />
+            <button 
+              onClick={() => document.getElementById('csv-upload-file')?.click()} 
+              className="bg-green-700 text-white text-sm font-bold py-2 px-4 rounded hover:bg-green-800 flex items-center"
+            >
+              <FileSpreadsheet className="mr-2" size={16} /> Bulk Upload (CSV)
+            </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -275,11 +661,28 @@ export const AdminPanel: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
             <h3 className="font-bold text-gray-800">Lead Management</h3>
             <span className="text-xs text-gray-500 bg-white border border-gray-200 px-3 py-1 rounded-full">
-              {bookings.length} Total Records
+              {displayedBookings.length} Total Records
             </span>
           </div>
+          
+          {/* Tabs */}
+          <div className="flex border-b">
+              <button 
+                  onClick={() => setCurrentAdminTab('Pending')} 
+                  className={`flex-1 py-3 text-center font-bold transition-colors ${currentAdminTab === 'Pending' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'}`}
+              >
+                  New Leads
+              </button>
+              <button 
+                  onClick={() => setCurrentAdminTab('Forwarded')} 
+                  className={`flex-1 py-3 text-center font-bold transition-colors ${currentAdminTab === 'Forwarded' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' : 'text-gray-500 hover:text-indigo-600 hover:bg-gray-50'}`}
+              >
+                  Forwarded
+              </button>
+          </div>
+
           <div className="p-4 bg-gray-50">
-            {bookings.map(booking => {
+            {displayedBookings.map(booking => {
                const waLink = getAdminWhatsAppLink(booking);
                let servicesText = "Services";
                if (booking.cartItems && booking.cartItems.length > 0) {
@@ -307,7 +710,11 @@ export const AdminPanel: React.FC = () => {
                     </div>
                     
                     <div className="mb-3 text-sm text-gray-700 space-y-1">
-                        <p><User size={14} className="inline text-indigo-500 w-5 mr-1"/> <strong>Customer:</strong> {booking.customerName} <a href={`tel:${booking.contactNumber}`} className="text-blue-500 ml-1"><Phone size={12} className="inline"/></a></p>
+                        <p><User size={14} className="inline text-indigo-500 w-5 mr-1"/> <strong>Customer:</strong> {booking.customerName}</p>
+                        <div className="flex space-x-2 mt-2 mb-3">
+                            <a href={`tel:${booking.contactNumber}`} className="flex-1 bg-blue-100 text-blue-700 text-xs font-bold py-1.5 rounded text-center hover:bg-blue-200 flex items-center justify-center"><Phone size={12} className="mr-1"/> Call</a>
+                            <a href={`https://wa.me/91${booking.contactNumber}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-green-100 text-green-700 text-xs font-bold py-1.5 rounded text-center hover:bg-green-200 flex items-center justify-center"><Send size={12} className="mr-1"/> Chat</a>
+                        </div>
                         <p><MapPin size={14} className="inline text-red-500 w-5 mr-1"/> <strong>Address:</strong> {booking.address}, {booking.city || ''} ({booking.pinCode})</p>
                         <p><Clock size={14} className="inline text-blue-500 w-5 mr-1"/> <strong>Time:</strong> {booking.date} | {booking.time}</p>
                         <p><Activity size={14} className="inline text-gray-500 w-5 mr-1"/> <strong>Job:</strong> {servicesText}</p>
@@ -318,17 +725,20 @@ export const AdminPanel: React.FC = () => {
                         {booking.status === 'pending' ? (
                             <>
                                 <p className="text-xs font-bold text-red-500">Action Required: Assign Partner</p>
-                                <div className="mt-3">
-                                    <a href={waLink} target="_blank" className="w-full bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition flex justify-center items-center">
-                                        <i className="fab fa-whatsapp text-white mr-2"></i> Forward to Admin WhatsApp
-                                    </a>
+                                <div className="mt-3 space-y-2">
+                                    <button 
+                                        onClick={() => openAssignModal(booking)}
+                                        className="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition flex justify-center items-center"
+                                    >
+                                        <Send className="mr-2" size={16} /> Assign & Forward (Manual)
+                                    </button>
+                                    <button 
+                                        onClick={() => setDispatchBooking(booking)}
+                                        className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center"
+                                    >
+                                        <Search className="mr-2" size={16} /> Find & Assign Partners (10km)
+                                    </button>
                                 </div>
-                                <button 
-                                    onClick={() => setDispatchBooking(booking)}
-                                    className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center mt-2"
-                                >
-                                    <Search className="mr-2" size={16} /> Find Partner (Database)
-                                </button>
                                 <div className="flex gap-2 mt-2">
                                     <button 
                                         onClick={() => openRescheduleModal(booking)}
@@ -342,7 +752,7 @@ export const AdminPanel: React.FC = () => {
                                     </button>
                                 </div>
                             </>
-                        ) : (booking.status === 'accepted') ? (
+                        ) : (booking.status === 'accepted' || booking.status === 'Forwarded') ? (
                             <>
                                 <div className="flex items-center gap-2">
                                     <p className="text-xs font-bold text-green-600 flex items-center"><CheckCircle size={14} className="mr-1"/> Partner Assigned</p>
@@ -350,6 +760,13 @@ export const AdminPanel: React.FC = () => {
                                 </div>
                                 <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                     <div className="flex gap-2 w-full justify-end">
+                                        <button 
+                                            onClick={() => setDispatchBooking(booking)}
+                                            className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded border border-red-200 hover:bg-red-100 font-bold transition flex items-center"
+                                            title="Remove & Re-assign Partner"
+                                        >
+                                            <Trash2 size={14} className="mr-1" /> Remove & Re-assign
+                                        </button>
                                         <button 
                                             onClick={() => openRescheduleModal(booking)}
                                             className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded border border-blue-200 hover:bg-blue-100 font-bold transition flex items-center"
@@ -540,38 +957,51 @@ export const AdminPanel: React.FC = () => {
 
                 {!isSearchingPartners && partnerSearchResults.length > 0 && (
                    partnerSearchResults.map(partner => {
-                     // Format categories for display
-                     let cats = "Partner";
-                     if(partner.categories) {
-                        cats = Array.isArray(partner.categories) ? partner.categories.join(', ') : partner.categories;
-                     }
-                     
                      return (
                         <div key={partner.id} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 hover:bg-indigo-50 transition-colors animate-fadeIn">
                             <div>
-                                <p className="text-sm font-bold text-gray-800">{partner.first_name} {partner.last_name || ''} <span className="text-xs font-normal text-indigo-600">({cats})</span></p>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <p className="text-sm font-bold text-gray-800">
+                                        {partner.partner_type === 'Primary' ? `${partner.first_name} ${partner.last_name || ''}` : partner.name}
+                                    </p>
+                                    {partner.partner_type === 'Primary' ? (
+                                        <span className="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-200">⭐ Primary</span>
+                                    ) : (
+                                        <span className="bg-gray-200 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-300">🗂️ Secondary (GMB)</span>
+                                    )}
+                                </div>
                                 <p className="text-xs text-gray-600 flex items-center gap-1 mt-0.5">
                                     <MapPin size={10} className="text-red-400"/> 
                                     {partner.city ? partner.city + ', ' : ''}{partner.address ? (partner.address.length > 25 ? partner.address.substring(0, 25) + '...' : partner.address) : 'Location NA'} - {partner.pincode}
                                 </p>
+                                {partner.distance !== undefined && partner.distance !== Infinity && (
+                                    <p className="text-xs text-indigo-600 font-semibold mt-1">
+                                        📍 {partner.distance.toFixed(1)} km away
+                                    </p>
+                                )}
                             </div>
-                            <div className="flex space-x-2">
+                            <div className="flex flex-col space-y-2 items-end">
                                 <a 
                                   href={`tel:${partner.phone}`} 
-                                  className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition" 
+                                  className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded font-bold hover:bg-blue-200 transition flex items-center justify-center w-full" 
                                   title="Call Partner"
                                 >
-                                    <Phone size={14} />
+                                    <Phone size={12} className="mr-1" /> Call
                                 </a>
-                                <a 
-                                  href={getWhatsAppLink(partner)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition" 
-                                  title="Send WhatsApp Alert"
+                                <button 
+                                  onClick={() => {
+                                      setAssignModalData({
+                                          booking: dispatchBooking,
+                                          partnerName: partner.partner_type === 'Primary' ? `${partner.first_name} ${partner.last_name || ''}`.trim() : partner.name,
+                                          partnerPhone: partner.phone || ''
+                                      });
+                                      setDispatchBooking(null);
+                                  }}
+                                  className="text-xs bg-green-600 text-white px-3 py-1.5 rounded font-bold hover:bg-green-700 transition flex items-center justify-center w-full" 
+                                  title="Assign & WhatsApp Info"
                                 >
-                                    <Send size={14} />
-                                </a>
+                                    <Send size={12} className="mr-1" /> Assign & WhatsApp Info
+                                </button>
                             </div>
                         </div>
                      );
@@ -582,6 +1012,195 @@ export const AdminPanel: React.FC = () => {
         </div>
       </Modal>
 
+      {/* Assign Partner Modal (Manual CRM) */}
+      <Modal 
+        isOpen={!!assignModalData.booking} 
+        onClose={closeAssignModal}
+        title="Assign Partner & Forward Lead"
+      >
+        <div className="space-y-4">
+          <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-800 mb-4 border border-gray-200">
+             <p className="font-bold">Assigning Lead #{assignModalData.booking?.id.substring(0,6).toUpperCase()}</p>
+             <p className="text-xs text-gray-500 mt-1"><MapPin size={12} className="inline mr-1"/>{assignModalData.booking?.address} ({assignModalData.booking?.pinCode})</p>
+          </div>
+
+          <div className="space-y-3">
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Partner Name</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Rahul Sharma" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+                  value={assignModalData.partnerName}
+                  onChange={(e) => setAssignModalData({...assignModalData, partnerName: e.target.value})}
+                />
+             </div>
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Partner WhatsApp Number</label>
+                <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                        +91
+                    </span>
+                    <input 
+                      type="tel" 
+                      placeholder="9876543210" 
+                      maxLength={10}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+                      value={assignModalData.partnerPhone}
+                      onChange={(e) => setAssignModalData({...assignModalData, partnerPhone: e.target.value.replace(/\D/g, '')})}
+                    />
+                </div>
+             </div>
+          </div>
+
+          <div className="pt-4 flex gap-3">
+             <button 
+               onClick={closeAssignModal}
+               className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition"
+             >
+               Cancel
+             </button>
+             <button 
+               onClick={submitLeadAssignment}
+               disabled={isAssigning}
+               className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 shadow-md flex justify-center items-center transition disabled:opacity-70 disabled:cursor-not-allowed"
+             >
+               {isAssigning ? (
+                   <><Loader2 size={16} className="mr-2 animate-spin" /> Saving...</>
+               ) : (
+                   <><Send size={16} className="mr-2" /> Assign & Send</>
+               )}
+             </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Add GMB Partner Modal */}
+      <Modal 
+        isOpen={isAddPartnerModalOpen} 
+        onClose={() => setIsAddPartnerModalOpen(false)}
+        title="Add Secondary Partner (GMB)"
+      >
+        <div className="space-y-4">
+            <div className="space-y-3">
+                <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Full Name / Shop Name</label>
+                    <input 
+                      type="text" 
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                      value={newPartner.name}
+                      onChange={(e) => setNewPartner({...newPartner, name: e.target.value})}
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">WhatsApp Number</label>
+                    <div className="flex">
+                        <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            +91
+                        </span>
+                        <input 
+                          type="tel" 
+                          maxLength={10}
+                          className="flex-1 border border-gray-300 rounded-r-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                          value={newPartner.phone}
+                          onChange={(e) => setNewPartner({...newPartner, phone: e.target.value.replace(/\D/g, '')})}
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Service Types (e.g., AC Repair, Plumber)</label>
+                    <input 
+                      type="text" 
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                      value={newPartner.services}
+                      onChange={(e) => setNewPartner({...newPartner, services: e.target.value})}
+                    />
+                </div>
+                <div className="flex space-x-2">
+                    <div className="w-2/3">
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Area / Address</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. Andheri West" 
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                          value={newPartner.address}
+                          onChange={(e) => setNewPartner({...newPartner, address: e.target.value})}
+                        />
+                    </div>
+                    <div className="w-1/3">
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Pincode</label>
+                        <input 
+                          type="text" 
+                          maxLength={6}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                          value={newPartner.pincode}
+                          onChange={(e) => setNewPartner({...newPartner, pincode: e.target.value.replace(/\D/g, '')})}
+                        />
+                    </div>
+                </div>
+            </div>
+            
+            <button 
+              onClick={saveSecondaryPartner}
+              disabled={isSavingPartner}
+              className="w-full mt-5 bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                {isSavingPartner ? (
+                    <><Loader2 size={16} className="mr-2 animate-spin" /> Locating & Saving...</>
+                ) : (
+                    'Save Partner to Database'
+                )}
+            </button>
+        </div>
+      </Modal>
+
+      {/* Bulk Upload Progress Modal */}
+      {isBulkUploadModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-[60] flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 text-center">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Uploading Partners...</h3>
+                <p className="text-xs text-gray-500 mb-4">Please do not close this window. Processing addresses takes time.</p>
+                
+                <div className="w-full bg-gray-200 rounded-full h-4 mb-2 overflow-hidden">
+                    <div 
+                        className="bg-indigo-600 h-4 rounded-full transition-all duration-300" 
+                        style={{ width: `${bulkUploadProgress.total > 0 ? Math.round((bulkUploadProgress.processed / bulkUploadProgress.total) * 100) : 0}%` }}
+                    ></div>
+                </div>
+                
+                <p className="text-sm font-bold text-indigo-700 mb-1">
+                    {bulkUploadProgress.processed} / {bulkUploadProgress.total} Processed
+                </p>
+                
+                {!bulkUploadProgress.isComplete && bulkUploadProgress.currentName && (
+                    <p className="text-xs text-gray-600 mb-4 animate-pulse">
+                        Processing: {bulkUploadProgress.currentName}...
+                    </p>
+                )}
+
+                {bulkUploadProgress.isComplete && (
+                    <p className="text-sm font-bold text-green-600 mb-4">
+                        ✅ Complete! Successfully added {bulkUploadProgress.success} out of {bulkUploadProgress.total} partners.
+                    </p>
+                )}
+
+                <div className="mt-4 text-xs text-red-500 max-h-24 overflow-y-auto text-left space-y-1">
+                    {bulkUploadProgress.errors.map((err, idx) => (
+                        <p key={idx}>{err}</p>
+                    ))}
+                </div>
+                
+                {bulkUploadProgress.isComplete && (
+                    <button 
+                        onClick={closeProgressModal} 
+                        className="mt-5 bg-gray-800 text-white font-bold py-2 px-6 rounded hover:bg-gray-900 transition"
+                    >
+                        Close
+                    </button>
+                )}
+            </div>
+        </div>
+      )}
 
     </div>
   );

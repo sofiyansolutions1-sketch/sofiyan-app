@@ -58,7 +58,7 @@ export const PartnerPanel: React.FC = () => {
     // Check Supabase Connection
     const checkConnection = async () => {
         try {
-            const { error } = await supabase.from('partners').select('count', { count: 'exact', head: true });
+            const { error } = await supabase.from('primary_partners').select('count', { count: 'exact', head: true });
             if (error) {
                 console.error("Supabase Connection Error:", error);
                 if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.code === '401') {
@@ -118,7 +118,7 @@ export const PartnerPanel: React.FC = () => {
   const syncUserWithStore = async (email: string) => {
     try {
         const { data } = await supabase
-            .from('partners')
+            .from('primary_partners')
             .select('*')
             .eq('email', email)
             .single();
@@ -127,12 +127,15 @@ export const PartnerPanel: React.FC = () => {
            const partner: Partner = {
                id: data.id,
                name: `${data.first_name} ${data.last_name}`,
+               first_name: data.first_name,
+               last_name: data.last_name,
                email: data.email,
                phone: data.phone,
                city: data.city,
                status: data.status,
                earnings: data.earnings || 0,
-               completedJobs: data.completed_jobs || 0
+               completedJobs: data.completed_jobs || 0,
+               partner_type: 'Primary'
            };
            setCurrentUser(partner);
         } else {
@@ -272,7 +275,7 @@ export const PartnerPanel: React.FC = () => {
 
       try {
         const { error } = await supabase
-           .from('partners')
+           .from('primary_partners')
            .insert([
                { 
                    id: session.user.id,

@@ -24,22 +24,40 @@ export const useStore = () => {
     price: data.total_price,
     status: data.status,
     assignedPartnerId: data.assigned_partner_id,
+    assignedPartnerName: data.assigned_partner_name,
+    assignedPartnerPhone: data.assigned_partner_phone,
     commissionPaid: data.commission_paid,
     createdAt: data.created_at,
     couponUsed: data.coupon_used,
     discountAmount: data.discount_amount
   });
 
-  const mapPartnerFromDB = (data: any): Partner => ({
+  const mapPrimaryPartnerFromDB = (data: any): Partner => ({
     id: data.id,
     name: `${data.first_name} ${data.last_name}`,
+    first_name: data.first_name,
+    last_name: data.last_name,
     email: data.email,
     phone: data.phone,
     city: data.city,
     categories: data.categories,
     status: data.status,
     earnings: data.earnings || 0,
-    completedJobs: data.completed_jobs || 0
+    completedJobs: data.completed_jobs || 0,
+    partner_type: 'Primary'
+  });
+
+  const mapSecondaryPartnerFromDB = (data: any): Partner => ({
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    city: data.city,
+    categories: data.categories,
+    status: data.status,
+    earnings: data.earnings || 0,
+    completedJobs: data.completed_jobs || 0,
+    partner_type: 'Secondary'
   });
 
   const fetchBookings = useCallback(async () => {
@@ -52,8 +70,15 @@ export const useStore = () => {
   }, []);
 
   const fetchPartners = useCallback(async () => {
-    const { data } = await supabase.from('partners').select('*');
-    if (data) setPartners(data.map(mapPartnerFromDB));
+    const [primaryRes, secondaryRes] = await Promise.all([
+      supabase.from('primary_partners').select('*'),
+      supabase.from('secondary_partners').select('*')
+    ]);
+    
+    const primary = primaryRes.data ? primaryRes.data.map(mapPrimaryPartnerFromDB) : [];
+    const secondary = secondaryRes.data ? secondaryRes.data.map(mapSecondaryPartnerFromDB) : [];
+    
+    setPartners([...primary, ...secondary]);
   }, []);
 
   useEffect(() => {
@@ -68,13 +93,18 @@ export const useStore = () => {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => fetchBookings())
       .subscribe();
       
-    const partnersSub = supabase.channel('partners-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'partners' }, () => fetchPartners())
+    const primaryPartnersSub = supabase.channel('primary-partners-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'primary_partners' }, () => fetchPartners())
+      .subscribe();
+
+    const secondaryPartnersSub = supabase.channel('secondary-partners-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'secondary_partners' }, () => fetchPartners())
       .subscribe();
 
     return () => {
       supabase.removeChannel(bookingsSub);
-      supabase.removeChannel(partnersSub);
+      supabase.removeChannel(primaryPartnersSub);
+      supabase.removeChannel(secondaryPartnersSub);
     };
   }, [fetchBookings, fetchPartners]);
 
@@ -108,7 +138,9 @@ export const useStore = () => {
   const updatePartner = async (updatedPartner: Partner) => {
      setPartners(prev => prev.map(p => p.id === updatedPartner.id ? updatedPartner : p));
 
-     const { error } = await supabase.from('partners').update({
+     const table = updatedPartner.partner_type === 'Secondary' ? 'secondary_partners' : 'primary_partners';
+
+     const { error } = await supabase.from(table).update({
          status: updatedPartner.status,
          earnings: updatedPartner.earnings,
          completed_jobs: updatedPartner.completedJobs

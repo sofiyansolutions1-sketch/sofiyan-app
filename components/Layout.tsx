@@ -45,6 +45,22 @@ const siteContent = {
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [activeContent, setActiveContent] = useState<keyof typeof siteContent | null>(null);
+  const [userLocation, setUserLocation] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    // Check for saved location on mount
+    const saved = sessionStorage.getItem('userLocation');
+    if (saved) {
+      setUserLocation(saved);
+    }
+
+    // Listen for custom event if we want to update it from outside React
+    const handleLocationUpdate = () => {
+      setUserLocation(sessionStorage.getItem('userLocation'));
+    };
+    window.addEventListener('locationUpdated', handleLocationUpdate);
+    return () => window.removeEventListener('locationUpdated', handleLocationUpdate);
+  }, []);
 
   const openContent = (key: keyof typeof siteContent) => {
     setActiveContent(key);
@@ -65,7 +81,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <span className="flex items-center gap-1"><Phone size={14} /> {HELPLINE}</span>
             <span className="hidden sm:flex items-center gap-1"><Mail size={14} /> {EMAIL}</span>
           </div>
-          <div className="font-semibold tracking-wide">Trusted Home Services</div>
+          <div className="flex items-center space-x-4">
+            <span id="header-location-display" className="hidden sm:flex items-center gap-1 font-medium text-indigo-200 cursor-pointer hover:text-white transition-colors" onClick={() => {
+              if ((window as any).openLocationModal) (window as any).openLocationModal();
+            }}>
+              <i className="fas fa-map-marker-alt"></i> {userLocation || "Select Location"}
+            </span>
+            <div className="font-semibold tracking-wide">Trusted Home Services</div>
+          </div>
         </div>
       </div>
 
