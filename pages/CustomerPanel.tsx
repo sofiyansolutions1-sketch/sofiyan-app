@@ -109,12 +109,23 @@ export const CustomerPanel: React.FC = () => {
   // Auto-fill address from localStorage when booking modal opens
   useEffect(() => {
     if (isBookingModalOpen) {
-      const savedLocation = localStorage.getItem('savedCustomerLocation');
-      if (savedLocation && !formData.address) {
-        setFormData(prev => ({ ...prev, address: savedLocation }));
+      const savedLocation = sessionStorage.getItem('userLocation');
+      if (savedLocation && !formData.city) {
+        const city = savedLocation.split(',')[0].trim();
+        setFormData(prev => ({ ...prev, city: city }));
       }
     }
-  }, [isBookingModalOpen, formData.address]);
+    
+    const handleLocationUpdate = () => {
+      const savedLocation = sessionStorage.getItem('userLocation');
+      if (savedLocation) {
+        const city = savedLocation.split(',')[0].trim();
+        setFormData(prev => ({ ...prev, city: city }));
+      }
+    };
+    window.addEventListener('locationUpdated', handleLocationUpdate);
+    return () => window.removeEventListener('locationUpdated', handleLocationUpdate);
+  }, [isBookingModalOpen, formData.city]);
 
   // 1. Flatten all sub-services for Global Search & Featured Section
   const allSubServices = useMemo(() => {
@@ -321,15 +332,6 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
-      // DEFENSIVE FIX: Strictly pull from location picker variables, parse to Number, and handle nulls.
-      // Assuming your Location Modal saves selected data to window.customerSelectedLat/Lng
-      const win = window as any;
-      const finalLat = win.customerSelectedLat && !isNaN(win.customerSelectedLat) ? parseFloat(win.customerSelectedLat) : null;
-      const finalLng = win.customerSelectedLng && !isNaN(win.customerSelectedLng) ? parseFloat(win.customerSelectedLng) : null;
-
-      // DEBUG LOG: Vital to see what is happening in the browser console.
-      console.log("🚀 SENDING BOOKING GPS TO SUPABASE:", finalLat, finalLng, "(Type:", typeof finalLat, ")");
-
       const { error } = await supabase
         .from('bookings')
         .insert([
@@ -339,8 +341,6 @@ export const CustomerPanel: React.FC = () => {
             customer_address: formData.address,
             city: formData.city,
             pincode: formData.pincode,
-            lat: finalLat,
-            lng: finalLng,
             cart_items: cart,
             total_price: finalTotal,
             service_date: formData.date,
@@ -892,6 +892,7 @@ export const CustomerPanel: React.FC = () => {
                   <div className="relative">
                     <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
                     <input
+                      id="checkout-address"
                       required
                       name="address"
                       value={formData.address}
@@ -908,6 +909,7 @@ export const CustomerPanel: React.FC = () => {
                     <div className="relative">
                         <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
                         <input
+                          id="checkout-city"
                           required
                           name="city"
                           value={formData.city}

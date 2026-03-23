@@ -92,31 +92,31 @@
     </div>
 
     <!-- Smart Address Matcher Modal -->
-    <div id="text-match-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col">
+    <div id="text-match-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col scale-100 transition-transform">
             <div class="flex justify-between items-center border-b pb-3 mb-3">
                 <div>
                     <h3 class="text-xl font-bold text-gray-900">🔍 Smart Address Matcher</h3>
                     <p id="match-customer-address" class="text-xs text-indigo-600 font-semibold mt-1"></p>
                 </div>
-                <button onclick="closeMatchModal()" class="text-gray-400 hover:text-red-500 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fas fa-times"></i></button>
+                <button onclick="closeMatchModal()" class="text-gray-400 hover:text-red-500 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fas fa-times"></i></button>
             </div>
             
             <input type="hidden" id="match-lead-id">
             <input type="hidden" id="match-lead-data">
             
-            <div class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100">
-                <label class="text-xs font-bold text-indigo-800 block mb-1">Live Filter (Type Area, City, or Pincode):</label>
+            <div class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100 shadow-inner">
+                <label class="text-xs font-bold text-indigo-800 block mb-1">Live Filter (e.g., Area, City, or Pincode):</label>
                 <div class="relative">
                     <i class="fas fa-keyboard absolute left-3 top-2.5 text-indigo-400"></i>
-                    <input type="text" id="live-keyword-search" onkeyup="runKeywordMatch()" placeholder="e.g. Mau, Ghosi, 275304..." class="w-full border border-indigo-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-indigo-500 font-medium">
+                    <input type="text" id="live-keyword-search" onkeyup="runKeywordMatch()" placeholder="Type 'Mau' to instantly filter..." class="w-full border border-indigo-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-indigo-500 font-medium">
                 </div>
             </div>
 
-            <div id="match-loading" class="text-center text-indigo-600 font-bold py-6 hidden">
-                <i class="fas fa-sync fa-spin text-3xl mb-2 block"></i> Matching words...
+            <div id="match-loading" class="text-center text-indigo-600 font-bold py-10 hidden">
+                <i class="fas fa-sync fa-spin text-3xl mb-2 block"></i> Matching address words...
             </div>
-            <div id="match-results" class="overflow-y-auto space-y-3 flex-1 pr-1"></div>
+            <div id="match-results" class="overflow-y-auto space-y-3 flex-1 pr-1 custom-scrollbar"></div>
         </div>
     </div>
 
@@ -124,7 +124,12 @@
       window.calculateWordMatchScore = function(searchQuery, partnerString) {
           if (!searchQuery || !partnerString) return 0;
           
-          const queryWords = searchQuery.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+          const stopWords = ['and', 'the', 'for', 'with', 'from', 'that', 'this'];
+          const queryWords = searchQuery.toLowerCase()
+              .replace(/[^a-z0-9\s]/g, '')
+              .split(/\s+/)
+              .filter(w => w.length > 2 && !stopWords.includes(w));
+              
           const targetString = partnerString.toLowerCase().replace(/[^a-z0-9\s]/g, '');
           
           let score = 0;
@@ -158,56 +163,64 @@
           
           const leadDataEncoded = document.getElementById('match-lead-data').value;
           const lead = JSON.parse(decodeURIComponent(leadDataEncoded));
-          let requiredServices = [];
-          if (lead.cart_items && Array.isArray(lead.cart_items)) {
-              requiredServices = lead.cart_items.map(item => item.name.toLowerCase());
-          } else if (lead.cartItems && Array.isArray(lead.cartItems)) {
-              requiredServices = lead.cartItems.map(item => item.name.toLowerCase());
-          }
-
-          // If search bar is empty, use the customer's full address as the search query
-          const queryToMatch = liveSearchText.length > 0 ? liveSearchText : `${lead.customer_address || lead.address || ''} ${lead.city || ''} ${lead.pincode || ''}`;
+          
+          // Search Query: liveSearchText or fallback to customer address
+          const queryToMatch = liveSearchText.length > 0 
+              ? liveSearchText 
+              : `${lead.customer_address || ''} ${lead.city || ''} ${lead.pincode || ''}`;
 
           resultsDiv.innerHTML = '';
           loadingDiv.classList.remove('hidden');
 
           try {
-              // Fetch ALL active partners from both tables
-              const { data: primaryPartners, error: primaryError } = await window.supabase.from('primary_partners').select('*').eq('status', 'available');
-              const { data: secondaryPartners, error: secondaryError } = await window.supabase.from('secondary_partners').select('*').eq('status', 'available');
+              // Fetch Primary and Secondary Partners
+              const [primaryResponse, secondaryResponse] = await Promise.all([
+                  window.supabase.from('primary_partners').select('*').eq('status', 'available'),
+                  window.supabase.from('secondary_partners').select('*').eq('status', 'available')
+              ]);
               
-              if (primaryError) throw primaryError;
-              if (secondaryError) throw secondaryError;
+              if (primaryResponse.error) throw primaryResponse.error;
+              if (secondaryResponse.error) throw secondaryResponse.error;
 
-              const partners = [
-                  ...(primaryPartners || []).map(p => ({...p, partner_type: 'Primary'})),
-                  ...(secondaryPartners || []).map(p => ({...p, partner_type: 'Secondary', first_name: p.name, service_types: (p.categories && Array.isArray(p.categories)) ? p.categories.join(', ') : ''}))
-              ];
+              // Map and Combine
+              const primaryPartners = (primaryResponse.data || []).map(p => ({
+                  ...p,
+                  display_name: `${p.first_name} ${p.last_name || ''}`.trim(),
+                  partner_type: 'Primary'
+              }));
 
+              const secondaryPartners = (secondaryResponse.data || []).map(p => ({
+                  ...p,
+                  display_name: p.name || 'Unknown',
+                  partner_type: 'Secondary'
+              }));
+
+              const allPartners = [...primaryPartners, ...secondaryPartners];
               let qualifiedPartners = [];
 
-              partners.forEach(p => {
-                  // 1. Service Category Match (Optional but recommended)
-                  let isCategoryMatch = true;
-                  if (p.service_types && requiredServices.length > 0) {
-                      let pServices = p.service_types.toLowerCase();
-                      isCategoryMatch = requiredServices.some(ls => pServices.includes(ls) || ls.includes(pServices));
-                  } else if (p.categories && Array.isArray(p.categories) && requiredServices.length > 0) {
-                      let pServices = p.categories.map(c => c.toLowerCase()).join(' ');
-                      isCategoryMatch = requiredServices.some(ls => pServices.includes(ls) || ls.includes(pServices));
-                  }
+              // Matching
+              allPartners.forEach(p => {
+                  // Combine city, address, pincode for searching
+                  const partnerSearchableString = `${p.address || ''} ${p.city || ''} ${p.pincode || ''}`;
                   
-                  // 2. Keyword Match Score
-                  const partnerFullText = `${p.first_name || p.name || ''} ${p.address || ''} ${p.city || ''} ${p.pincode || ''}`;
-                  let matchScore = calculateWordMatchScore(queryToMatch, partnerFullText);
+                  let matchScore = window.calculateWordMatchScore(queryToMatch, partnerSearchableString);
 
-                  if (isCategoryMatch && matchScore > 0) {
+                  // Bonus for exact city match
+                  const leadCity = (lead.city || '').toLowerCase();
+                  const searchCity = liveSearchText.toLowerCase();
+                  
+                  if((searchCity && p.city && p.city.toLowerCase().includes(searchCity)) || 
+                     (!searchCity && leadCity && p.city && p.city.toLowerCase().includes(leadCity))) {
+                      matchScore += 10; 
+                  }
+
+                  if (matchScore > 0) {
                       p.match_score = matchScore;
                       qualifiedPartners.push(p);
                   }
               });
 
-              // Sort: Highest Match Score first, then Primary over Secondary
+              // Filter & Sort
               qualifiedPartners.sort((a, b) => {
                   if (b.match_score !== a.match_score) return b.match_score - a.match_score;
                   if (a.partner_type === 'Primary' && b.partner_type !== 'Primary') return -1;
@@ -217,32 +230,39 @@
 
               loadingDiv.classList.add('hidden');
 
+              // Render Empty State
               if (qualifiedPartners.length === 0) {
                   resultsDiv.innerHTML = '<p class="text-gray-500 text-sm p-4 text-center font-bold">No partners found matching those keywords.</p>';
                   return;
               }
 
-              // Render UI
+              // Render Results
               qualifiedPartners.forEach(p => {
                   let badge = p.partner_type === 'Primary' 
-                      ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider"><i class="fas fa-star text-yellow-500"></i> Primary</span>'
-                      : '<span class="bg-gray-100 text-gray-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">GMB</span>';
+                      ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded uppercase border border-indigo-200 tracking-wider"><i class="fas fa-star text-yellow-500 mr-1"></i> Primary</span>'
+                      : '<span class="bg-gray-100 text-gray-600 text-[10px] font-black px-2.5 py-1 rounded uppercase border border-gray-200 tracking-wider">Secondary</span>';
 
-                  let partnerName = p.first_name || p.name || 'Partner';
-
-                  let safePartnerName = partnerName.replace(/'/g, "\\'");
+                  let safePartnerName = p.display_name.replace(/'/g, "\\'");
+                  let servicesDisplay = (p.categories && Array.isArray(p.categories)) ? p.categories.join(', ') : 'Generalist';
 
                   resultsDiv.innerHTML += `
-                  <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:border-indigo-300 transition">
+                  <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:border-indigo-300 transition-colors group">
                       <div class="flex justify-between items-start">
                           <div>
-                              <h4 class="font-bold text-gray-900 text-lg">${partnerName} ${badge}</h4>
-                              <p class="text-xs text-gray-600 mt-1"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${p.address || ''}, ${p.city || ''} - ${p.pincode || ''}</p>
-                              <p class="text-[10px] font-bold text-green-600 mt-1 bg-green-50 inline-block px-2 py-0.5 rounded border border-green-100">🔥 Match Score: ${p.match_score}</p>
+                              <div class="flex items-center space-x-2">
+                                  <h4 class="font-bold text-gray-900 text-lg">${p.display_name}</h4>
+                                  ${badge}
+                              </div>
+                              <p class="text-xs text-gray-600 mt-1.5"><i class="fas fa-map-marker-alt text-red-500 mr-1.5"></i> ${p.address || ''}, ${p.city || ''} - ${p.pincode || ''}</p>
+                              <p class="text-xs text-gray-500 mt-2"><b>Services:</b> ${servicesDisplay}</p>
+                          </div>
+                          <div class="text-center bg-indigo-50 border border-indigo-100 p-2 rounded-lg">
+                              <p class="text-[10px] font-black text-indigo-700 uppercase">Match Score</p>
+                              <p class="text-3xl font-black text-indigo-900">${p.match_score}</p>
                           </div>
                       </div>
-                      <button onclick="assignPartnerToLead('${lead.id}', '${p.id}', '${safePartnerName}', '${p.phone || ''}')" class="w-full mt-3 bg-green-500 text-white font-bold py-2 rounded-lg text-sm hover:bg-green-600 transition shadow-sm">
-                          <i class="fab fa-whatsapp mr-1"></i> Assign & Send Details
+                      <button onclick="assignPartnerToLead('${lead.id}', '${p.id}', '${safePartnerName}', '${p.phone || ''}')" class="w-full mt-4 bg-green-500 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-green-600 transition shadow-sm group-hover:shadow-lg flex items-center justify-center">
+                          <i class="fab fa-whatsapp mr-2 text-base"></i> Assign & Send Details
                       </button>
                   </div>`;
               });
@@ -250,7 +270,7 @@
           } catch (e) {
               console.error(e);
               loadingDiv.classList.add('hidden');
-              resultsDiv.innerHTML = `<p class="text-red-500 text-sm p-4">Error: ${e.message}</p>`;
+              resultsDiv.innerHTML = '<p class="text-red-500 text-sm p-4 text-center">Error loading partners.</p>';
           }
       };
 
@@ -318,7 +338,7 @@
                               <p class="text-xs text-gray-500">${cleanAddress}</p>
                           </div>
                       `;
-                      div.onclick = () => selectLocation(cleanAddress, place.lat, place.lon);
+                      div.onclick = () => selectLocation(cleanAddress);
                       suggestionsBox.appendChild(div);
                   });
               } catch (error) {
@@ -328,22 +348,25 @@
           }, 500);
       };
 
-      window.selectLocation = function(address, lat, lng) {
-          // Save to variables/storage
-          window.customerSelectedLat = lat;
-          window.customerSelectedLng = lng;
-          window.customerSelectedAddress = address;
-          
-          sessionStorage.setItem('userLocation', address);
-          window.dispatchEvent(new Event('locationUpdated'));
-          
-          // Update Header UI
+      window.selectLocation = function(addressText) {
+          // 1. Update the Header UI
           const headerDisplay = document.getElementById('header-location-display');
-          if(headerDisplay) {
-              headerDisplay.innerText = address.split(',')[0]; // Show short name in header
+          if(headerDisplay) headerDisplay.innerText = addressText.split(',')[0];
+          
+          // 2. ONLY update the CITY input in the checkout form (extract city name)
+          const cityInput = document.getElementById('checkout-city'); // Ensure this ID matches your City input
+          if(cityInput) {
+              // We use the native setter to ensure React picks up the change if it's a controlled component
+              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+              nativeInputValueSetter.call(cityInput, addressText.split(',')[0]);
+              cityInput.dispatchEvent(new Event('input', { bubbles: true }));
           }
           
-          // Clear input and close
+          // Also update session storage and dispatch event for React to pick up
+          sessionStorage.setItem('userLocation', addressText);
+          window.dispatchEvent(new Event('locationUpdated'));
+          
+          // 3. Clear the search and close modal
           document.getElementById('location-search-input').value = '';
           document.getElementById('location-suggestions').classList.add('hidden');
           closeLocationModal();
@@ -371,7 +394,7 @@
                       const data = await response.json();
                       
                       const cleanAddress = data.display_name.split(',').slice(0, 3).join(', ');
-                      selectLocation(cleanAddress, lat, lng);
+                      selectLocation(cleanAddress);
                       
                   } catch (error) {
                       alert("Could not fetch address details for your location.");

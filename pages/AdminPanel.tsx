@@ -42,14 +42,32 @@ export const AdminPanel: React.FC = () => {
 
   // Add GMB Partner State
   const [isAddPartnerModalOpen, setIsAddPartnerModalOpen] = useState(false);
-  const [newPartner, setNewPartner] = useState({
+  const [newPartner, setNewPartner] = useState<{
+    name: string;
+    phone: string;
+    services: string[];
+    city: string;
+    address: string;
+    pincode: string;
+  }>({
     name: '',
     phone: '',
-    services: '',
+    services: [],
+    city: '',
     address: '',
     pincode: ''
   });
   const [isSavingPartner, setIsSavingPartner] = useState(false);
+  const [showHomeAppliances, setShowHomeAppliances] = useState(false);
+
+  const toggleService = (service: string) => {
+    setNewPartner(prev => {
+      const services = prev.services.includes(service)
+        ? prev.services.filter(s => s !== service)
+        : [...prev.services, service];
+      return { ...prev, services };
+    });
+  };
 
   const getCoordinatesFromAddress = async (address: string) => {
     try {
@@ -69,51 +87,39 @@ export const AdminPanel: React.FC = () => {
   };
 
   const saveSecondaryPartner = async () => {
-    const { name, phone, services, address, pincode } = newPartner;
+    const { name, phone, services, city, address, pincode } = newPartner;
 
-    if (!name.trim() || !phone.trim() || !address.trim() || !pincode.trim()) {
-        alert("Please fill all required fields (Name, Phone, Address, Pincode).");
+    if (!name.trim() || !phone.trim() || !city.trim() || !address.trim() || !pincode.trim() || services.length === 0) {
+        alert("Please fill all required fields and select at least one service.");
         return;
     }
 
     setIsSavingPartner(true);
 
     try {
-        // 1. Convert Address to GPS Coordinates
-        const fullAddressQuery = `${address.trim()}, ${pincode.trim()}, Mumbai`;
-        const coords = await getCoordinatesFromAddress(fullAddressQuery);
-
-        // STRICT PARSING: Ensure coords are numbers before sending to Supabase
-        const pLat = coords && coords.lat && !isNaN(Number(coords.lat)) ? parseFloat(String(coords.lat)) : null;
-        const pLng = coords && coords.lng && !isNaN(Number(coords.lng)) ? parseFloat(String(coords.lng)) : null;
-
-        console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
-
         // 2. Prepare Payload
         const partnerData = {
-            name: name.trim(),
+            first_name: name.trim(), // Using first_name for shop name/name
             phone: phone.trim(),
-            city: 'Mumbai',
-            status: 'available', // Auto-active for manual entries
-            categories: services.split(',').map(s => s.trim()).filter(Boolean),
+            city: city.trim(),
+            status: 'Active', // Auto-active for manual entries
+            expertise: services.join(', '), // Store services as expertise
             address: address.trim(),
             pincode: pincode.trim(),
-            lat: pLat,
-            lng: pLng,
             email: `${phone.trim()}@partner.com`, // Dummy email
-            earnings: 0,
-            completed_jobs: 0
+            partner_type: 'Secondary'
         };
 
         // 3. Save to Supabase
-        const { error } = await supabase.from('secondary_partners').insert([partnerData]);
+        const { error } = await supabase.from('partners').insert([partnerData]);
 
         if (error) throw error;
 
-        alert(`✅ Secondary Partner '${name}' saved successfully! Location mapped: ${coords ? 'YES' : 'NO (Check Address)'}`);
+        alert(`✅ Secondary Partner '${name}' saved successfully!`);
         
         // Reset form
-        setNewPartner({ name: '', phone: '', services: '', address: '', pincode: '' });
+        setNewPartner({ name: '', phone: '', services: [], city: '', address: '', pincode: '' });
+        setShowHomeAppliances(false);
         setIsAddPartnerModalOpen(false);
 
     } catch (e: any) {
@@ -1193,35 +1199,69 @@ export const AdminPanel: React.FC = () => {
                         />
                     </div>
                 </div>
-                <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Service Types (e.g., AC Repair, Plumber)</label>
-                    <input 
-                      type="text" 
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
-                      value={newPartner.services}
-                      onChange={(e) => setNewPartner({...newPartner, services: e.target.value})}
-                    />
+                <div className="mb-3">
+                    <label className="block text-xs font-bold text-gray-700 mb-2">Select Expertise / Services</label>
+                    <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Electrician" checked={newPartner.services.includes("Electrician")} onChange={() => toggleService("Electrician")} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="text-gray-700">Electrician</span></label>
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Plumber" checked={newPartner.services.includes("Plumber")} onChange={() => toggleService("Plumber")} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="text-gray-700">Plumber</span></label>
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Carpenters" checked={newPartner.services.includes("Carpenters")} onChange={() => toggleService("Carpenters")} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="text-gray-700">Carpenters</span></label>
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Cleaning & Pest Control" checked={newPartner.services.includes("Cleaning & Pest Control")} onChange={() => toggleService("Cleaning & Pest Control")} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="text-gray-700">Cleaning & Pest</span></label>
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Pooja" checked={newPartner.services.includes("Pooja")} onChange={() => toggleService("Pooja")} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="text-gray-700">Pooja</span></label>
+                        <label className="flex items-center space-x-2 text-sm cursor-pointer"><input type="checkbox" value="Home Appliances" checked={showHomeAppliances} onChange={(e) => setShowHomeAppliances(e.target.checked)} className="sec-expertise-cb w-4 h-4 text-indigo-600 rounded" /> <span className="font-bold text-indigo-700">Home Appliances ▾</span></label>
+                    </div>
                 </div>
-                <div className="flex space-x-2">
-                    <div className="w-2/3">
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Area / Address</label>
+
+                {showHomeAppliances && (
+                <div id="sub-appliances-menu" className="mb-3 bg-indigo-50 p-3 rounded-lg border border-indigo-100 transition-all duration-300">
+                    <label className="block text-xs font-bold text-indigo-800 mb-2">Select Specific Appliances:</label>
+                    <div className="grid grid-cols-2 gap-y-2 gap-x-1">
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="AC repair and services" checked={newPartner.services.includes("AC repair and services")} onChange={() => toggleService("AC repair and services")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">AC Repair</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="water purifier" checked={newPartner.services.includes("water purifier")} onChange={() => toggleService("water purifier")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Water Purifier</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="geyser" checked={newPartner.services.includes("geyser")} onChange={() => toggleService("geyser")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Geyser</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="mixer grinder" checked={newPartner.services.includes("mixer grinder")} onChange={() => toggleService("mixer grinder")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Mixer Grinder</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="air cooler repair" checked={newPartner.services.includes("air cooler repair")} onChange={() => toggleService("air cooler repair")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Air Cooler</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="television" checked={newPartner.services.includes("television")} onChange={() => toggleService("television")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Television</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="washing machine" checked={newPartner.services.includes("washing machine")} onChange={() => toggleService("washing machine")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Washing Machine</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="CCTV camera" checked={newPartner.services.includes("CCTV camera")} onChange={() => toggleService("CCTV camera")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">CCTV Camera</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="air purifier" checked={newPartner.services.includes("air purifier")} onChange={() => toggleService("air purifier")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Air Purifier</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="Chimney repair" checked={newPartner.services.includes("Chimney repair")} onChange={() => toggleService("Chimney repair")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Chimney Repair</span></label>
+                        <label className="flex items-center space-x-1 text-xs cursor-pointer"><input type="checkbox" value="refrigerator repair & services" checked={newPartner.services.includes("refrigerator repair & services")} onChange={() => toggleService("refrigerator repair & services")} className="sec-expertise-cb w-3.5 h-3.5 text-indigo-500 rounded" /> <span className="text-gray-700">Refrigerator</span></label>
+                    </div>
+                </div>
+                )}
+                <div className="flex flex-col space-y-3">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">City</label>
                         <input 
                           type="text" 
-                          placeholder="e.g. Andheri West" 
+                          id="sec-partner-city"
+                          placeholder="e.g. Mau" 
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
-                          value={newPartner.address}
-                          onChange={(e) => setNewPartner({...newPartner, address: e.target.value})}
+                          value={newPartner.city}
+                          onChange={(e) => setNewPartner({...newPartner, city: e.target.value})}
                         />
                     </div>
-                    <div className="w-1/3">
-                        <label className="block text-xs font-bold text-gray-700 mb-1">Pincode</label>
-                        <input 
-                          type="text" 
-                          maxLength={6}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
-                          value={newPartner.pincode}
-                          onChange={(e) => setNewPartner({...newPartner, pincode: e.target.value.replace(/\D/g, '')})}
-                        />
+                    <div className="flex space-x-2">
+                        <div className="w-2/3">
+                            <label className="block text-xs font-bold text-gray-700 mb-1">Area / Address</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. Andheri West" 
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                              value={newPartner.address}
+                              onChange={(e) => setNewPartner({...newPartner, address: e.target.value})}
+                            />
+                        </div>
+                        <div className="w-1/3">
+                            <label className="block text-xs font-bold text-gray-700 mb-1">Pincode</label>
+                            <input 
+                              type="text" 
+                              maxLength={6}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                              value={newPartner.pincode}
+                              onChange={(e) => setNewPartner({...newPartner, pincode: e.target.value.replace(/\D/g, '')})}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
