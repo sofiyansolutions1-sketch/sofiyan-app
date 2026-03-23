@@ -83,6 +83,12 @@ export const AdminPanel: React.FC = () => {
         const fullAddressQuery = `${address.trim()}, ${pincode.trim()}, Mumbai`;
         const coords = await getCoordinatesFromAddress(fullAddressQuery);
 
+        // STRICT PARSING: Ensure coords are numbers before sending to Supabase
+        const pLat = coords && coords.lat && !isNaN(Number(coords.lat)) ? parseFloat(String(coords.lat)) : null;
+        const pLng = coords && coords.lng && !isNaN(Number(coords.lng)) ? parseFloat(String(coords.lng)) : null;
+
+        console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
+
         // 2. Prepare Payload
         const partnerData = {
             name: name.trim(),
@@ -92,8 +98,8 @@ export const AdminPanel: React.FC = () => {
             categories: services.split(',').map(s => s.trim()).filter(Boolean),
             address: address.trim(),
             pincode: pincode.trim(),
-            lat: coords ? coords.lat : null,
-            lng: coords ? coords.lng : null,
+            lat: pLat,
+            lng: pLng,
             email: `${phone.trim()}@partner.com`, // Dummy email
             earnings: 0,
             completed_jobs: 0
@@ -190,6 +196,12 @@ export const AdminPanel: React.FC = () => {
                 const query = `${address}, ${pincode}, Mumbai`;
                 const coords = await getCoordinatesFromAddress(query);
 
+                // STRICT PARSING: Ensure coords are numbers before sending to Supabase
+                const pLat = coords && coords.lat && !isNaN(Number(coords.lat)) ? parseFloat(String(coords.lat)) : null;
+                const pLng = coords && coords.lng && !isNaN(Number(coords.lng)) ? parseFloat(String(coords.lng)) : null;
+
+                console.log("🚀 SENDING BULK PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
+
                 // 2. Prepare Payload
                 const partnerData = {
                     name: name,
@@ -199,8 +211,8 @@ export const AdminPanel: React.FC = () => {
                     categories: services.split(',').map(s => s.trim()).filter(Boolean),
                     address: address,
                     pincode: pincode,
-                    lat: coords ? coords.lat : null,
-                    lng: coords ? coords.lng : null,
+                    lat: pLat,
+                    lng: pLng,
                     email: `${phone}@partner.com`, // Dummy email
                     earnings: 0,
                     completed_jobs: 0
@@ -287,7 +299,7 @@ export const AdminPanel: React.FC = () => {
           }
 
           waText += `🛠️ *Services Required:*\n`;
-          if (booking.cartItems && booking.cartItems.length > 0) {
+          if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
               booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
           } else {
               waText += `👉 ${booking.subServiceName}\n`;
@@ -503,7 +515,7 @@ export const AdminPanel: React.FC = () => {
           }
 
           waText += `🛠️ *Services Required:*\n`;
-          if (booking.cartItems && booking.cartItems.length > 0) {
+          if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
               booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
           } else {
               waText += `👉 ${booking.subServiceName}\n`;
@@ -524,8 +536,8 @@ export const AdminPanel: React.FC = () => {
           });
 
           // 4. Update UI and Open WhatsApp
-          if ((window as any).closeRadarModal) {
-              (window as any).closeRadarModal();
+          if ((window as any).closeMatchModal) {
+              (window as any).closeMatchModal();
           }
           
           // Optimistic update
@@ -550,7 +562,7 @@ export const AdminPanel: React.FC = () => {
   const getAdminWhatsAppLink = (booking: Booking) => {
       // 1. Format Services Text
       let servicesText = "Services";
-      if (booking.cartItems && booking.cartItems.length > 0) {
+      if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
         servicesText = booking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
       } else {
           servicesText = booking.subServiceName;
@@ -751,7 +763,7 @@ export const AdminPanel: React.FC = () => {
             {displayedBookings.map(booking => {
                const waLink = getAdminWhatsAppLink(booking);
                let servicesText = "Services";
-               if (booking.cartItems && booking.cartItems.length > 0) {
+               if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
                  servicesText = booking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
                } else {
                    servicesText = booking.subServiceName;
@@ -800,13 +812,13 @@ export const AdminPanel: React.FC = () => {
                                     </button>
                                     <button 
                                         onClick={() => {
-                                            if ((window as any).openRadarModal) {
-                                                (window as any).openRadarModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
+                                            if ((window as any).openMatchModal) {
+                                                (window as any).openMatchModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
                                             }
                                         }}
                                         className="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center"
                                     >
-                                        <Search className="mr-2" size={16} /> Hyper-Local Category Radar
+                                        <Search className="mr-2" size={16} /> Smart Assign Partner
                                     </button>
                                 </div>
                                 <div className="flex gap-2 mt-2">
@@ -832,8 +844,8 @@ export const AdminPanel: React.FC = () => {
                                     <div className="flex gap-2 w-full justify-end">
                                         <button 
                                             onClick={() => {
-                                                if ((window as any).openRadarModal) {
-                                                    (window as any).openRadarModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
+                                                if ((window as any).openMatchModal) {
+                                                    (window as any).openMatchModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
                                                 }
                                             }}
                                             className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded border border-red-200 hover:bg-red-100 font-bold transition flex items-center"

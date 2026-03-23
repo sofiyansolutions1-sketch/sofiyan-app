@@ -274,6 +274,25 @@ export const PartnerPanel: React.FC = () => {
       setIsSubmitting(true);
 
       try {
+        // 1. Convert Address to GPS Coordinates
+        const fullAddressQuery = `${regData.address.trim()}, ${regData.pincode.trim()}, ${finalCityValue}`;
+        let pLat = null;
+        let pLng = null;
+        
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddressQuery)}`);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                // STRICT PARSING: Ensure coords are numbers before sending to Supabase
+                pLat = data[0].lat && !isNaN(Number(data[0].lat)) ? parseFloat(String(data[0].lat)) : null;
+                pLng = data[0].lon && !isNaN(Number(data[0].lon)) ? parseFloat(String(data[0].lon)) : null;
+            }
+        } catch (geocodeError) {
+            console.error("Geocoding error:", geocodeError);
+        }
+
+        console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
+
         const { error } = await supabase
            .from('primary_partners')
            .insert([
@@ -290,6 +309,8 @@ export const PartnerPanel: React.FC = () => {
                    address: regData.address,
                    city: finalCityValue,
                    pincode: regData.pincode,
+                   lat: pLat,
+                   lng: pLng,
                    status: 'available',
                    earnings: 0,
                    completed_jobs: 0
@@ -591,7 +612,7 @@ export const PartnerPanel: React.FC = () => {
                 <h3 className="text-lg font-bold text-gray-800">{myActiveJob.serviceCategory}</h3>
                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2 mb-4">
                    <p className="text-indigo-700 font-bold mb-1 text-sm uppercase tracking-wide">Work Order:</p>
-                   {myActiveJob.cartItems ? (
+                   {myActiveJob.cartItems && Array.isArray(myActiveJob.cartItems) ? (
                       <ul className="space-y-1">
                         {myActiveJob.cartItems.map((item, idx) => (
                            <li key={idx} className="flex justify-between text-sm text-gray-700">
@@ -659,7 +680,7 @@ export const PartnerPanel: React.FC = () => {
                       
                       <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
                         <Briefcase size={16} className="text-gray-400" />
-                        {lead.cartItems ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
+                        {lead.cartItems && Array.isArray(lead.cartItems) ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
                       </h3>
                       <p className="text-xs text-gray-500 mb-2">{lead.serviceCategory}</p>
                     </div>
@@ -900,7 +921,7 @@ export const PartnerPanel: React.FC = () => {
               </div>
               
               <div className="bg-white p-3 rounded border border-gray-200 my-2">
-                 {paymentModal.cartItems ? (
+                 {paymentModal.cartItems && Array.isArray(paymentModal.cartItems) ? (
                     <ul className="space-y-1">
                       {paymentModal.cartItems.map((item, idx) => (
                         <li key={idx} className="flex justify-between text-xs">
