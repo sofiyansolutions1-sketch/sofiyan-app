@@ -165,6 +165,15 @@ export const CustomerPanel: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    (window as any).addServiceToCart = (id: string, name: string, price: number, categoryName: string) => {
+      addToCart({ id, name, price }, categoryName);
+    };
+    return () => {
+      delete (window as any).addServiceToCart;
+    };
+  }, []);
+
   const removeFromCart = (itemId: string) => {
     setCart(prev => prev.filter(item => item.id !== itemId));
   };
@@ -494,7 +503,13 @@ export const CustomerPanel: React.FC = () => {
             {filteredServices.map((service) => (
               <button
                 key={service.id}
-                onClick={() => setSelectedService(service)}
+                onClick={() => {
+                  if (service.name === 'Cleaning' && (window as any).openCleaningModal) {
+                    (window as any).openCleaningModal();
+                  } else {
+                    setSelectedService(service);
+                  }
+                }}
                 className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl"
               >
                 <img 

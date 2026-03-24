@@ -120,6 +120,36 @@
         </div>
     </div>
 
+    <!-- Urban Company Style Cleaning Modal -->
+    <div id="uc-cleaning-modal" class="fixed inset-0 bg-white z-30 hidden flex flex-col md:flex-row h-screen w-full overflow-hidden transition-transform transform translate-y-full duration-300">
+        <!-- Header (Mobile & Desktop) -->
+        <div class="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm z-10">
+            <h2 class="text-lg font-bold text-gray-900">Cleaning Services</h2>
+            <button onclick="closeCleaningModal()" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <!-- Desktop Sidebar / Mobile Tab Bar -->
+        <div class="md:w-1/4 lg:w-1/5 bg-gray-50 border-r border-gray-200 flex-shrink-0 flex flex-col h-auto md:h-full z-10 shadow-sm md:shadow-none">
+            <!-- Desktop Header -->
+            <div class="hidden md:flex items-center justify-between p-6 border-b border-gray-200 bg-white">
+                <h2 class="text-xl font-bold text-gray-900">Cleaning</h2>
+                <button onclick="closeCleaningModal()" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <!-- Categories List -->
+            <div id="cleaning-categories-list" class="flex md:flex-col overflow-x-auto md:overflow-y-auto p-2 md:p-4 gap-2 md:gap-1 custom-scrollbar scroll-smooth whitespace-nowrap md:whitespace-normal">
+                <!-- Rendered via JS -->
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="cleaning-services-container" class="flex-1 bg-white overflow-y-auto custom-scrollbar relative pb-24 md:pb-0 scroll-smooth">
+            <div id="cleaning-services-inner" class="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
+                <!-- Rendered via JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
       window.calculateWordMatchScore = function(searchQuery, partnerString) {
           if (!searchQuery || !partnerString) return 0;
@@ -412,6 +442,230 @@
               },
               { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
           );
+      };
+
+      // --- Cleaning Modal Logic ---
+      const cleaningServicesData = {
+          "Furnished House": [
+              { id: "c1", name: "Full Home 1BHK", price: 3499 },
+              { id: "c2", name: "Full Home 2BHK", price: 3899 },
+              { id: "c3", name: "Full Home 3BHK", price: 4799 },
+              { id: "c4", name: "Full Home 4BHK", price: 6199 },
+              { id: "c5", name: "Full Home 5BHK", price: 7299 }
+          ],
+          "Unfurnished House": [
+              { id: "c6", name: "Full Home 1BHK", price: 399 },
+              { id: "c7", name: "Full Home 2BHK", price: 3699 },
+              { id: "c8", name: "Full Home 3BHK", price: 4499 },
+              { id: "c9", name: "Full Home 4BHK", price: 5699 },
+              { id: "c10", name: "Full Home 5BHK", price: 6599 }
+          ],
+          "Furnished Bungalow": [
+              { id: "c11", name: "Bungalow (1000-2000 sqft)", price: 5179 },
+              { id: "c12", name: "Bungalow (2000-3000 sqft)", price: 8099 },
+              { id: "c13", name: "Bungalow (3000-4000 sqft)", price: 10879 },
+              { id: "c14", name: "Bungalow (4000-5000 sqft)", price: 12899 },
+              { id: "c15", name: "Bungalow (5000-6000 sqft)", price: 15839 }
+          ],
+          "Unfurnished Bungalow": [
+              { id: "c16", name: "Unfurnished (1000-2000 sqft)", price: 4899 },
+              { id: "c17", name: "Unfurnished (2000-3000 sqft)", price: 7899 },
+              { id: "c18", name: "Unfurnished (3000-4000 sqft)", price: 10499 },
+              { id: "c19", name: "Unfurnished (4000-5000 sqft)", price: 12659 },
+              { id: "c20", name: "Unfurnished (5000-6000 sqft)", price: 15579 }
+          ],
+          "Kitchen & Bathroom": [
+              { id: "c21", name: "Kitchen Deep Cleaning", price: 1599 },
+              { id: "c22", name: "Chimney Outer Cleaning", price: 899 },
+              { id: "c23", name: "Chimney Full Deep Cleaning", price: 1300 },
+              { id: "c24", name: "Bathroom Deep Cleaning", price: 549 },
+              { id: "c25", name: "Toilet Cleaning Only", price: 499 },
+              { id: "c26", name: "Utensil Removal & Replacement", price: 399 },
+              { id: "c27", name: "Fridge Inside Cleaning", price: 249 },
+              { id: "c28", name: "Microwave Inside Cleaning", price: 149 }
+          ],
+          "Sofa Cleaning": [
+              { id: "c29", name: "3 seats Sofa Cleaning", price: 499 },
+              { id: "c30", name: "4 seats Sofa Cleaning", price: 649 },
+              { id: "c31", name: "5 seats Sofa Cleaning", price: 749 },
+              { id: "c32", name: "6 seats Sofa Cleaning", price: 899 },
+              { id: "c33", name: "7 seats Sofa Cleaning", price: 999 },
+              { id: "c34", name: "8 seats Sofa Cleaning", price: 1149 },
+              { id: "c35", name: "9 seats Sofa Cleaning", price: 1249 },
+              { id: "c36", name: "10 seats Sofa Cleaning", price: 1349 },
+              { id: "c37", name: "11 seats Sofa Cleaning", price: 1599 },
+              { id: "c38", name: "12 seats Sofa Cleaning", price: 1699 }
+          ],
+          "Carpet Cleaning": [
+              { id: "c39", name: "Extra Small (upto 25 sq ft)", price: 399 },
+              { id: "c40", name: "Small (25-50 sq ft)", price: 599 },
+              { id: "c41", name: "Medium (50-100 sq ft)", price: 799 },
+              { id: "c42", name: "Large (100-150 sq ft)", price: 949 },
+              { id: "c43", name: "Extra Large (150-200 sq ft)", price: 1099 }
+          ],
+          "Dining Table & Chairs": [
+              { id: "c44", name: "4 Seats Dining Cleaning", price: 299 },
+              { id: "c45", name: "5 Seats Dining Cleaning", price: 349 },
+              { id: "c46", name: "6 Seats Dining Cleaning", price: 399 },
+              { id: "c47", name: "7 Seats Dining Cleaning", price: 449 },
+              { id: "c48", name: "8 Seats Dining Cleaning", price: 499 },
+              { id: "c49", name: "9 Seats Dining Cleaning", price: 549 },
+              { id: "c50", name: "10 Seats Dining Cleaning", price: 599 }
+          ],
+          "Mattress": [
+              { id: "c51", name: "Single Bed Mattress", price: 399 },
+              { id: "c52", name: "Double Bed Mattress", price: 699 }
+          ],
+          "Others": [
+              { id: "c53", name: "Window Glass Cleaning (per window)", price: 149 },
+              { id: "c54", name: "Balcony Cleaning", price: 599 },
+              { id: "c55", name: "Washing Machine Drum Clean", price: 249 },
+              { id: "c56", name: "Wardrobe Cleaning (per unit)", price: 299 },
+              { id: "c57", name: "Water Tank Cleaning (1000L)", price: 749 },
+              { id: "c58", name: "Water Tank Cleaning (2000L)", price: 1299 },
+              { id: "c59", name: "Consultation", price: 249 }
+          ]
+      };
+
+      let isCleaningScrolling = false;
+
+      window.renderCleaningModal = function() {
+          const categoriesList = document.getElementById('cleaning-categories-list');
+          const servicesContainer = document.getElementById('cleaning-services-inner');
+          
+          categoriesList.innerHTML = '';
+          servicesContainer.innerHTML = '';
+          
+          Object.keys(cleaningServicesData).forEach((category, index) => {
+              const categoryId = `clean-cat-${index}`;
+              
+              // Render Sidebar/Tab Item
+              const btn = document.createElement('button');
+              btn.className = `cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 ${index === 0 ? 'bg-indigo-50 text-indigo-700 font-bold border-b-2 md:border-b-0 md:border-l-4 border-indigo-600' : 'text-gray-600 hover:bg-gray-100'}`;
+              btn.innerText = category;
+              btn.dataset.target = categoryId;
+              btn.onclick = () => window.scrollCleaningToCategory(categoryId, btn);
+              categoriesList.appendChild(btn);
+              
+              // Render Services Section
+              const section = document.createElement('div');
+              section.id = categoryId;
+              section.className = 'cleaning-section pt-4 md:pt-8 first:pt-0';
+              
+              let servicesHtml = `<h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">${category}</h3><div class="space-y-4 md:space-y-6">`;
+              
+              cleaningServicesData[category].forEach(service => {
+                  servicesHtml += `
+                  <div class="flex justify-between items-center p-4 md:p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                      <div class="pr-4">
+                          <h4 class="font-bold text-gray-800 text-base md:text-lg">${service.name}</h4>
+                          <div class="flex items-center gap-2 mt-1 md:mt-2">
+                              <span class="font-bold text-gray-900">₹${service.price}</span>
+                              <span class="text-xs text-gray-500 line-through">₹${Math.round(service.price * 1.2)}</span>
+                              <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">20% OFF</span>
+                          </div>
+                      </div>
+                      <button onclick="addCleaningServiceToCart(event, '${service.id}', '${service.name.replace(/'/g, "\\'")}', ${service.price}, '${category.replace(/'/g, "\\'")}')" class="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-600 hover:text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
+                          Add
+                      </button>
+                  </div>`;
+              });
+              
+              servicesHtml += `</div>`;
+              section.innerHTML = servicesHtml;
+              servicesContainer.appendChild(section);
+          });
+          
+          // Setup ScrollSpy
+          document.getElementById('cleaning-services-container').addEventListener('scroll', window.handleCleaningScrollSpy);
+      };
+
+      window.scrollCleaningToCategory = function(id, btn) {
+          isCleaningScrolling = true;
+          window.updateActiveCleaningCategoryBtn(btn);
+          
+          const target = document.getElementById(id);
+          const container = document.getElementById('cleaning-services-container');
+          
+          // Scroll to element
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Reset isScrolling after animation
+          setTimeout(() => { isCleaningScrolling = false; }, 800);
+      };
+
+      window.handleCleaningScrollSpy = function() {
+          if (isCleaningScrolling) return;
+          
+          const container = document.getElementById('cleaning-services-container');
+          const sections = document.querySelectorAll('.cleaning-section');
+          const scrollPosition = container.scrollTop + 100; // Offset
+          
+          let currentActiveId = null;
+          
+          sections.forEach(section => {
+              if (section.offsetTop <= scrollPosition) {
+                  currentActiveId = section.id;
+              }
+          });
+          
+          if (currentActiveId) {
+              const activeBtn = document.querySelector(`.cleaning-cat-btn[data-target="${currentActiveId}"]`);
+              if (activeBtn) window.updateActiveCleaningCategoryBtn(activeBtn);
+          }
+      };
+
+      window.updateActiveCleaningCategoryBtn = function(activeBtn) {
+          document.querySelectorAll('.cleaning-cat-btn').forEach(btn => {
+              btn.className = 'cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 text-gray-600 hover:bg-gray-100';
+          });
+          activeBtn.className = 'cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 bg-indigo-50 text-indigo-700 font-bold border-b-2 md:border-b-0 md:border-l-4 border-indigo-600';
+          
+          // Scroll tab bar on mobile to keep active item in view
+          activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      };
+
+      window.openCleaningModal = function() {
+          const modal = document.getElementById('uc-cleaning-modal');
+          modal.classList.remove('hidden');
+          // Trigger reflow
+          void modal.offsetWidth;
+          modal.classList.remove('translate-y-full');
+          modal.classList.add('translate-y-0');
+          
+          if (document.getElementById('cleaning-categories-list').children.length === 0) {
+              window.renderCleaningModal();
+          }
+      };
+
+      window.closeCleaningModal = function() {
+          const modal = document.getElementById('uc-cleaning-modal');
+          modal.classList.remove('translate-y-0');
+          modal.classList.add('translate-y-full');
+          setTimeout(() => {
+              modal.classList.add('hidden');
+          }, 300); // Match transition duration
+      };
+
+      window.addCleaningServiceToCart = function(event, id, name, price, category) {
+          if (window.addServiceToCart) {
+              window.addServiceToCart(id, name, price, category);
+              
+              // Optional: Show a small toast or animation
+              const btn = event.currentTarget;
+              const originalText = btn.innerText;
+              btn.innerText = 'Added!';
+              btn.classList.add('bg-green-500', 'text-white', 'border-green-500');
+              btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+              
+              setTimeout(() => {
+                  btn.innerText = originalText;
+                  btn.classList.remove('bg-green-500', 'text-white', 'border-green-500');
+                  btn.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+              }, 1500);
+          } else {
+              console.error("React cart function not found");
+          }
       };
     </script>
 
