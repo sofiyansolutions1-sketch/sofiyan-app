@@ -120,32 +120,43 @@
         </div>
     </div>
 
-    <!-- Urban Company Style Cleaning Modal -->
-    <div id="uc-cleaning-modal" class="fixed inset-0 bg-white z-30 hidden flex flex-col md:flex-row h-screen w-full overflow-hidden transition-transform transform translate-y-full duration-300">
-        <!-- Header (Mobile & Desktop) -->
-        <div class="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white shadow-sm z-10">
-            <h2 class="text-lg font-bold text-gray-900">Cleaning Services</h2>
-            <button onclick="closeCleaningModal()" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
-        </div>
-
-        <!-- Desktop Sidebar / Mobile Tab Bar -->
-        <div class="md:w-1/4 lg:w-1/5 bg-gray-50 border-r border-gray-200 flex-shrink-0 flex flex-col h-auto md:h-full z-10 shadow-sm md:shadow-none">
-            <!-- Desktop Header -->
-            <div class="hidden md:flex items-center justify-between p-6 border-b border-gray-200 bg-white">
-                <h2 class="text-xl font-bold text-gray-900">Cleaning</h2>
-                <button onclick="closeCleaningModal()" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            
-            <!-- Categories List -->
-            <div id="cleaning-categories-list" class="flex md:flex-col overflow-x-auto md:overflow-y-auto p-2 md:p-4 gap-2 md:gap-1 custom-scrollbar scroll-smooth whitespace-nowrap md:whitespace-normal">
-                <!-- Rendered via JS -->
+    <!-- Full-Screen Service Modal -->
+    <div id="full-service-modal" class="hidden fixed inset-0 z-[100] w-full h-full bg-slate-50 flex-col">
+        <!-- Sticky Header -->
+        <div class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm flex-shrink-0">
+            <button onclick="closeCategoryView()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 id="full-modal-title" class="text-lg font-bold text-slate-800">Category Name</h2>
+            <div class="relative p-2 text-slate-600">
+                <i class="fas fa-shopping-cart text-xl"></i>
+                <span id="full-modal-cart-count" class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
             </div>
         </div>
 
         <!-- Main Content Area -->
-        <div id="cleaning-services-container" class="flex-1 bg-white overflow-y-auto custom-scrollbar relative pb-24 md:pb-0 scroll-smooth">
-            <div id="cleaning-services-inner" class="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
-                <!-- Rendered via JS -->
+        <div class="flex flex-1 overflow-hidden relative pb-20">
+            <!-- Sidebar (Subcategories) -->
+            <div id="full-modal-sidebar" class="w-1/3 md:w-64 bg-slate-100 border-r border-slate-200 overflow-y-auto custom-scrollbar">
+                <!-- Subcategory items injected here -->
+            </div>
+
+            <!-- Services List -->
+            <div id="full-modal-services-content" class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar scroll-smooth">
+                <!-- Service sections injected here -->
+            </div>
+        </div>
+
+        <!-- Sticky Bottom Bar -->
+        <div id="full-modal-bottom-bar" class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] hidden z-20">
+            <div class="max-w-3xl mx-auto flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wider"><span id="full-modal-total-items">0 items</span></p>
+                    <p id="full-modal-total-price" class="text-xl font-bold text-slate-900">₹0</p>
+                </div>
+                <button onclick="proceedToCheckout()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors shadow-md">
+                    Continue <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -444,229 +455,322 @@
           );
       };
 
-      // --- Cleaning Modal Logic ---
-      const cleaningServicesData = {
-          "Furnished House": [
-              { id: "c1", name: "Full Home 1BHK", price: 3499 },
-              { id: "c2", name: "Full Home 2BHK", price: 3899 },
-              { id: "c3", name: "Full Home 3BHK", price: 4799 },
-              { id: "c4", name: "Full Home 4BHK", price: 6199 },
-              { id: "c5", name: "Full Home 5BHK", price: 7299 }
-          ],
-          "Unfurnished House": [
-              { id: "c6", name: "Full Home 1BHK", price: 399 },
-              { id: "c7", name: "Full Home 2BHK", price: 3699 },
-              { id: "c8", name: "Full Home 3BHK", price: 4499 },
-              { id: "c9", name: "Full Home 4BHK", price: 5699 },
-              { id: "c10", name: "Full Home 5BHK", price: 6599 }
-          ],
-          "Furnished Bungalow": [
-              { id: "c11", name: "Bungalow (1000-2000 sqft)", price: 5179 },
-              { id: "c12", name: "Bungalow (2000-3000 sqft)", price: 8099 },
-              { id: "c13", name: "Bungalow (3000-4000 sqft)", price: 10879 },
-              { id: "c14", name: "Bungalow (4000-5000 sqft)", price: 12899 },
-              { id: "c15", name: "Bungalow (5000-6000 sqft)", price: 15839 }
-          ],
-          "Unfurnished Bungalow": [
-              { id: "c16", name: "Unfurnished (1000-2000 sqft)", price: 4899 },
-              { id: "c17", name: "Unfurnished (2000-3000 sqft)", price: 7899 },
-              { id: "c18", name: "Unfurnished (3000-4000 sqft)", price: 10499 },
-              { id: "c19", name: "Unfurnished (4000-5000 sqft)", price: 12659 },
-              { id: "c20", name: "Unfurnished (5000-6000 sqft)", price: 15579 }
-          ],
-          "Kitchen & Bathroom": [
-              { id: "c21", name: "Kitchen Deep Cleaning", price: 1599 },
-              { id: "c22", name: "Chimney Outer Cleaning", price: 899 },
-              { id: "c23", name: "Chimney Full Deep Cleaning", price: 1300 },
-              { id: "c24", name: "Bathroom Deep Cleaning", price: 549 },
-              { id: "c25", name: "Toilet Cleaning Only", price: 499 },
-              { id: "c26", name: "Utensil Removal & Replacement", price: 399 },
-              { id: "c27", name: "Fridge Inside Cleaning", price: 249 },
-              { id: "c28", name: "Microwave Inside Cleaning", price: 149 }
-          ],
-          "Sofa Cleaning": [
-              { id: "c29", name: "3 seats Sofa Cleaning", price: 499 },
-              { id: "c30", name: "4 seats Sofa Cleaning", price: 649 },
-              { id: "c31", name: "5 seats Sofa Cleaning", price: 749 },
-              { id: "c32", name: "6 seats Sofa Cleaning", price: 899 },
-              { id: "c33", name: "7 seats Sofa Cleaning", price: 999 },
-              { id: "c34", name: "8 seats Sofa Cleaning", price: 1149 },
-              { id: "c35", name: "9 seats Sofa Cleaning", price: 1249 },
-              { id: "c36", name: "10 seats Sofa Cleaning", price: 1349 },
-              { id: "c37", name: "11 seats Sofa Cleaning", price: 1599 },
-              { id: "c38", name: "12 seats Sofa Cleaning", price: 1699 }
-          ],
-          "Carpet Cleaning": [
-              { id: "c39", name: "Extra Small (upto 25 sq ft)", price: 399 },
-              { id: "c40", name: "Small (25-50 sq ft)", price: 599 },
-              { id: "c41", name: "Medium (50-100 sq ft)", price: 799 },
-              { id: "c42", name: "Large (100-150 sq ft)", price: 949 },
-              { id: "c43", name: "Extra Large (150-200 sq ft)", price: 1099 }
-          ],
-          "Dining Table & Chairs": [
-              { id: "c44", name: "4 Seats Dining Cleaning", price: 299 },
-              { id: "c45", name: "5 Seats Dining Cleaning", price: 349 },
-              { id: "c46", name: "6 Seats Dining Cleaning", price: 399 },
-              { id: "c47", name: "7 Seats Dining Cleaning", price: 449 },
-              { id: "c48", name: "8 Seats Dining Cleaning", price: 499 },
-              { id: "c49", name: "9 Seats Dining Cleaning", price: 549 },
-              { id: "c50", name: "10 Seats Dining Cleaning", price: 599 }
-          ],
-          "Mattress": [
-              { id: "c51", name: "Single Bed Mattress", price: 399 },
-              { id: "c52", name: "Double Bed Mattress", price: 699 }
-          ],
-          "Others": [
-              { id: "c53", name: "Window Glass Cleaning (per window)", price: 149 },
-              { id: "c54", name: "Balcony Cleaning", price: 599 },
-              { id: "c55", name: "Washing Machine Drum Clean", price: 249 },
-              { id: "c56", name: "Wardrobe Cleaning (per unit)", price: 299 },
-              { id: "c57", name: "Water Tank Cleaning (1000L)", price: 749 },
-              { id: "c58", name: "Water Tank Cleaning (2000L)", price: 1299 },
-              { id: "c59", name: "Consultation", price: 249 }
-          ]
-      };
+      // --- Simplified Full-Screen Modal Logic ---
+      window.masterServicesData = {
+  "Electrician": {
+    "Switch & socket": [ {name: "Switchbox installation", price: 349}, {name: "AC switchbox installation", price: 329}, {name: "Switch board installation", price: 279}, {name: "Smart switch installation", price: 299}, {name: "Smart appliance controller", price: 249}, {name: "Wi-Fi smart switch installation", price: 239}, {name: "Switch / Socket replacement", price: 149}, {name: "Switch board / switchbox repair", price: 179} ],
+    "Fan": [ {name: "Fan uninstallation (any type)", price: 180}, {name: "Fan replacement (any type)", price: 299}, {name: "Fan repair (any type)", price: 349}, {name: "Fan regulator repair/replacement", price: 180}, {name: "Fan installation", price: 249} ],
+    "Wall/ceiling light": [ {name: "Bulb/tubelight holder install", price: 149}, {name: "CFL to LED replacement", price: 229}, {name: "Decorative lights install (per 5m)", price: 109}, {name: "Light uninstallation (per light)", price: 129}, {name: "Chandelier installation", price: 649}, {name: "Wall ceiling light installation", price: 149} ],
+    "Wiring": [ {name: "New external wiring (per 5m)", price: 109}, {name: "New internal wiring (per 5m)", price: 249} ],
+    "Doorbell": [ {name: "Doorbell installation", price: 199}, {name: "Doorbell replacement", price: 199} ],
+    "MCB & submeter": [ {name: "Single-Pole MCB installation", price: 179}, {name: "Double-pole MCB installation", price: 229}, {name: "MCB / fuse replacement", price: 180}, {name: "Sub-meter installation", price: 349}, {name: "3-phase changeover switch", price: 349} ],
+    "Inverter & stabiliser": [ {name: "Inverter installation", price: 699}, {name: "Inverter uninstallation", price: 499}, {name: "Stabilizer installation", price: 229}, {name: "Inverter fuse replacement", price: 169}, {name: "Inverter servicing", price: 349}, {name: "Inverter repair", price: 299}, {name: "Book a Consultation", price: 199} ]
+  },
+  "Plumbing": {
+    "Bath fittings": [ {name: "Bath accessory installation", price: 249}, {name: "pipe blockage repair", price: 399}, {name: "Shower installation", price: 249} ],
+    "Basin & sink": [ {name: "Wash basin installation", price: 499}, {name: "Waste pipe replacement", price: 249}, {name: "Sink drainage removal", price: 249}, {name: "Waste coupling installation", price: 199} ],
+    "Grouting": [ {name: "Bathroom tile grouting", price: 1500}, {name: "Kitchen tile grouting", price: 999} ],
+    "Water filter": [ {name: "Shower filter installation", price: 249}, {name: "Washing machine filter install", price: 249} ],
+    "Drainage": [ {name: "Drainage cover installation", price: 249}, {name: "Bathroom drainage removal", price: 399}, {name: "Balcony drainage removal", price: 309} ],
+    "Toilet": [ {name: "Toilet seat cover replacement", price: 199}, {name: "Flush tank repair (external pvc)", price: 199}, {name: "Flush tank repair (concealed)", price: 249}, {name: "Flush tank repair (ext ceramic)", price: 349}, {name: "Western toilet repair (floor)", price: 799}, {name: "Toilet pipe blockage removal", price: 1299}, {name: "Jet spray installation", price: 199}, {name: "Western toilet replacement", price: 1699}, {name: "Indian toilet installation", price: 1699}, {name: "Flush tank replacement", price: 549}, {name: "Western toilet installation", price: 1499} ],
+    "Tap & mixer": [ {name: "Tap repair", price: 149}, {name: "Geyser Water Pipe Fix", price: 249}, {name: "Water mixer tap repair", price: 299}, {name: "Tap installation", price: 149}, {name: "Water mixer installation", price: 399}, {name: "Water nozzle installation", price: 149}, {name: "Tap replacement", price: 149} ],
+    "Water tank": [ {name: "Water tank repair", price: 249}, {name: "Overhead water tank installation", price: 649}, {name: "Water tank cleaning (left placed)", price: 1099}, {name: "Overhead tank cleaning", price: 649}, {name: "Underground tank cleaning", price: 1299}, {name: "Pipeline leakage repair", price: 299}, {name: "Water meter installation", price: 399} ],
+    "Motor": [ {name: "Motor air cavity removal", price: 199}, {name: "Motor installation/replacement", price: 449} ],
+    "Water pipes": [ {name: "Washing machine inlet install", price: 200}, {name: "Connecting hose installation", price: 199}, {name: "Plumber consultation", price: 149} ]
+  },
+  "AC": {
+    "Super saver packages": [ {name: "Foam-jet service (2 ACs)", price: 1148}, {name: "Foam-jet service (3 ACs)", price: 1647}, {name: "Foam-jet service (4 ACs)", price: 2096}, {name: "Foam-jet service (5 ACs)", price: 2496} ],
+    "Service": [ {name: "Foam-jet AC service", price: 549} ],
+    "Repair & gas refill": [ {name: "AC repair", price: 549}, {name: "AC Less/no cooling", price: 399}, {name: "AC Power Issue", price: 399}, {name: "AC Unwanted noise/smell", price: 499}, {name: "AC Water Leakage", price: 599}, {name: "Gas refill & check-up", price: 2800} ],
+    "Installation & uninstallation": [ {name: "AC installation", price: 799}, {name: "AC uninstallation", price: 799} ]
+  },
+  "WashingMachine": {
+    "Checkup": [ {name: "Auto Top Load Checkup", price: 149}, {name: "Auto Front Load Checkup", price: 249}, {name: "Washing Machine Deep-Cleaning", price: 349}, {name: "Semi Auto Checkup", price: 249} ],
+    "Service": [ {name: "Washing machine servicing", price: 499} ],
+    "Repair": [ {name: "Basic Check-up/Error/Water", price: 349}, {name: "Drain/Inlet Valve Clean/Replace", price: 349}, {name: "Spin / Drum Jam Fix", price: 399}, {name: "Door Lock / Sensor Fix", price: 349}, {name: "Display/Panel/Buttons Diagnosis", price: 299}, {name: "PCB Fault Diagnosis", price: 299}, {name: "PCB Repair Labor", price: 499}, {name: "Water Leakage Fix", price: 349}, {name: "Bearing Replacement Labor", price: 699}, {name: "Shock Absorber Replace Labor", price: 499}, {name: "Clutch Plate/Coupling Labor", price: 499}, {name: "Motor Repair/Replacement", price: 599}, {name: "Heating System/Dryer Fix", price: 399}, {name: "Drum Removal & Refitting", price: 699}, {name: "Outer Tub/Drum Replace Labor", price: 999}, {name: "Drain Pump Replace Labor", price: 399} ],
+    "Installation & uninstallation": [ {name: "Installation – Front Load", price: 399}, {name: "Installation – Top Load", price: 399}, {name: "Uninstallation – Front Load", price: 349}, {name: "Uninstallation – Top Load", price: 349}, {name: "Water Inlet + Drain Setup", price: 299} ],
+    "Book a consultation": [ {name: "Book a Consultation", price: 199} ]
+  },
+  "Refrigerator": {
+    "Repair/check-up": [ {name: "Power Issue", price: 349}, {name: "Refrigerator Deep Cleaning", price: 349}, {name: "Excess Cooling", price: 349}, {name: "No Cooling", price: 349}, {name: "Noise Issue", price: 349}, {name: "Water Leakage", price: 349}, {name: "Less Cooling", price: 349}, {name: "Compartment Water Leakage", price: 349}, {name: "Door Issue", price: 349} ]
+  },
+  "WaterPurifier": {
+    "check-up": [ {name: "Water purifier check-up", price: 299}, {name: "Filter check-up", price: 299} ],
+    "Installation & uninstallation": [ {name: "Water purifier installation", price: 449}, {name: "Water purifier uninstallation", price: 349} ],
+    "Repair": [ {name: "Foul Taste/Odour", price: 299}, {name: "Low Water Flow", price: 299}, {name: "Unknown Issue", price: 299}, {name: "Ro Not Working", price: 299}, {name: "Water Leakage", price: 299} ],
+    "Service": [ {name: "Water purifier filter check-up", price: 299}, {name: "Water purifier regular service", price: 1800}, {name: "Water purifier full service", price: 4000} ]
+  },
+  "Television": {
+    "Select a service": [ {name: "TV check-up", price: 249}, {name: "TV installation", price: 399}, {name: "TV uninstallation", price: 349} ]
+  },
+  "Microwave": {
+    "Microwave check-up": [ {name: "Not heating", price: 299}, {name: "Not working", price: 299}, {name: "Unknown issue", price: 299}, {name: "Buttons not working", price: 299}, {name: "Noise issue", price: 299} ]
+  },
+  "Geyser": {
+    "Check-up": [ {name: "Geyser Check-up", price: 249}, {name: "Geyser Repair", price: 449}, {name: "Geyser Service", price: 599}, {name: "Geyser Deep Cleaning", price: 349} ],
+    "Installation & uninstallation": [ {name: "Geyser Installation", price: 549}, {name: "Geyser Uninstallation", price: 349} ]
+  },
+  "Chimney": {
+    "Combos": [ {name: "Chimney deep cleaning with gas stove (Wall Mount)", price: 1499}, {name: "Chimney deep cleaning with gas stove (Island)", price: 1749}, {name: "Chimney basic cleaning with gas stove (Wall Mount)", price: 899}, {name: "Chimney basic cleaning with gas stove (Island)", price: 999} ],
+    "Repair": [ {name: "Chimney check-up (Wall Mount)", price: 199}, {name: "Chimney check-up (Island)", price: 199} ],
+    "Service": [ {name: "Deep chimney service (Wall Mount)", price: 1199}, {name: "Deep chimney service (Island)", price: 1499}, {name: "Basic chimney service (Wall Mount)", price: 599}, {name: "Basic chimney service (Island)", price: 699} ],
+    "Installation/uninstallation": [ {name: "Chimney installation (Wall Mount)", price: 698}, {name: "Chimney installation (Island)", price: 1599}, {name: "Chimney uninstallation (Wall Mount)", price: 499}, {name: "Chimney uninstallation (Island)", price: 799} ]
+  },
+  "Cleaning": {
+    "Furnished House": [ {name: "Full Home 1BHK", price: 3499}, {name: "Full Home 2BHK", price: 3899}, {name: "Full Home 3BHK", price: 4799}, {name: "Full Home 4BHK", price: 6199}, {name: "Full Home 4BHK", price: 7299} ],
+    "Unfurnished House": [ {name: "Full Home 1BHK", price: 399}, {name: "Full Home 2BHK", price: 3699}, {name: "Full Home 3BHK", price: 4499}, {name: "Full Home 4BHK", price: 5699}, {name: "Full Home 4BHK", price: 6599} ],
+    "Furnished Bungalow Cleaning": [ {name: "Furnished Bungalow Cleaning (1000-2000 sqft)", price: 5179}, {name: "Furnished Bungalow Cleaning (2000-3000 sqft)", price: 8099}, {name: "Furnished Bungalow Cleaning (3000-4000 sqft)", price: 10879}, {name: "Furnished Bungalow Cleaning (4000-5000 sqft)", price: 12899}, {name: "Furnished Bungalow Cleaning (5000-6000 sqft)", price: 15839} ],
+    "UnFurnished Bungalow Cleaning": [ {name: "UnFurnished Bungalow Cleaning (1000-2000 sqft)", price: 4899}, {name: "UnFurnished Bungalow Cleaning (2000-3000 sqft)", price: 7899}, {name: "UnFurnished Bungalow Cleaning (3000-4000 sqft)", price: 10499}, {name: "UnFurnished Bungalow Cleaning (4000-5000 sqft)", price: 12659}, {name: "UnFurnished Bungalow Cleaning (5000-6000 sqft)", price: 15579} ],
+    "Kitchen & Bathroom": [ {name: "Kitchen Deep Cleaning", price: 1599}, {name: "Chimney Outer Cleaning", price: 899}, {name: "Chimney Full Deep Cleaning", price: 1300}, {name: "Bathroom Deep Cleaning", price: 549}, {name: "Toilet Cleaning Only", price: 499}, {name: "Utensil Removal & Replacement", price: 399}, {name: "Fridge Inside Cleaning", price: 249}, {name: "Microwave Inside Cleaning", price: 149} ],
+    "Sofa Cleaning": [ {name: "3 seats", price: 499}, {name: "4 seats", price: 649}, {name: "5 seats", price: 749}, {name: "6 seats", price: 899}, {name: "7 seats", price: 999}, {name: "8 seats", price: 1149}, {name: "9 seats", price: 1249}, {name: "10 seats", price: 1349}, {name: "11 seats", price: 1599}, {name: "12 seats", price: 1699} ],
+    "Carpet Cleaning": [ {name: "Extra Small (upto 25 sq ft)", price: 399}, {name: "Small (upto 25-50 sq ft)", price: 599}, {name: "Medium (upto 50-100 sq ft)", price: 799}, {name: "Large (upto 100-150 sq ft)", price: 949}, {name: "Extra Large (upto 150-200 sq ft)", price: 1099} ],
+    "Dining table & chairs cleaning": [ {name: "4 Seats", price: 299}, {name: "5 Seats", price: 349}, {name: "6 Seats", price: 399}, {name: "7 Seats", price: 449}, {name: "8 Seats", price: 499}, {name: "9 Seats", price: 549}, {name: "10 Seats", price: 599} ],
+    "Mattress": [ {name: "Single Bed", price: 399}, {name: "Double Bed", price: 699} ],
+    "Others": [ {name: "Window Glass Cleaning (per window)", price: 149}, {name: "Balcony Cleaning", price: 599}, {name: "Washing Machine Drum Clean", price: 249}, {name: "Wardrobe Cleaning (per unit)", price: 299}, {name: "Water Tank Cleaning (1000L)", price: 749}, {name: "Water Tank Cleaning (2000L)", price: 1299}, {name: "Consultation", price: 249} ]
+  }
+};
 
-      let isCleaningScrolling = false;
+      let currentCategoryView = "";
 
-      window.renderCleaningModal = function() {
-          const categoriesList = document.getElementById('cleaning-categories-list');
-          const servicesContainer = document.getElementById('cleaning-services-inner');
+      window.openCategoryView = function(categoryName) {
+          currentCategoryView = categoryName;
+          const modal = document.getElementById('full-service-modal');
+          const title = document.getElementById('full-modal-title');
+          const sidebar = document.getElementById('full-modal-sidebar');
+          const content = document.getElementById('full-modal-services-content');
+
+          title.textContent = categoryName;
+          sidebar.innerHTML = '';
+          content.innerHTML = '';
+
+          const categoryData = window.masterServicesData[categoryName] || window.masterServicesData["Electrician"];
+          const subcategories = Object.keys(categoryData);
           
-          categoriesList.innerHTML = '';
-          servicesContainer.innerHTML = '';
-          
-          Object.keys(cleaningServicesData).forEach((category, index) => {
-              const categoryId = `clean-cat-${index}`;
-              
-              // Render Sidebar/Tab Item
+          if (subcategories.length === 0) return;
+
+          // Render Sidebar
+          subcategories.forEach((subcat, index) => {
               const btn = document.createElement('button');
-              btn.className = `cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 ${index === 0 ? 'bg-indigo-50 text-indigo-700 font-bold border-b-2 md:border-b-0 md:border-l-4 border-indigo-600' : 'text-gray-600 hover:bg-gray-100'}`;
-              btn.innerText = category;
-              btn.dataset.target = categoryId;
-              btn.onclick = () => window.scrollCleaningToCategory(categoryId, btn);
-              categoriesList.appendChild(btn);
-              
-              // Render Services Section
+              btn.className = `w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors ${index === 0 ? 'bg-white text-indigo-700 border-l-4 border-l-indigo-600' : 'text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent'}`;
+              btn.textContent = subcat;
+              btn.onclick = () => {
+                  // Update active state
+                  Array.from(sidebar.children).forEach(c => {
+                      c.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent';
+                  });
+                  btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors bg-white text-indigo-700 border-l-4 border-l-indigo-600';
+                  
+                  // Scroll to section
+                  const section = document.getElementById(`section-${subcat.replace(/\s+/g, '-')}`);
+                  if (section) {
+                      content.scrollTo({
+                          top: section.offsetTop - content.offsetTop,
+                          behavior: 'smooth'
+                      });
+                  }
+              };
+              sidebar.appendChild(btn);
+          });
+
+          // Render Content
+          subcategories.forEach(subcat => {
               const section = document.createElement('div');
-              section.id = categoryId;
-              section.className = 'cleaning-section pt-4 md:pt-8 first:pt-0';
+              section.id = `section-${subcat.replace(/\s+/g, '-')}`;
+              section.className = 'mb-8';
               
-              let servicesHtml = `<h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">${category}</h3><div class="space-y-4 md:space-y-6">`;
-              
-              cleaningServicesData[category].forEach(service => {
-                  servicesHtml += `
-                  <div class="flex justify-between items-center p-4 md:p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                      <div class="pr-4">
-                          <h4 class="font-bold text-gray-800 text-base md:text-lg">${service.name}</h4>
-                          <div class="flex items-center gap-2 mt-1 md:mt-2">
-                              <span class="font-bold text-gray-900">₹${service.price}</span>
-                              <span class="text-xs text-gray-500 line-through">₹${Math.round(service.price * 1.2)}</span>
-                              <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">20% OFF</span>
+              const sectionTitle = document.createElement('h3');
+              sectionTitle.className = 'font-bold text-lg text-slate-800 mb-4 sticky top-0 bg-slate-50 py-2 z-10';
+              sectionTitle.textContent = subcat;
+              section.appendChild(sectionTitle);
+
+              const servicesList = document.createElement('div');
+              servicesList.className = 'space-y-3';
+
+              categoryData[subcat].forEach(service => {
+                  // Generate a unique ID if not present
+                  const serviceId = service.id || `${categoryName}-${subcat}-${service.name}`.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                  
+                  let qty = 0;
+                  if (window.getReactCart) {
+                      const reactCart = window.getReactCart();
+                      const item = reactCart.find(i => i.id === serviceId);
+                      if (item) qty = item.quantity;
+                  }
+
+                  const card = document.createElement('div');
+                  card.className = 'bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex justify-between items-center';
+                  
+                  const originalPriceHtml = service.originalPrice ? `<span class="text-sm text-slate-400 line-through">₹${service.originalPrice}</span>` : '';
+                  
+                  let buttonHtml = '';
+                  if (qty > 0) {
+                      buttonHtml = `
+                          <div class="flex items-center bg-indigo-50 rounded-lg border border-indigo-200 overflow-hidden h-10">
+                              <button onclick="decreaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-8 h-full flex items-center justify-center text-indigo-700 font-bold hover:bg-indigo-100 transition-colors">-</button>
+                              <span class="w-8 text-center font-bold text-indigo-900 text-sm flex items-center justify-center">${qty}</span>
+                              <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-8 h-full flex items-center justify-center text-indigo-700 font-bold hover:bg-indigo-100 transition-colors">+</button>
+                          </div>
+                      `;
+                  } else {
+                      buttonHtml = `
+                          <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-6 py-2 bg-white border-2 border-indigo-100 text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 shadow-sm transition-colors h-10">
+                              ADD
+                          </button>
+                      `;
+                  }
+
+                  card.innerHTML = `
+                      <div class="flex-1 pr-4">
+                          <h4 class="font-bold text-slate-800 text-base mb-1">${service.name}</h4>
+                          <div class="flex items-center gap-2">
+                              <span class="font-extrabold text-slate-900">₹${service.price}</span>
+                              ${originalPriceHtml}
                           </div>
                       </div>
-                      <button onclick="addCleaningServiceToCart(event, '${service.id}', '${service.name.replace(/'/g, "\\'")}', ${service.price}, '${category.replace(/'/g, "\\'")}')" class="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-600 hover:text-white font-bold py-2 px-6 rounded-lg transition-colors shadow-sm">
-                          Add
-                      </button>
-                  </div>`;
+                      <div class="flex-shrink-0">
+                          ${buttonHtml}
+                      </div>
+                  `;
+                  servicesList.appendChild(card);
               });
               
-              servicesHtml += `</div>`;
-              section.innerHTML = servicesHtml;
-              servicesContainer.appendChild(section);
+              section.appendChild(servicesList);
+              content.appendChild(section);
           });
-          
-          // Setup ScrollSpy
-          document.getElementById('cleaning-services-container').addEventListener('scroll', window.handleCleaningScrollSpy);
-      };
 
-      window.scrollCleaningToCategory = function(id, btn) {
-          isCleaningScrolling = true;
-          window.updateActiveCleaningCategoryBtn(btn);
-          
-          const target = document.getElementById(id);
-          const container = document.getElementById('cleaning-services-container');
-          
-          // Scroll to element
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          
-          // Reset isScrolling after animation
-          setTimeout(() => { isCleaningScrolling = false; }, 800);
-      };
-
-      window.handleCleaningScrollSpy = function() {
-          if (isCleaningScrolling) return;
-          
-          const container = document.getElementById('cleaning-services-container');
-          const sections = document.querySelectorAll('.cleaning-section');
-          const scrollPosition = container.scrollTop + 100; // Offset
-          
-          let currentActiveId = null;
-          
-          sections.forEach(section => {
-              if (section.offsetTop <= scrollPosition) {
-                  currentActiveId = section.id;
+          // Add scroll spy to update sidebar active state
+          content.onscroll = () => {
+              let current = '';
+              const sections = content.querySelectorAll('div[id^="section-"]');
+              sections.forEach(section => {
+                  const sectionTop = section.offsetTop - content.offsetTop;
+                  if (content.scrollTop >= sectionTop - 60) {
+                      current = section.getAttribute('id').replace('section-', '').replace(/-/g, ' ');
+                  }
+              });
+              
+              if (current) {
+                 Array.from(sidebar.children).forEach(btn => {
+                     if (btn.textContent.toLowerCase() === current.toLowerCase()) {
+                         btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors bg-white text-indigo-700 border-l-4 border-l-indigo-600';
+                     } else {
+                         btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent';
+                     }
+                 });
               }
-          });
-          
-          if (currentActiveId) {
-              const activeBtn = document.querySelector(`.cleaning-cat-btn[data-target="${currentActiveId}"]`);
-              if (activeBtn) window.updateActiveCleaningCategoryBtn(activeBtn);
-          }
-      };
+          };
 
-      window.updateActiveCleaningCategoryBtn = function(activeBtn) {
-          document.querySelectorAll('.cleaning-cat-btn').forEach(btn => {
-              btn.className = 'cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 text-gray-600 hover:bg-gray-100';
-          });
-          activeBtn.className = 'cleaning-cat-btn text-left px-4 py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-medium transition-all flex-shrink-0 bg-indigo-50 text-indigo-700 font-bold border-b-2 md:border-b-0 md:border-l-4 border-indigo-600';
-          
-          // Scroll tab bar on mobile to keep active item in view
-          activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      };
-
-      window.openCleaningModal = function() {
-          const modal = document.getElementById('uc-cleaning-modal');
           modal.classList.remove('hidden');
-          // Trigger reflow
-          void modal.offsetWidth;
-          modal.classList.remove('translate-y-full');
-          modal.classList.add('translate-y-0');
+          modal.classList.add('flex');
+          document.body.style.overflow = 'hidden';
+          window.updateStickyCart();
+      };
+
+      window.closeCategoryView = function() {
+          const modal = document.getElementById('full-service-modal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.body.style.overflow = '';
+      };
+
+      window.updateStickyCart = function() {
+          let totalQty = 0;
+          let totalPrice = 0;
           
-          if (document.getElementById('cleaning-categories-list').children.length === 0) {
-              window.renderCleaningModal();
+          if (window.getReactCart) {
+              const cartItems = window.getReactCart();
+              cartItems.forEach(item => {
+                  totalQty += item.quantity;
+                  totalPrice += item.price * item.quantity;
+              });
           }
-      };
 
-      window.closeCleaningModal = function() {
-          const modal = document.getElementById('uc-cleaning-modal');
-          modal.classList.remove('translate-y-0');
-          modal.classList.add('translate-y-full');
-          setTimeout(() => {
-              modal.classList.add('hidden');
-          }, 300); // Match transition duration
-      };
+          const bottomBar = document.getElementById('full-modal-bottom-bar');
+          const priceEl = document.getElementById('full-modal-total-price');
+          const countEl = document.getElementById('full-modal-cart-count');
+          const itemsEl = document.getElementById('full-modal-total-items');
 
-      window.addCleaningServiceToCart = function(event, id, name, price, category) {
-          if (window.addServiceToCart) {
-              window.addServiceToCart(id, name, price, category);
-              
-              // Optional: Show a small toast or animation
-              const btn = event.currentTarget;
-              const originalText = btn.innerText;
-              btn.innerText = 'Added!';
-              btn.classList.add('bg-green-500', 'text-white', 'border-green-500');
-              btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
-              
-              setTimeout(() => {
-                  btn.innerText = originalText;
-                  btn.classList.remove('bg-green-500', 'text-white', 'border-green-500');
-                  btn.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
-              }, 1500);
+          if (totalQty > 0) {
+              bottomBar.classList.remove('hidden');
+              priceEl.textContent = '₹' + totalPrice;
+              if (itemsEl) itemsEl.textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+              countEl.textContent = totalQty;
+              countEl.classList.remove('hidden');
           } else {
-              console.error("React cart function not found");
+              bottomBar.classList.add('hidden');
+              countEl.classList.add('hidden');
           }
       };
+
+      window.increaseQty = function(id, price, name, categoryName) {
+          if (window.addServiceToCart) {
+              window.addServiceToCart(id, name, price, categoryName);
+          } else if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, 1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.decreaseQty = function(id, price, name, categoryName) {
+          if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, -1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.proceedToCheckout = function() {
+          window.closeCategoryView();
+          
+          if (window.openReactCheckout) {
+              window.openReactCheckout();
+          } else {
+              window.dispatchEvent(new Event('openCheckout'));
+          }
+      };
+
+      // Expose sync function for React to call when cart changes externally
+      window.syncVanillaCartUI = function() {
+          if (!document.getElementById('full-service-modal').classList.contains('hidden')) {
+              window.updateStickyCart();
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }
+      };
+      
+      // Remove old unused functions to avoid errors
+      window.openCategoryModal = function(name) { window.openCategoryView(name); };
+      window.closeCategoryModal = function() { window.closeCategoryView(); };
+      window.openCartSidebar = function() { window.proceedToCheckout(); };
+      window.closeCartSidebar = function() {};
+      window.renderCartSidebar = function() {};
     </script>
 
     <script type="module" src="./index.tsx"></script>

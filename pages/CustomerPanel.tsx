@@ -83,6 +83,20 @@ const featuredServicesData = [
 
 
 
+const categoryList = [
+    { name: "AC", image: "https://i.postimg.cc/s2SR2Pvz/Chat-GPT-Image-Mar-25-2026-06-17-17-PM.png" },
+    { name: "Electrician", image: "https://i.postimg.cc/tCXRmc7V/Chat-GPT-Image-Mar-25-2026-06-17-31-PM.png" },
+    { name: "Plumbing", image: "https://i.postimg.cc/L5vSpHhY/Chat-GPT-Image-Mar-25-2026-06-17-26-PM.png" },
+    { name: "WashingMachine", image: "https://i.postimg.cc/FsBtgCL8/Chat-GPT-Image-Mar-25-2026-06-17-13-PM.png" },
+    { name: "Refrigerator", image: "https://i.postimg.cc/wxwng400/Chat-GPT-Image-Mar-25-2026-06-17-10-PM.png" },
+    { name: "WaterPurifier", image: "https://i.postimg.cc/jj6k9MD8/Chat-GPT-Image-Mar-25-2026-06-17-06-PM.png" },
+    { name: "Geyser", image: "https://i.postimg.cc/GhsKVXNY/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg" },
+    { name: "Microwave", image: "https://i.postimg.cc/yddXPjcW/Chat-GPT-Image-Mar-25-2026-06-17-03-PM.png" },
+    { name: "Television", image: "https://i.postimg.cc/GhsKVXNY/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg" },
+    { name: "Chimney", image: "https://i.postimg.cc/Gh528Qhy/Chat-GPT-Image-Mar-25-2026-06-16-57-PM.png" },
+    { name: "Cleaning", image: "https://i.postimg.cc/0Np241Gb/Chat-GPT-Image-Mar-25-2026-06-16-45-PM.png" }
+];
+
 export const CustomerPanel: React.FC = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
@@ -108,6 +122,11 @@ export const CustomerPanel: React.FC = () => {
 
   // Auto-fill address from localStorage when booking modal opens
   useEffect(() => {
+    (window as any).openReactCheckout = () => {
+      setIsBookingModalOpen(true);
+      setBookingStep('form');
+    };
+
     if (isBookingModalOpen) {
       const savedLocation = sessionStorage.getItem('userLocation');
       if (savedLocation && !formData.city) {
@@ -149,10 +168,17 @@ export const CustomerPanel: React.FC = () => {
   }, [searchQuery, allSubServices]);
 
   // Grid Filtering Logic
-  const filteredServices = SERVICES.filter(service => 
-    service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    service.subServices.some(sub => sub.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredCategories = categoryList.filter(category => {
+    const query = searchQuery.toLowerCase();
+    if (category.name.toLowerCase().includes(query)) return true;
+    
+    // Check if any sub-service in this category matches the query
+    const serviceData = SERVICES.find(s => s.name === category.name);
+    if (serviceData && serviceData.subServices.some(sub => sub.name.toLowerCase().includes(query))) {
+      return true;
+    }
+    return false;
+  });
 
   // Cart Logic
   const addToCart = (sub: SubService, categoryName: string) => {
@@ -169,10 +195,34 @@ export const CustomerPanel: React.FC = () => {
     (window as any).addServiceToCart = (id: string, name: string, price: number, categoryName: string) => {
       addToCart({ id, name, price }, categoryName);
     };
+    (window as any).getReactCart = () => cart;
+    (window as any).updateReactCartQuantity = (id: string, delta: number) => {
+      setCart(prev => {
+        const item = prev.find(i => i.id === id);
+        if (!item) return prev;
+        const newQty = item.quantity + delta;
+        if (newQty <= 0) {
+          return prev.filter(i => i.id !== id);
+        }
+        return prev.map(i => i.id === id ? { ...i, quantity: newQty } : i);
+      });
+    };
     return () => {
       delete (window as any).addServiceToCart;
+      delete (window as any).getReactCart;
+      delete (window as any).updateReactCartQuantity;
     };
-  }, []);
+  }, [cart]);
+
+  // Sync vanilla UI when cart changes
+  useEffect(() => {
+    if ((window as any).renderCartSidebar) {
+      (window as any).renderCartSidebar();
+    }
+    if ((window as any).syncVanillaCartUI) {
+      (window as any).syncVanillaCartUI();
+    }
+  }, [cart]);
 
   const removeFromCart = (itemId: string) => {
     setCart(prev => prev.filter(item => item.id !== itemId));
@@ -236,8 +286,12 @@ export const CustomerPanel: React.FC = () => {
   // 3. Handle Direct Booking from Search Dropdown
   const handleDirectBooking = (item: typeof allSubServices[0]) => {
     addToCart(item, item.categoryName);
-    setIsBookingModalOpen(true);
-    setBookingStep('form');
+    if ((window as any).openCartSidebar) {
+      (window as any).openCartSidebar();
+    } else {
+      setIsBookingModalOpen(true);
+      setBookingStep('form');
+    }
     setSearchQuery(''); 
   };
   
@@ -249,8 +303,12 @@ export const CustomerPanel: React.FC = () => {
           price: price
       };
       addToCart(subService, "Featured Service");
-      setIsBookingModalOpen(true);
-      setBookingStep('form');
+      if ((window as any).openCartSidebar) {
+        (window as any).openCartSidebar();
+      } else {
+        setIsBookingModalOpen(true);
+        setBookingStep('form');
+      }
   };
 
 
@@ -498,29 +556,27 @@ export const CustomerPanel: React.FC = () => {
         </div>
 
         {/* Categories Grid */}
-        {filteredServices.length > 0 ? (
+        {filteredCategories.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredServices.map((service) => (
+            {filteredCategories.map((category) => (
               <button
-                key={service.id}
+                key={category.name}
                 onClick={() => {
-                  if (service.name === 'Cleaning' && (window as any).openCleaningModal) {
-                    (window as any).openCleaningModal();
-                  } else {
-                    setSelectedService(service);
+                  if ((window as any).openCategoryModal) {
+                    (window as any).openCategoryModal(category.name);
                   }
                 }}
                 className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl"
               >
                 <img 
-                  src={service.image} 
-                  alt={service.name}
+                  src={category.image} 
+                  alt={category.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 flex justify-center items-end h-2/3">
                   <span className="text-white font-bold text-sm tracking-wide text-center drop-shadow-md">
-                    {service.name}
+                    {category.name}
                   </span>
                 </div>
               </button>
@@ -581,7 +637,14 @@ export const CustomerPanel: React.FC = () => {
                 </div>
               </div>
               <button 
-                onClick={() => { setIsBookingModalOpen(true); setBookingStep('form'); }}
+                onClick={() => {
+                  if ((window as any).openCartSidebar) {
+                    (window as any).openCartSidebar();
+                  } else {
+                    setIsBookingModalOpen(true); 
+                    setBookingStep('form');
+                  }
+                }}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
               >
                 View Cart & Book <ArrowRight size={18} />

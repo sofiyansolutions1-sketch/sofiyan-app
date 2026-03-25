@@ -13,15 +13,10 @@ export const ADMIN_PASSWORD = "ta7867@#";
 export const CATEGORY_IMAGES: Record<string, string> = {
   "Electrician": "https://i.postimg.cc/dts84RjY/Whats-App-Image-2026-01-13-at-1-49-19-AM.jpg",
   "Plumbing": "https://i.postimg.cc/MKLvV1P8/Whats-App-Image-2026-01-13-at-1-01-12-AM.jpg",
-  "AC": "https://i.postimg.cc/B6ZqdvYF/Whats-App-Image-2026-01-12-at-11-13-39-PM.jpg",
-  "WashingMachine": "https://i.postimg.cc/Jhx8cLrX/Whats-App-Image-2026-01-12-at-10-43-01-PM-(1).jpg",
-  "Refrigerator": "https://i.postimg.cc/6QpWP31Y/Whats-App-Image-2026-01-12-at-7-49-01-AM.jpg",
+  "AC Repair": "https://i.postimg.cc/B6ZqdvYF/Whats-App-Image-2026-01-12-at-11-13-39-PM.jpg",
+  "Appliances": "https://i.postimg.cc/Jhx8cLrX/Whats-App-Image-2026-01-12-at-10-43-01-PM-(1).jpg",
   "Cleaning": "https://i.postimg.cc/7L2sw1cy/Whats-App-Image-2026-01-12-at-11-52-39-PM.jpg",
-  "WaterPurifier": "https://i.postimg.cc/sgRJdBSs/Chat-GPT-Image-Jan-13-2026-05-16-10-AM.jpg",
-  "TV": "https://i.postimg.cc/nrRYvM54/Whats-App-Image-2026-01-13-at-1-49-17-AM-(1).jpg",
-  "Geyser": "https://i.postimg.cc/MKB83R64/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg",
-  "CCTV": "https://i.postimg.cc/25Shrn5Z/Whats-App-Image-2026-01-13-at-1-49-20-AM.jpg",
-  "Chimney": "https://i.postimg.cc/pdRhLRcL/Chat-GPT-Image-Jan-13-2026-04-35-16-AM.jpg"
+  "Pest Control": "https://i.postimg.cc/25Shrn5Z/Whats-App-Image-2026-01-13-at-1-49-20-AM.jpg",
 };
 
 // Real Database Data
@@ -263,31 +258,57 @@ export const DB_DATA = {
 const CATEGORY_METADATA: Record<string, { icon: string, color: string, description: string }> = {
   "Electrician": { icon: 'Zap', color: 'bg-yellow-500', description: 'Expert electrical repairs & installs' },
   "Plumbing": { icon: 'Droplet', color: 'bg-blue-500', description: 'Leak fixes, pipes & fittings' },
-  "AC": { icon: 'Wind', color: 'bg-cyan-500', description: 'Cooling, repair & gas refill' },
-  "WashingMachine": { icon: 'Disc', color: 'bg-indigo-500', description: 'Washer repair & maintenance' },
-  "Refrigerator": { icon: 'Snowflake', color: 'bg-sky-500', description: 'Fridge cooling & repair' },
-  "Geyser": { icon: 'Flame', color: 'bg-orange-500', description: 'Heater repair & installation' },
-  "WaterPurifier": { icon: 'Filter', color: 'bg-teal-500', description: 'RO service & filter change' },
+  "AC Repair": { icon: 'Wind', color: 'bg-cyan-500', description: 'Cooling, repair & gas refill' },
+  "Appliances": { icon: 'Disc', color: 'bg-indigo-500', description: 'Washer, Fridge, TV & more' },
   "Cleaning": { icon: 'Sparkles', color: 'bg-green-500', description: 'Deep home & tank cleaning' },
-  "Chimney": { icon: 'Cloud', color: 'bg-gray-500', description: 'Kitchen chimney deep cleaning' },
-  "TV": { icon: 'Tv', color: 'bg-purple-500', description: 'TV installation & mounting' },
-  "CCTV": { icon: 'Video', color: 'bg-slate-600', description: 'Security camera setup' },
+  "Pest Control": { icon: 'Sparkles', color: 'bg-red-500', description: 'Pest control services' },
+  "Carpentry": { icon: 'Wrench', color: 'bg-orange-500', description: 'Woodwork & furniture repair' },
+  "Painting": { icon: 'PaintBucket', color: 'bg-purple-500', description: 'Home painting & waterproofing' },
 };
 
-// Transform DB_DATA into the application's Service structure
-export const SERVICES: Service[] = Object.keys(DB_DATA.Services).map((key) => ({
-  id: key.toLowerCase(),
-  name: key,
-  icon: CATEGORY_METADATA[key]?.icon || 'Wrench',
-  image: CATEGORY_IMAGES[key] || 'https://images.unsplash.com/photo-1581578731117-104f2a41272c?auto=format&fit=crop&q=80', // Fallback image
-  color: CATEGORY_METADATA[key]?.color || 'bg-gray-500',
-  description: CATEGORY_METADATA[key]?.description || 'Professional Home Service',
-  subServices: (DB_DATA.Services as any)[key].map((s: any, index: number) => ({
-    id: `${key.toLowerCase()}-${index}`,
-    name: s.name,
-    price: s.price
-  }))
-}));
+// Use window.masterServicesData if available, otherwise fallback to a default structure
+const getMasterData = () => {
+  if (typeof window !== 'undefined' && (window as any).masterServicesData) {
+    return (window as any).masterServicesData;
+  }
+  return {
+    "Cleaning": {},
+    "Electrician": {},
+    "Plumbing": {},
+    "Appliances": {},
+    "AC Repair": {},
+    "Pest Control": {},
+    "Carpentry": {},
+    "Painting": {}
+  };
+};
+
+// Transform masterServicesData into the application's Service structure
+export const SERVICES: Service[] = Object.keys(getMasterData()).map((key) => {
+  const categoryData = getMasterData()[key];
+  
+  // Flatten all sub-services for the search/grid functionality
+  const allSubServices: any[] = [];
+  Object.keys(categoryData).forEach(subcat => {
+      categoryData[subcat].forEach((s: any) => {
+          allSubServices.push({
+              id: s.id || `${key}-${subcat}-${s.name}`.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase(),
+              name: s.name,
+              price: s.price
+          });
+      });
+  });
+
+  return {
+    id: key.toLowerCase().replace(/\s+/g, '-'),
+    name: key,
+    icon: CATEGORY_METADATA[key]?.icon || 'Wrench',
+    image: CATEGORY_IMAGES[key] || 'https://images.unsplash.com/photo-1581578731117-104f2a41272c?auto=format&fit=crop&q=80',
+    color: CATEGORY_METADATA[key]?.color || 'bg-gray-500',
+    description: CATEGORY_METADATA[key]?.description || 'Professional Home Service',
+    subServices: allSubServices
+  };
+});
 
 export const getIcon = (name: string) => {
   switch (name) {

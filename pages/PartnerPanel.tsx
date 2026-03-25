@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { Partner, Booking } from '../types';
-import { DB_DATA } from '../constants';
+import { SERVICES } from '../constants';
 import { Modal } from '../components/Modal';
 import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -954,8 +954,8 @@ export const PartnerPanel: React.FC = () => {
                   onChange={(e) => {
                      const selectedServiceName = e.target.value;
                      let service = null;
-                     for (const cat in DB_DATA.Services) {
-                         const found = (DB_DATA.Services as any)[cat].find((s: any) => s.name === selectedServiceName);
+                     for (const category of SERVICES) {
+                         const found = category.subServices.find((s: any) => s.name === selectedServiceName);
                          if (found) {
                              service = found;
                              break;
@@ -970,10 +970,10 @@ export const PartnerPanel: React.FC = () => {
                   defaultValue=""
                 >
                   <option value="" disabled>Select extra service...</option>
-                  {Object.entries(DB_DATA.Services).map(([category, services]) => (
-                    <optgroup key={category} label={category}>
-                      {(services as any[]).map((s: any) => (
-                         <option key={`${category}-${s.name}`} value={s.name}>{s.name} - ₹{s.price}</option>
+                  {SERVICES.map((category) => (
+                    <optgroup key={category.name} label={category.name}>
+                      {category.subServices.map((s: any) => (
+                         <option key={`${category.name}-${s.name}`} value={s.name}>{s.name} - ₹{s.price}</option>
                       ))}
                     </optgroup>
                   ))}
