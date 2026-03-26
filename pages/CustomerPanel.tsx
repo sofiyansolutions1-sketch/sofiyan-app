@@ -92,7 +92,7 @@ const categoryList = [
     { name: "WaterPurifier", image: "https://i.postimg.cc/jj6k9MD8/Chat-GPT-Image-Mar-25-2026-06-17-06-PM.png" },
     { name: "Geyser", image: "https://i.postimg.cc/GhsKVXNY/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg" },
     { name: "Microwave", image: "https://i.postimg.cc/yddXPjcW/Chat-GPT-Image-Mar-25-2026-06-17-03-PM.png" },
-    { name: "Television", image: "https://i.postimg.cc/GhsKVXNY/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg" },
+    { name: "Television", image: "https://i.postimg.cc/Ss5hbvjM/Chat-GPT-Image-Mar-26-2026-07-07-43-PM.png" },
     { name: "Chimney", image: "https://i.postimg.cc/Gh528Qhy/Chat-GPT-Image-Mar-25-2026-06-16-57-PM.png" },
     { name: "Cleaning", image: "https://i.postimg.cc/0Np241Gb/Chat-GPT-Image-Mar-25-2026-06-16-45-PM.png" }
 ];
@@ -399,10 +399,29 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
-      const { error } = await supabase
+      // 1. First, save the customer information
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .insert([
+          {
+            name: formData.name,
+            phone: formData.contact,
+            address: formData.address,
+            city: formData.city,
+            pincode: formData.pincode
+          }
+        ])
+        .select()
+        .single();
+
+      if (customerError) throw customerError;
+
+      // 2. Then, save the booking with the new customer_id
+      const { error: bookingError } = await supabase
         .from('bookings')
         .insert([
           {
+            customer_id: customerData.id,
             customer_name: formData.name,
             customer_phone: formData.contact,
             customer_address: formData.address,
@@ -423,7 +442,7 @@ export const CustomerPanel: React.FC = () => {
           }
         ]);
 
-      if (error) throw error;
+      if (bookingError) throw bookingError;
 
       // Success UI
       setBookingStep('success');
@@ -562,7 +581,9 @@ export const CustomerPanel: React.FC = () => {
               <button
                 key={category.name}
                 onClick={() => {
-                  if ((window as any).openCategoryModal) {
+                  if ((window as any).openCategoryView) {
+                    (window as any).openCategoryView(category.name);
+                  } else if ((window as any).openCategoryModal) {
                     (window as any).openCategoryModal(category.name);
                   }
                 }}

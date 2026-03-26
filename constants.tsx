@@ -17,6 +17,7 @@ export const CATEGORY_IMAGES: Record<string, string> = {
   "Appliances": "https://i.postimg.cc/Jhx8cLrX/Whats-App-Image-2026-01-12-at-10-43-01-PM-(1).jpg",
   "Cleaning": "https://i.postimg.cc/7L2sw1cy/Whats-App-Image-2026-01-12-at-11-52-39-PM.jpg",
   "Pest Control": "https://i.postimg.cc/25Shrn5Z/Whats-App-Image-2026-01-13-at-1-49-20-AM.jpg",
+  "Television": "https://i.postimg.cc/Ss5hbvjM/Chat-GPT-Image-Mar-26-2026-07-07-43-PM.png",
 };
 
 // Real Database Data

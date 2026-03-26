@@ -99,19 +99,22 @@ export const AdminPanel: React.FC = () => {
     try {
         // 2. Prepare Payload
         const partnerData = {
-            first_name: name.trim(), // Using first_name for shop name/name
+            name: name.trim(),
             phone: phone.trim(),
             city: city.trim(),
-            status: 'Active', // Auto-active for manual entries
-            expertise: services.join(', '), // Store services as expertise
+            status: 'available',
+            categories: services, // Store services as array
             address: address.trim(),
             pincode: pincode.trim(),
             email: `${phone.trim()}@partner.com`, // Dummy email
-            partner_type: 'Secondary'
+            lat: 0,
+            lng: 0,
+            earnings: 0,
+            completed_jobs: 0
         };
 
         // 3. Save to Supabase
-        const { error } = await supabase.from('partners').insert([partnerData]);
+        const { error } = await supabase.from('secondary_partners').insert([partnerData]);
 
         if (error) throw error;
 
