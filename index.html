@@ -775,6 +775,9 @@
         const amountInput = document.getElementById('invoice-final-amount');
         amountInput.value = baseAmount || 0;
 
+        const phoneInput = document.getElementById('invoice-partner-phone');
+        if (phoneInput) phoneInput.value = partnerPhone || '';
+
         const modal = document.getElementById('invoice-bill-modal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -803,7 +806,13 @@
         const finalAmount = parseFloat(amountInput.value) || 0;
         const commission = finalAmount * 0.25;
         
-        const { partnerPhone, partnerName, customerName, serviceName } = currentInvoiceData;
+        const { partnerName, customerName, serviceName } = currentInvoiceData;
+
+        const phoneInput = document.getElementById('invoice-partner-phone').value.trim();
+        if (!phoneInput) {
+            alert("Please enter the partner's WhatsApp number.");
+            return;
+        }
 
         const message = `🧾 *SOFIYAN HOME SERVICE - INVOICE* 🧾
 
@@ -818,11 +827,11 @@
 
 📲 *Pay via WhatsApp here:* https://wa.me/919219345455
 
-Payment karne ke baad yahan screenshot bhej dein. Thank you!`;
+📸 *Payment karne ke baad yahan screenshot zaroor bhej dein.* Thank you!`;
 
         const encodedMessage = encodeURIComponent(message);
-        // Send directly to Admin's WhatsApp
-        const whatsappUrl = `https://wa.me/919219345455?text=${encodedMessage}`;
+        // Send directly to Partner's WhatsApp
+        const whatsappUrl = `https://wa.me/91${phoneInput}?text=${encodedMessage}`;
         window.open(whatsappUrl, '_blank');
         
         window.closeInvoiceModal();
@@ -846,6 +855,14 @@ Payment karne ke baad yahan screenshot bhej dein. Thank you!`;
         <!-- Body -->
         <div class="space-y-5 p-6 overflow-y-auto">
           
+          <div class="mb-4">
+              <label class="block text-sm font-bold text-gray-700 mb-1">Partner WhatsApp Number <span class="text-red-500">*</span></label>
+              <div class="flex">
+                  <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md font-bold">+91</span>
+                  <input type="tel" id="invoice-partner-phone" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 block flex-1 min-w-0 w-full text-sm p-2.5" placeholder="Enter 10-digit mobile number">
+              </div>
+          </div>
+
           <!-- Lead Summary -->
           <div class="rounded-lg bg-gray-50 p-4 border border-gray-100">
             <div class="flex justify-between text-sm mb-1">
