@@ -70,14 +70,14 @@ const featuredServicesData = [
     { name: "AC Installation – Split", price: 1499, img: "https://i.postimg.cc/zfwpJmFk/Whats-App-Image-2026-01-12-at-11-13-40-PM-(1).jpg", desc: "Flawless split AC mounting & installation." },
     { name: "AC Installation – Window", price: 799, img: "https://i.postimg.cc/0Q8njttm/Whats-App-Image-2026-01-12-at-11-13-41-PM.jpg", desc: "Secure window AC fitting by verified pros." },
     { name: "Kitchen Deep Cleaning", price: 1599, img: "https://i.postimg.cc/SsfmkPwM/Whats-App-Image-2026-01-12-at-11-52-48-PM.jpg", desc: "Remove tough grease & stains completely." },
-    { name: "Chimney Full Deep Cleaning", price: 2000, img: "https://i.postimg.cc/FFPQp0m9/Chat-GPT-Image-Jan-13-2026-04-35-34-AM.jpg", desc: "Dismantling & deep chemical wash for chimneys." },
-    { name: "Sofa Cleaning (per seat)", price: 170, img: "https://i.postimg.cc/D0ZGk18T/Whats-App-Image-2026-01-12-at-11-52-40-PM.jpg", desc: "Shampooing & vacuuming for spotless sofas." },
+    { name: "Chimney Full Deep Cleaning", price: 1300, img: "https://i.postimg.cc/FFPQp0m9/Chat-GPT-Image-Jan-13-2026-04-35-34-AM.jpg", desc: "Dismantling & deep chemical wash for chimneys." },
+    { name: "Sofa Cleaning", price: 499, img: "https://i.postimg.cc/D0ZGk18T/Whats-App-Image-2026-01-12-at-11-52-40-PM.jpg", desc: "Shampooing & vacuuming for spotless sofas." },
     { name: "AC Water Leakage Repair", price: 599, img: "https://i.postimg.cc/442GJpmj/Whats-App-Image-2026-01-12-at-11-13-46-PM.jpg", desc: "Drainpipe blockages & leakage fixed instantly." },
     { name: "AC Shifting (other site)", price: 1699, img: "https://i.postimg.cc/zfwpJmFk/Whats-App-Image-2026-01-12-at-11-13-40-PM-(1).jpg", desc: "Safe uninstallation & shifting of your AC." },
-    { name: "Full Home 1BHK", price: 4000, img: "https://i.postimg.cc/q7cP33QD/Whats-App-Image-2026-01-12-at-11-52-37-PM.jpg", desc: "Intensive 1BHK deep cleaning by Sofiyan experts." },
-    { name: "Full Home 2BHK", price: 6000, img: "https://i.postimg.cc/026hC3cq/Whats-App-Image-2026-01-12-at-11-52-38-PM.jpg", desc: "Complete 2BHK sanitization & deep cleaning." },
-    { name: "Full Home 3BHK", price: 9000, img: "https://i.postimg.cc/25xt6f8J/Whats-App-Image-2026-01-12-at-11-52-39-PM-(1).jpg", desc: "Premium 3BHK hygiene & deep clean service." },
-    { name: "Full Home 4BHK", price: 13000, img: "https://i.postimg.cc/kg3Yv5VJ/Whats-App-Image-2026-01-12-at-11-52-39-PM.jpg", desc: "Extensive 4BHK cleaning for a sparkling home." },
+    { name: "Full Home 1BHK", price: 3499, img: "https://i.postimg.cc/q7cP33QD/Whats-App-Image-2026-01-12-at-11-52-37-PM.jpg", desc: "Intensive 1BHK deep cleaning by Sofiyan experts." },
+    { name: "Full Home 2BHK", price: 3899, img: "https://i.postimg.cc/026hC3cq/Whats-App-Image-2026-01-12-at-11-52-38-PM.jpg", desc: "Complete 2BHK sanitization & deep cleaning." },
+    { name: "Full Home 3BHK", price: 4799, img: "https://i.postimg.cc/25xt6f8J/Whats-App-Image-2026-01-12-at-11-52-39-PM-(1).jpg", desc: "Premium 3BHK hygiene & deep clean service." },
+    { name: "Full Home 4BHK", price: 6199, img: "https://i.postimg.cc/kg3Yv5VJ/Whats-App-Image-2026-01-12-at-11-52-39-PM.jpg", desc: "Extensive 4BHK cleaning for a sparkling home." },
     { name: "Water Tank Cleaning (1000L)", price: 749, img: "https://i.postimg.cc/fy2xJB6v/Chat-GPT-Image-Jan-13-2026-12-44-47-AM.jpg", desc: "Anti-bacterial water tank cleaning & treatment." }
 ];
 
@@ -243,7 +243,7 @@ export const CustomerPanel: React.FC = () => {
 
   // Coupon Logic
   const validCoupons: Record<string, number> = {
-      'SAVE10': 10, 'EASY10': 10, 'QUICK10': 10,
+      'GET20': 10, 'SAVE10': 10, 'EASY10': 10, 'QUICK10': 10,
       'SOFIYAN15': 15, 'CLEAN15': 15, 'SMART15': 15,
       'SUPER20': 20, 'MUMBAI20': 20, 'RELAX20': 20,
       'MEGA30': 30, 'VIP30': 30, 'FESTIVAL30': 30,
@@ -920,6 +920,10 @@ export const CustomerPanel: React.FC = () => {
                         <div className="mt-2">
                             <p className="text-[10px] text-gray-500 mb-1">Available Offers (Tap to apply):</p>
                             <div className="flex flex-wrap gap-1">
+                                <span onClick={() => handleApplyCoupon('GET20')} className="cursor-pointer bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-blue-200 transition">
+                                    GET20 (10% OFF)
+                                </span>
+
                                 <span onClick={() => handleApplyCoupon('SAVE10')} className="cursor-pointer bg-green-100 text-green-700 border border-green-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-green-200 transition">
                                     SAVE10 (10% OFF)
                                 </span>

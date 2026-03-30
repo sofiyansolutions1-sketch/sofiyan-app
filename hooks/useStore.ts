@@ -119,7 +119,9 @@ export const useStore = () => {
 
     const { error } = await supabase.from('bookings').update({
         status: updatedBooking.status,
-        assigned_partner_id: updatedBooking.assignedPartnerId,
+        assigned_partner_id: updatedBooking.assignedPartnerId || null,
+        assigned_partner_name: updatedBooking.assignedPartnerName || null,
+        assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
         commission_paid: updatedBooking.commissionPaid,
         service_date: updatedBooking.date,
         service_time: updatedBooking.time

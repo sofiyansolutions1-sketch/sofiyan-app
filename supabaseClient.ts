@@ -29,7 +29,12 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // Update Supabase Database
         const { error } = await supabase
             .from('bookings')
-            .update({ status: 'Cancelled', assigned_partner_id: null })
+            .update({ 
+                status: 'cancelled', 
+                assigned_partner_id: null,
+                assigned_partner_name: null,
+                assigned_partner_phone: null
+            })
             .eq('id', bookingId);
             
         if (error) throw error;

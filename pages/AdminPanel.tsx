@@ -377,7 +377,9 @@ export const AdminPanel: React.FC = () => {
     const updatedBooking: Booking = { 
       ...booking, 
       status: 'cancelled',
-      assignedPartnerId: undefined // Remove assignment
+      assignedPartnerId: undefined, // Remove assignment
+      assignedPartnerName: undefined,
+      assignedPartnerPhone: undefined
     };
     
     // Optimistic update to hide from list immediately
@@ -413,10 +415,24 @@ export const AdminPanel: React.FC = () => {
     }
 
     try {
-        // Update Supabase: Set status back to Pending and remove the assigned partner
+        // 1. If a partner was assigned, free them up
+        if (booking.assignedPartnerId) {
+          const partner = partners.find(p => p.id === booking.assignedPartnerId);
+          if (partner) {
+            const updatedPartner: Partner = { ...partner, status: 'available' };
+            updatePartner(updatedPartner);
+          }
+        }
+
+        // 2. Update Supabase: Set status back to Pending and remove the assigned partner
         const { error } = await supabase
             .from('bookings')
-            .update({ status: 'pending', assigned_partner_id: null })
+            .update({ 
+                status: 'pending', 
+                assigned_partner_id: null,
+                assigned_partner_name: null,
+                assigned_partner_phone: null
+            })
             .eq('id', booking.id);
             
         if (error) throw error;
@@ -538,11 +554,18 @@ export const AdminPanel: React.FC = () => {
           // 3. Update Database in Background
           supabase.from('bookings').update({
               status: 'Forwarded',
+              assigned_partner_id: partnerId,
               assigned_partner_name: partnerName,
               assigned_partner_phone: cleanPhone
           }).eq('id', booking.id).then(({error}) => {
               if(error) console.error("DB Update Failed:", error);
           });
+
+          // Also update partner status to busy
+          const partner = partners.find(p => p.id === partnerId);
+          if (partner) {
+              updatePartner({ ...partner, status: 'busy' });
+          }
 
           // 4. Update UI and Open WhatsApp
           if ((window as any).closeMatchModal) {
@@ -553,6 +576,7 @@ export const AdminPanel: React.FC = () => {
           updateBooking({
               ...booking,
               status: 'Forwarded',
+              assignedPartnerId: partnerId,
               assignedPartnerName: partnerName,
               assignedPartnerPhone: cleanPhone
           });
@@ -565,7 +589,7 @@ export const AdminPanel: React.FC = () => {
           alert("Something went wrong while formatting the lead data.");
       }
     };
-  }, [bookings, updateBooking]);
+  }, [bookings, updateBooking, partners, updatePartner]);
 
   // Generate WhatsApp Message for Admin
   const getAdminWhatsAppLink = (booking: Booking) => {
@@ -793,6 +817,23 @@ export const AdminPanel: React.FC = () => {
                             <a href={waLink} target="_blank" rel="noopener noreferrer" title="Forward to Admin WhatsApp" className="text-xs bg-green-50 text-green-600 px-3 py-1 rounded border border-green-200 hover:bg-green-100 font-bold flex items-center transition">
                                 <Send size={14} className="mr-1" /> Forward
                             </a>
+                            <button 
+                                onClick={() => {
+                                    if ((window as any).openInvoiceModal) {
+                                        (window as any).openInvoiceModal(
+                                            booking.id, 
+                                            booking.assignedPartnerPhone || '', 
+                                            booking.assignedPartnerName || 'Admin', 
+                                            booking.customerName, 
+                                            servicesText, 
+                                            booking.price
+                                        );
+                                    }
+                                }}
+                                className="text-xs bg-emerald-50 text-emerald-700 px-3 py-1 rounded border border-emerald-200 hover:bg-emerald-100 font-bold flex items-center transition"
+                            >
+                                🧾 Generate Bill
+                            </button>
                         </div>
                     </div>
                     

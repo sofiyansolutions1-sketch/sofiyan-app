@@ -58,14 +58,27 @@ create index if not exists secondary_partners_pincode_idx on public.secondary_pa
 create index if not exists secondary_partners_status_idx on public.secondary_partners (status);
 create index if not exists secondary_partners_categories_idx on public.secondary_partners using gin (categories);
 
--- 3. Create Bookings Table
+-- 3. Create Customers Table
+-- This table stores customer details.
+create table public.customers (
+  id uuid default uuid_generate_v4() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  name text,
+  phone text,
+  address text,
+  city text,
+  pincode text
+);
+
+-- 4. Create Bookings Table
 -- This table stores all customer service requests.
 create table public.bookings (
   id uuid default uuid_generate_v4() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  customer_name text not null,
-  customer_phone text not null,
-  customer_address text not null,
+  customer_id uuid references public.customers(id),
+  customer_name text,
+  customer_phone text,
+  customer_address text,
   city text,
   pincode text,
   cart_items jsonb, -- Stores the array of selected services as JSON
@@ -94,9 +107,20 @@ create index if not exists bookings_service_date_idx on public.bookings (service
 alter table public.primary_partners enable row level security;
 alter table public.secondary_partners enable row level security;
 alter table public.bookings enable row level security;
+alter table public.customers enable row level security;
 
 -- 5. Create Policies
 -- Note: These are simplified policies. In production, you might want stricter rules.
+
+-- Customers Policies
+create policy "Anyone can insert customers" 
+  on public.customers for insert with check (true);
+
+create policy "Customers are viewable by everyone" 
+  on public.customers for select using (true);
+
+create policy "Customers are updatable by everyone" 
+  on public.customers for update using (true);
 
 -- Primary Partners Policies
 create policy "Public primary partners are viewable by everyone" 
