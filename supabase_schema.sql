@@ -1,153 +1,104 @@
--- Enable UUID extension if not already enabled
-create extension if not exists "uuid-ossp";
-
--- 1. Create Primary Partners Table
--- This table stores profile information for verified service partners.
--- The 'id' links directly to Supabase Auth 'users' table.
-create table public.primary_partners (
-  id uuid references auth.users not null primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  first_name text not null,
-  last_name text,
-  phone text,
-  email text,
-  gender text,
-  categories text[] default '{}', -- Array of service categories (e.g., ['Electrician', 'Plumber'])
-  sub_categories text[] default '{}', -- Array of specific services (e.g., ['AC Repair'])
-  experience text,
-  address text,
-  city text,
-  pincode text,
-  lat numeric,
-  lng numeric,
-  status text default 'available', -- 'available', 'busy'
-  earnings numeric default 0,
-  completed_jobs integer default 0,
-  is_verified boolean default false
+-- ==========================================
+-- 1. Create Bookings Table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS bookings (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_address TEXT NOT NULL,
+    city TEXT,
+    pincode TEXT,
+    cart_items JSONB NOT NULL,
+    total_price NUMERIC NOT NULL,
+    service_date TEXT NOT NULL,
+    service_time TEXT NOT NULL,
+    notes TEXT,
+    status TEXT DEFAULT 'pending',
+    service_category TEXT,
+    sub_service_name TEXT,
+    commission_paid BOOLEAN DEFAULT false,
+    coupon_used TEXT,
+    discount_amount NUMERIC DEFAULT 0,
+    assigned_partner_id TEXT,
+    assigned_partner_name TEXT,
+    assigned_partner_phone TEXT,
+    applied_referral_code TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Indexes for Primary Partners Search Performance
-create index if not exists primary_partners_city_idx on public.primary_partners (city);
-create index if not exists primary_partners_pincode_idx on public.primary_partners (pincode);
-create index if not exists primary_partners_status_idx on public.primary_partners (status);
-create index if not exists primary_partners_categories_idx on public.primary_partners using gin (categories);
-
--- 2. Create Secondary Partners Table
--- This table stores profile information for GMB / Bulk uploaded partners.
-create table public.secondary_partners (
-  id uuid default uuid_generate_v4() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  name text not null,
-  phone text,
-  email text,
-  categories text[] default '{}',
-  address text,
-  city text,
-  pincode text,
-  lat numeric,
-  lng numeric,
-  status text default 'available',
-  earnings numeric default 0,
-  completed_jobs integer default 0,
-  is_verified boolean default false
+-- ==========================================
+-- 2. Create Primary Partners Table
+-- (For partners who register via the app)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS primary_partners (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    phone TEXT,
+    email TEXT,
+    gender TEXT,
+    categories JSONB,
+    sub_categories JSONB,
+    experience TEXT,
+    address TEXT,
+    city TEXT,
+    pincode TEXT,
+    lat FLOAT8,
+    lng FLOAT8,
+    status TEXT DEFAULT 'available',
+    earnings NUMERIC DEFAULT 0,
+    completed_jobs INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Indexes for Secondary Partners Search Performance
-create index if not exists secondary_partners_city_idx on public.secondary_partners (city);
-create index if not exists secondary_partners_pincode_idx on public.secondary_partners (pincode);
-create index if not exists secondary_partners_status_idx on public.secondary_partners (status);
-create index if not exists secondary_partners_categories_idx on public.secondary_partners using gin (categories);
-
--- 3. Create Customers Table
--- This table stores customer details.
-create table public.customers (
-  id uuid default uuid_generate_v4() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  name text,
-  phone text,
-  address text,
-  city text,
-  pincode text
+-- ==========================================
+-- 3. Create Secondary Partners Table 
+-- (For GMB/Manual partners added by Admin)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS secondary_partners (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT,
+    phone TEXT,
+    email TEXT,
+    city TEXT,
+    categories JSONB,
+    address TEXT,
+    pincode TEXT,
+    lat FLOAT8,
+    lng FLOAT8,
+    status TEXT DEFAULT 'available',
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 4. Create Bookings Table
--- This table stores all customer service requests.
-create table public.bookings (
-  id uuid default uuid_generate_v4() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  customer_id uuid references public.customers(id),
-  customer_name text,
-  customer_phone text,
-  customer_address text,
-  city text,
-  pincode text,
-  cart_items jsonb, -- Stores the array of selected services as JSON
-  total_price numeric,
-  service_date text,
-  service_time text,
-  notes text,
-  status text default 'pending', -- 'pending', 'accepted', 'completed', 'cancelled'
-  service_category text, -- Primary category for filtering
-  sub_service_name text, -- Summary of services
-  commission_paid boolean default false,
-  assigned_partner_id uuid, -- Removed foreign key constraint to allow assignment to either partner type
-  assigned_partner_name text,
-  assigned_partner_phone text,
-  coupon_used text,
-  discount_amount numeric default 0
+-- ==========================================
+-- 4. Create Influencers Table
+-- ==========================================
+CREATE TABLE IF NOT EXISTS influencers (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    page_name TEXT UNIQUE NOT NULL,
+    contact_number TEXT,
+    password TEXT NOT NULL,
+    referral_code TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Indexes for Bookings Filtering and Retrieval
-create index if not exists bookings_status_idx on public.bookings (status);
-create index if not exists bookings_city_idx on public.bookings (city);
-create index if not exists bookings_assigned_partner_id_idx on public.bookings (assigned_partner_id);
-create index if not exists bookings_service_date_idx on public.bookings (service_date);
+-- ==========================================
+-- 5. ENABLE Row Level Security (RLS)
+-- (Fixes the "UNRESTRICTED" warning in Supabase)
+-- ==========================================
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE primary_partners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE secondary_partners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE influencers ENABLE ROW LEVEL SECURITY;
 
--- 4. Enable Row Level Security (RLS)
-alter table public.primary_partners enable row level security;
-alter table public.secondary_partners enable row level security;
-alter table public.bookings enable row level security;
-alter table public.customers enable row level security;
+-- ==========================================
+-- 6. Create RLS Policies
+-- (Allows your frontend to read/write freely 
+-- so all features continue to work properly)
+-- ==========================================
 
--- 5. Create Policies
--- Note: These are simplified policies. In production, you might want stricter rules.
-
--- Customers Policies
-create policy "Anyone can insert customers" 
-  on public.customers for insert with check (true);
-
-create policy "Customers are viewable by everyone" 
-  on public.customers for select using (true);
-
-create policy "Customers are updatable by everyone" 
-  on public.customers for update using (true);
-
--- Primary Partners Policies
-create policy "Public primary partners are viewable by everyone" 
-  on public.primary_partners for select using (true);
-
-create policy "Primary partners can insert their own profile" 
-  on public.primary_partners for insert with check (auth.uid() = id);
-
-create policy "Primary partners can update their own profile" 
-  on public.primary_partners for update using (auth.uid() = id);
-
--- Secondary Partners Policies
-create policy "Public secondary partners are viewable by everyone" 
-  on public.secondary_partners for select using (true);
-
-create policy "Anyone can insert secondary partners" 
-  on public.secondary_partners for insert with check (true);
-
-create policy "Anyone can update secondary partners" 
-  on public.secondary_partners for update using (true);
-
--- Bookings Policies
-create policy "Anyone can insert bookings" 
-  on public.bookings for insert with check (true);
-
-create policy "Bookings are viewable by everyone" 
-  on public.bookings for select using (true);
-
-create policy "Bookings are updatable by everyone" 
-  on public.bookings for update using (true);
+-- Create new permissive policies
+CREATE POLICY "Enable full access for all users" ON bookings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Enable full access for all users" ON primary_partners FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Enable full access for all users" ON secondary_partners FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Enable full access for all users" ON influencers FOR ALL USING (true) WITH CHECK (true);

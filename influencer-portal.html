@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer Portal | Sofiyan Home Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Auth View -->
+    <div id="auth-view" class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-indigo-600 p-6 text-center">
+                <h2 class="text-2xl font-bold text-white">Influencer Portal</h2>
+                <p class="text-indigo-200 text-sm mt-1">Partner with Sofiyan Home Service</p>
+            </div>
+
+            <div class="p-6">
+                <!-- Toggle Tabs -->
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors">Login</button>
+                    <button id="tab-signup" onclick="switchTab('signup')" class="flex-1 py-3 text-sm font-bold text-gray-500 border-b-2 border-transparent hover:text-indigo-600 transition-colors">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" onsubmit="event.preventDefault(); loginInfluencer();" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Instagram Page Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">@</span>
+                            <input type="text" id="login-page-name" required class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="your_page_name">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="••••••••">
+                    </div>
+                    <button type="submit" id="btn-login" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors flex justify-center items-center">
+                        Login to Dashboard
+                    </button>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="signup-form" onsubmit="event.preventDefault(); registerInfluencer();" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Instagram Page Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">@</span>
+                            <input type="text" id="signup-page-name" required class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="your_page_name">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                        <input type="tel" id="signup-contact" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="10-digit mobile number">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Create Referral Code</label>
+                        <input type="text" id="signup-referral-code" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase" placeholder="e.g. SOFIYAN20">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="signup-password" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="••••••••">
+                    </div>
+                    <button type="submit" id="btn-signup" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors flex justify-center items-center">
+                        Create Account
+                    </button>
+                </form>
+                
+                <div id="auth-error" class="mt-4 text-sm text-red-600 text-center hidden font-medium"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="hidden flex-1 flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900" id="dash-welcome">Welcome, @page</h1>
+                </div>
+                <button onclick="logoutInfluencer()" class="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            
+            <!-- Live Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="bg-blue-50 p-2.5 rounded-lg text-blue-600">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Code Uses</h3>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900" id="stat-uses">0</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="bg-purple-50 p-2.5 rounded-lg text-purple-600">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Booking Volume</h3>
+                    </div>
+                    <p class="text-3xl font-bold text-gray-900" id="stat-volume">₹0</p>
+                </div>
+
+                <!-- Card 3 (Commission) -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-sm border border-green-200 flex flex-col justify-center relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-green-200 opacity-50 text-6xl">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="bg-green-100 p-2.5 rounded-lg text-green-700">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-green-800">Your 20% Commission</h3>
+                        </div>
+                        <p class="text-4xl font-black text-green-600" id="stat-commission">₹0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Recent Activity Table -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">Recent Activity</h3>
+                        <button onclick="refreshDashboard()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1">
+                            <i class="fas fa-sync-alt" id="refresh-icon"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                                    <th class="px-6 py-4">Date</th>
+                                    <th class="px-6 py-4">Customer</th>
+                                    <th class="px-6 py-4 text-right">Booking Value</th>
+                                    <th class="px-6 py-4 text-right">Your Cut (20%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-table-body" class="divide-y divide-gray-100">
+                                <!-- Rows injected via JS -->
+                                <tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 text-sm">Loading activity...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-3">Settings</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Referral Code</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="settings-referral-code" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold text-indigo-700 bg-indigo-50">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Share this code with your followers. They get a discount, and you earn 20% of the booking value.</p>
+                        </div>
+                        
+                        <button onclick="updateReferralCode()" id="btn-update-code" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2.5 px-4 rounded-lg shadow transition-colors flex justify-center items-center">
+                            Update Code
+                        </button>
+                        <div id="settings-msg" class="text-sm text-center hidden font-medium mt-2"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://bvtqginkszmzzmetdjdm.supabase.co';
+        const supabaseAnonKey = 'sb_publishable_F0wwfftZVcsHQhoNStUQqw_UgPaOyYq';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        // State
+        let currentInfluencer = null;
+
+        // UI Helpers
+        window.switchTab = function(tab) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+            const errorDiv = document.getElementById('auth-error');
+            
+            errorDiv.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                tabLogin.className = 'flex-1 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors';
+                tabSignup.className = 'flex-1 py-3 text-sm font-bold text-gray-500 border-b-2 border-transparent hover:text-indigo-600 transition-colors';
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                tabSignup.className = 'flex-1 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors';
+                tabLogin.className = 'flex-1 py-3 text-sm font-bold text-gray-500 border-b-2 border-transparent hover:text-indigo-600 transition-colors';
+            }
+        };
+
+        function showAuthError(msg) {
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function setBtnLoading(btnId, isLoading, text) {
+            const btn = document.getElementById(btnId);
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Processing...`;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = text;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        // Auth Logic
+        window.registerInfluencer = async function() {
+            const pageName = document.getElementById('signup-page-name').value.trim().toLowerCase();
+            const contact = document.getElementById('signup-contact').value.trim();
+            const referralCode = document.getElementById('signup-referral-code').value.trim().toUpperCase();
+            const password = document.getElementById('signup-password').value;
+
+            if (!pageName || !contact || !referralCode || !password) {
+                showAuthError("All fields are required.");
+                return;
+            }
+
+            setBtnLoading('btn-signup', true, 'Create Account');
+
+            try {
+                // Check if page_name exists
+                const { data: existingPage } = await supabaseClient
+                    .from('influencers')
+                    .select('id')
+                    .eq('page_name', pageName)
+                    .maybeSingle();
+                
+                if (existingPage) {
+                    throw new Error("Instagram Page Name is already registered.");
+                }
+
+                // Check if referral_code exists
+                const { data: existingCode } = await supabaseClient
+                    .from('influencers')
+                    .select('id')
+                    .eq('referral_code', referralCode)
+                    .maybeSingle();
+                
+                if (existingCode) {
+                    throw new Error("Referral Code is already taken. Please choose another.");
+                }
+
+                // Insert
+                const { data, error } = await supabaseClient
+                    .from('influencers')
+                    .insert([{
+                        page_name: pageName,
+                        contact_number: contact,
+                        referral_code: referralCode,
+                        password: password // In a real app, hash this!
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Success
+                currentInfluencer = data;
+                localStorage.setItem('influencer_session', JSON.stringify(data));
+                showDashboard();
+
+            } catch (err) {
+                showAuthError(err.message || "Registration failed.");
+            } finally {
+                setBtnLoading('btn-signup', false, 'Create Account');
+            }
+        };
+
+        window.loginInfluencer = async function() {
+            const pageName = document.getElementById('login-page-name').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            if (!pageName || !password) {
+                showAuthError("Please enter both Page Name and Password.");
+                return;
+            }
+
+            setBtnLoading('btn-login', true, 'Login to Dashboard');
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('influencers')
+                    .select('*')
+                    .eq('page_name', pageName)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !data) {
+                    throw new Error("Invalid Page Name or Password.");
+                }
+
+                currentInfluencer = data;
+                localStorage.setItem('influencer_session', JSON.stringify(data));
+                showDashboard();
+
+            } catch (err) {
+                showAuthError(err.message || "Login failed.");
+            } finally {
+                setBtnLoading('btn-login', false, 'Login to Dashboard');
+            }
+        };
+
+        window.logoutInfluencer = function() {
+            localStorage.removeItem('influencer_session');
+            currentInfluencer = null;
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+        };
+
+        // Dashboard Logic
+        function showDashboard() {
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('flex');
+            
+            document.getElementById('dash-welcome').textContent = `Welcome, @${currentInfluencer.page_name}`;
+            document.getElementById('settings-referral-code').value = currentInfluencer.referral_code;
+            
+            loadInfluencerDashboard();
+        }
+
+        window.refreshDashboard = function() {
+            const icon = document.getElementById('refresh-icon');
+            icon.classList.add('fa-spin');
+            loadInfluencerDashboard().finally(() => {
+                setTimeout(() => icon.classList.remove('fa-spin'), 500);
+            });
+        };
+
+        async function loadInfluencerDashboard() {
+            if (!currentInfluencer) return;
+
+            try {
+                // Fetch bookings using this referral code
+                // Only count completed or accepted bookings for volume, or all? Let's fetch all that aren't cancelled
+                const { data: bookings, error } = await supabaseClient
+                    .from('bookings')
+                    .select('created_at, customer_name, total_price, status')
+                    .eq('applied_referral_code', currentInfluencer.referral_code)
+                    .neq('status', 'cancelled')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const uses = bookings.length;
+                const volume = bookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
+                const commission = volume * 0.20;
+
+                // Update Stats
+                document.getElementById('stat-uses').textContent = uses;
+                document.getElementById('stat-volume').textContent = `₹${volume.toLocaleString('en-IN')}`;
+                document.getElementById('stat-commission').textContent = `₹${commission.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+
+                // Update Table
+                const tbody = document.getElementById('activity-table-body');
+                tbody.innerHTML = '';
+
+                if (bookings.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 text-sm">No bookings yet. Share your code to get started!</td></tr>`;
+                    return;
+                }
+
+                // Show latest 10
+                const recentBookings = bookings.slice(0, 10);
+                
+                recentBookings.forEach(b => {
+                    const date = new Date(b.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                    // Mask customer name: "Rahul" -> "Ra***"
+                    const name = b.customer_name || 'Unknown';
+                    const maskedName = name.length > 2 ? name.substring(0, 2) + '***' : name + '***';
+                    const price = Number(b.total_price) || 0;
+                    const cut = price * 0.20;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${date}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">${maskedName}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600 text-right font-medium">₹${price.toLocaleString('en-IN')}</td>
+                        <td class="px-6 py-4 text-sm text-green-600 text-right font-bold">+₹${cut.toLocaleString('en-IN', {maximumFractionDigits: 0})}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error("Error loading dashboard:", err);
+            }
+        }
+
+        window.updateReferralCode = async function() {
+            const newCode = document.getElementById('settings-referral-code').value.trim().toUpperCase();
+            const msgDiv = document.getElementById('settings-msg');
+            
+            if (!newCode) {
+                msgDiv.textContent = "Code cannot be empty.";
+                msgDiv.className = "text-sm text-center font-medium mt-2 text-red-600 block";
+                return;
+            }
+
+            if (newCode === currentInfluencer.referral_code) {
+                msgDiv.textContent = "This is already your active code.";
+                msgDiv.className = "text-sm text-center font-medium mt-2 text-gray-500 block";
+                return;
+            }
+
+            setBtnLoading('btn-update-code', true, 'Update Code');
+
+            try {
+                // Check if taken
+                const { data: existing } = await supabaseClient
+                    .from('influencers')
+                    .select('id')
+                    .eq('referral_code', newCode)
+                    .maybeSingle();
+                
+                if (existing) {
+                    throw new Error("Code is already taken by someone else.");
+                }
+
+                // Update
+                const { data, error } = await supabaseClient
+                    .from('influencers')
+                    .update({ referral_code: newCode })
+                    .eq('id', currentInfluencer.id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                currentInfluencer = data;
+                localStorage.setItem('influencer_session', JSON.stringify(data));
+                
+                msgDiv.textContent = "Referral code updated successfully!";
+                msgDiv.className = "text-sm text-center font-medium mt-2 text-green-600 block";
+                
+                // Refresh dashboard to reflect new code (though uses will reset to 0 for the new code)
+                loadInfluencerDashboard();
+
+            } catch (err) {
+                msgDiv.textContent = err.message || "Failed to update code.";
+                msgDiv.className = "text-sm text-center font-medium mt-2 text-red-600 block";
+            } finally {
+                setBtnLoading('btn-update-code', false, 'Update Code');
+                setTimeout(() => { msgDiv.classList.add('hidden'); }, 3000);
+            }
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = localStorage.getItem('influencer_session');
+            if (session) {
+                try {
+                    currentInfluencer = JSON.parse(session);
+                    showDashboard();
+                } catch(e) {
+                    localStorage.removeItem('influencer_session');
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

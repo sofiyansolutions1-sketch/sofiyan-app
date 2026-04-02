@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star } from 'lucide-react';
 import { BUSINESS_NAME, EMAIL, HELPLINE } from '../constants';
 
 const siteContent = {
@@ -110,6 +110,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <NavLink to="/" icon={<Home size={18} />} label="Customer" />
               <NavLink to="/partner" icon={<Users size={18} />} label="Partner" />
               <NavLink to="/admin" icon={<Lock size={18} />} label="Admin" />
+              <a href="/influencer-portal.html" className="flex items-center space-x-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                <Star size={18} />
+                <span>Influencer</span>
+              </a>
             </div>
 
             {/* Mobile menu button */}
@@ -131,6 +135,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <MobileNavLink to="/" onClick={() => setIsMenuOpen(false)} label="Customer Panel" />
               <MobileNavLink to="/partner" onClick={() => setIsMenuOpen(false)} label="Partner Panel" />
               <MobileNavLink to="/admin" onClick={() => setIsMenuOpen(false)} label="Admin Panel" />
+              <a href="/influencer-portal.html" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100">
+                Influencer Portal
+              </a>
             </div>
           </div>
         )}

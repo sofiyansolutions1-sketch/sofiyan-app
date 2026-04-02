@@ -31,6 +31,7 @@ export const AdminPanel: React.FC = () => {
   // Partner Dispatch State
   const [dispatchBooking, setDispatchBooking] = useState<Booking | null>(null);
   const [partnerSearchQuery, setPartnerSearchQuery] = useState('');
+  const [partnerCategoryFilter, setPartnerCategoryFilter] = useState('');
   const [partnerSearchResults, setPartnerSearchResults] = useState<any[]>([]);
   const [isSearchingPartners, setIsSearchingPartners] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -465,6 +466,11 @@ export const AdminPanel: React.FC = () => {
             secondaryQuery = secondaryQuery.or(`pincode.ilike.%${query}%,address.ilike.%${query}%,city.ilike.%${query}%`);
         }
 
+        if (partnerCategoryFilter) {
+            primaryQuery = primaryQuery.contains('categories', [partnerCategoryFilter]);
+            secondaryQuery = secondaryQuery.contains('categories', [partnerCategoryFilter]);
+        }
+
         const [primaryRes, secondaryRes] = await Promise.all([primaryQuery, secondaryQuery]);
         
         if (primaryRes.error) throw primaryRes.error;
@@ -510,6 +516,7 @@ export const AdminPanel: React.FC = () => {
 
   useEffect(() => {
     if (dispatchBooking) {
+        setPartnerCategoryFilter(dispatchBooking.serviceCategory || '');
         handlePartnerSearch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -861,6 +868,12 @@ export const AdminPanel: React.FC = () => {
                                         <Send className="mr-2" size={16} /> Assign & Forward (Manual)
                                     </button>
                                     <button 
+                                        onClick={() => setDispatchBooking(booking)}
+                                        className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition flex justify-center items-center"
+                                    >
+                                        <Search className="mr-2" size={16} /> Find Partner (DB Search)
+                                    </button>
+                                    <button 
                                         onClick={() => {
                                             if ((window as any).openMatchModal) {
                                                 (window as any).openMatchModal(booking.id, encodeURIComponent(JSON.stringify(booking)));
@@ -1054,25 +1067,45 @@ export const AdminPanel: React.FC = () => {
 
           <div className="pt-2 border-t border-gray-100">
              <h4 className="text-sm font-bold text-gray-700 mb-2">Find Partner (Real-time Database)</h4>
-             <div className="flex space-x-2 mb-3">
-                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Enter Area or Pincode" 
-                      className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
-                      value={partnerSearchQuery}
-                      onChange={(e) => setPartnerSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handlePartnerSearch()}
-                    />
+             <div className="flex flex-col space-y-2 mb-3">
+                 <div className="flex space-x-2">
+                     <div className="relative flex-1">
+                        <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
+                        <input 
+                          type="text" 
+                          placeholder="Enter Area or Pincode" 
+                          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-400 outline-none"
+                          value={partnerSearchQuery}
+                          onChange={(e) => setPartnerSearchQuery(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handlePartnerSearch()}
+                        />
+                     </div>
+                     <select
+                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none bg-white"
+                        value={partnerCategoryFilter}
+                        onChange={(e) => setPartnerCategoryFilter(e.target.value)}
+                     >
+                        <option value="">All Categories</option>
+                        <option value="Electrician">Electrician</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="AC">AC</option>
+                        <option value="WashingMachine">Washing Machine</option>
+                        <option value="Refrigerator">Refrigerator</option>
+                        <option value="WaterPurifier">Water Purifier</option>
+                        <option value="Television">Television</option>
+                        <option value="Microwave">Microwave</option>
+                        <option value="Geyser">Geyser</option>
+                        <option value="Chimney">Chimney</option>
+                        <option value="Cleaning">Cleaning</option>
+                     </select>
+                     <button 
+                        onClick={handlePartnerSearch}
+                        disabled={isSearchingPartners}
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[50px]"
+                     >
+                        {isSearchingPartners ? <Loader2 className="animate-spin w-4 h-4"/> : 'Go'}
+                     </button>
                  </div>
-                 <button 
-                    onClick={handlePartnerSearch}
-                    disabled={isSearchingPartners}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[50px]"
-                 >
-                    {isSearchingPartners ? <Loader2 className="animate-spin w-4 h-4"/> : 'Go'}
-                 </button>
              </div>
              
              <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">

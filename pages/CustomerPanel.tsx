@@ -117,7 +117,8 @@ export const CustomerPanel: React.FC = () => {
     pincode: '',
     description: '',
     date: '',
-    time: ''
+    time: '',
+    referralCode: ''
   });
 
   // Auto-fill address from localStorage when booking modal opens
@@ -399,29 +400,10 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
-      // 1. First, save the customer information
-      const { data: customerData, error: customerError } = await supabase
-        .from('customers')
-        .insert([
-          {
-            name: formData.name,
-            phone: formData.contact,
-            address: formData.address,
-            city: formData.city,
-            pincode: formData.pincode
-          }
-        ])
-        .select()
-        .single();
-
-      if (customerError) throw customerError;
-
-      // 2. Then, save the booking with the new customer_id
       const { error: bookingError } = await supabase
         .from('bookings')
         .insert([
           {
-            customer_id: customerData.id,
             customer_name: formData.name,
             customer_phone: formData.contact,
             customer_address: formData.address,
@@ -438,7 +420,8 @@ export const CustomerPanel: React.FC = () => {
             sub_service_name: subServiceName,
             commission_paid: false,
             coupon_used: appliedCoupon || 'None',
-            discount_amount: discountAmount
+            discount_amount: discountAmount,
+            applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
           }
         ]);
 
@@ -460,7 +443,7 @@ export const CustomerPanel: React.FC = () => {
   const resetFlow = () => {
     setIsBookingModalOpen(false);
     setSelectedService(null);
-    setFormData({ name: '', contact: '', address: '', city: '', pincode: '', description: '', date: '', time: '' });
+    setFormData({ name: '', contact: '', address: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '' });
   };
 
   return (
@@ -1072,6 +1055,20 @@ export const CustomerPanel: React.FC = () => {
                             )}
                         </select>
                     </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Influencer Referral Code (Optional)</label>
+                  <div className="relative">
+                      <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                      <input
+                      name="referralCode"
+                      value={formData.referralCode}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase"
+                      placeholder="e.g. SOFIYAN20"
+                      />
+                  </div>
                 </div>
 
                 <div className="space-y-1">
