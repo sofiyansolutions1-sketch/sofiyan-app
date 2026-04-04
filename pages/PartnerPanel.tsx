@@ -8,6 +8,8 @@ import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCirc
 import { supabase } from '../supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
+import { getCoordinatesWithGemini } from '../services/geminiService';
+
 export const PartnerPanel: React.FC = () => {
   const navigate = useNavigate();
   const { bookings, updateBooking, updatePartner } = useStore();
@@ -43,6 +45,18 @@ export const PartnerPanel: React.FC = () => {
     email: '',
     gender: 'Male',
     experience: '',
+    address: '',
+    city: '',
+    customCity: '',
+    pincode: '',
+    categories: [] as string[],
+    subCategories: [] as string[]
+  });
+
+  // Edit Profile State
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editData, setEditData] = useState({
+    phone: '',
     address: '',
     city: '',
     customCity: '',
@@ -280,12 +294,10 @@ export const PartnerPanel: React.FC = () => {
         let pLng = null;
         
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddressQuery)}`);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                // STRICT PARSING: Ensure coords are numbers before sending to Supabase
-                pLat = data[0].lat && !isNaN(Number(data[0].lat)) ? parseFloat(String(data[0].lat)) : null;
-                pLng = data[0].lon && !isNaN(Number(data[0].lon)) ? parseFloat(String(data[0].lon)) : null;
+            const coords = await getCoordinatesWithGemini(fullAddressQuery);
+            if (coords) {
+                pLat = coords.lat;
+                pLng = coords.lng;
             }
         } catch (geocodeError) {
             console.error("Geocoding error:", geocodeError);
@@ -328,6 +340,122 @@ export const PartnerPanel: React.FC = () => {
       } catch (error: any) {
         console.error("Error saving partner:", error);
         alert("Registration failed: " + (error.message || "Unknown error"));
+      } finally {
+        setIsSubmitting(false);
+      }
+  };
+
+  const handleEditProfile = async () => {
+    if (!currentUser?.email) return;
+    setIsSubmitting(true);
+    try {
+        const { data, error } = await supabase
+            .from('primary_partners')
+            .select('*')
+            .eq('email', currentUser.email)
+            .single();
+            
+        if (error) throw error;
+        
+        setEditData({
+            phone: data.phone || '',
+            address: data.address || '',
+            city: data.city || '',
+            customCity: '',
+            pincode: data.pincode || '',
+            categories: data.categories || [],
+            subCategories: data.sub_categories || []
+        });
+        setIsEditingProfile(true);
+    } catch (err: any) {
+        console.error("Error fetching profile for edit:", err);
+        alert("Failed to load profile details.");
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
+  const handleEditCategoryChange = (category: string) => {
+    setEditData(prev => {
+      const isSelected = prev.categories.includes(category);
+      let newCategories;
+      if (isSelected) {
+        newCategories = prev.categories.filter(c => c !== category);
+        if (category === "Home Appliances") {
+             return { ...prev, categories: newCategories, subCategories: [] };
+        }
+      } else {
+        newCategories = [...prev.categories, category];
+      }
+      return { ...prev, categories: newCategories };
+    });
+  };
+
+  const handleEditSubCategoryChange = (sub: string) => {
+    setEditData(prev => {
+        const isSelected = prev.subCategories.includes(sub);
+        if (isSelected) {
+            return { ...prev, subCategories: prev.subCategories.filter(s => s !== sub) };
+        } else {
+            return { ...prev, subCategories: [...prev.subCategories, sub] };
+        }
+    });
+  };
+
+  const submitProfileEdit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!currentUser?.id) return;
+
+      let finalCityValue = editData.city;
+      if (finalCityValue === 'Others') {
+          finalCityValue = editData.customCity.trim();
+          if (!finalCityValue) {
+              alert("Please type your city name in the box provided.");
+              return;
+          }
+      }
+
+      setIsSubmitting(true);
+
+      try {
+        const fullAddressQuery = `${editData.address.trim()}, ${editData.pincode.trim()}, ${finalCityValue}`;
+        let pLat = null;
+        let pLng = null;
+        
+        try {
+            const coords = await getCoordinatesWithGemini(fullAddressQuery);
+            if (coords) {
+                pLat = coords.lat;
+                pLng = coords.lng;
+            }
+        } catch (geocodeError) {
+            console.error("Geocoding error:", geocodeError);
+        }
+
+        const { error } = await supabase
+           .from('primary_partners')
+           .update({ 
+               phone: editData.phone,
+               categories: editData.categories, 
+               sub_categories: editData.subCategories, 
+               address: editData.address,
+               city: finalCityValue,
+               pincode: editData.pincode,
+               lat: pLat,
+               lng: pLng
+           })
+           .eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        await syncUserWithStore(currentUser.email);
+        
+        setIsEditingProfile(false);
+        setNotification("Profile Updated Successfully!");
+
+      } catch (error: any) {
+        console.error("Error updating profile:", error);
+        alert("Update failed: " + (error.message || "Unknown error"));
       } finally {
         setIsSubmitting(false);
       }
@@ -581,12 +709,20 @@ export const PartnerPanel: React.FC = () => {
             </span>
           </p>
         </div>
-        <button 
-          onClick={handleSignOut}
-          className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
-        >
-          <LogOut size={18} /> Sign Out
-        </button>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={handleEditProfile}
+            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors font-medium text-sm"
+          >
+            <User size={18} /> Edit Profile
+          </button>
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors text-sm"
+          >
+            <LogOut size={18} /> Sign Out
+          </button>
+        </div>
       </div>
 
       {notification && (
@@ -899,6 +1035,156 @@ export const PartnerPanel: React.FC = () => {
                           <Loader2 className="w-6 h-6 animate-spin" /> Saving Profile...
                         </span>
                     ) : 'Submit Registration'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+      {isEditingProfile && (
+          <div id="partner-edit-modal" className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex justify-center items-center px-4 animate-fadeIn backdrop-blur-sm">
+            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                   <h2 className="text-2xl font-bold text-gray-800">Edit Your Profile ✏️</h2>
+                   <button onClick={() => setIsEditingProfile(false)} className="text-gray-400 hover:text-gray-600">
+                     <span className="sr-only">Close</span>
+                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                   </button>
+                </div>
+
+                <form onSubmit={submitProfileEdit} className="space-y-6">
+                  {/* Personal Info */}
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Contact Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <input 
+                        type="tel" 
+                        placeholder="Phone Number" 
+                        required 
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        value={editData.phone}
+                        onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Work Categories */}
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Select Your Expertise</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                       {CATEGORY_LIST.map((cat) => (
+                         <label key={cat} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                           <input 
+                             type="checkbox" 
+                             className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                             checked={editData.categories.includes(cat)}
+                             onChange={() => handleEditCategoryChange(cat)}
+                           />
+                           <span className="text-sm font-medium text-gray-700">{cat}</span>
+                         </label>
+                       ))}
+                    </div>
+
+                    {/* Conditional Sub-Categories */}
+                    {editData.categories.includes("Home Appliances") && (
+                      <div className="bg-blue-50 p-4 rounded-xl mt-4 border border-blue-100 animate-fadeIn">
+                         <h4 className="text-sm font-bold text-blue-800 mb-3">Select Appliances you can repair:</h4>
+                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                           {APPLIANCE_LIST.map((sub) => (
+                             <label key={sub} className="flex items-center gap-2">
+                               <input 
+                                 type="checkbox" 
+                                 className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
+                                 checked={editData.subCategories.includes(sub)}
+                                 onChange={() => handleEditSubCategoryChange(sub)}
+                               />
+                               <span className="text-sm text-blue-700">{sub}</span>
+                             </label>
+                           ))}
+                         </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                     <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Location Details</h3>
+                     <div className="space-y-3">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Your City <span className="text-red-500">*</span></label>
+                            <select 
+                              required 
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none bg-white cursor-pointer appearance-none"
+                              value={editData.city}
+                              onChange={(e) => setEditData({...editData, city: e.target.value})}
+                            >
+                                <option value="" disabled>Tap to select your city...</option>
+                                <option value="Ahmedabad">Ahmedabad</option>
+                                <option value="Bangalore">Bangalore</option>
+                                <option value="Bhubaneswar">Bhubaneswar</option>
+                                <option value="Chennai">Chennai</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Faridabad">Faridabad</option>
+                                <option value="Ghaziabad">Ghaziabad</option>
+                                <option value="Gurgaon">Gurgaon</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                                <option value="Kochi">Kochi</option>
+                                <option value="Kolkata">Kolkata</option>
+                                <option value="Lucknow">Lucknow</option>
+                                <option value="Mysore">Mysore</option>
+                                <option value="NCR">NCR</option>
+                                <option value="Noida">Noida</option>
+                                <option value="Patna">Patna</option>
+                                <option value="Pune">Pune</option>
+                                <option value="Mumbai">Mumbai</option>
+                                <option value="Surat">Surat</option>
+                                <option value="Vadodara">Vadodara</option>
+                                <option value="Vizag">Vizag</option>
+                                <option value="Others" className="font-bold text-indigo-600">Others (Please specify)</option>
+                            </select>
+                            
+                            {editData.city === 'Others' && (
+                              <input 
+                                  type="text" 
+                                  placeholder="Type your city name" 
+                                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
+                                  value={editData.customCity}
+                                  onChange={(e) => setEditData({...editData, customCity: e.target.value})}
+                                  required
+                              />
+                            )}
+                        </div>
+                        <input 
+                          type="number" 
+                          placeholder="Area Pincode" 
+                          required 
+                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                          value={editData.pincode}
+                          onChange={(e) => setEditData({...editData, pincode: e.target.value})}
+                        />
+                        <textarea 
+                           placeholder="Full Address" 
+                           required
+                           rows={2}
+                           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                           value={editData.address}
+                           onChange={(e) => setEditData({...editData, address: e.target.value})}
+                        ></textarea>
+                     </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className={`w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all active:scale-95 text-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  >
+                    {isSubmitting ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-6 h-6 animate-spin" /> Saving Profile...
+                        </span>
+                    ) : 'Save Changes'}
                   </button>
                 </form>
               </div>

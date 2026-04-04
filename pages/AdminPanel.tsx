@@ -3,8 +3,9 @@ import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet, Info, UploadCloud } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { getCoordinatesWithGemini } from '../services/geminiService';
 
 const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371; // Radius of the earth in km
@@ -70,23 +71,6 @@ export const AdminPanel: React.FC = () => {
     });
   };
 
-  const getCoordinatesFromAddress = async (address: string) => {
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-      const data = await response.json();
-      if (data && data.length > 0) {
-        return {
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon)
-        };
-      }
-      return null;
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      return null;
-    }
-  };
-
   const saveSecondaryPartner = async () => {
     const { name, phone, services, city, address, pincode } = newPartner;
 
@@ -135,6 +119,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   // Bulk Upload State
+  const [isCsvUploadModalOpen, setIsCsvUploadModalOpen] = useState(true);
   const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
   const [bulkUploadProgress, setBulkUploadProgress] = useState({
     total: 0,
@@ -171,6 +156,7 @@ export const AdminPanel: React.FC = () => {
     }
 
     // Show Modal
+    setIsCsvUploadModalOpen(false);
     setIsBulkUploadModalOpen(true);
     
     // Assuming Row 0 is headers. Start from Row 1.
@@ -204,7 +190,7 @@ export const AdminPanel: React.FC = () => {
             try {
                 // 1. Convert Address to GPS
                 const query = `${address}, ${pincode}, Mumbai`;
-                const coords = await getCoordinatesFromAddress(query);
+                const coords = await getCoordinatesWithGemini(query);
 
                 // STRICT PARSING: Ensure coords are numbers before sending to Supabase
                 const pLat = coords && coords.lat && !isNaN(Number(coords.lat)) ? parseFloat(String(coords.lat)) : null;
@@ -481,11 +467,23 @@ export const AdminPanel: React.FC = () => {
 
         let results = [...primaryData, ...secondaryData];
 
+        let bookingLat = dispatchBooking?.lat;
+        let bookingLng = dispatchBooking?.lng;
+
+        if (dispatchBooking && (!bookingLat || !bookingLng)) {
+            const queryAddress = `${dispatchBooking.address}, ${dispatchBooking.pinCode}, ${dispatchBooking.city || ''}`;
+            const coords = await getCoordinatesWithGemini(queryAddress);
+            if (coords) {
+                bookingLat = coords.lat;
+                bookingLng = coords.lng;
+            }
+        }
+
         // If we have a booking with lat/lng, calculate distance and sort
-        if (dispatchBooking?.lat && dispatchBooking?.lng) {
+        if (bookingLat && bookingLng) {
             results = results.map(partner => {
                 if (partner.lat && partner.lng) {
-                    const distance = calculateDistanceKM(dispatchBooking.lat!, dispatchBooking.lng!, partner.lat, partner.lng);
+                    const distance = calculateDistanceKM(bookingLat!, bookingLng!, partner.lat, partner.lng);
                     return { ...partner, distance };
                 }
                 return { ...partner, distance: Infinity };
@@ -737,7 +735,7 @@ export const AdminPanel: React.FC = () => {
               onChange={handleCSVUpload} 
             />
             <button 
-              onClick={() => document.getElementById('csv-upload-file')?.click()} 
+              onClick={() => setIsCsvUploadModalOpen(true)} 
               className="bg-green-700 text-white text-sm font-bold py-2 px-4 rounded hover:bg-green-800 flex items-center"
             >
               <FileSpreadsheet className="mr-2" size={16} /> Bulk Upload (CSV)
@@ -1354,6 +1352,49 @@ export const AdminPanel: React.FC = () => {
                     'Save Partner to Database'
                 )}
             </button>
+        </div>
+      </Modal>
+
+      {/* CSV Upload Modal */}
+      <Modal isOpen={isCsvUploadModalOpen} onClose={() => setIsCsvUploadModalOpen(false)} title="Bulk Upload Partners (CSV)">
+        <div className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <h4 className="font-bold text-blue-800 mb-2 flex items-center">
+                    <Info size={16} className="mr-2" /> Expected CSV Format
+                </h4>
+                <p className="text-sm text-blue-700 mb-2">
+                    Your CSV file must have exactly these 5 columns in order:
+                </p>
+                <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1 font-mono bg-white p-2 rounded border border-blue-200">
+                    <li>Name</li>
+                    <li>Phone</li>
+                    <li>Services (comma separated)</li>
+                    <li>Address</li>
+                    <li>Pincode</li>
+                </ol>
+                <p className="text-xs text-blue-600 mt-3">
+                    Note: The system will automatically find the GPS coordinates for each address. This may take a few seconds per partner.
+                </p>
+            </div>
+
+            <div className="flex justify-center items-center w-full">
+                <label htmlFor="csv-upload-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <UploadCloud className="w-10 h-10 mb-3 text-gray-400" />
+                        <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-gray-500">CSV files only</p>
+                    </div>
+                </label>
+            </div>
+            
+            <div className="flex justify-end pt-4">
+                <button 
+                    onClick={() => setIsCsvUploadModalOpen(false)}
+                    className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
         </div>
       </Modal>
 
