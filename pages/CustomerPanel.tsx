@@ -560,17 +560,23 @@ export const CustomerPanel: React.FC = () => {
         {/* Categories Grid */}
         {filteredCategories.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredCategories.map((category) => (
-              <button
+            {filteredCategories.map((category) => {
+              const hashRoute = `#/${category.name.toLowerCase().replace(/\s+/g, '-')}`;
+              return (
+              <a
                 key={category.name}
-                onClick={() => {
+                href={hashRoute}
+                onClick={(e) => {
+                  // We can still optionally prevent default and handle it directly, 
+                  // but allowing the hash change is good for SEO and history.
+                  // e.preventDefault();
                   if ((window as any).openCategoryView) {
                     (window as any).openCategoryView(category.name);
                   } else if ((window as any).openCategoryModal) {
                     (window as any).openCategoryModal(category.name);
                   }
                 }}
-                className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl"
+                className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl block"
               >
                 <img 
                   src={category.image} 
@@ -583,8 +589,8 @@ export const CustomerPanel: React.FC = () => {
                     {category.name}
                   </span>
                 </div>
-              </button>
-            ))}
+              </a>
+            )})}
           </div>
         ) : (
           !searchQuery && (

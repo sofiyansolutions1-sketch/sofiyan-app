@@ -13,6 +13,7 @@ function App() {
           <Route path="/" element={<CustomerPanel />} />
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>
     </Router>

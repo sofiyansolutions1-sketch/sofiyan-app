@@ -928,6 +928,51 @@
       window.getCoordinatesWithGemini = getCoordinatesWithGemini;
       window.getAddressSuggestions = getAddressSuggestions;
       window.reverseGeocodeWithGemini = reverseGeocodeWithGemini;
+
+      // Listen for hash changes in the URL
+      window.addEventListener('hashchange', handleHashRouting);
+
+      // Also check the hash when the page first loads
+      window.addEventListener('DOMContentLoaded', handleHashRouting);
+
+      function handleHashRouting() {
+          const hash = window.location.hash;
+          
+          // Check if the hash matches our category pattern (e.g., #/electrician)
+          // Ignore the root hash '#/' used by React Router
+          if (hash.startsWith('#/') && hash.length > 2) {
+              // Exclude known React Router paths
+              if (hash === '#/partner' || hash === '#/admin') return;
+
+              const category = hash.replace('#/', '').replace(/-/g, ' ');
+              
+              // Call the function to open the modal for this category
+              if (window.openCategoryView) {
+                  window.openCategoryView(category);
+              } else if (window.openCategoryModal) {
+                  window.openCategoryModal(category);
+              }
+          } else if (hash === '' || hash === '#' || hash === '#/') {
+              // If the hash is cleared or at root, close the modal
+              if (window.closeCategoryView) {
+                  window.closeCategoryView();
+              }
+          }
+      }
+
+      // Update the close modal function to clear the hash
+      const originalCloseView = window.closeCategoryView;
+      window.closeCategoryView = function() {
+          // Return to the React Router root instead of clearing the hash completely
+          if (window.location.hash !== '#/' && window.location.hash !== '#/partner' && window.location.hash !== '#/admin') {
+              history.replaceState(null, null, '#/');
+          }
+          
+          // Call the original close logic
+          if (typeof originalCloseView === 'function') {
+              originalCloseView();
+          }
+      };
     </script>
   </body>
 </html>
