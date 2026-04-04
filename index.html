@@ -922,13 +922,8 @@
       </div>
     </div>
 
-    <script type="module" src="./index.tsx"></script>
-    <script type="module">
-      import { getCoordinatesWithGemini, getAddressSuggestions, reverseGeocodeWithGemini } from '/services/geminiService.ts';
-      window.getCoordinatesWithGemini = getCoordinatesWithGemini;
-      window.getAddressSuggestions = getAddressSuggestions;
-      window.reverseGeocodeWithGemini = reverseGeocodeWithGemini;
-
+    <script type="module" src="/index.tsx"></script>
+    <script>
       // Listen for hash changes in the URL
       window.addEventListener('hashchange', handleHashRouting);
 
