@@ -924,46 +924,68 @@
 
     <script type="module" src="/index.tsx"></script>
     <script>
-      // Listen for hash changes in the URL
-      window.addEventListener('hashchange', handleHashRouting);
+      // --- Clean URL Routing Logic for SEO ---
+      
+      // 2. Handling Back/Forward Buttons (popstate)
+      window.addEventListener('popstate', handleCleanRouting);
 
-      // Also check the hash when the page first loads
-      window.addEventListener('DOMContentLoaded', handleHashRouting);
+      // 3. Direct Link Visit (Page Load Logic)
+      window.addEventListener('DOMContentLoaded', handleCleanRouting);
 
-      function handleHashRouting() {
-          const hash = window.location.hash;
+      function handleCleanRouting() {
+          const path = window.location.pathname;
           
-          // Check if the hash matches our category pattern (e.g., #/electrician)
-          // Ignore the root hash '#/' used by React Router
-          if (hash.startsWith('#/') && hash.length > 2) {
-              // Exclude known React Router paths
-              if (hash === '#/partner' || hash === '#/admin') return;
-
-              const category = hash.replace('#/', '').replace(/-/g, ' ');
+          if (path.startsWith('/services/')) {
+              const categorySlug = path.replace('/services/', '');
               
-              // Call the function to open the modal for this category
-              if (window.openCategoryView) {
-                  window.openCategoryView(category);
-              } else if (window.openCategoryModal) {
-                  window.openCategoryModal(category);
+              // Map slug back to exact category name from masterServicesData
+              const slugToKeyMap = {};
+              if (window.masterServicesData) {
+                  for (const key in window.masterServicesData) {
+                      const slug = key.replace(/\s+/g, '-').toLowerCase();
+                      slugToKeyMap[slug] = key;
+                  }
               }
-          } else if (hash === '' || hash === '#' || hash === '#/') {
-              // If the hash is cleared or at root, close the modal
+              
+              const category = slugToKeyMap[categorySlug] || categorySlug.replace(/-/g, ' ');
+              
+              if (window.openCategoryView) {
+                  window.openCategoryView(category, true); // true = isPopState
+              }
+          } else if (path === '/' || path === '') {
               if (window.closeCategoryView) {
-                  window.closeCategoryView();
+                  window.closeCategoryView(true); // true = isPopState
               }
           }
       }
 
-      // Update the close modal function to clear the hash
-      const originalCloseView = window.closeCategoryView;
-      window.closeCategoryView = function() {
-          // Return to the React Router root instead of clearing the hash completely
-          if (window.location.hash !== '#/' && window.location.hash !== '#/partner' && window.location.hash !== '#/admin') {
-              history.replaceState(null, null, '#/');
+      // 1. The Navigation Function (MapsToService)
+      // Intercept openCategoryView to push state and update title
+      const originalOpenView = window.openCategoryView;
+      window.openCategoryView = function(categoryName, isPopState = false) {
+          if (!isPopState) {
+              const slug = categoryName.replace(/\s+/g, '-').toLowerCase();
+              window.history.pushState({ category: categoryName }, '', `/services/${slug}`);
           }
           
-          // Call the original close logic
+          document.title = `Best ${categoryName} Services | Sofiyan Home Service`;
+          
+          if (typeof originalOpenView === 'function') {
+              originalOpenView(categoryName);
+          }
+      };
+
+      // Intercept closeCategoryView to push state and update title
+      const originalCloseView = window.closeCategoryView;
+      window.closeCategoryView = function(isPopState = false) {
+          if (!isPopState) {
+              if (window.location.pathname.startsWith('/services/')) {
+                  window.history.pushState(null, '', '/');
+              }
+          }
+          
+          document.title = 'Sofiyan Home Service Solutions';
+          
           if (typeof originalCloseView === 'function') {
               originalCloseView();
           }
