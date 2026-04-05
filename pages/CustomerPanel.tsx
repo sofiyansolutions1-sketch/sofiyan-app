@@ -567,11 +567,15 @@ export const CustomerPanel: React.FC = () => {
                 key={category.name}
                 href={cleanRoute}
                 onClick={(e) => {
-                  e.preventDefault();
-                  if ((window as any).openCategoryView) {
-                    (window as any).openCategoryView(category.name);
-                  } else if ((window as any).openCategoryModal) {
-                    (window as any).openCategoryModal(category.name);
+                  if ((window as any).handleLinkClick) {
+                    (window as any).handleLinkClick(e);
+                  } else {
+                    e.preventDefault();
+                    if ((window as any).openCategoryView) {
+                      (window as any).openCategoryView(category.name);
+                    } else if ((window as any).openCategoryModal) {
+                      (window as any).openCategoryModal(category.name);
+                    }
                   }
                 }}
                 className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl block"

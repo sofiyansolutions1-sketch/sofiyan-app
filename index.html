@@ -926,16 +926,129 @@
 
     <script type="module" src="/index.tsx"></script>
     <script>
-      // --- Clean URL Routing Logic for SEO ---
+      // --- Hyper-Local Programmatic SEO Manager ---
       
-      // 2. Handling Back/Forward Buttons (popstate)
-      window.addEventListener('popstate', handleCleanRouting);
+      // PART 1: The SEO Data Dictionary
+      const seoConfig = {
+          'ac-repair': {
+              title: "Top AC Repair Near Me | Bengaluru, Delhi | Sofiyan Solutions",
+              description: "Looking for affordable AC repair near me? Get 24/7 expert technicians in Bengaluru, Delhi, Lucknow, and Varanasi. Fast, reliable, and guaranteed service.",
+              keywords: "best AC mechanic near me, AC service in Lucknow, AC repair Delhi near me, AC installation Bengaluru, affordable AC service Varanasi",
+              h1: "Expert AC Repair & Service Near You"
+          },
+          'plumber': {
+              title: "Best Plumber Near Me | 24/7 Services | Sofiyan Solutions",
+              description: "Find a reliable plumber near me for fast, affordable fixes. Expert plumbing services available 24/7 in Bengaluru, Delhi, Lucknow, and Varanasi.",
+              keywords: "plumber near me, best plumber in Delhi, emergency plumber Lucknow, affordable plumbing Varanasi, water leak repair Bengaluru",
+              h1: "Professional Plumbing Services Near You"
+          },
+          'electrician': {
+              title: "Expert Electrician Near Me | Fast Fix | Sofiyan Solutions",
+              description: "Need an electrician near me? Our certified experts provide 24/7 affordable electrical repairs in Bengaluru, Delhi, Lucknow, and Varanasi. Book now!",
+              keywords: "electrician near me, electrical repair Delhi, best electrician Lucknow, wiring expert Varanasi, emergency electrician Bengaluru",
+              h1: "Certified Electricians Near You"
+          },
+          'cleaning': {
+              title: "Deep Cleaning Services Near Me | Sofiyan Solutions",
+              description: "Top-rated deep cleaning near me. Get affordable, spotless home & office cleaning in Bengaluru, Delhi, Lucknow, and Varanasi by verified professionals.",
+              keywords: "home cleaning near me, deep cleaning Delhi, office cleaning Lucknow, affordable cleaners Varanasi, best cleaning service Bengaluru",
+              h1: "Professional Deep Cleaning Services Near You"
+          },
+          'default': {
+              title: "Best Home Services Near Me | Sofiyan Solutions",
+              description: "Looking for top home services near me? Sofiyan Solutions offers expert AC repair, plumbing, and cleaning in Bengaluru, Delhi, Lucknow, and Varanasi.",
+              keywords: "home services near me, handyman Delhi, home maintenance Lucknow, affordable services Varanasi, expert technicians Bengaluru",
+              h1: "Top-Rated Home Services Near You"
+          }
+      };
 
-      // 3. Direct Link Visit (Page Load Logic)
-      window.addEventListener('DOMContentLoaded', handleCleanRouting);
+      // PART 2: The Injection Function
+      function applyLocalSEO(serviceSlug) {
+          const config = seoConfig[serviceSlug] || seoConfig['default'];
+          
+          // 1. Update Title
+          document.title = config.title;
+          
+          // 2. Update Meta Description
+          let metaDesc = document.querySelector('meta[name="description"]');
+          if (!metaDesc) {
+              metaDesc = document.createElement('meta');
+              metaDesc.setAttribute('name', 'description');
+              document.head.appendChild(metaDesc);
+          }
+          metaDesc.setAttribute('content', config.description);
+          
+          // 3. Update Meta Keywords
+          let metaKeywords = document.querySelector('meta[name="keywords"]');
+          if (!metaKeywords) {
+              metaKeywords = document.createElement('meta');
+              metaKeywords.setAttribute('name', 'keywords');
+              document.head.appendChild(metaKeywords);
+          }
+          metaKeywords.setAttribute('content', config.keywords);
+          
+          // 4. Update H1 (if it exists in the DOM)
+          const h1Tag = document.querySelector('h1');
+          if (h1Tag) {
+              h1Tag.textContent = config.h1;
+          }
+          
+          // 5. Update Canonical Tag
+          let canonical = document.querySelector('link[rel="canonical"]');
+          if (!canonical) {
+              canonical = document.createElement('link');
+              canonical.setAttribute('rel', 'canonical');
+              document.head.appendChild(canonical);
+          }
+          const cleanSlug = (serviceSlug && serviceSlug !== 'default') ? `services/${serviceSlug}` : '';
+          canonical.setAttribute('href', `https://www.sofiyansolutions.com/${cleanSlug}`);
+      }
 
-      function handleCleanRouting() {
-          const path = window.location.pathname;
+      // PART 3: Advanced "Near Me" JSON-LD Schema (LocalBusiness)
+      function injectLocalSchema(serviceSlug) {
+          const config = seoConfig[serviceSlug] || seoConfig['default'];
+          
+          // Remove existing schema if present
+          const existingSchema = document.querySelector('#local-seo-schema');
+          if (existingSchema) {
+              existingSchema.remove();
+          }
+          
+          const cleanSlug = (serviceSlug && serviceSlug !== 'default') ? `services/${serviceSlug}` : '';
+          
+          const schemaJSON = {
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "serviceType": config.h1,
+              "provider": {
+                  "@type": "LocalBusiness",
+                  "name": "Sofiyan Home Service Solutions",
+                  "image": "https://www.sofiyansolutions.com/vite.svg",
+                  "telephone": "+919219345455",
+                  "priceRange": "$$"
+              },
+              "areaServed": [
+                  { "@type": "City", "name": "Bengaluru" },
+                  { "@type": "City", "name": "Delhi" },
+                  { "@type": "City", "name": "Lucknow" },
+                  { "@type": "City", "name": "Varanasi" }
+              ],
+              "description": config.description,
+              "url": `https://www.sofiyansolutions.com/${cleanSlug}`
+          };
+          
+          const scriptTag = document.createElement('script');
+          scriptTag.id = 'local-seo-schema';
+          scriptTag.type = 'application/ld+json';
+          scriptTag.text = JSON.stringify(schemaJSON);
+          document.head.appendChild(scriptTag);
+      }
+
+      // 1. The Routing Logic
+      window.MapsTo = function(path, isPopState = false) {
+          if (!isPopState) {
+              window.history.pushState({ path: path }, '', path);
+          }
           
           if (path.startsWith('/services/')) {
               const categorySlug = path.replace('/services/', '');
@@ -951,45 +1064,68 @@
               
               const category = slugToKeyMap[categorySlug] || categorySlug.replace(/-/g, ' ');
               
+              // Apply Local SEO and Schema
+              applyLocalSEO(categorySlug);
+              injectLocalSchema(categorySlug);
+              
               if (window.openCategoryView) {
-                  window.openCategoryView(category, true); // true = isPopState
+                  window.openCategoryView(category, true); // true = skip pushState in openCategoryView
               }
           } else if (path === '/' || path === '') {
+              // Apply Default Local SEO and Schema
+              applyLocalSEO('default');
+              injectLocalSchema('default');
+              
               if (window.closeCategoryView) {
-                  window.closeCategoryView(true); // true = isPopState
+                  window.closeCategoryView(true); // true = skip pushState in closeCategoryView
               }
           }
-      }
+      };
 
-      // 1. The Navigation Function (MapsToService)
-      // Intercept openCategoryView to push state and update title
+      // 3. Deep Linking Handler
+      window.addEventListener('popstate', (event) => {
+          window.MapsTo(window.location.pathname, true);
+      });
+
+      window.addEventListener('DOMContentLoaded', () => {
+          window.MapsTo(window.location.pathname, true);
+      });
+
+      // Intercept openCategoryView to use MapsTo
       const originalOpenView = window.openCategoryView;
-      window.openCategoryView = function(categoryName, isPopState = false) {
-          if (!isPopState) {
+      window.openCategoryView = function(categoryName, skipRouting = false) {
+          if (!skipRouting) {
               const slug = categoryName.replace(/\s+/g, '-').toLowerCase();
-              window.history.pushState({ category: categoryName }, '', `/services/${slug}`);
+              window.MapsTo(`/services/${slug}`);
+              return; // MapsTo will call openCategoryView with skipRouting = true
           }
-          
-          document.title = `Best ${categoryName} Services | Sofiyan Home Service`;
           
           if (typeof originalOpenView === 'function') {
               originalOpenView(categoryName);
           }
       };
 
-      // Intercept closeCategoryView to push state and update title
+      // Intercept closeCategoryView to use MapsTo
       const originalCloseView = window.closeCategoryView;
-      window.closeCategoryView = function(isPopState = false) {
-          if (!isPopState) {
+      window.closeCategoryView = function(skipRouting = false) {
+          if (!skipRouting) {
               if (window.location.pathname.startsWith('/services/')) {
-                  window.history.pushState(null, '', '/');
+                  window.MapsTo('/');
+                  return; // MapsTo will call closeCategoryView with skipRouting = true
               }
           }
           
-          document.title = 'Sofiyan Home Service Solutions';
-          
           if (typeof originalCloseView === 'function') {
               originalCloseView();
+          }
+      };
+      
+      // 4. Link Structure Handler
+      window.handleLinkClick = function(event) {
+          event.preventDefault();
+          const href = event.currentTarget.getAttribute('href');
+          if (href) {
+              window.MapsTo(href);
           }
       };
     </script>
