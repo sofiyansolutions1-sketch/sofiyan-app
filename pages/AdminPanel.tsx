@@ -3,9 +3,10 @@ import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet, Info, UploadCloud } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet, Info, UploadCloud, FileText } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getCoordinatesWithGemini } from '../services/geminiService';
+import { BlogManager } from '../components/BlogManager';
 
 const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371; // Radius of the earth in km
@@ -23,6 +24,7 @@ export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners, updatePartner } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager'>('Dashboard');
   
   // Reschedule Modal State
   const [rescheduleData, setRescheduleData] = useState<{ booking: Booking | null, date: string, time: string }>({ 
@@ -743,8 +745,38 @@ export const AdminPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      {/* Main Tabs */}
+      <div className="flex space-x-4 mb-8 border-b border-gray-200">
+        <button
+          onClick={() => setMainTab('Dashboard')}
+          className={`py-3 px-6 font-bold text-sm border-b-2 transition-colors ${
+            mainTab === 'Dashboard'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <Activity className="inline-block mr-2" size={18} />
+          Dashboard
+        </button>
+        <button
+          onClick={() => setMainTab('BlogManager')}
+          className={`py-3 px-6 font-bold text-sm border-b-2 transition-colors ${
+            mainTab === 'BlogManager'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <FileText className="inline-block mr-2" size={18} />
+          Blog Manager
+        </button>
+      </div>
+
+      {mainTab === 'BlogManager' && <BlogManager />}
+
+      {mainTab === 'Dashboard' && (
+        <>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <StatCard 
           title="Total Commission" 
           value={`₹${totalRevenue.toFixed(2)}`} 
@@ -1444,6 +1476,8 @@ export const AdminPanel: React.FC = () => {
                 )}
             </div>
         </div>
+      )}
+        </>
       )}
 
     </div>

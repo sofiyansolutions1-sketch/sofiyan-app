@@ -400,10 +400,36 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
+      // 1. Upsert Customer Data
+      let customerId = null;
+      try {
+        const { data: customerData, error: customerError } = await supabase
+          .from('customers')
+          .upsert([
+            {
+              name: formData.name,
+              phone: formData.contact,
+              address: formData.address,
+              city: formData.city,
+              pincode: formData.pincode
+            }
+          ], { onConflict: 'phone' })
+          .select('id')
+          .single();
+          
+        if (!customerError && customerData) {
+          customerId = customerData.id;
+        }
+      } catch (e) {
+        console.warn("Could not save to customers table, proceeding with booking anyway.", e);
+      }
+
+      // 2. Insert Booking Data
       const { error: bookingError } = await supabase
         .from('bookings')
         .insert([
           {
+            customer_id: customerId,
             customer_name: formData.name,
             customer_phone: formData.contact,
             customer_address: formData.address,

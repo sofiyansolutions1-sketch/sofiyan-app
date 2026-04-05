@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star } from 'lucide-react';
+import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star, FileText } from 'lucide-react';
 import { BUSINESS_NAME, EMAIL, HELPLINE } from '../constants';
 
 const siteContent = {
@@ -99,15 +99,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
             
             {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
               <button onClick={() => {
                 if ((window as any).openLocationModal) (window as any).openLocationModal();
-              }} className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition text-sm font-bold mr-4">
+              }} className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition text-sm font-bold mr-2">
                   <i className="fas fa-map-marker-alt text-indigo-500"></i>
-                  <span id="header-location-display" className="truncate max-w-[150px]">{userLocation ? userLocation.split(',')[0] : "Select Location"}</span>
+                  <span id="header-location-display" className="truncate max-w-[100px] xl:max-w-[150px]">{userLocation ? userLocation.split(',')[0] : "Select Location"}</span>
                   <i className="fas fa-chevron-down text-xs ml-1"></i>
               </button>
               <NavLink to="/" icon={<Home size={18} />} label="Customer" />
+              <NavLink to="/blogs" icon={<FileText size={18} />} label="Blogs" />
               <NavLink to="/partner" icon={<Users size={18} />} label="Partner" />
               <NavLink to="/admin" icon={<Lock size={18} />} label="Admin" />
               <a href="/influencer-portal.html" className="flex items-center space-x-1 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
@@ -117,7 +118,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
 
             {/* Mobile menu button */}
-            <div className="flex items-center md:hidden">
+            <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-600 hover:text-indigo-600 focus:outline-none"
@@ -130,9 +131,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="lg:hidden bg-white border-t border-gray-100">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <MobileNavLink to="/" onClick={() => setIsMenuOpen(false)} label="Customer Panel" />
+              <MobileNavLink to="/blogs" onClick={() => setIsMenuOpen(false)} label="Blogs" />
               <MobileNavLink to="/partner" onClick={() => setIsMenuOpen(false)} label="Partner Panel" />
               <MobileNavLink to="/admin" onClick={() => setIsMenuOpen(false)} label="Admin Panel" />
               <a href="/influencer-portal.html" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100">

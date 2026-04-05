@@ -4,6 +4,8 @@ import { Layout } from './components/Layout';
 import { CustomerPanel } from './pages/CustomerPanel';
 import { PartnerPanel } from './pages/PartnerPanel';
 import { AdminPanel } from './pages/AdminPanel';
+import { BlogPanel } from './pages/BlogPanel';
+import { BlogPost } from './pages/BlogPost';
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<CustomerPanel />} />
+          <Route path="/blogs" element={<BlogPanel />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<CustomerPanel />} />
