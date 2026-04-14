@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { Edit2, Trash2 } from 'lucide-react';
+import { SERVICES } from '../constants';
 
 export const BlogManager: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -10,14 +11,11 @@ export const BlogManager: React.FC = () => {
     const [targetLocations, setTargetLocations] = useState('');
     const [metaDescription, setMetaDescription] = useState('');
     const [relatedService, setRelatedService] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
     const [content, setContent] = useState('');
     const [isPublishing, setIsPublishing] = useState(false);
     const [blogs, setBlogs] = useState<any[]>([]);
     const [editingId, setEditingId] = useState<string | null>(null);
-
-    useEffect(() => {
-        fetchBlogs();
-    }, []);
 
     const fetchBlogs = async () => {
         const { data, error } = await supabase
@@ -31,6 +29,11 @@ export const BlogManager: React.FC = () => {
             setBlogs(data);
         }
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchBlogs();
+    }, []);
 
     const generateSlug = (text: string) => {
         const generatedSlug = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
@@ -56,6 +59,7 @@ export const BlogManager: React.FC = () => {
             target_locations: targetLocations,
             meta_description: metaDescription,
             related_service: relatedService,
+            image_url: imageUrl,
             content,
             author: 'Admin',
             status: 'published'
@@ -97,6 +101,7 @@ export const BlogManager: React.FC = () => {
         setTargetLocations(blog.target_locations || '');
         setMetaDescription(blog.meta_description || '');
         setRelatedService(blog.related_service || '');
+        setImageUrl(blog.image_url || '');
         setContent(blog.content || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -121,6 +126,7 @@ export const BlogManager: React.FC = () => {
         setTargetLocations('');
         setMetaDescription('');
         setRelatedService('');
+        setImageUrl('');
         setContent('');
     };
 
@@ -174,13 +180,24 @@ export const BlogManager: React.FC = () => {
                         </div>
 
                         <div className="md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Featured Image URL</label>
+                            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="https://example.com/image.jpg" />
+                        </div>
+
+                        <div className="md:col-span-2">
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Related Service (For Booking Link)</label>
                             <select value={relatedService} onChange={(e) => setRelatedService(e.target.value)} className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="">None</option>
-                                <option value="ac-repair">AC Repair</option>
-                                <option value="plumber">Plumbing</option>
-                                <option value="electrician">Electrician</option>
-                                <option value="cleaning">Cleaning</option>
+                                {SERVICES.map((category) => (
+                                    <optgroup key={category.name} label={category.name}>
+                                        <option value={category.name}>{category.name} (General)</option>
+                                        {category.subServices.map((sub) => (
+                                            <option key={sub.id} value={sub.name}>
+                                                -- {sub.name}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                ))}
                             </select>
                         </div>
 

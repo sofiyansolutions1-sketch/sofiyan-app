@@ -3,10 +3,11 @@ import { useStore } from '../hooks/useStore';
 import { ADMIN_PASSWORD } from '../constants';
 import { Booking, Partner } from '../types';
 import { Modal } from '../components/Modal';
-import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet, Info, UploadCloud, FileText } from 'lucide-react';
+import { Lock, Users, Calendar, DollarSign, Activity, Clock, User, Edit2, Trash2, Phone, Search, Send, MapPin, Loader2, CheckCircle, Undo, UserPlus, FileSpreadsheet, Info, UploadCloud, FileText, Plus, MessageCircle, Star } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getCoordinatesWithGemini } from '../services/geminiService';
 import { BlogManager } from '../components/BlogManager';
+import { PartnerManager } from '../components/PartnerManager';
 
 const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371; // Radius of the earth in km
@@ -24,7 +25,7 @@ export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners, updatePartner } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager'>('Dashboard');
+  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement'>('Dashboard');
   
   // Reschedule Modal State
   const [rescheduleData, setRescheduleData] = useState<{ booking: Booking | null, date: string, time: string }>({ 
@@ -35,6 +36,7 @@ export const AdminPanel: React.FC = () => {
   const [dispatchBooking, setDispatchBooking] = useState<Booking | null>(null);
   const [partnerSearchQuery, setPartnerSearchQuery] = useState('');
   const [partnerCategoryFilter, setPartnerCategoryFilter] = useState('');
+  const [partnerStatusFilter, setPartnerStatusFilter] = useState('');
   const [partnerSearchResults, setPartnerSearchResults] = useState<any[]>([]);
   const [isSearchingPartners, setIsSearchingPartners] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -63,6 +65,82 @@ export const AdminPanel: React.FC = () => {
   });
   const [isSavingPartner, setIsSavingPartner] = useState(false);
   const [showHomeAppliances, setShowHomeAppliances] = useState(false);
+
+  // Smart Follow-Up CRM State
+  const [crmLeads, setCrmLeads] = useState<any[]>([]);
+  const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [leadForm, setLeadForm] = useState({
+    customer_name: '',
+    phone_number: '',
+    service_interested: '',
+    follow_up_date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
+
+  const fetchTodaysFollowUps = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('leads')
+        .select('*')
+        .eq('follow_up_date', today)
+        .eq('status', 'Pending');
+      
+      if (error) {
+        console.error("Error fetching leads:", error);
+      } else if (data) {
+        setCrmLeads(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch leads:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTodaysFollowUps();
+    }
+  }, [isAuthenticated]);
+
+  const saveLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.from('leads').insert([leadForm]);
+      if (error) {
+        alert('Error saving lead: ' + error.message);
+      } else {
+        alert('Lead saved successfully!');
+        setShowAddLeadModal(false);
+        setLeadForm({
+          customer_name: '',
+          phone_number: '',
+          service_interested: '',
+          follow_up_date: new Date().toISOString().split('T')[0],
+          notes: ''
+        });
+        fetchTodaysFollowUps();
+      }
+    } catch (err: any) {
+      alert('Error saving lead: ' + err.message);
+    }
+  };
+
+  const markLeadConverted = async (leadId: string) => {
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .update({ status: 'Converted' })
+        .eq('id', leadId);
+        
+      if (error) {
+        alert('Error updating lead: ' + error.message);
+      } else {
+        fetchTodaysFollowUps();
+      }
+    } catch (err: any) {
+      alert('Error updating lead: ' + err.message);
+    }
+  };
 
   const toggleService = (service: string) => {
     setNewPartner(prev => {
@@ -121,7 +199,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   // Bulk Upload State
-  const [isCsvUploadModalOpen, setIsCsvUploadModalOpen] = useState(true);
+  const [isCsvUploadModalOpen, setIsCsvUploadModalOpen] = useState(false);
   const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
   const [bulkUploadProgress, setBulkUploadProgress] = useState({
     total: 0,
@@ -437,6 +515,38 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+    const handleRatePartner = async (booking: Booking) => {
+        if (!booking.assignedPartnerId) return;
+        const ratingStr = window.prompt('Rate the partner from 1 to 5:');
+        if (!ratingStr) return;
+        const rating = parseFloat(ratingStr);
+        if (isNaN(rating) || rating < 1 || rating > 5) {
+            alert('Invalid rating. Please enter a number between 1 and 5.');
+            return;
+        }
+
+        try {
+            const partner = partners.find(p => p.id === booking.assignedPartnerId);
+            if (!partner) throw new Error('Partner not found');
+
+            const newReviewCount = (partner.review_count || 0) + 1;
+            const newRating = ((partner.rating || 0) * (partner.review_count || 0) + rating) / newReviewCount;
+
+            const table = partner.partner_type === 'Primary' ? 'primary_partners' : 'secondary_partners';
+            const { error } = await supabase
+                .from(table)
+                .update({ rating: newRating, review_count: newReviewCount })
+                .eq('id', partner.id);
+
+            if (error) throw error;
+            updatePartner({ ...partner, rating: newRating, review_count: newReviewCount });
+            alert('Partner rated successfully!');
+        } catch (error) {
+            console.error('Error rating partner:', error);
+            alert('Failed to rate partner.');
+        }
+    };
+
   // Real Supabase Partner Search Logic
   const handlePartnerSearch = async () => {
     setIsSearchingPartners(true);
@@ -457,6 +567,11 @@ export const AdminPanel: React.FC = () => {
         if (partnerCategoryFilter) {
             primaryQuery = primaryQuery.contains('categories', [partnerCategoryFilter]);
             secondaryQuery = secondaryQuery.contains('categories', [partnerCategoryFilter]);
+        }
+
+        if (partnerStatusFilter) {
+            primaryQuery = primaryQuery.eq('status', partnerStatusFilter);
+            secondaryQuery = secondaryQuery.eq('status', partnerStatusFilter);
         }
 
         const [primaryRes, secondaryRes] = await Promise.all([primaryQuery, secondaryQuery]);
@@ -769,9 +884,21 @@ export const AdminPanel: React.FC = () => {
           <FileText className="inline-block mr-2" size={18} />
           Blog Manager
         </button>
+        <button
+          onClick={() => setMainTab('PartnerManagement')}
+          className={`py-3 px-6 font-bold text-sm border-b-2 transition-colors ${
+            mainTab === 'PartnerManagement'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <Users className="inline-block mr-2" size={18} />
+          Partner Management
+        </button>
       </div>
 
       {mainTab === 'BlogManager' && <BlogManager />}
+      {mainTab === 'PartnerManagement' && <PartnerManager />}
 
       {mainTab === 'Dashboard' && (
         <>
@@ -801,6 +928,75 @@ export const AdminPanel: React.FC = () => {
           icon={<Calendar className="text-purple-600" />} 
           bg="bg-purple-50"
         />
+      </div>
+
+      {/* Smart Follow-Up CRM Section */}
+      <div className="mb-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Phone className="text-indigo-600" /> Today's Follow-ups
+          </h2>
+          <button 
+            onClick={() => setShowAddLeadModal(true)} 
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition"
+          >
+            <Plus className="w-5 h-5" /> Add Lead
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {crmLeads.map(lead => (
+            <div key={lead.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">{lead.customer_name}</h3>
+                  <p className="text-indigo-600 font-medium text-sm">{lead.service_interested}</p>
+                </div>
+                <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-semibold">
+                  Pending
+                </span>
+              </div>
+              
+              {lead.notes && (
+                <div className="bg-gray-50 p-3 rounded-lg mb-4 text-sm text-gray-600 border border-gray-100">
+                  {lead.notes}
+                </div>
+              )}
+              
+              <div className="flex gap-2 mt-4">
+                <a 
+                  href={`tel:${lead.phone_number}`} 
+                  className="flex-1 bg-green-50 text-green-700 py-2.5 rounded-lg flex justify-center items-center gap-2 hover:bg-green-100 font-medium transition"
+                >
+                  <Phone className="w-4 h-4" /> Call
+                </a>
+                <a 
+                  href={`https://wa.me/91${lead.phone_number}?text=${encodeURIComponent(`Hello ${lead.customer_name}, aapne ${lead.service_interested} ke liye inquiry ki thi. Kya hum aaj service schedule karein?`)}`} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex-1 bg-green-500 text-white py-2.5 rounded-lg flex justify-center items-center gap-2 hover:bg-green-600 font-medium transition shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </a>
+              </div>
+              
+              <button 
+                onClick={() => markLeadConverted(lead.id)} 
+                className="w-full mt-3 border border-gray-200 text-gray-600 py-2.5 rounded-lg flex justify-center items-center gap-2 hover:bg-gray-50 font-medium transition"
+              >
+                <CheckCircle className="w-4 h-4" /> Mark as Done/Converted
+              </button>
+            </div>
+          ))}
+          
+          {crmLeads.length === 0 && (
+            <div className="col-span-full bg-gray-50 p-10 text-center rounded-xl border border-dashed border-gray-300">
+              <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
+              <h3 className="text-lg font-medium text-gray-900">All caught up!</h3>
+              <p className="text-gray-500">No follow-ups scheduled for today.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
@@ -851,6 +1047,14 @@ export const AdminPanel: React.FC = () => {
                                 'bg-yellow-100 text-yellow-700'}`}>
                                 {booking.status.toUpperCase()}
                             </span>
+                            {booking.status === 'completed' && booking.assignedPartnerId && (
+                                <button 
+                                    onClick={() => handleRatePartner(booking)}
+                                    className="text-xs bg-yellow-50 text-yellow-600 px-3 py-1 rounded border border-yellow-200 hover:bg-yellow-100 font-bold flex items-center transition"
+                                >
+                                    <Star size={14} className="mr-1" /> Rate Partner
+                                </button>
+                            )}
                             <a href={waLink} target="_blank" rel="noopener noreferrer" title="Forward to Admin WhatsApp" className="text-xs bg-green-50 text-green-600 px-3 py-1 rounded border border-green-200 hover:bg-green-100 font-bold flex items-center transition">
                                 <Send size={14} className="mr-1" /> Forward
                             </a>
@@ -981,8 +1185,14 @@ export const AdminPanel: React.FC = () => {
 
         {/* Partners List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
             <h3 className="font-bold text-gray-800">Partner Status</h3>
+            <button 
+              onClick={() => setIsCsvUploadModalOpen(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition text-sm"
+            >
+              <UploadCloud className="w-4 h-4" /> Bulk Upload Partners
+            </button>
           </div>
            <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
@@ -1127,6 +1337,15 @@ export const AdminPanel: React.FC = () => {
                         <option value="Geyser">Geyser</option>
                         <option value="Chimney">Chimney</option>
                         <option value="Cleaning">Cleaning</option>
+                     </select>
+                     <select
+                        className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none bg-white"
+                        value={partnerStatusFilter}
+                        onChange={(e) => setPartnerStatusFilter(e.target.value)}
+                     >
+                        <option value="">All Statuses</option>
+                        <option value="available">Available</option>
+                        <option value="busy">Busy</option>
                      </select>
                      <button 
                         onClick={handlePartnerSearch}
@@ -1477,6 +1696,90 @@ export const AdminPanel: React.FC = () => {
             </div>
         </div>
       )}
+
+      {/* Add Lead Modal */}
+      <Modal 
+        isOpen={showAddLeadModal} 
+        onClose={() => setShowAddLeadModal(false)}
+        title="Add New Lead"
+      >
+        <form onSubmit={saveLead} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
+            <input 
+              type="text" 
+              required
+              value={leadForm.customer_name}
+              onChange={(e) => setLeadForm({...leadForm, customer_name: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="John Doe"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+            <input 
+              type="tel" 
+              required
+              value={leadForm.phone_number}
+              onChange={(e) => setLeadForm({...leadForm, phone_number: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="9876543210"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Service Interested In *</label>
+            <input 
+              type="text" 
+              required
+              value={leadForm.service_interested}
+              onChange={(e) => setLeadForm({...leadForm, service_interested: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="e.g., AC Repair, Plumbing"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Follow-up Date *</label>
+            <input 
+              type="date" 
+              required
+              value={leadForm.follow_up_date}
+              onChange={(e) => setLeadForm({...leadForm, follow_up_date: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+            <textarea 
+              value={leadForm.notes}
+              onChange={(e) => setLeadForm({...leadForm, notes: e.target.value})}
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Any specific requirements or details..."
+              rows={3}
+            ></textarea>
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <button 
+              type="button"
+              onClick={() => setShowAddLeadModal(false)}
+              className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              className="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition"
+            >
+              Save Lead
+            </button>
+          </div>
+        </form>
+      </Modal>
+
         </>
       )}
 

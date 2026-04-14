@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star, FileText } from 'lucide-react';
-import { BUSINESS_NAME, EMAIL, HELPLINE } from '../constants';
+import { BUSINESS_NAME } from '../constants';
 
 const siteContent = {
   about: {
@@ -74,17 +74,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      {/* Top Bar */}
-      <div className="bg-indigo-900 text-white py-2 px-4 text-xs sm:text-sm">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center gap-1"><Phone size={14} /> {HELPLINE}</span>
-            <span className="hidden sm:flex items-center gap-1"><Mail size={14} /> {EMAIL}</span>
-          </div>
-          <div className="font-semibold tracking-wide">Trusted Home Services</div>
-        </div>
-      </div>
-
       {/* Navbar */}
       <nav className="bg-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,168 +1,214 @@
 -- ==========================================
--- FULL SUPABASE SCHEMA FOR SOFIYAN HOME SERVICES
+-- FULL SUPABASE SQL SCHEMA FOR HOME SERVICES
 -- ==========================================
 
+-- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ==========================================
--- 1. CUSTOMERS TABLE
+-- 1. CUSTOMERS (Customer Panel)
 -- ==========================================
 CREATE TABLE IF NOT EXISTS customers (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    name TEXT NOT NULL,
-    phone TEXT UNIQUE NOT NULL,
+    full_name TEXT NOT NULL,
+    phone_number TEXT UNIQUE NOT NULL,
     email TEXT,
     address TEXT,
     city TEXT,
     pincode TEXT,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ==========================================
--- 2. BOOKINGS TABLE
+-- 2. BOOKINGS (Customer & Admin Panel)
 -- ==========================================
 CREATE TABLE IF NOT EXISTS bookings (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
     customer_name TEXT NOT NULL,
-    customer_phone TEXT NOT NULL,
-    customer_address TEXT NOT NULL,
+    contact_number TEXT NOT NULL,
+    address TEXT NOT NULL,
     city TEXT,
-    pincode TEXT,
-    cart_items JSONB NOT NULL,
-    total_price NUMERIC NOT NULL,
-    service_date TEXT NOT NULL,
-    service_time TEXT NOT NULL,
-    notes TEXT,
-    status TEXT DEFAULT 'pending',
+    pin_code TEXT,
+    lat NUMERIC,
+    lng NUMERIC,
+    description TEXT,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
     service_category TEXT,
     sub_service_name TEXT,
-    commission_paid BOOLEAN DEFAULT false,
-    coupon_used TEXT,
+    cart_items JSONB DEFAULT '[]',
+    price NUMERIC,
     discount_amount NUMERIC DEFAULT 0,
-    assigned_partner_id TEXT,
+    status TEXT DEFAULT 'pending',
+    assigned_partner_id UUID,
     assigned_partner_name TEXT,
     assigned_partner_phone TEXT,
+    commission_paid BOOLEAN DEFAULT FALSE,
     applied_referral_code TEXT,
-    created_at TIMESTAMPTZ DEFAULT now()
+    coupon_used TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ==========================================
--- 3. PRIMARY PARTNERS TABLE (App Registered)
+-- 3. LEADS (Today's Follow-ups / CRM)
 -- ==========================================
-CREATE TABLE IF NOT EXISTS primary_partners (
+CREATE TABLE IF NOT EXISTS leads (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    first_name TEXT,
-    last_name TEXT,
-    phone TEXT UNIQUE,
-    email TEXT,
-    gender TEXT,
-    categories JSONB,
-    sub_categories JSONB,
-    experience TEXT,
-    address TEXT,
+    customer_name TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    service_interested TEXT NOT NULL,
+    follow_up_date DATE,
+    notes TEXT,
+    status TEXT DEFAULT 'pending',
+    source TEXT DEFAULT 'website',
     city TEXT,
-    pincode TEXT,
-    lat FLOAT8,
-    lng FLOAT8,
-    status TEXT DEFAULT 'available',
-    earnings NUMERIC DEFAULT 0,
-    completed_jobs INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ==========================================
--- 4. SECONDARY PARTNERS TABLE (Admin Added)
--- ==========================================
-CREATE TABLE IF NOT EXISTS secondary_partners (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    name TEXT,
-    phone TEXT,
-    email TEXT,
-    city TEXT,
-    categories JSONB,
-    address TEXT,
-    pincode TEXT,
-    lat FLOAT8,
-    lng FLOAT8,
-    status TEXT DEFAULT 'available',
-    earnings NUMERIC DEFAULT 0,
-    completed_jobs INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- ==========================================
--- 5. INFLUENCERS TABLE
--- ==========================================
-CREATE TABLE IF NOT EXISTS influencers (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    page_name TEXT UNIQUE NOT NULL,
-    contact_number TEXT,
-    password TEXT NOT NULL,
-    referral_code TEXT UNIQUE NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- ==========================================
--- 6. BLOG POSTS TABLE
+-- 4. BLOG POSTS (Blogs)
 -- ==========================================
 CREATE TABLE IF NOT EXISTS blog_posts (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
-    sub_heading TEXT,
-    content TEXT,
+    content TEXT NOT NULL,
+    excerpt TEXT,
+    image_url TEXT,
+    author_name TEXT DEFAULT 'Admin',
+    target_locations JSONB DEFAULT '[]',
+    service_category TEXT,
+    meta_title TEXT,
     meta_description TEXT,
-    target_keywords TEXT,
-    target_locations TEXT,
-    related_service TEXT,
-    author TEXT DEFAULT 'Admin',
-    status TEXT DEFAULT 'published',
-    created_at TIMESTAMPTZ DEFAULT now()
+    published BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ==========================================
--- 7. ADMINS TABLE
+-- 5. PRIMARY PARTNERS (Partner Panel)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS primary_partners (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    phone TEXT UNIQUE NOT NULL,
+    email TEXT,
+    gender TEXT,
+    city TEXT,
+    address TEXT,
+    pincode TEXT,
+    categories JSONB DEFAULT '[]',
+    sub_categories JSONB DEFAULT '[]',
+    experience TEXT,
+    status TEXT DEFAULT 'available',
+    lat NUMERIC,
+    lng NUMERIC,
+    earnings NUMERIC DEFAULT 0,
+    completed_jobs INTEGER DEFAULT 0,
+    rating NUMERIC DEFAULT 0,
+    review_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==========================================
+-- 6. SECONDARY PARTNERS (Admin Panel)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS secondary_partners (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    phone TEXT UNIQUE NOT NULL,
+    email TEXT,
+    gender TEXT,
+    city TEXT,
+    address TEXT,
+    pincode TEXT,
+    categories JSONB DEFAULT '[]',
+    sub_categories JSONB DEFAULT '[]',
+    experience TEXT,
+    status TEXT DEFAULT 'available',
+    lat NUMERIC,
+    lng NUMERIC,
+    earnings NUMERIC DEFAULT 0,
+    completed_jobs INTEGER DEFAULT 0,
+    rating NUMERIC DEFAULT 0,
+    review_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==========================================
+-- 7. ADMINS (Admin Panel)
 -- ==========================================
 CREATE TABLE IF NOT EXISTS admins (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     role TEXT DEFAULT 'superadmin',
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ==========================================
--- 8. ENABLE ROW LEVEL SECURITY (RLS)
+-- 8. INFLUENCERS (Influencer Panel)
 -- ==========================================
+CREATE TABLE IF NOT EXISTS influencers (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    platform TEXT,
+    handle TEXT,
+    phone_number TEXT UNIQUE NOT NULL,
+    email TEXT,
+    referral_code TEXT UNIQUE NOT NULL,
+    commission_rate NUMERIC DEFAULT 10.0,
+    total_earnings NUMERIC DEFAULT 0,
+    total_referrals INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==========================================
+-- 9. INFLUENCER REFERRALS (Tracking)
+-- ==========================================
+CREATE TABLE IF NOT EXISTS influencer_referrals (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    influencer_id UUID REFERENCES influencers(id) ON DELETE CASCADE,
+    booking_id UUID REFERENCES bookings(id) ON DELETE CASCADE,
+    commission_earned NUMERIC DEFAULT 0,
+    status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==========================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- ==========================================
+-- Enable RLS on all tables
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE primary_partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE secondary_partners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE influencers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE influencers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE influencer_referrals ENABLE ROW LEVEL SECURITY;
 
--- ==========================================
--- 9. CREATE RLS POLICIES (Permissive for MVP)
--- ==========================================
--- Customers
-CREATE POLICY "Allow all operations on customers" ON customers FOR ALL USING (true);
+-- Create basic policies to allow public/authenticated access for the MVP
+-- Note: For a production app, you should restrict these using Supabase Auth (auth.uid())
+CREATE POLICY "Allow public access to customers" ON customers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to bookings" ON bookings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to leads" ON leads FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to blog_posts" ON blog_posts FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to primary_partners" ON primary_partners FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to secondary_partners" ON secondary_partners FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to admins" ON admins FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to influencers" ON influencers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to influencer_referrals" ON influencer_referrals FOR ALL USING (true) WITH CHECK (true);
 
--- Bookings
-CREATE POLICY "Allow all operations on bookings" ON bookings FOR ALL USING (true);
-
--- Primary Partners
-CREATE POLICY "Allow all operations on primary_partners" ON primary_partners FOR ALL USING (true);
-
--- Secondary Partners
-CREATE POLICY "Allow all operations on secondary_partners" ON secondary_partners FOR ALL USING (true);
-
--- Influencers
-CREATE POLICY "Allow all operations on influencers" ON influencers FOR ALL USING (true);
-
--- Blog Posts
-CREATE POLICY "Allow all operations on blog_posts" ON blog_posts FOR ALL USING (true);
-
--- Admins
-CREATE POLICY "Allow all operations on admins" ON admins FOR ALL USING (true);
+-- Enable Realtime for all tables (so the dashboard updates instantly)
+-- Note: supabase_realtime publication exists by default in Supabase.
+ALTER PUBLICATION supabase_realtime ADD TABLE primary_partners;
+ALTER PUBLICATION supabase_realtime ADD TABLE secondary_partners;
+ALTER PUBLICATION supabase_realtime ADD TABLE bookings;
+ALTER PUBLICATION supabase_realtime ADD TABLE leads;
+ALTER PUBLICATION supabase_realtime ADD TABLE blog_posts;

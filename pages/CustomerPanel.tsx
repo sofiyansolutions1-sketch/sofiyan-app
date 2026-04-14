@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SERVICES } from '../constants';
 import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, Plus, Minus, Shield, ArrowRight, Trash2, FileText } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -98,6 +99,7 @@ const categoryList = [
 ];
 
 export const CustomerPanel: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
   // Advanced Cart State
@@ -108,6 +110,10 @@ export const CustomerPanel: React.FC = () => {
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Blogs State
+  const [latestBlogs, setLatestBlogs] = useState<any[]>([]);
+  const blogScrollRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -120,6 +126,88 @@ export const CustomerPanel: React.FC = () => {
     time: '',
     referralCode: ''
   });
+
+  useEffect(() => {
+    const fetchLatestBlogs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('title, slug, sub_heading, target_locations, created_at, content, meta_description, image_url')
+          .eq('status', 'published')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          setLatestBlogs(data);
+        }
+      } catch (err) {
+        console.error('Error fetching blogs:', err);
+      }
+    };
+    fetchLatestBlogs();
+  }, []);
+
+  // Auto-scroll for latest blogs
+  useEffect(() => {
+    if (latestBlogs.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      if (blogScrollRef.current) {
+        const container = blogScrollRef.current;
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        
+        // Check if we've reached the end
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          // Scroll by one card width
+          const cardWidth = container.children[0]?.clientWidth || 350;
+          const gap = 24; // gap-6 is 24px
+          container.scrollBy({ left: cardWidth + gap, behavior: 'smooth' });
+        }
+      }
+    }, 3000);
+    
+    return () => clearInterval(interval);
+  }, [latestBlogs.length]);
+
+  const calculateReadingTime = (text: string) => {
+    const wordsPerMinute = 200;
+    const words = text ? text.replace(/<[^>]*>?/gm, '').split(/\s+/).length : 0;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return `${minutes} min read`;
+  };
+
+  const formatLocations = (locations: string) => {
+    if (!locations) return 'All Cities';
+    const locArray = locations.split(',').map(l => l.trim());
+    if (locArray.length > 2) {
+      return `${locArray[0]}, ${locArray[1]} +${locArray.length - 2} more`;
+    }
+    return locations;
+  };
+
+  const getSnippet = (post: any) => {
+    let snippet = post.sub_heading || post.meta_description || '';
+    if (!snippet && post.content) {
+      snippet = post.content.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
+    }
+    return snippet;
+  };
+
+  const scrollBlogsLeft = () => {
+    if (blogScrollRef.current) {
+      const cardWidth = blogScrollRef.current.children[0]?.clientWidth || 350;
+      blogScrollRef.current.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+    }
+  };
+
+  const scrollBlogsRight = () => {
+    if (blogScrollRef.current) {
+      const cardWidth = blogScrollRef.current.children[0]?.clientWidth || 350;
+      blogScrollRef.current.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+    }
+  };
 
   // Auto-fill address from localStorage when booking modal opens
   useEffect(() => {
@@ -407,13 +495,13 @@ export const CustomerPanel: React.FC = () => {
           .from('customers')
           .upsert([
             {
-              name: formData.name,
-              phone: formData.contact,
+              full_name: formData.name,
+              phone_number: formData.contact,
               address: formData.address,
               city: formData.city,
               pincode: formData.pincode
             }
-          ], { onConflict: 'phone' })
+          ], { onConflict: 'phone_number' })
           .select('id')
           .single();
           
@@ -431,21 +519,18 @@ export const CustomerPanel: React.FC = () => {
           {
             customer_id: customerId,
             customer_name: formData.name,
-            customer_phone: formData.contact,
-            customer_address: formData.address,
+            contact_number: formData.contact,
+            address: formData.address,
             city: formData.city,
-            pincode: formData.pincode,
+            pin_code: formData.pincode,
             cart_items: cart,
-            total_price: finalTotal,
-            service_date: formData.date,
-            service_time: formData.time,
-            notes: formData.description,
+            price: finalTotal,
+            date: formData.date,
+            time: formData.time,
             status: 'pending',
             // Additional fields for admin tracking
             service_category: categoryName,
             sub_service_name: subServiceName,
-            commission_paid: false,
-            coupon_used: appliedCoupon || 'None',
             discount_amount: discountAmount,
             applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
           }
@@ -474,38 +559,20 @@ export const CustomerPanel: React.FC = () => {
 
   return (
     <>
-      {/* Customer Support Badge - New Position & Design */}
-      <div className="w-full max-w-7xl mx-auto flex justify-start px-4 sm:px-6 lg:px-8 mt-4 md:mt-6 mb-[-1rem] relative z-10">
-          <a href="tel:+919219345455" className="group flex items-center bg-white border border-indigo-100 shadow-sm hover:shadow-md hover:border-indigo-300 rounded-full py-1.5 px-3 md:py-2 md:px-4 transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer">
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-50 flex items-center justify-center mr-2 md:mr-3 group-hover:bg-indigo-100 transition-colors">
-                  <i className="fas fa-headset text-indigo-600 text-sm md:text-lg animate-pulse"></i>
-              </div>
-              <div className="flex flex-col text-left">
-                  <span className="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase tracking-wider leading-tight">Customer Support</span>
-                  <span className="text-sm md:text-base font-extrabold text-gray-800 group-hover:text-indigo-600 transition-colors leading-tight">
-                      9219345455
-                  </span>
-              </div>
-              <div className="ml-2 pl-2 md:ml-3 md:pl-3 border-l border-gray-200 hidden sm:flex items-center">
-                  <span className="text-[10px] md:text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-1 rounded-md">Call Now</span>
-              </div>
-          </a>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 mb-20">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 mb-8">
+        <div className="text-center mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
               Professional Home Services
             </span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Expert help at your doorstep
           </p>
         </div>
 
         {/* Global Search Bar Section */}
-        <div className="max-w-xl mx-auto mb-12 relative z-30">
+        <div className="max-w-xl mx-auto mb-6 relative z-30">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
           </div>
@@ -560,24 +627,24 @@ export const CustomerPanel: React.FC = () => {
 
         {/* Trust Badge Banner */}
         <div className="w-full flex justify-center mt-4 mb-6 px-2">
-            <div className="flex flex-row items-center bg-white rounded-full shadow-sm border border-gray-100 py-2 px-2 sm:px-4 divide-x divide-gray-200 max-w-full overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex flex-row items-center bg-white rounded-full shadow-sm border border-gray-100 py-1.5 px-2 sm:px-4 divide-x divide-gray-200 max-w-full overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <style>
                     {`.overflow-x-auto::-webkit-scrollbar { display: none; }`}
                 </style>
                 
-                <div className="flex items-center px-2 sm:px-4 whitespace-nowrap text-[10px] sm:text-xs md:text-sm font-semibold text-gray-700">
-                    <span className="w-1.5 h-1.5 md:w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> 
-                    24/7 Expert
+                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> 
+                    24/7
                 </div>
                 
-                <div className="flex items-center px-2 sm:px-4 whitespace-nowrap text-[10px] sm:text-xs md:text-sm font-semibold text-gray-700">
-                    <i className="fas fa-check text-blue-600 mr-1.5 text-[10px] md:text-base"></i> 
-                    100% Quality
+                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
+                    <i className="fas fa-check text-blue-600 mr-1.5 text-[10px]"></i> 
+                    Quality
                 </div>
                 
-                <div className="flex items-center px-2 sm:px-4 whitespace-nowrap text-[10px] sm:text-xs md:text-sm font-semibold text-gray-700">
-                    <i className="fas fa-bolt text-purple-600 mr-1.5 text-[10px] md:text-base"></i> 
-                    Fast Booking
+                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
+                    <i className="fas fa-bolt text-purple-600 mr-1.5 text-[10px]"></i> 
+                    Fast
                 </div>
                 
             </div>
@@ -695,22 +762,22 @@ export const CustomerPanel: React.FC = () => {
         <div className="mt-20 py-12 bg-blue-50 -mx-4 sm:-mx-6 lg:-mx-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">What Our Customers Say</h2>
-              <div className="relative overflow-hidden group">
-                  <div className="flex space-x-6 animate-scroll w-max hover:[animation-play-state:paused]">
+              <div className="relative overflow-hidden group py-4">
+                  <div className="flex space-x-4 animate-scroll w-max hover:[animation-play-state:paused]">
                       {[...customerReviews, ...customerReviews].map((review, index) => (
-                          <div key={index} className="w-80 md:w-96 flex-shrink-0 bg-white p-6 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-                              <div className="flex items-center gap-4 mb-4">
-                                  <img src={review.img} alt={review.name} className="w-14 h-14 rounded-full object-cover border-2 border-indigo-100" />
+                          <div key={index} className="w-64 md:w-72 flex-shrink-0 bg-white p-5 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
+                              <div className="flex items-center gap-3 mb-3">
+                                  <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full object-cover border-2 border-indigo-50" />
                                   <div>
-                                      <h4 className="font-bold text-gray-900 text-lg">{review.name}</h4>
+                                      <h4 className="font-bold text-gray-900 text-sm">{review.name}</h4>
                                       <div className="flex text-yellow-400 gap-0.5">
                                           {[...Array(5)].map((_, i) => (
-                                              <Star key={i} size={16} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} />
+                                              <Star key={i} size={12} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} />
                                           ))}
                                       </div>
                                   </div>
                               </div>
-                              <p className="text-gray-600 text-sm leading-relaxed italic">"{review.text}"</p>
+                              <p className="text-gray-600 text-xs leading-relaxed italic line-clamp-4">"{review.text}"</p>
                           </div>
                       ))}
                   </div>
@@ -718,16 +785,16 @@ export const CustomerPanel: React.FC = () => {
           </div>
           <style>{`
               @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-              .animate-scroll { animation: scroll 40s linear infinite; }
+              .animate-scroll { animation: scroll 30s linear infinite; }
               @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
               .animate-slideUp { animation: slideUp 0.3s ease-out; }
           `}</style>
         </div>
 
         {/* Trust Metrics / Stats Section */}
-        <div className="py-16 bg-blue-50/30 -mx-4 sm:-mx-6 lg:-mx-8">
+        <div className="py-8 bg-blue-50/30 -mx-4 sm:-mx-6 lg:-mx-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
+            <div className="text-center mb-10">
               <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
                 Your Trusted Home Experts
               </h2>
@@ -759,6 +826,100 @@ export const CustomerPanel: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Latest Articles Section */}
+        {latestBlogs.length > 0 && (
+          <div className="py-8 bg-white -mx-4 sm:-mx-6 lg:-mx-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row justify-between items-end mb-6">
+                <div className="max-w-2xl">
+                  <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-4">
+                    Latest Home Service Guides
+                  </h2>
+                  <p className="text-lg text-gray-500">
+                    Expert advice, home maintenance tips, and local insights.
+                  </p>
+                </div>
+                <div className="hidden md:flex gap-3 mt-6 md:mt-0">
+                  <button onClick={scrollBlogsLeft} className="p-3 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm">
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button onClick={scrollBlogsRight} className="p-3 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm">
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+                <div 
+                  ref={blogScrollRef}
+                  id="home-blog-scroll-container"
+                  className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-8 pt-4 hide-scrollbar"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {latestBlogs.map((post) => (
+                    <article 
+                      key={post.slug}
+                      onClick={() => navigate(`/blog/${post.slug}`)}
+                      className="snap-start shrink-0 w-[85vw] sm:w-[350px] bg-white rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 flex flex-col group cursor-pointer"
+                    >
+                      <div className="h-48 overflow-hidden relative bg-gray-50">
+                        {post.image_url ? (
+                          <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <span className="text-gray-400 font-bold text-xl">{post.title.substring(0, 2).toUpperCase()}</span>
+                          </div>
+                        )}
+                        <div className="absolute top-3 left-3 flex gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-800 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded shadow-sm">
+                            {formatLocations(post.target_locations)}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-6 flex flex-col flex-grow">
+                        <div className="flex items-center gap-3 mb-3 text-xs text-gray-500 font-medium">
+                          <span className="flex items-center">
+                            <Calendar className="w-3.5 h-3.5 mr-1 text-gray-400" />
+                            {new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                          <span className="flex items-center">
+                            <Clock className="w-3.5 h-3.5 mr-1 text-gray-400" />
+                            {calculateReadingTime(post.content)}
+                          </span>
+                        </div>
+                        
+                        <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
+                          {post.title}
+                        </h3>
+                        
+                        <p className="text-gray-600 mb-6 text-sm line-clamp-3 flex-grow leading-relaxed">
+                          {getSnippet(post)}
+                        </p>
+                        
+                        <div className="inline-flex items-center text-blue-600 text-sm font-semibold group-hover:text-blue-800 transition mt-auto">
+                          Read Article 
+                          <ArrowRight className="w-4 h-4 ml-1.5 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mt-4 text-center">
+                <button 
+                  onClick={() => navigate('/blogs')}
+                  className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                >
+                  View All Articles
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Sub-service Selection Modal */}
         <Modal

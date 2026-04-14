@@ -43,7 +43,7 @@ export interface Booking {
   subServiceName: string; // Summary string for backward compatibility
   cartItems?: CartItem[]; // Full cart details
   price: number;
-  status: 'pending' | 'accepted' | 'completed' | 'cancelled' | 'Forwarded';
+  status: 'pending' | 'accepted' | 'completed' | 'cancelled' | 'Forwarded' | 'on_hold';
   assignedPartnerId?: string;
   assignedPartnerName?: string;
   assignedPartnerPhone?: string;
@@ -51,6 +51,7 @@ export interface Booking {
   createdAt: string;
   couponUsed?: string;
   discountAmount?: number;
+  appliedReferralCode?: string;
 }
 
 export interface Partner {
@@ -60,6 +61,7 @@ export interface Partner {
   last_name?: string;
   email: string;
   phone?: string; // Optional for backward compatibility
+  gender?: string;
   address?: string;
   pincode?: string;
   city?: string;
@@ -67,8 +69,12 @@ export interface Partner {
   lng?: number;
   partner_type?: 'Primary' | 'Secondary';
   categories?: string[];
+  sub_categories?: string[];
+  experience?: string;
   password?: string;
-  status: 'available' | 'busy';
+  status: 'available' | 'busy' | 'on_hold' | 'blocked';
+  rating?: number;
+  review_count?: number;
   earnings: number;
   completedJobs: number;
 }

@@ -4,7 +4,7 @@ import { useStore } from '../hooks/useStore';
 import { Partner, Booking } from '../types';
 import { SERVICES } from '../constants';
 import { Modal } from '../components/Modal';
-import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle } from 'lucide-react';
+import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Session } from '@supabase/supabase-js';
 
@@ -62,7 +62,9 @@ export const PartnerPanel: React.FC = () => {
     customCity: '',
     pincode: '',
     categories: [] as string[],
-    subCategories: [] as string[]
+    subCategories: [] as string[],
+    experience: '',
+    gender: 'Male'
   });
 
   const CATEGORY_LIST = ["Electrician", "Plumber", "Carpenters", "Cleaning & Pest Control", "Pooja", "Home Appliances"];
@@ -140,15 +142,25 @@ export const PartnerPanel: React.FC = () => {
         if (data) {
            const partner: Partner = {
                id: data.id,
-               name: `${data.first_name} ${data.last_name}`,
+               name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name,
                first_name: data.first_name,
                last_name: data.last_name,
                email: data.email,
                phone: data.phone,
+               gender: data.gender,
+               address: data.address,
+               pincode: data.pincode,
                city: data.city,
+               lat: data.lat,
+               lng: data.lng,
+               categories: data.categories || [],
+               sub_categories: data.sub_categories || [],
+               experience: data.experience,
                status: data.status,
                earnings: data.earnings || 0,
                completedJobs: data.completed_jobs || 0,
+               rating: data.rating || 0,
+               review_count: data.review_count || 0,
                partner_type: 'Primary'
            };
            setCurrentUser(partner);
@@ -310,6 +322,7 @@ export const PartnerPanel: React.FC = () => {
            .insert([
                { 
                    id: session.user.id,
+                   name: `${regData.firstName} ${regData.lastName}`.trim(),
                    first_name: regData.firstName, 
                    last_name: regData.lastName,
                    phone: regData.phone,
@@ -364,7 +377,9 @@ export const PartnerPanel: React.FC = () => {
             customCity: '',
             pincode: data.pincode || '',
             categories: data.categories || [],
-            subCategories: data.sub_categories || []
+            subCategories: data.sub_categories || [],
+            experience: data.experience || '',
+            gender: data.gender || 'Male'
         });
         setIsEditingProfile(true);
     } catch (err: any) {
@@ -438,6 +453,8 @@ export const PartnerPanel: React.FC = () => {
                phone: editData.phone,
                categories: editData.categories, 
                sub_categories: editData.subCategories, 
+               experience: editData.experience,
+               gender: editData.gender,
                address: editData.address,
                city: finalCityValue,
                pincode: editData.pincode,
@@ -463,6 +480,17 @@ export const PartnerPanel: React.FC = () => {
 
   const handleAcceptLead = (booking: Booking) => {
     if (!currentUser) return;
+    
+    if (currentUser.status === 'blocked') {
+      alert("🚫 Your account has been blocked. Please contact admin for support.");
+      return;
+    }
+    
+    if (currentUser.status === 'on_hold') {
+      alert("⚠️ Your account is currently on hold. You cannot accept new jobs at this time.");
+      return;
+    }
+
     const hasActiveJob = bookings.some(b => b.assignedPartnerId === currentUser.id && b.status === 'accepted');
     if (currentUser.status === 'busy' || hasActiveJob) {
       alert("🚫 You have an ongoing job! Please complete your current task before accepting a new one.");
@@ -702,12 +730,26 @@ export const PartnerPanel: React.FC = () => {
       <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Welcome, {currentUser?.name}</h1>
-          <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-            Status: 
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${currentUser?.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {currentUser?.status.toUpperCase()}
-            </span>
-          </p>
+          <div className="flex items-center gap-3 mt-2">
+            <p className="text-sm text-gray-500 flex items-center gap-2">
+              Status: 
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                currentUser?.status === 'available' ? 'bg-green-100 text-green-700' : 
+                currentUser?.status === 'busy' ? 'bg-blue-100 text-blue-700' :
+                currentUser?.status === 'on_hold' ? 'bg-orange-100 text-orange-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {currentUser?.status.replace('_', ' ').toUpperCase()}
+              </span>
+            </p>
+            {currentUser?.rating !== undefined && (
+              <div className="flex items-center bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-100">
+                <Star className="w-3 h-3 text-yellow-500 fill-current mr-1" />
+                <span className="text-xs font-bold text-yellow-700">{currentUser.rating.toFixed(1)}</span>
+                <span className="text-xs text-yellow-600 ml-1">({currentUser.review_count || 0})</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <button 
@@ -1066,6 +1108,23 @@ export const PartnerPanel: React.FC = () => {
                         className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                         value={editData.phone}
                         onChange={(e) => setEditData({...editData, phone: e.target.value})}
+                      />
+                      <select 
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        value={editData.gender}
+                        onChange={(e) => setEditData({...editData, gender: e.target.value})}
+                      >
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <input 
+                        type="number" 
+                        placeholder="Work Experience (Years)" 
+                        required 
+                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        value={editData.experience}
+                        onChange={(e) => setEditData({...editData, experience: e.target.value})}
                       />
                     </div>
                   </div>

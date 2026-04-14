@@ -11,25 +11,26 @@ export const useStore = () => {
   const mapBookingFromDB = (data: any): Booking => ({
     id: data.id,
     customerName: data.customer_name,
-    contactNumber: data.customer_phone,
-    address: data.customer_address,
+    contactNumber: data.contact_number,
+    address: data.address,
     city: data.city,
-    pinCode: data.pincode,
-    description: data.notes,
-    date: data.service_date,
-    time: data.service_time,
+    pinCode: data.pin_code,
+    description: '', // Not in schema
+    date: data.date,
+    time: data.time,
     serviceCategory: data.service_category,
     subServiceName: data.sub_service_name,
     cartItems: data.cart_items,
-    price: data.total_price,
+    price: data.price,
     status: data.status,
     assignedPartnerId: data.assigned_partner_id,
     assignedPartnerName: data.assigned_partner_name,
     assignedPartnerPhone: data.assigned_partner_phone,
-    commissionPaid: data.commission_paid,
+    commissionPaid: false, // Not in schema
     createdAt: data.created_at,
-    couponUsed: data.coupon_used,
-    discountAmount: data.discount_amount
+    couponUsed: '', // Not in schema
+    discountAmount: data.discount_amount,
+    appliedReferralCode: data.applied_referral_code
   });
 
   const mapPrimaryPartnerFromDB = (data: any): Partner => ({
@@ -42,6 +43,8 @@ export const useStore = () => {
     city: data.city,
     categories: data.categories,
     status: data.status,
+    rating: data.rating || 0,
+    review_count: data.review_count || 0,
     earnings: data.earnings || 0,
     completedJobs: data.completed_jobs || 0,
     partner_type: 'Primary'
@@ -55,6 +58,8 @@ export const useStore = () => {
     city: data.city,
     categories: data.categories,
     status: data.status,
+    rating: data.rating || 0,
+    review_count: data.review_count || 0,
     earnings: data.earnings || 0,
     completedJobs: data.completed_jobs || 0,
     partner_type: 'Secondary'
@@ -122,9 +127,8 @@ export const useStore = () => {
         assigned_partner_id: updatedBooking.assignedPartnerId || null,
         assigned_partner_name: updatedBooking.assignedPartnerName || null,
         assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
-        commission_paid: updatedBooking.commissionPaid,
-        service_date: updatedBooking.date,
-        service_time: updatedBooking.time
+        date: updatedBooking.date,
+        time: updatedBooking.time
     }).eq('id', updatedBooking.id);
     
     if (error) {
