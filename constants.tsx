@@ -108,8 +108,8 @@ export const DB_DATA = {
     "AC": [
       {name: "AC Basic Check-up/Cooling Issue", price: 199},
       {name: "AC Basic Repair (Minor/Gas Check)", price: 399}, 
-      {name: "Premium AC Service (Split)", price: 599},
-      {name: "Premium AC Service (Window)", price: 449},
+      {name: "Premium AC Service (Split)", price: 499},
+      {name: "Premium AC Service (Window)", price: 399},
       {name: "Lite ac service", price: 499},
       {name: "Front-jet AC Deep Cleaning", price: 599},
       {name: "AC Less/No Cooling Repair", price: 299},

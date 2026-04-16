@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SERVICES } from '../constants';
 import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
+import { RateCardModal, rateCardDatabase } from '../components/RateCardModal';
 import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
@@ -47,7 +48,7 @@ const customerReviews = [
 ];
 
 const featuredServicesData = [
-    { name: "Premium AC Service (Split)", price: 599, img: "https://i.postimg.cc/4dh6m6X0/Whats-App-Image-2026-01-12-at-11-13-39-PM.jpg", desc: "Expert AC deep cleaning & cooling solutions by Sofiyan." },
+    { name: "Premium AC Service (Split)", price: 499, img: "https://i.postimg.cc/4dh6m6X0/Whats-App-Image-2026-01-12-at-11-13-39-PM.jpg", desc: "Expert AC deep cleaning & cooling solutions by Sofiyan." },
     { name: "AC Basic Check-up/Cooling", price: 399, img: "https://i.postimg.cc/442GJpmj/Whats-App-Image-2026-01-12-at-11-13-46-PM.jpg", desc: "Quick AC diagnosis & minor repairs at your doorstep." },
     { name: "AC Power Issue Repair", price: 499, img: "https://i.postimg.cc/HnZhd0zF/Whats-App-Image-2026-01-12-at-11-13-48-PM.jpg", desc: "Safe and reliable AC electrical fault repair." },
     { name: "Switchbox installation", price: 349, img: "https://i.postimg.cc/BvbRbntk/Whats-App-Image-2026-01-13-at-1-49-12-AM.jpg", desc: "Certified electricians for safe board installations." },
@@ -110,6 +111,20 @@ export const CustomerPanel: React.FC = () => {
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Rate Card Modal State
+  const [isRateCardModalOpen, setIsRateCardModalOpen] = useState(false);
+  const [activeRateCardCategory, setActiveRateCardCategory] = useState<string | null>(null);
+
+  // Helper to map service name to rate card database key
+  const getRateCardCategory = (serviceName: string) => {
+    const name = serviceName.toLowerCase();
+    if (name === 'ac' || name === 'ac repair' || name.includes('ac ')) return 'AC Service';
+    if (name === 'washingmachine' || name.includes('washing')) return 'Washing Machine';
+    if (name === 'refrigerator' || name.includes('refrigerat') || name.includes('fridge')) return 'Refrigerator';
+    if (name === 'waterpurifier' || name.includes('water purifier') || name.includes('ro service')) return 'Water Purifier';
+    return null;
+  };
 
   // Blogs State
   const [latestBlogs, setLatestBlogs] = useState<any[]>([]);
@@ -928,7 +943,21 @@ export const CustomerPanel: React.FC = () => {
           title={selectedService?.name || 'Select Service'}
         >
           <div className="space-y-4">
-            <p className="text-gray-600 mb-4">Available services for {selectedService?.name}:</p>
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-gray-600">Available services for {selectedService?.name}:</p>
+              {selectedService?.name && getRateCardCategory(selectedService.name) && (
+                <button
+                  onClick={() => {
+                    setActiveRateCardCategory(getRateCardCategory(selectedService.name!));
+                    setIsRateCardModalOpen(true);
+                  }}
+                  className="text-sm font-semibold text-indigo-700 hover:text-indigo-800 flex items-center gap-1.5 bg-white border border-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition-all shadow-sm"
+                >
+                  <FileText size={16} />
+                  {getRateCardCategory(selectedService.name)} Rate Card
+                </button>
+              )}
+            </div>
             <div className="grid gap-3 max-h-[60vh] overflow-y-auto pr-2">
               {selectedService?.subServices
                 .filter(sub => !searchQuery || sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || selectedService.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -987,7 +1016,7 @@ export const CustomerPanel: React.FC = () => {
                             className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all active:scale-95 flex items-center gap-2"
                           >
                             <Plus size={16} />
-                            Add
+                            Add to cart
                           </button>
                         )}
                       </div>
@@ -1052,7 +1081,29 @@ export const CustomerPanel: React.FC = () => {
 
               {/* Cart Summary */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Order Summary</h4>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wide">Order Summary</h4>
+                  {(() => {
+                    const cartRateCategory = cart.find(item => getRateCardCategory(item.categoryName))?.categoryName;
+                    const matchedCategory = cartRateCategory ? getRateCardCategory(cartRateCategory) : null;
+                    if (matchedCategory) {
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveRateCardCategory(matchedCategory);
+                            setIsRateCardModalOpen(true);
+                          }}
+                          className="text-xs font-semibold text-indigo-700 hover:text-indigo-800 flex items-center gap-1.5 bg-white border border-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-md transition-all shadow-sm"
+                        >
+                          <FileText size={14} />
+                          {matchedCategory} Rate Card
+                        </button>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
                 <div className="space-y-3 max-h-40 overflow-y-auto pr-1">
                   {cart.map(item => (
                     <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
@@ -1132,151 +1183,178 @@ export const CustomerPanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Customer Details */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Full Name</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                      <input
-                        required
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Mobile Number</label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                      <input
-                        required
-                        name="contact"
-                        value={formData.contact}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="10-digit mobile number"
-                        pattern="[0-9]{10}"
-                        title="Please enter a valid 10-digit mobile number"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Service Address</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                    <input
-                      id="checkout-address"
-                      required
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                      placeholder="House No, Street, Landmark"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">City <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                          id="checkout-city"
-                          required
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="e.g. Mumbai"
-                        />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode</label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              {/* Customer Details - Redesigned */}
+              <div className="space-y-6">
+                
+                {/* Section 1: Contact Info */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
+                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                    Contact Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Full Name <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
                         <input
                           required
-                          name="pincode"
-                          value={formData.pincode}
+                          name="name"
+                          value={formData.name}
                           onChange={handleInputChange}
                           className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="e.g. 560001"
+                          placeholder="John Doe"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Mobile Number <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                        <input
+                          required
+                          name="contact"
+                          value={formData.contact}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                          placeholder="10-digit mobile number"
+                          pattern="[0-9]{10}"
+                          title="Please enter a valid 10-digit mobile number"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Service Location */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
+                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                    Service Location
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Address <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                        <input
+                          id="checkout-address"
+                          required
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                          placeholder="House No, Street, Landmark"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">City <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                            <input
+                              id="checkout-city"
+                              required
+                              name="city"
+                              value={formData.city}
+                              onChange={handleInputChange}
+                              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                              placeholder="e.g. Mumbai"
+                            />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                            <input
+                              required
+                              name="pincode"
+                              value={formData.pincode}
+                              onChange={handleInputChange}
+                              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                              placeholder="e.g. 560001"
+                            />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Schedule */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
+                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                    Schedule Service
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                      <div>
+                          <label className="block text-xs font-semibold text-gray-500 uppercase ml-1 mb-1">Date <span className="text-red-500">*</span></label>
+                          <input 
+                              type="date" 
+                              id="service-date" 
+                              name="date"
+                              value={formData.date}
+                              onChange={handleInputChange}
+                              min={minDate}
+                              className="w-full py-3 bg-gray-50 border border-gray-200 rounded-xl px-4 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+                              required 
+                          />
+                      </div>
+                      <div>
+                          <label className="block text-xs font-semibold text-gray-500 uppercase ml-1 mb-1">Time <span className="text-red-500">*</span></label>
+                          <select 
+                              id="selected-time-slot" 
+                              name="time"
+                              value={formData.time}
+                              onChange={handleInputChange}
+                              className="w-full py-3 bg-gray-50 border border-gray-200 rounded-xl px-4 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+                              required
+                          >
+                              <option value="" disabled>Select Date First</option>
+                              {availableTimeSlots.length === 0 && formData.date ? (
+                                  <option value="" disabled>No slots available</option>
+                              ) : (
+                                  availableTimeSlots.map(slot => (
+                                      <option key={slot} value={slot}>{slot}</option>
+                                  ))
+                              )}
+                          </select>
+                      </div>
+                  </div>
+                </div>
+
+                {/* Section 4: Additional Info */}
+                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4 space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Influencer Referral Code (Optional)</label>
+                    <div className="relative">
+                        <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                        <input
+                        name="referralCode"
+                        value={formData.referralCode}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase"
+                        placeholder="e.g. SOFIYAN20"
                         />
                     </div>
                   </div>
 
-                </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Date <span className="text-red-500">*</span></label>
-                        <input 
-                            type="date" 
-                            id="service-date" 
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            min={minDate}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 outline-none" 
-                            required 
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Instructions (Optional)</label>
+                    <div className="relative">
+                        <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                        <input
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Any specific needs or directions..."
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Time <span className="text-red-500">*</span></label>
-                        <select 
-                            id="selected-time-slot" 
-                            name="time"
-                            value={formData.time}
-                            onChange={handleInputChange}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 bg-white outline-none" 
-                            required
-                        >
-                            <option value="" disabled>Select Date First</option>
-                            {availableTimeSlots.length === 0 && formData.date ? (
-                                <option value="" disabled>No slots available</option>
-                            ) : (
-                                availableTimeSlots.map(slot => (
-                                    <option key={slot} value={slot}>{slot}</option>
-                                ))
-                            )}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Influencer Referral Code (Optional)</label>
-                  <div className="relative">
-                      <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                      <input
-                      name="referralCode"
-                      value={formData.referralCode}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase"
-                      placeholder="e.g. SOFIYAN20"
-                      />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Instructions (Optional)</label>
-                  <div className="relative">
-                      <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                      <input
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                      placeholder="Any specific needs..."
-                      />
                   </div>
                 </div>
 
@@ -1284,13 +1362,20 @@ export const CustomerPanel: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full mt-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] hover:from-green-600 hover:to-green-700 transition-all transform flex items-center justify-center gap-2"
+                className="w-full mt-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] hover:from-indigo-700 hover:to-indigo-800 transition-all transform flex items-center justify-center gap-2 text-lg"
               >
-                Confirm Booking - ₹{cartTotal} <ArrowRight size={20} />
+                Confirm Booking - ₹{finalTotal} <ArrowRight size={20} />
               </button>
             </form>
           )}
         </Modal>
+
+        {/* Rate Card Modal */}
+        <RateCardModal 
+          isOpen={isRateCardModalOpen} 
+          onClose={() => setIsRateCardModalOpen(false)}
+          category={activeRateCardCategory}
+        />
       </div>
     </>
   );

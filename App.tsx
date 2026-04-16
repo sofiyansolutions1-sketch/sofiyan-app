@@ -6,6 +6,7 @@ import { PartnerPanel } from './pages/PartnerPanel';
 import { AdminPanel } from './pages/AdminPanel';
 import { BlogPanel } from './pages/BlogPanel';
 import { BlogPost } from './pages/BlogPost';
+import RateList from './pages/RateList';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<CustomerPanel />} />
+          <Route path="/rate-list" element={<RateList />} />
           <Route path="/blogs" element={<BlogPanel />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/partner" element={<PartnerPanel />} />
