@@ -349,7 +349,7 @@ export const AdminPanel: React.FC = () => {
   const submitLeadAssignment = async () => {
       const { booking, partnerName, partnerPhone } = assignModalData;
       if (!booking) return;
-      
+
       if (!partnerName || !partnerPhone || partnerPhone.length < 10) {
           alert("❌ Please enter a valid Partner Name and a 10-digit Phone Number.");
           return;
@@ -361,27 +361,30 @@ export const AdminPanel: React.FC = () => {
           const cleanPhone = partnerPhone.replace(/[^0-9]/g, '');
 
           // 1. Generate Professional WhatsApp Message
-          let waText = `🚨 *NEW BOOKING ASSIGNED* 🚨\n\n`;
+          let waText = `✨ *SOFIYAN HOME SERVICE - NEW ASSIGNMENT* ✨\n\n`;
           waText += `Hello *${partnerName}*, a new service request has been assigned to you:\n\n`;
-          waText += `👤 *Customer Name:* ${booking.customerName}\n`;
-          waText += `📞 *Contact:* ${booking.contactNumber}\n`;
-          waText += `🏠 *Address:* ${booking.address}, ${booking.city || ''} - ${booking.pinCode}\n`;
-          waText += `📅 *Date & Time:* ${booking.date} at ${booking.time}\n`;
+          waText += `*1️⃣ CUSTOMER DETAILS*\n`;
+          waText += `👤 *Name:* ${booking.customerName}\n`;
+          waText += `📞 *Phone:* ${booking.contactNumber}\n`;
+          waText += `📍 *City:* ${booking.city || ''} - ${booking.pinCode || ''}\n`;
+          waText += `🏠 *Address:* ${booking.address || 'Not Provided'}\n`;
+          waText += `🗺️ *Location Map:* ${booking.location_link ? booking.location_link : 'No link provided'}\n\n`;
           
-          if(booking.discountAmount && booking.discountAmount > 0) {
-              waText += `💰 *To Collect:* ₹${booking.price} (After ₹${booking.discountAmount} Discount)\n\n`;
-          } else {
-              waText += `💰 *To Collect:* ₹${booking.price}\n\n`;
-          }
-
+          waText += `*2️⃣ SERVICE REQUIREMENTS*\n`;
           waText += `🛠️ *Services Required:*\n`;
           if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
               booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
           } else {
               waText += `👉 ${booking.subServiceName}\n`;
           }
+          if (booking.description) {
+              waText += `📝 *Notes:* ${booking.description}\n`;
+          }
+          waText += `📅 *Preferred Date:* ${booking.date}\n`;
+          waText += `⏰ *Preferred Time:* ${booking.time}\n\n`;
+          waText += `💵 *Service Charge:* ₹${booking.price}\n\n`;
           
-          waText += `\n*Please call the customer immediately to confirm!*`;
+          waText += `🚀 *Please call the customer immediately to confirm!*`;
 
           // 2. Generate the WhatsApp Deep Link
           const whatsappUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waText)}`;
@@ -648,27 +651,30 @@ export const AdminPanel: React.FC = () => {
           const cleanPhone = partnerPhone.replace(/[^0-9]/g, '');
 
           // 1. Generate Professional WhatsApp Message
-          let waText = `🚨 *NEW BOOKING ASSIGNED* 🚨\n\n`;
+          let waText = `✨ *SOFIYAN HOME SERVICE - NEW ASSIGNMENT* ✨\n\n`;
           waText += `Hello *${partnerName}*, a new service request has been assigned to you:\n\n`;
-          waText += `👤 *Customer Name:* ${booking.customerName}\n`;
-          waText += `📞 *Contact:* ${booking.contactNumber}\n`;
-          waText += `🏠 *Address:* ${booking.address}, ${booking.city || ''} - ${booking.pinCode}\n`;
-          waText += `📅 *Date & Time:* ${booking.date} at ${booking.time}\n`;
+          waText += `*1️⃣ CUSTOMER DETAILS*\n`;
+          waText += `👤 *Name:* ${booking.customerName}\n`;
+          waText += `📞 *Phone:* ${booking.contactNumber}\n`;
+          waText += `📍 *City:* ${booking.city || ''} - ${booking.pinCode || ''}\n`;
+          waText += `🏠 *Address:* ${booking.address || 'Not Provided'}\n`;
+          waText += `🗺️ *Location Map:* ${booking.location_link ? booking.location_link : 'No link provided'}\n\n`;
           
-          if(booking.discountAmount && booking.discountAmount > 0) {
-              waText += `💰 *To Collect:* ₹${booking.price} (After ₹${booking.discountAmount} Discount)\n\n`;
-          } else {
-              waText += `💰 *To Collect:* ₹${booking.price}\n\n`;
-          }
-
+          waText += `*2️⃣ SERVICE REQUIREMENTS*\n`;
           waText += `🛠️ *Services Required:*\n`;
           if (booking.cartItems && Array.isArray(booking.cartItems) && booking.cartItems.length > 0) {
               booking.cartItems.forEach(item => { waText += `👉 ${item.name} (Qty: ${item.quantity || 1})\n`; });
           } else {
               waText += `👉 ${booking.subServiceName}\n`;
           }
+          if (booking.description) {
+              waText += `📝 *Notes:* ${booking.description}\n`;
+          }
+          waText += `📅 *Preferred Date:* ${booking.date}\n`;
+          waText += `⏰ *Preferred Time:* ${booking.time}\n\n`;
+          waText += `💵 *Service Charge:* ₹${booking.price}\n\n`;
           
-          waText += `\n*Please call the customer immediately to confirm!*`;
+          waText += `🚀 *Please call the customer immediately to confirm!*`;
 
           // 2. Generate the WhatsApp Deep Link
           const whatsappUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(waText)}`;
@@ -724,15 +730,22 @@ export const AdminPanel: React.FC = () => {
       }
 
       // 2. Create Attractive WhatsApp Message Template
-      let waText = `🚨 *NEW LEAD ALERT - Sofiyan Home Service* 🚨\n\n`;
-      waText += `👤 *Customer:* ${booking.customerName}\n`;
+      let waText = `✨ *SOFIYAN HOME SERVICE - NEW LEAD* ✨\n\n`;
+      waText += `*1️⃣ CUSTOMER DETAILS*\n`;
+      waText += `👤 *Name:* ${booking.customerName}\n`;
       waText += `📞 *Phone:* ${booking.contactNumber}\n`;
-      waText += `📍 *City:* ${booking.city || 'N/A'}\n`;
-      waText += `🏠 *Address:* ${booking.address} (${booking.pinCode})\n\n`;
+      waText += `📍 *City:* ${booking.city || 'N/A'} - ${booking.pinCode || 'N/A'}\n`;
+      waText += `🏠 *Address:* ${booking.address || 'Not Provided'}\n`;
+      waText += `🗺️ *Location Map:* ${booking.location_link ? booking.location_link : 'Not provided'}\n\n`;
+      waText += `*2️⃣ SERVICE REQUIREMENTS*\n`;
       waText += `🛠️ *Services:* ${servicesText}\n`;
-      waText += `💰 *Total Value:* ₹${booking.price}\n`;
-      waText += `⏰ *Schedule:* ${booking.date} | ${booking.time}\n\n`;
-      waText += `📌 *Current Status:* ${booking.status}`;
+      if (booking.description) {
+          waText += `📝 *Notes:* ${booking.description}\n`;
+      }
+      waText += `📅 *Preferred Date:* ${booking.date}\n`;
+      waText += `⏰ *Preferred Time:* ${booking.time}\n\n`;
+      waText += `💵 *Service Charge:* ₹${booking.price}\n\n`;
+      waText += `📌 *Current Status:* ${booking.status.toUpperCase()}`;
 
       // Encode for URL
       const encodedWaText = encodeURIComponent(waText);
@@ -1084,7 +1097,12 @@ export const AdminPanel: React.FC = () => {
                             <a href={`tel:${booking.contactNumber}`} className="flex-1 bg-blue-100 text-blue-700 text-xs font-bold py-1.5 rounded text-center hover:bg-blue-200 flex items-center justify-center"><Phone size={12} className="mr-1"/> Call</a>
                             <a href={`https://wa.me/91${booking.contactNumber}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-green-100 text-green-700 text-xs font-bold py-1.5 rounded text-center hover:bg-green-200 flex items-center justify-center"><Send size={12} className="mr-1"/> Chat</a>
                         </div>
-                        <p><MapPin size={14} className="inline text-red-500 w-5 mr-1"/> <strong>Address:</strong> {booking.address}, {booking.city || ''} ({booking.pinCode})</p>
+                        {booking.location_link && (
+                            <a href={booking.location_link} target="_blank" rel="noopener noreferrer" className="block w-full bg-indigo-100 text-indigo-700 text-xs font-bold py-2 rounded text-center hover:bg-indigo-200 flex items-center justify-center mt-2 mb-2 border border-indigo-200">
+                                📍 View Map (Google Maps)
+                            </a>
+                        )}
+                        <p><MapPin size={14} className="inline text-red-500 w-5 mr-1"/> <strong>Address:</strong> {booking.address || 'Not Provided'}, {booking.city || ''} ({booking.pinCode})</p>
                         <p><Clock size={14} className="inline text-blue-500 w-5 mr-1"/> <strong>Time:</strong> {booking.date} | {booking.time}</p>
                         <p><Activity size={14} className="inline text-gray-500 w-5 mr-1"/> <strong>Job:</strong> {servicesText}</p>
                     </div>

@@ -14,6 +14,7 @@ export const useStore = () => {
     contactNumber: data.contact_number,
     address: data.address,
     city: data.city,
+    location_link: data.location_link,
     pinCode: data.pin_code,
     description: '', // Not in schema
     date: data.date,

@@ -134,6 +134,7 @@ export const CustomerPanel: React.FC = () => {
     name: '',
     contact: '',
     address: '',
+    locationLink: '',
     city: '',
     pincode: '',
     description: '',
@@ -492,6 +493,13 @@ export const CustomerPanel: React.FC = () => {
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
+    
+    // Validate Location
+    if (!formData.address.trim() && !formData.locationLink.trim()) {
+      alert("Please provide either your full address or a map location link.");
+      return;
+    }
+
     if (!formData.time) {
       alert("Please select a time slot!");
       return;
@@ -546,6 +554,7 @@ export const CustomerPanel: React.FC = () => {
             // Additional fields for admin tracking
             service_category: categoryName,
             sub_service_name: subServiceName,
+            location_link: formData.locationLink,
             discount_amount: discountAmount,
             applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
           }
@@ -569,7 +578,7 @@ export const CustomerPanel: React.FC = () => {
   const resetFlow = () => {
     setIsBookingModalOpen(false);
     setSelectedService(null);
-    setFormData({ name: '', contact: '', address: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '' });
+    setFormData({ name: '', contact: '', address: '', locationLink: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '' });
   };
 
   return (
@@ -1235,12 +1244,11 @@ export const CustomerPanel: React.FC = () => {
                   </h4>
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Address <span className="text-red-500">*</span></label>
+                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Manual Address</label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
                         <input
                           id="checkout-address"
-                          required
                           name="address"
                           value={formData.address}
                           onChange={handleInputChange}
@@ -1250,7 +1258,29 @@ export const CustomerPanel: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 my-2 w-full">
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                      <span className="text-xs font-bold text-gray-400 uppercase">OR</span>
+                      <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-indigo-600 uppercase ml-1 flex items-center gap-1">Fast Checkout: Google Maps Link</label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-3.5 text-indigo-400" size={18} />
+                        <input
+                          type="url"
+                          id="customerLocationLink"
+                          name="locationLink"
+                          value={formData.locationLink}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 bg-indigo-50/50 border border-indigo-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                          placeholder="Paste Google Maps Link here..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 pt-2">
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-gray-500 uppercase ml-1">City <span className="text-red-500">*</span></label>
                         <div className="relative">
@@ -1267,7 +1297,7 @@ export const CustomerPanel: React.FC = () => {
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode <span className="text-red-500">*</span></label>
+                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode</label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
                             <input

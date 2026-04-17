@@ -33,6 +33,7 @@ export interface Booking {
   address: string;
   city: string; // Added city field
   location?: string;
+  location_link?: string;
   lat?: number;
   lng?: number;
   pinCode: string;

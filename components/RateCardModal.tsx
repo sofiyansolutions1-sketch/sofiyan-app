@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Download, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface RateCardItem {
   name: string;
@@ -829,6 +831,7 @@ export const rateCardDatabase: Record<string, Record<string, RateCardItem[]>> = 
 
 export const RateCardModal: React.FC<{ isOpen: boolean; onClose: () => void; category: string | null }> = ({ isOpen, onClose, category }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (isOpen && category && rateCardDatabase[category]) {
@@ -850,8 +853,65 @@ export const RateCardModal: React.FC<{ isOpen: boolean; onClose: () => void; cat
 
   const currentRateCardData = rateCardDatabase[category];
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    
+    const originalSections = { ...openSections };
+    
+    const allExpanded: Record<string, boolean> = {};
+    if (category && rateCardDatabase[category]) {
+      Object.keys(rateCardDatabase[category]).forEach(key => {
+        allExpanded[key] = true;
+      });
+    }
+    setOpenSections(allExpanded);
+    
+    // Wait for DOM to update animations
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    const content = document.getElementById('rate-card-content');
+    if (content) {
+      // Temporarily hide the close and download buttons for the PDF
+      const headerBtns = document.querySelectorAll('.pdf-exclude');
+      headerBtns.forEach(btn => (btn as HTMLElement).style.display = 'none');
+      
+      try {
+        const canvas = await html2canvas(content, {
+          scale: 2,
+          useCORS: true,
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        let position = 0;
+        let heightLeft = pdfHeight;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft >= 0) {
+          position -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pageHeight;
+        }
+        
+        pdf.save(`${category}-Rate-Card.pdf`);
+      } catch (error) {
+        console.error("PDF Generation failed", error);
+      } finally {
+        // Restore buttons
+        headerBtns.forEach(btn => (btn as HTMLElement).style.display = '');
+      }
+    }
+    
+    setOpenSections(originalSections);
+    setIsDownloading(false);
   };
 
   const toggleSection = (section: string) => {
@@ -904,7 +964,7 @@ export const RateCardModal: React.FC<{ isOpen: boolean; onClose: () => void; cat
             </div>
             <button 
               onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors focus:outline-none"
+              className="pdf-exclude p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors focus:outline-none"
             >
               <X size={24} />
             </button>
@@ -919,11 +979,12 @@ export const RateCardModal: React.FC<{ isOpen: boolean; onClose: () => void; cat
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center no-print w-full">
             <p className="text-sm text-gray-600 font-medium">Clear pricing for all {category} services</p>
             <button 
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="pdf-exclude flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download size={16} />
-              Download as PDF
+              {isDownloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+              {isDownloading ? "Generating PDF..." : "Download as PDF"}
             </button>
           </div>
 

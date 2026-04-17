@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     customer_name TEXT NOT NULL,
     contact_number TEXT NOT NULL,
     address TEXT NOT NULL,
+    location_link TEXT,
     city TEXT,
     pin_code TEXT,
     lat NUMERIC,
