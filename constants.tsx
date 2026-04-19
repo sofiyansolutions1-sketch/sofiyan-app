@@ -14,13 +14,13 @@ export const CITY_DATA = [
   { name: 'Delhi', img: 'https://i.postimg.cc/RVDqpQ8c/Chat-GPT-Image-Apr-19-2026-12-41-30-AM.png', areasCount: 32 },
   { name: 'Mumbai', img: 'https://i.postimg.cc/QdYgbTg5/Chat-GPT-Image-Apr-19-2026-12-27-58-AM.png', areasCount: 36 },
   { name: 'Hyderabad', img: 'https://i.postimg.cc/59Zc2sXS/Chat-GPT-Image-Apr-19-2026-02-27-49-AM.png', areasCount: 24 },
-  { name: 'Pune', img: 'https://i.postimg.cc/T3NJT4wp/Chat-GPT-Image-Apr-19-2026-02-32-39-AM.png', areasCount: 18 },
-  { name: 'Chennai', img: 'https://i.postimg.cc/kgHK0R1M/Chat-GPT-Image-Apr-19-2026-02-34-24-AM.png', areasCount: 22 },
+  { name: 'Pune', img: 'https://i.postimg.cc/C5H7qsFb/Chat-GPT-Image-Apr-19-2026-02-32-39-AM.png', areasCount: 18 },
+  { name: 'Chennai', img: 'https://i.postimg.cc/ryPw62cN/Chat-GPT-Image-Apr-19-2026-02-34-24-AM.png', areasCount: 22 },
   { name: 'Kolkata', img: 'https://i.postimg.cc/4NdKXNh2/Chat-GPT-Image-Apr-19-2026-02-36-38-AM.png', areasCount: 20 },
-  { name: 'Ahmedabad', img: 'https://i.postimg.cc/9XNmtPrG/Chat-GPT-Image-Apr-19-2026-02-40-08-AM.png', areasCount: 15 },
-  { name: 'Gurgaon', img: 'https://i.postimg.cc/sgCRwTyC/Chat-GPT-Image-Apr-19-2026-02-42-24-AM.png', areasCount: 23 },
-  { name: 'Noida', img: 'https://i.postimg.cc/13K5Fk6N/Chat-GPT-Image-Apr-19-2026-02-43-16-AM.png', areasCount: 16 },
-  { name: 'Varanasi', img: 'https://wispy-shape-617.linkyhost.com', areasCount: 12 }
+  { name: 'Ahmedabad', img: 'https://i.postimg.cc/65FqZJm8/Chat-GPT-Image-Apr-19-2026-02-40-08-AM.png', areasCount: 15 },
+  { name: 'Gurgaon', img: 'https://i.postimg.cc/sxXxYVzh/Chat-GPT-Image-Apr-19-2026-02-42-24-AM.png', areasCount: 23 },
+  { name: 'Noida', img: 'https://i.postimg.cc/ZKnv3LK4/Chat-GPT-Image-Apr-19-2026-02-43-16-AM.png', areasCount: 16 },
+  { name: 'Varanasi', img: 'https://i.postimg.cc/DfPYmLBD/Chat-GPT-Image-Apr-19-2026-01-17-09-PM.png', areasCount: 12 }
 ];
 
 export const PREDEFINED_AREAS: Record<string, string[]> = {

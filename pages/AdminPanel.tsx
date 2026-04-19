@@ -4,8 +4,8 @@ import { ADMIN_PASSWORD } from '../constants';
 import { Booking } from '../types';
 import { Modal } from '../components/Modal';
 import { 
-  Lock, Users, Calendar, DollarSign, Activity, Clock, Phone,
-  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, FileText
+  Lock, Users, Calendar, Activity, Clock, Phone, DollarSign,
+  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { BlogManager } from '../components/BlogManager';
@@ -86,9 +86,6 @@ export const AdminPanel: React.FC = () => {
   }, [dispatchBooking, handlePartnerSearch]);
 
   const completedBookings = bookings.filter(b => b.status === 'completed');
-  const totalIncome = completedBookings.reduce((acc, curr) => acc + curr.price, 0);
-  const totalRevenue = completedBookings.reduce((acc, curr) => acc + (curr.price * 0.25), 0);
-  
   const pendingJobs = bookings.filter(b => b.status === 'pending').length;
   const assignedJobs = bookings.filter(b => b.status === 'Forwarded' || b.status === 'accepted').length;
   const completedJobs = completedBookings.length;
@@ -102,9 +99,9 @@ export const AdminPanel: React.FC = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-indigo-900 text-center">
-            <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Lock className="text-indigo-600" size={32} />
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm border-t-4 border-gray-900 text-center">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Lock className="text-gray-900" size={32} />
             </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Founder Login</h2>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -113,9 +110,9 @@ export const AdminPanel: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter Access Key..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-center"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-900 transition-all text-center"
             />
-            <button className="w-full bg-indigo-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all active:scale-95 shadow-lg shadow-indigo-100">
+            <button className="w-full bg-gray-950 text-white py-3 rounded-xl font-bold hover:bg-black transition-all active:scale-95 shadow-lg">
               Unlock Panel
             </button>
           </form>
@@ -139,9 +136,9 @@ export const AdminPanel: React.FC = () => {
       </div>
 
       <div className="flex space-x-1 mb-10 bg-gray-100 p-1 rounded-2xl w-fit">
-        <button onClick={() => setMainTab('Dashboard')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'Dashboard' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
-        <button onClick={() => setMainTab('BlogManager')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'BlogManager' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
-        <button onClick={() => setMainTab('PartnerManagement')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'PartnerManagement' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
+        <button onClick={() => setMainTab('Dashboard')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'Dashboard' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
+        <button onClick={() => setMainTab('BlogManager')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'BlogManager' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
+        <button onClick={() => setMainTab('PartnerManagement')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'PartnerManagement' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
       </div>
 
       {mainTab === 'BlogManager' && <BlogManager />}
@@ -150,27 +147,13 @@ export const AdminPanel: React.FC = () => {
       {mainTab === 'Dashboard' && (
         <div className="space-y-10">
           {/* Stats Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <StatCard 
-              title="Total Income" 
-              value={`₹${totalIncome.toFixed(0)}`} 
-              icon={<FileText size={24} />} 
-              color="text-blue-600" 
-              bg="bg-blue-50"
-            />
-            <StatCard 
-              title="Net Revenue" 
-              value={`₹${totalRevenue.toFixed(0)}`} 
-              icon={<DollarSign size={24} />} 
-              color="text-emerald-600" 
-              bg="bg-emerald-50"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard 
               title="Active Partners" 
               value={partners.filter(p => p.status === 'available').length.toString()} 
               icon={<Users size={24} />} 
-              color="text-indigo-600" 
-              bg="bg-indigo-50"
+              color="text-gray-900" 
+              bg="bg-gray-50"
             />
             <StatCard 
               title="Pending Leads" 

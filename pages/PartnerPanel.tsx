@@ -1069,7 +1069,7 @@ export const PartnerPanel: React.FC = () => {
                   )}
                   <button
                     onClick={() => handleCompleteService(myActiveJob)}
-                    className="flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-green-700 transition-all flex justify-center items-center gap-2"
+                    className="flex-1 bg-gray-950 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-black transition-all flex justify-center items-center gap-2"
                   >
                     <CheckCircle size={20} /> Complete Task
                   </button>
@@ -1095,10 +1095,10 @@ export const PartnerPanel: React.FC = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div className="w-full">
                       <div className="flex justify-between items-center mb-2">
-                          <span className="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded uppercase">
+                          <span className="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded uppercase">
                             {lead.city || 'City N/A'}
                           </span>
-                          <span className="text-2xl font-bold text-green-600">₹{lead.price}</span>
+                          <span className="text-2xl font-bold text-gray-900">₹{lead.price}</span>
                       </div>
                       
                       <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
@@ -1133,11 +1133,11 @@ export const PartnerPanel: React.FC = () => {
                         </a>
                       )}
                     </div>
-                    <p className="flex items-center gap-2"><Clock size={14} className="text-indigo-400" /> {lead.date} | {lead.time}</p>
+                    <p className="flex items-center gap-2"><Clock size={14} className="text-gray-400" /> {lead.date} | {lead.time}</p>
                   </div>
                   <button
                     onClick={() => handleAcceptLead(lead)}
-                    className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-sm"
+                    className="w-full py-2.5 bg-gray-950 text-white rounded-lg font-bold hover:bg-black transition-colors shadow-sm"
                   >
                     Accept Lead
                   </button>

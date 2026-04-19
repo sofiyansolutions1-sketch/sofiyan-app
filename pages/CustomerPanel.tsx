@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation, ShieldCheck } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -658,100 +658,114 @@ export const CustomerPanel: React.FC = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 mb-8">
-        <div className="text-center mb-4">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-              Professional Home Services
-            </span>
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Expert help at your doorstep
-          </p>
-        </div>
-
-        {/* Global Search Bar Section */}
-        <div className="max-w-xl mx-auto mb-6 relative z-30">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+      {/* Mobile-Friendly Urban Company Style Hero Content */}
+      <div className="bg-indigo-600 sm:bg-transparent pb-8 pt-6 sm:pt-8 transition-all duration-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Desktop Version of Title (Hidden on small mobile) */}
+          <div className="hidden sm:block text-center mb-10">
+            <h1 className="text-4xl sm:text-6xl font-black text-indigo-950 mb-3 tracking-tighter uppercase leading-none">
+              Professional <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-950">Home Services</span>
+            </h1>
+            <p className="text-base sm:text-lg text-indigo-900/40 font-black uppercase tracking-[0.3em] max-w-2xl mx-auto">
+              Elite Expertise Delivered Directly To Your Doorstep
+            </p>
           </div>
-          <input
-            type="text"
-            className="block w-full pl-11 pr-4 py-4 border border-gray-200 rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 shadow-lg transition-all hover:shadow-xl text-gray-800"
-            placeholder="Search for 'AC Service', 'Fan Repair', 'Cleaning'..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
 
-          {/* Search Results Dropdown */}
-          {searchQuery && (
-            <div className="absolute w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-96 overflow-y-auto animate-fadeIn overflow-hidden">
-              {searchResults.length > 0 ? (
-                <div className="py-2">
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Suggested Services</div>
-                  {searchResults.map((result) => (
-                    <button
-                      key={`${result.categoryName}-${result.id}`}
-                      onClick={() => handleDirectBooking(result)}
-                      className="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors border-b border-gray-50 last:border-0 flex justify-between items-center group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600">
-                          <Search size={16} />
+          {/* Search Bar - Repositioned Above Banner for UC Style */}
+          <div className="max-w-2xl mx-auto mb-6 sm:mb-10 relative z-30">
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-indigo-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-12 pr-4 py-4 sm:py-5 border-2 border-transparent sm:border-indigo-50 rounded-2xl sm:rounded-3xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 shadow-xl shadow-indigo-600/10 sm:shadow-indigo-100/50 transition-all hover:shadow-indigo-200/50 text-gray-900 font-extrabold"
+              placeholder="Search for 'AC', 'Cleaning', 'Electrician'..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            {/* Search Results Dropdown remains same */}
+            {searchQuery && (
+              <div className="absolute w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-96 overflow-y-auto animate-fadeIn overflow-hidden">
+                {searchResults.length > 0 ? (
+                  <div className="py-2">
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Suggested Results</div>
+                    {searchResults.map((result) => (
+                      <button
+                        key={`${result.categoryName}-${result.id}`}
+                        onClick={() => handleDirectBooking(result)}
+                        className="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors border-b border-gray-50 last:border-0 flex justify-between items-center group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                            <Search size={16} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 group-hover:text-indigo-700">{result.name}</p>
+                            <p className="text-xs text-gray-500">in {result.categoryName}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-800 group-hover:text-indigo-700">{result.name}</p>
-                          <p className="text-xs text-gray-500">in {result.categoryName}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-indigo-600">₹{result.price}</span>
+                          <ChevronRight size={16} className="text-gray-300 group-hover:text-indigo-500" />
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-indigo-600">₹{result.price}</span>
-                        <ChevronRight size={16} className="text-gray-300 group-hover:text-indigo-500" />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="px-6 py-8 text-center">
-                  <div className="bg-gray-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Search className="text-gray-400" size={20} />
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-gray-800 font-medium">No services found</p>
-                  <p className="text-gray-500 text-sm">Try searching for something else like "AC" or "Plumbing"</p>
-                </div>
-              )}
+                ) : (
+                  <div className="px-6 py-8 text-center">
+                    <p className="text-gray-800 font-medium">No services found</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* UC Style Promotional Banner - Tighter height for mobile above-the-fold */}
+          <div className="max-w-4xl mx-auto rounded-3xl sm:rounded-[2.5rem] overflow-hidden relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-indigo-950/60 to-transparent z-10"></div>
+              <img 
+                src="https://i.postimg.cc/W4bqsRYV/Whats-App-Image-2026-01-09-at-5-28-14-AM-(1).jpg" 
+                alt="Pro Home Services Banner" 
+                className="w-full h-40 sm:h-64 object-cover group-hover:scale-105 transition-transform duration-1000"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 z-20 flex flex-col justify-center p-5 sm:p-12">
+                  <div className="inline-flex items-center gap-2 bg-indigo-600 text-white text-[8px] sm:text-[10px] font-black px-2 py-1 rounded-full mb-2 sm:mb-4 w-fit uppercase tracking-widest shadow-lg animate-bounce">
+                      <Star size={8} className="fill-white" /> Pro Choice
+                  </div>
+                  <h2 className="text-xl sm:text-4xl font-black text-white uppercase tracking-tighter leading-none mb-1 sm:mb-2">
+                      Elite <span className="text-indigo-400">Restoration</span><br />
+                      Summer Protocols
+                  </h2>
+                  <p className="text-indigo-200/80 text-[8px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-3 sm:mb-6">
+                      High-Grade Sanitization Elite
+                  </p>
+                  <button className="bg-white text-indigo-950 px-4 py-2 sm:px-6 sm:py-3 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-2xl hover:bg-indigo-50 active:scale-95 transition-all w-fit border-b-2 sm:border-b-4 border-indigo-200">
+                      View Rates
+                  </button>
+              </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8 sm:px-6 lg:px-8 mb-24">
+        {/* Explore Labels - Reduced spacing */}
+        <div className="flex items-center justify-between mb-4 sm:mb-12">
+            <div className="flex flex-col">
+                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-1">Catalog</span>
+                <h3 className="text-2xl sm:text-3xl font-black text-indigo-950 uppercase tracking-tighter">Explore all services</h3>
             </div>
-          )}
+            <div className="hidden sm:flex gap-2">
+               <div className="w-12 h-1 bg-indigo-600 rounded-full"></div>
+               <div className="w-4 h-1 bg-indigo-200 rounded-full"></div>
+               <div className="w-4 h-1 bg-indigo-100 rounded-full"></div>
+            </div>
         </div>
 
-        {/* Trust Badge Banner */}
-        <div className="w-full flex justify-center mt-4 mb-6 px-2">
-            <div className="flex flex-row items-center bg-white rounded-full shadow-sm border border-gray-100 py-1.5 px-2 sm:px-4 divide-x divide-gray-200 max-w-full overflow-x-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <style>
-                    {`.overflow-x-auto::-webkit-scrollbar { display: none; }`}
-                </style>
-                
-                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> 
-                    24/7
-                </div>
-                
-                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
-                    <i className="fas fa-check text-blue-600 mr-1.5 text-[10px]"></i> 
-                    Quality
-                </div>
-                
-                <div className="flex items-center px-2 sm:px-3 whitespace-nowrap text-[10px] sm:text-xs font-semibold text-gray-700">
-                    <i className="fas fa-bolt text-purple-600 mr-1.5 text-[10px]"></i> 
-                    Fast
-                </div>
-                
-            </div>
-        </div>
-
-        {/* Categories Grid */}
+        {/* Categories Grid - Optimized for density like UC */}
         {filteredCategories.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-8">
             {filteredCategories.map((category) => {
               const cleanRoute = `/services/${category.name.toLowerCase().replace(/\s+/g, '-')}`;
               return (
@@ -770,16 +784,18 @@ export const CustomerPanel: React.FC = () => {
                     }
                   }
                 }}
-                className="relative group rounded-xl overflow-hidden shadow-lg h-40 cursor-pointer w-full transition-shadow duration-300 hover:shadow-xl block"
+                className="relative group rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg h-32 sm:h-48 cursor-pointer w-full transition-all duration-300 hover:shadow-indigo-200/50 hover:scale-[1.02] block border border-indigo-50 bg-white"
               >
+                <div className="absolute inset-0 bg-indigo-950 opacity-10 group-hover:opacity-0 transition-opacity z-10"></div>
                 <img 
                   src={category.image} 
                   alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90"
                   loading="lazy"
+                  referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 flex justify-center items-end h-2/3">
-                  <span className="text-white font-bold text-sm tracking-wide text-center drop-shadow-md">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-indigo-950 via-indigo-950/40 to-transparent p-2 sm:p-5 flex flex-col justify-end items-center h-full z-20">
+                  <span className="text-white font-black text-[9px] sm:text-xs tracking-widest uppercase text-center leading-tight">
                     {category.name}
                   </span>
                 </div>
@@ -794,30 +810,45 @@ export const CustomerPanel: React.FC = () => {
           )
         )}
 
-        {/* NEW: Featured Services Auto-Scrolling Section with Custom Data */}
-        <div id="featured-services-section" className="mt-16 mb-8 py-10 bg-gray-50 overflow-hidden">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Popular Services</h2>
-          <div className="relative w-full overflow-hidden">
-            {/* Double the list to create seamless infinite scroll */}
-            <div className="flex gap-6 animate-scroll w-max">
-              {[...featuredServicesData, ...featuredServicesData].map((service, index) => (
-                <div key={`${service.name}-${index}`} className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden group cursor-pointer">
-                  <div className="relative h-40 overflow-hidden">
-                    <img src={service.img} alt={service.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
-                    <div className="absolute top-2 left-2 bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full flex items-center shadow-sm">
-                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span> Available
+        {/* UPGRADED: Mobile-Friendly Manual Scroll Featured Services */}
+        <div id="featured-services-section" className="mt-12 mb-4 py-8 bg-white border-y border-indigo-50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-16 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+          
+          <div className="text-center mb-6 sm:mb-10 px-4">
+            <h2 className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Elite Selection</h2>
+            <h3 className="text-xl sm:text-2xl font-black text-indigo-950 tracking-tighter uppercase italic">Most Popular Services</h3>
+          </div>
+          
+          <div className="relative w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4">
+            <style>
+                {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
+            </style>
+            <div className="flex gap-4 sm:gap-6 px-4 sm:px-8 w-max">
+              {featuredServicesData.map((service, index) => (
+                <div 
+                  key={`${service.name}-${index}`} 
+                  className="snap-start flex-shrink-0 w-48 sm:w-64 bg-white rounded-[2rem] shadow-lg shadow-indigo-100/30 border border-indigo-50/50 overflow-hidden group cursor-pointer relative transition-transform"
+                >
+                  <div className="relative h-32 sm:h-40 overflow-hidden">
+                    <img src={service.img} alt={service.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" referrerPolicy="no-referrer" />
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-indigo-950 text-[8px] font-black px-2 py-1 rounded-full flex items-center shadow-lg border border-indigo-100 uppercase tracking-widest">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> Open
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-gray-800 text-sm mb-1 truncate" title={service.name}>{service.name}</h3>
-                    <p className="text-xs text-gray-500 mb-3 h-8 overflow-hidden leading-tight">{service.desc}</p>
-                    <div className="flex justify-between items-center">
-                        <span className="font-bold text-indigo-700 text-sm">₹{service.price}</span>
+                  <div className="p-4 sm:p-5">
+                    <h3 className="font-black text-indigo-950 text-xs sm:text-sm mb-1 truncate uppercase tracking-tight" title={service.name}>{service.name}</h3>
+                    <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 mb-3 h-7 overflow-hidden leading-tight uppercase tracking-wider">{service.desc}</p>
+                    <div className="flex justify-between items-center bg-indigo-50/50 p-1.5 sm:p-2 rounded-xl border border-indigo-100/50">
+                        <div className="pl-1">
+                           <p className="text-[7px] font-black text-indigo-400 uppercase tracking-widest leading-none">STARTING</p>
+                           <span className="font-black text-indigo-950 text-base sm:text-lg tracking-tighter">₹{service.price}</span>
+                        </div>
                         <button 
                           onClick={() => handleFeaturedBooking(service.name, service.price)}
-                          className="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                          className="bg-indigo-950 text-white text-[9px] font-black px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg tracking-[0.05em] uppercase hover:bg-black transition-all shadow-md shadow-indigo-100"
                         >
-                            Book Now
+                            Book Job
                         </button>
                     </div>
                   </div>
@@ -829,15 +860,18 @@ export const CustomerPanel: React.FC = () => {
 
         {/* Sticky Cart Footer */}
         {cart.length > 0 && (
-          <div className="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4 animate-slideUp">
+          <div className="fixed bottom-0 inset-x-0 z-40 bg-white/80 backdrop-blur-xl border-t border-indigo-100 shadow-[0_-20px_50px_rgba(79,70,229,0.12)] p-5 animate-slideUp">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="bg-indigo-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
-                  {cartItemCount}
+              <div className="flex items-center gap-5">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-indigo-600 rounded-2xl blur opacity-20 animate-pulse"></div>
+                  <div className="relative bg-indigo-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-black shadow-lg shadow-indigo-200 text-lg">
+                    {cartItemCount}
+                  </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Total Items</p>
-                  <p className="text-xl font-bold text-gray-900">₹{cartTotal}</p>
+                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] leading-none mb-1.5">Selected Items</p>
+                  <p className="text-2xl font-black text-indigo-950 tracking-tighter leading-none">₹{cartTotal}</p>
                 </div>
               </div>
               <button 
@@ -849,18 +883,25 @@ export const CustomerPanel: React.FC = () => {
                     setBookingStep('form');
                   }
                 }}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+                className="bg-indigo-950 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all flex items-center gap-3 shadow-2xl shadow-indigo-300 transform active:scale-95"
               >
-                View Cart & Book <ArrowRight size={18} />
+                <span>Checkout Now</span>
+                <ChevronRight size={18} className="stroke-[3]" />
               </button>
             </div>
           </div>
         )}
 
         {/* Customer Reviews Section */}
-        <div className="mt-20 py-12 bg-blue-50 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">What Our Customers Say</h2>
+        <div className="mt-28 py-20 bg-indigo-50/30 -mx-4 sm:-mx-6 lg:-mx-8 border-y border-indigo-50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-200/20 blur-[100px] rounded-full"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-200/20 blur-[100px] rounded-full"></div>
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="text-center mb-16">
+                  <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mb-4">Customer Chronicles</h2>
+                  <h3 className="text-4xl font-black text-indigo-950 tracking-tighter uppercase italic">Voice of Excellence</h3>
+              </div>
               <div className="relative overflow-hidden group py-4">
                   <div className="flex space-x-4 animate-scroll w-max hover:[animation-play-state:paused]">
                       {[...customerReviews, ...customerReviews].map((review, index) => (
@@ -1169,12 +1210,12 @@ export const CustomerPanel: React.FC = () => {
 
               {/* Cart Summary Card */}
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                <div className="relative bg-white border border-indigo-50 border-opacity-50 rounded-2xl p-5 shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-xs font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-indigo-950 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                <div className="relative bg-white border border-indigo-50 rounded-[2rem] p-6 shadow-sm">
+                  <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-2">
                        <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
-                       Order Summary
+                       Service Dossier
                     </h4>
                     {(() => {
                       const cartRateCategory = cart.find(item => getRateCardCategory(item.categoryName))?.categoryName;
@@ -1221,22 +1262,22 @@ export const CustomerPanel: React.FC = () => {
                   </div>
 
                   {/* Coupon Section - Inlined for better flow */}
-                  <div className="mt-5 pt-4 border-t border-gray-100">
-                      <div className="bg-indigo-50/40 p-4 rounded-2xl border border-indigo-100/50">
-                        <label className="block text-[10px] font-black text-indigo-900 uppercase tracking-widest mb-2 ml-1">Promotional Offers</label>
+                  <div className="mt-6 pt-6 border-t border-indigo-50">
+                      <div className="bg-indigo-50/30 p-5 rounded-3xl border border-indigo-100/50">
+                        <label className="block text-[9px] font-black text-indigo-900 uppercase tracking-[0.3em] mb-3 ml-1">Elite Coupons</label>
                         <div className="flex gap-2">
                             <input 
                                 type="text" 
                                 value={couponCode}
                                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                placeholder="ENTER CODE" 
-                                className="flex-1 bg-white border-2 border-indigo-100 rounded-xl px-4 py-2.5 text-sm font-bold uppercase outline-none focus:border-indigo-500 shadow-sm transition-all text-indigo-900 placeholder:text-gray-300"
+                                placeholder="OFFER CODE" 
+                                className="flex-1 bg-white border-2 border-indigo-50 rounded-2xl px-4 py-3 text-sm font-black uppercase outline-none focus:border-indigo-600 shadow-sm transition-all text-indigo-950 placeholder:text-indigo-100"
                                 disabled={!!appliedCoupon}
                             />
                             {appliedCoupon ? (
-                                <button type="button" onClick={removeCoupon} className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-md hover:bg-red-700 active:scale-95 transition-all uppercase letter-spacing-1 border-b-4 border-red-800">REMOVE</button>
+                                <button type="button" onClick={removeCoupon} className="bg-rose-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-rose-700 active:scale-95 transition-all uppercase tracking-widest">REMOVE</button>
                             ) : (
-                                <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-md hover:bg-indigo-700 active:scale-95 transition-all uppercase letter-spacing-1 border-b-4 border-indigo-800">APPLY</button>
+                                <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-950 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-black active:scale-95 transition-all uppercase tracking-widest">APPLY</button>
                             )}
                         </div>
                         {couponMessage && (
@@ -1295,39 +1336,39 @@ export const CustomerPanel: React.FC = () => {
                 
                 {/* Section 1: Contact Info Card */}
                 <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
-                      <span className="bg-indigo-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-indigo-200">1</span>
-                      Client Information
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
+                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">1</span>
+                      Identity Protocols
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Lead Name</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Full Identity</label>
                         <div className="relative group/input">
-                          <User className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <User className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
                             required
                             name="name"
                             value={formData.name}
                             onChange={handleInputChange}
-                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
-                            placeholder="Full Name"
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="Client Name"
                           />
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Direct Contact</label>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Secure Contact</label>
                         <div className="relative group/input">
-                          <Phone className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <Phone className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
                             required
                             name="contact"
                             value={formData.contact}
                             onChange={handleInputChange}
-                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
-                            placeholder="10-digit number"
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="10-Digit Mobile"
                             pattern="[0-9]{10}"
                           />
                         </div>
@@ -1338,20 +1379,18 @@ export const CustomerPanel: React.FC = () => {
 
                 {/* Section 2: Service Location Card */}
                 <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-indigo-50 rounded-2xl p-5 shadow-sm">
-                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
-                      <span className="bg-indigo-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-indigo-200">2</span>
-                      Venue Details
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
+                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">2</span>
+                      Deployment Address
                     </h4>
                     
-                    <div className="space-y-6">
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Manual Street Address</label>
-                        </div>
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Operational Venue</label>
                         <div className="relative group/input">
-                          <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <MapPin className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
                             id="checkout-address"
                             name="address"
@@ -1367,8 +1406,8 @@ export const CustomerPanel: React.FC = () => {
                                   setIsDetectingPincode(false);
                               }
                             }}
-                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
-                            placeholder="House / Building / Street / Landmark"
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="House / Building / Street / Pincode"
                           />
                         </div>
                       </div>
@@ -1395,8 +1434,8 @@ export const CustomerPanel: React.FC = () => {
                                       </motion.div>
                                    </div>
                                    <div className="text-center sm:text-left">
-                                      <h5 className="font-black text-indigo-950 text-sm tracking-tight">Smart Geolocation</h5>
-                                      <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mt-0.5">Instant Maps Coordination</p>
+                                      <h5 className="font-black text-indigo-950 text-sm tracking-tight uppercase">Precision Geolocation</h5>
+                                      <p className="text-[10px] text-indigo-400 font-black uppercase tracking-[0.2em] mt-0.5 whitespace-nowrap">Instant Real-Time Sync</p>
                                    </div>
                                 </div>
 
@@ -1404,10 +1443,10 @@ export const CustomerPanel: React.FC = () => {
                                   type="button" 
                                   onClick={handleTrackLocation} 
                                   disabled={isTrackingLocation}
-                                  className={`relative group/btn min-w-[200px] h-12 flex items-center justify-center gap-2 px-8 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 z-10 overflow-hidden ${
+                                  className={`relative group/btn min-w-[200px] h-12 flex items-center justify-center gap-2 px-8 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 z-10 overflow-hidden ${
                                     formData.locationLink 
-                                      ? 'bg-emerald-600 text-white shadow-emerald-200 border-b-4 border-emerald-800' 
-                                      : 'bg-indigo-600 text-white shadow-indigo-200 hover:shadow-xl border-b-4 border-indigo-800'
+                                      ? 'bg-emerald-600 text-white shadow-emerald-100 border-b-4 border-emerald-800' 
+                                      : 'bg-indigo-950 text-white shadow-indigo-200 hover:shadow-xl border-b-4 border-black'
                                   } shadow-lg`}
                                 >
                                   {isTrackingLocation ? (
@@ -1515,20 +1554,20 @@ export const CustomerPanel: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center justify-between">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1 flex items-center justify-between">
                           Postal Pin-Code
-                          {(isDetectingPincode || isFetchingAreaPincode) && <span className="text-indigo-500 lowercase flex items-center gap-1"><Loader2 size={10} className="animate-spin" />syncing...</span>}
+                          {(isDetectingPincode || isFetchingAreaPincode) && <span className="text-indigo-600 font-black lowercase flex items-center gap-1 animate-pulse"><Loader2 size={10} className="animate-spin" />syncing...</span>}
                         </label>
                         <div className="relative group/input">
-                          <MapPin className="absolute left-3.5 top-3.5 text-indigo-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <MapPin className="absolute left-4 top-4 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
                             required
                             name="pincode"
                             value={formData.pincode}
                             onChange={handleInputChange}
                             disabled={isDetectingPincode || isFetchingAreaPincode}
-                            className="w-full pl-11 pr-4 py-3.5 bg-indigo-50/20 border-2 border-indigo-100/30 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all disabled:opacity-60 font-black text-indigo-700 tracking-widest text-lg"
+                            className="w-full pl-12 pr-4 py-4 bg-indigo-50/10 border-2 border-indigo-100/30 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all disabled:opacity-60 font-black text-indigo-950 tracking-[0.2em] text-xl"
                             placeholder="------"
                           />
                         </div>
@@ -1590,22 +1629,22 @@ export const CustomerPanel: React.FC = () => {
 
                 {/* Section 4: Extra Details Card */}
                 <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl blur opacity-10 transition duration-1000"></div>
-                  <div className="relative bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-4">
-                       <div className="w-1.5 h-4 bg-gray-400 rounded-full"></div>
-                       Special Handover
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-300 to-indigo-600 rounded-[2rem] blur opacity-5 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
+                       <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
+                       Special Dispatch Info
                     </h4>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Service Directives</label>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Service Directives</label>
                       <div className="relative group/input">
-                          <FileText className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <FileText className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
                             name="description"
                             value={formData.description}
                             onChange={handleInputChange}
-                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
-                            placeholder="Any specific instructions for the team..."
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="Specific instructions for our team..."
                           />
                       </div>
                     </div>
@@ -1614,25 +1653,26 @@ export const CustomerPanel: React.FC = () => {
               </div>
 
               {/* Submit Button */}
-              <div className="pt-8 flex flex-col items-center">
+              <div className="pt-10 flex flex-col items-center">
                   <div className="w-full relative group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
                     <button
                       type="submit"
-                      className="relative w-full h-16 bg-indigo-600 text-white font-black text-xl rounded-2xl shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 overflow-hidden border-b-8 border-indigo-950 active:translate-y-2 active:border-b-0"
+                      className="relative w-full h-18 py-6 bg-indigo-950 text-white font-black text-xl rounded-2xl shadow-2xl hover:bg-black transition-all flex items-center justify-center gap-4 overflow-hidden border-b-8 border-indigo-950 active:translate-y-2 active:border-b-0 uppercase tracking-tighter"
                     >
-                      <span>CONFIRM BOOKING - ₹{finalTotal}</span>
-                      <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                      <Shield size={24} className="text-indigo-400 fill-indigo-400/20" />
+                      <span>SECURE CONFIRMATION - ₹{finalTotal}</span>
+                      <ArrowRight size={24} className="group-hover:translate-x-3 transition-transform" />
                       <motion.div 
-                        className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full"
+                        className="absolute inset-0 bg-white/5 transform -skew-x-12 -translate-x-full"
                         animate={{ translateX: ['-100%', '200%'] }}
-                        transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                        transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                       />
                     </button>
                   </div>
-                  <p className="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] flex items-center gap-2">
-                    <Shield size={12} className="text-emerald-500" /> SECURE END-TO-END ENCRYPTED CHECKOUT
-                  </p>
+                  <Link to="/blogs" className="mt-8 text-[9px] text-indigo-400 font-black uppercase tracking-[0.4em] flex items-center gap-2 hover:text-indigo-600 transition-colors">
+                    <ShieldCheck size={14} className="text-emerald-500" /> MILITARY-GRADE ENCRYPTION ACTIVE
+                  </Link>
               </div>
             </form>
           )}
