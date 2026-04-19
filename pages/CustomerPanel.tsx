@@ -6,7 +6,7 @@ import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation, ShieldCheck } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation, ShieldCheck, Lock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -656,6 +656,246 @@ export const CustomerPanel: React.FC = () => {
     setFormData({ name: '', contact: '', address: '', area: '', locationLink: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '', lat: null, lng: null });
   };
 
+  if (isBookingModalOpen) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col font-sans animate-fadeIn">
+        {/* Simple Header */}
+        <header className="bg-white border-b border-gray-200 py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-40">
+           <div className="flex items-center gap-2">
+             <Shield className="text-indigo-600" size={24} />
+             <span className="font-black text-xl text-gray-900 tracking-tight leading-none pt-1">Secure Checkout</span>
+           </div>
+           <button onClick={resetFlow} className="text-xs sm:text-sm font-bold text-gray-500 hover:text-indigo-600 flex items-center gap-1 transition-colors bg-gray-100 hover:bg-indigo-50 px-3 py-1.5 rounded-lg">
+             <ChevronLeft size={16} /> <span className="hidden sm:inline">Back</span>
+           </button>
+        </header>
+
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+          {bookingStep === 'loading' && (
+            <div className="flex flex-col items-center justify-center py-32">
+              <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mb-6" />
+              <p className="text-xl font-bold text-gray-600">Processing your booking securely...</p>
+            </div>
+          )}
+
+          {bookingStep === 'success' && (
+            <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center animate-fadeIn max-w-2xl mx-auto">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-green-50 rounded-full flex items-center justify-center mb-6 sm:mb-8 shadow-inner border-4 sm:border-8 border-green-100">
+                <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" />
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mb-3 sm:mb-4 tracking-tight">Booking Confirmed!</h2>
+              <p className="text-base sm:text-lg text-gray-600 mb-8 sm:mb-10 font-medium leading-relaxed px-4">
+                Thank you for choosing Professional Home Services. Your request has been securely processed and a partner will reach out to you shortly.
+              </p>
+              <button
+                onClick={resetFlow}
+                className="px-8 sm:px-10 py-4 sm:py-5 bg-indigo-600 text-white rounded-2xl font-bold text-base sm:text-lg hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-200 active:scale-95"
+              >
+                Return to Homepage
+              </button>
+            </div>
+          )}
+
+          {bookingStep === 'form' && (
+            <form onSubmit={handleSubmitBooking} className="flex flex-col lg:flex-row gap-6 sm:gap-8 items-start relative pb-20">
+              
+              {/* Left Column: Form Fields */}
+              <div className="flex-1 w-full space-y-6">
+                 
+                 {/* Identity */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">1</span>
+                       Your Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                         <input required name="name" value={formData.name} onChange={handleInputChange} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="Enter your full name" />
+                       </div>
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+                         <input required name="contact" value={formData.contact} onChange={handleInputChange} pattern="[0-9]{10}" className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="10-digit mobile number" />
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Address */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-3">
+                           <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">2</span>
+                           Service Address
+                        </h3>
+                        <button type="button" onClick={handleTrackLocation} disabled={isTrackingLocation} className={`text-xs font-bold flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all shadow-sm ${formData.locationLink ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 active:scale-95'}`}>
+                           {isTrackingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : formData.locationLink ? <CheckCircle className="w-4 h-4" /> : <Navigation className="w-4 h-4" />}
+                           {isTrackingLocation ? 'Detecting...' : formData.locationLink ? 'Location Saved' : 'Auto-Detect Address'}
+                        </button>
+                    </div>
+
+                    <div className="space-y-5">
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Address</label>
+                         <input required name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => { if (!formData.pincode && formData.address) { setIsDetectingPincode(true); const foundPin = await identifyPincode(formData.address); if (foundPin) setFormData(p => ({ ...p, pincode: foundPin })); setIsDetectingPincode(false); } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
+                       </div>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">City</label>
+                            <div className="relative">
+                               <select required name="city" value={formData.city} onChange={(e) => { const newCity = e.target.value; setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' })); localStorage.setItem('preferredCity', newCity); window.dispatchEvent(new Event('cityUpdated')); }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
+                                  <option value="">Select City</option>
+                                  {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                               </select>
+                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area / Locality</label>
+                            <div className="relative">
+                               <select required name="area" value={formData.area} onChange={async (e) => { const newArea = e.target.value; setFormData(prev => ({ ...prev, area: newArea })); if (newArea) { setIsFetchingAreaPincode(true); try { const pins = await fetchPincodesByArea([newArea]); if (pins && pins.length > 0) setFormData(prev => ({ ...prev, pincode: pins[0] })); } finally { setIsFetchingAreaPincode(false); } } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium" disabled={!formData.city}>
+                                  <option value="">Select Area</option>
+                                  {formData.city && PREDEFINED_AREAS[formData.city] ? PREDEFINED_AREAS[formData.city].map(area => <option key={area} value={area}>{area}</option>) : <option value="Other">Other</option>}
+                               </select>
+                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                            </div>
+                          </div>
+                       </div>
+
+                       <div>
+                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 flex items-center gap-2">Pincode {(isDetectingPincode || isFetchingAreaPincode) && <Loader2 size={12} className="animate-spin text-indigo-600" />}</label>
+                         <input required name="pincode" value={formData.pincode} onChange={handleInputChange} disabled={isDetectingPincode || isFetchingAreaPincode} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:opacity-50 text-gray-900 font-medium" placeholder="6-digit pincode" />
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Time Slot */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
+                       Preference Time
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Date</label>
+                         <input type="date" required name="date" value={formData.date} onChange={handleInputChange} min={minDate} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 font-medium" />
+                       </div>
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Time Slot</label>
+                         <div className="relative">
+                            <select required name="time" value={formData.time} onChange={handleInputChange} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
+                               <option value="">Select Time</option>
+                               {availableTimeSlots.map(slot => <option key={slot} value={slot}>{slot}</option>)}
+                            </select>
+                            <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                         </div>
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Extra Info */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">4</span>
+                       Additional Info
+                    </h3>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Instructions (Optional)</label>
+                      <input name="description" value={formData.description} onChange={handleInputChange} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="Any specific requirements?" />
+                    </div>
+                 </div>
+
+              </div>
+
+              {/* Right Column: Order Summary (Sticky) */}
+              <div className="w-full lg:w-[420px] lg:sticky lg:top-24 space-y-6">
+                  
+                  <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-xl shadow-indigo-100/40 border border-indigo-50">
+                     <h3 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-tight flex justify-between items-center">
+                        Order Summary
+                        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{cartItemCount} Items</span>
+                     </h3>
+                     
+                     <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                       {cart.map(item => (
+                         <div key={item.id} className="flex justify-between items-start gap-4 p-3 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
+                           <div className="flex-1">
+                             <p className="font-bold text-gray-800 text-sm leading-snug">{item.name}</p>
+                             <div className="flex items-center gap-2 mt-2">
+                               <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-medium">-</button>
+                               <span className="text-xs font-black text-indigo-900 min-w-[12px] text-center">{item.quantity}</span>
+                               <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-medium">+</button>
+                               <button type="button" onClick={() => removeFromCart(item.id)} className="ml-3 text-red-500 hover:text-red-700 text-[10px] uppercase font-black tracking-widest bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors">Discard</button>
+                             </div>
+                           </div>
+                           <span className="font-black text-indigo-600 shrink-0 text-base">₹{item.price * item.quantity}</span>
+                         </div>
+                       ))}
+                     </div>
+
+                     <div className="pt-6 border-t border-gray-100 space-y-5">
+                        <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                          <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 ml-1">Promo Code</label>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <input value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())} disabled={!!appliedCoupon} placeholder="Enter Code" className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-600 outline-none uppercase font-black text-indigo-950 placeholder-gray-400" />
+                            {appliedCoupon ? (
+                               <button type="button" onClick={removeCoupon} className="bg-red-50 text-red-600 border border-red-100 px-6 py-3 rounded-xl text-xs font-black uppercase hover:bg-red-100 transition-colors whitespace-nowrap active:scale-95">Remove</button>
+                            ) : (
+                               <button type="button" onClick={() => handleApplyCoupon()} className="bg-gray-900 text-white border border-gray-900 px-6 py-3 rounded-xl text-xs font-black uppercase hover:bg-black transition-colors shadow-lg shadow-gray-900/20 whitespace-nowrap active:scale-95">Apply</button>
+                            )}
+                          </div>
+                          {couponMessage && <p className={`text-[11px] mt-2 font-bold ml-1 ${couponMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{couponMessage.text}</p>}
+                          
+                          {!appliedCoupon && (
+                            <div className="mt-3 flex gap-2">
+                                <button type="button" onClick={() => handleApplyCoupon('GET20')} className="text-[10px] font-black px-3 py-1.5 rounded-lg border border-indigo-100 text-indigo-600 bg-white hover:bg-indigo-50 transition-colors uppercase tracking-widest shadow-sm">GET20</button>
+                                <button type="button" onClick={() => handleApplyCoupon('SAVE10')} className="text-[10px] font-black px-3 py-1.5 rounded-lg border border-indigo-100 text-indigo-600 bg-white hover:bg-indigo-50 transition-colors uppercase tracking-widest shadow-sm">SAVE10</button>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="space-y-3 pt-2 px-1">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-gray-500 font-bold uppercase tracking-wider text-xs">Subtotal</span>
+                            <span className="font-bold text-gray-900 text-base">₹{cartTotal}</span>
+                          </div>
+                          {discountAmount > 0 && (
+                            <AnimatePresence>
+                               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-center text-sm text-emerald-600 font-bold bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100">
+                                 <span className="uppercase tracking-wider text-xs">Discount</span>
+                                 <span className="text-base">-₹{discountAmount}</span>
+                               </motion.div>
+                            </AnimatePresence>
+                          )}
+                          <div className="flex justify-between items-end pt-5 border-t border-gray-200 mt-4">
+                             <div>
+                                <span className="block text-gray-900 font-black text-sm uppercase tracking-wider">Final Total</span>
+                                <span className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Inc. of all taxes</span>
+                             </div>
+                             <span className="text-4xl font-black text-indigo-600 tracking-tighter leading-none">₹{finalTotal}</span>
+                          </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <button type="submit" className="w-full bg-indigo-600 text-white text-lg font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-700 hover:shadow-indigo-200 transition-all active:scale-[0.98] uppercase tracking-wide flex items-center justify-center gap-2 group border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1">
+                     <ShieldCheck size={20} className="group-hover:scale-110 transition-transform" />
+                     Confirm Booking
+                  </button>
+
+                  <p className="text-center text-xs font-bold text-gray-400 flex items-center justify-center gap-2 mt-4">
+                     <Lock size={12} className="text-gray-400" />
+                     Payments are secure and encrypted.
+                  </p>
+              </div>
+
+            </form>
+          )}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Mobile-Friendly Urban Company Style Hero Content */}
@@ -1211,8 +1451,8 @@ export const CustomerPanel: React.FC = () => {
               {/* Cart Summary Card */}
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-indigo-950 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                <div className="relative bg-white border border-indigo-50 rounded-[2rem] p-6 shadow-sm">
-                  <div className="flex justify-between items-center mb-6">
+                <div className="relative bg-white border border-indigo-50 rounded-[2rem] p-4 sm:p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
                     <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-2">
                        <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
                        Service Dossier
@@ -1241,15 +1481,15 @@ export const CustomerPanel: React.FC = () => {
                   
                   <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
                     {cart.map(item => (
-                      <div key={item.id} className="flex justify-between items-center bg-gray-50/50 p-3 rounded-xl border border-gray-100 group/item hover:bg-white hover:shadow-md transition-all">
-                        <div className="flex-1">
-                          <p className="font-bold text-gray-800 text-sm leading-tight">{item.name}</p>
+                      <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50/50 p-3 rounded-xl border border-gray-100 group/item hover:bg-white hover:shadow-md transition-all gap-3">
+                        <div className="flex-1 w-full">
+                          <p className="font-bold text-gray-800 text-sm leading-tight pr-2">{item.name}</p>
                           <div className="flex items-center gap-1.5 mt-1">
                              <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">₹{item.price}</span>
                              <span className="text-[10px] text-gray-400 font-medium">x {item.quantity}</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                           <div className="flex items-center bg-white rounded-lg border border-gray-200 p-1 shadow-inner">
                             <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-md text-gray-600 transition-colors">-</button>
                             <span className="text-xs font-black w-6 text-center text-indigo-900">{item.quantity}</span>
@@ -1263,21 +1503,21 @@ export const CustomerPanel: React.FC = () => {
 
                   {/* Coupon Section - Inlined for better flow */}
                   <div className="mt-6 pt-6 border-t border-indigo-50">
-                      <div className="bg-indigo-50/30 p-5 rounded-3xl border border-indigo-100/50">
+                      <div className="bg-indigo-50/30 p-4 sm:p-5 rounded-3xl border border-indigo-100/50">
                         <label className="block text-[9px] font-black text-indigo-900 uppercase tracking-[0.3em] mb-3 ml-1">Elite Coupons</label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                             <input 
                                 type="text" 
                                 value={couponCode}
                                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                 placeholder="OFFER CODE" 
-                                className="flex-1 bg-white border-2 border-indigo-50 rounded-2xl px-4 py-3 text-sm font-black uppercase outline-none focus:border-indigo-600 shadow-sm transition-all text-indigo-950 placeholder:text-indigo-100"
+                                className="flex-1 bg-white border-2 border-indigo-50 rounded-2xl px-4 py-3 text-sm font-black uppercase outline-none focus:border-indigo-600 shadow-sm transition-all text-indigo-950 placeholder:text-indigo-100 w-full"
                                 disabled={!!appliedCoupon}
                             />
                             {appliedCoupon ? (
-                                <button type="button" onClick={removeCoupon} className="bg-rose-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-rose-700 active:scale-95 transition-all uppercase tracking-widest">REMOVE</button>
+                                <button type="button" onClick={removeCoupon} className="w-full sm:w-auto bg-rose-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-rose-700 active:scale-95 transition-all uppercase tracking-widest whitespace-nowrap">REMOVE</button>
                             ) : (
-                                <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-950 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-black active:scale-95 transition-all uppercase tracking-widest">APPLY</button>
+                                <button type="button" onClick={() => handleApplyCoupon()} className="w-full sm:w-auto bg-indigo-950 text-white px-6 py-3 rounded-2xl text-[10px] font-black shadow-lg hover:bg-black active:scale-95 transition-all uppercase tracking-widest whitespace-nowrap">APPLY</button>
                             )}
                         </div>
                         {couponMessage && (
@@ -1320,11 +1560,11 @@ export const CustomerPanel: React.FC = () => {
                             </motion.div>
                         )}
                       </AnimatePresence>
-                      <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-indigo-100 mt-2">
-                          <span className="font-black text-gray-900 uppercase tracking-tight">Final Payable</span>
+                      <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-indigo-100 mt-2 gap-2">
+                          <span className="font-black text-gray-900 uppercase tracking-tight text-xs sm:text-base">Final Payable</span>
                           <div className="text-right">
-                             <span className="block font-black text-2xl text-indigo-600 drop-shadow-sm">₹{finalTotal}</span>
-                             <span className="text-[9px] text-green-600 font-bold uppercase tracking-widest">Pricing Inclusive of Tax</span>
+                             <span className="block font-black text-xl sm:text-2xl text-indigo-600 drop-shadow-sm">₹{finalTotal}</span>
+                             <span className="text-[8px] sm:text-[9px] text-green-600 font-bold uppercase tracking-widest leading-none block mt-1">Pricing Inclusive of Tax</span>
                           </div>
                       </div>
                   </div>
@@ -1337,7 +1577,7 @@ export const CustomerPanel: React.FC = () => {
                 {/* Section 1: Contact Info Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
                     <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
                       <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">1</span>
                       Identity Protocols
@@ -1380,7 +1620,7 @@ export const CustomerPanel: React.FC = () => {
                 {/* Section 2: Service Location Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
                     <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
                       <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">2</span>
                       Deployment Address
@@ -1579,12 +1819,12 @@ export const CustomerPanel: React.FC = () => {
                 {/* Section 3: Schedule Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-orange-50 rounded-2xl p-5 shadow-sm">
+                  <div className="relative bg-white border border-orange-50 rounded-2xl p-4 sm:p-5 shadow-sm">
                     <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
                       <span className="bg-orange-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-orange-200">3</span>
                       Time Slot
                     </h4>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Preferred Date</label>
                             <div className="relative">
@@ -1630,7 +1870,7 @@ export const CustomerPanel: React.FC = () => {
                 {/* Section 4: Extra Details Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-300 to-indigo-600 rounded-[2rem] blur opacity-5 transition duration-1000"></div>
-                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-6 shadow-sm">
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
                     <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
                        <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
                        Special Dispatch Info
