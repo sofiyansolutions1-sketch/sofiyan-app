@@ -9,6 +9,34 @@ export const HELPLINE = "9219345455";
 export const EMAIL = "sofiyansolutions1@gmail.com";
 export const ADMIN_PASSWORD = "ta7867@#";
 
+export const CITY_DATA = [
+  { name: 'Bangalore', img: 'https://i.postimg.cc/Xq9y6ZC0/Chat-GPT-Image-Apr-19-2026-12-21-24-AM.png', areasCount: 27 },
+  { name: 'Delhi', img: 'https://i.postimg.cc/RVDqpQ8c/Chat-GPT-Image-Apr-19-2026-12-41-30-AM.png', areasCount: 32 },
+  { name: 'Mumbai', img: 'https://i.postimg.cc/QdYgbTg5/Chat-GPT-Image-Apr-19-2026-12-27-58-AM.png', areasCount: 36 },
+  { name: 'Hyderabad', img: 'https://i.postimg.cc/59Zc2sXS/Chat-GPT-Image-Apr-19-2026-02-27-49-AM.png', areasCount: 24 },
+  { name: 'Pune', img: 'https://i.postimg.cc/T3NJT4wp/Chat-GPT-Image-Apr-19-2026-02-32-39-AM.png', areasCount: 18 },
+  { name: 'Chennai', img: 'https://i.postimg.cc/kgHK0R1M/Chat-GPT-Image-Apr-19-2026-02-34-24-AM.png', areasCount: 22 },
+  { name: 'Kolkata', img: 'https://i.postimg.cc/4NdKXNh2/Chat-GPT-Image-Apr-19-2026-02-36-38-AM.png', areasCount: 20 },
+  { name: 'Ahmedabad', img: 'https://i.postimg.cc/9XNmtPrG/Chat-GPT-Image-Apr-19-2026-02-40-08-AM.png', areasCount: 15 },
+  { name: 'Gurgaon', img: 'https://i.postimg.cc/sgCRwTyC/Chat-GPT-Image-Apr-19-2026-02-42-24-AM.png', areasCount: 23 },
+  { name: 'Noida', img: 'https://i.postimg.cc/13K5Fk6N/Chat-GPT-Image-Apr-19-2026-02-43-16-AM.png', areasCount: 16 },
+  { name: 'Varanasi', img: 'https://wispy-shape-617.linkyhost.com', areasCount: 12 }
+];
+
+export const PREDEFINED_AREAS: Record<string, string[]> = {
+  Bangalore: ["Bellandur", "Koramangala", "Brookefield", "Indiranagar", "BTM Layout", "Hebbal", "HSR Layout", "Hongasandra", "Whitefield", "Hoodi", "Marathahalli", "Hulimavu", "Electronic City", "Kudlu", "Mahadevapura", "Mahalakshmi", "Munnekolala", "Nagasandra", "Rayasandra", "Sarjapura", "Seegehalli", "Singasandra", "Tejaswini Nagar", "Thanisandra", "Varthur", "Yelahanka", "Yeswanthpur"],
+  Delhi: ["Connaught Place", "Karol Bagh", "Dwarka", "Vasant Kunj", "Rohini", "Saket", "Hauz Khas", "Lajpat Nagar", "Janakpuri", "Pitampura", "Chandni Chowk", "Okhla"],
+  Mumbai: ["Andheri", "Bandra", "Borivali", "Juhu", "Colaba", "Malad", "Navi Mumbai", "Goregaon", "Powai", "Dadar", "Thane", "Kalyan"],
+  Hyderabad: ["HITEC City", "Banjara Hills", "Jubilee Hills", "Gachibowli", "Madhapur", "Kukatpally", "Secunderabad", "Ameerpet", "Miyapur", "Kondapur"],
+  Chennai: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "Tambaram", "Guindy", "OMR", "Porur", "Mylapore", "Thiruvanmiyur"],
+  Pune: ["Hinjewadi", "Kothrud", "Koregaon Park", "Viman Nagar", "Wakad", "Baner", "Hadapsar", "Kharadi", "Shivajinagar", "Pimpri Chinchwad"],
+  Kolkata: ["Salt Lake", "New Town", "Park Street", "Ballygunge", "Dum Dum", "Jadavpur", "Garia", "Rajarhat", "Tollygunge", "Howrah"],
+  Ahmedabad: ["SG Highway", "Navrangpura", "Satellite", "Vastrapur", "Bopal", "Paldi", "Maninagar", "Prahlad Nagar", "Gota", "Thaltej"],
+  Gurgaon: ["Cyber City", "Sohna Road", "DLF Phase 1", "DLF Phase 2", "DLF Phase 3", "Golf Course Road", "Sector 56", "Sector 14", "Palam Vihar"],
+  Noida: ["Sector 18", "Sector 62", "Sector 15", "Sector 63", "Greater Noida", "Sector 137", "Sector 50", "Sector 16"],
+  Varanasi: ["Ghats", "Lanka", "Godowlia", "Sigra", "Sarnath", "Cantonment", "Bhelupur", "Pandeypur", "Mahmoorganj", "Jaitpura", "Chaitganj", "Adampura"]
+};
+
 // Custom Image Mapping
 export const CATEGORY_IMAGES: Record<string, string> = {
   "Electrician": "https://i.postimg.cc/dts84RjY/Whats-App-Image-2026-01-13-at-1-49-19-AM.jpg",

@@ -1,10 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICES } from '../constants';
+import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
+import { motion, AnimatePresence } from 'motion/react';
 import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
-import { RateCardModal, rateCardDatabase } from '../components/RateCardModal';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock } from 'lucide-react';
+import { RateCardModal } from '../components/RateCardModal';
+import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -134,14 +136,60 @@ export const CustomerPanel: React.FC = () => {
     name: '',
     contact: '',
     address: '',
+    area: '',
     locationLink: '',
-    city: '',
+    city: localStorage.getItem('preferredCity') || '',
     pincode: '',
     description: '',
     date: '',
     time: '',
-    referralCode: ''
+    referralCode: '',
+    lat: null as number | null,
+    lng: null as number | null
   });
+
+  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+  const [isDetectingPincode, setIsDetectingPincode] = useState(false);
+  const [isFetchingAreaPincode, setIsFetchingAreaPincode] = useState(false);
+
+  // Sync city when localStorage changes (handled globally by Layout, but sync local formData)
+  useEffect(() => {
+    const handleCitySync = () => {
+      const city = localStorage.getItem('preferredCity') || '';
+      setFormData(prev => ({ ...prev, city }));
+    };
+    window.addEventListener('cityUpdated', handleCitySync);
+    return () => window.removeEventListener('cityUpdated', handleCitySync);
+  }, []);
+
+  const handleTrackLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Location tracking is not supported by your browser.");
+      return;
+    }
+    setIsTrackingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+        
+        setFormData(prev => ({
+          ...prev,
+          lat,
+          lng,
+          locationLink: googleMapsLink
+        }));
+        setIsTrackingLocation(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        setIsTrackingLocation(false);
+        alert("Unable to fetch location. Please ensure location permissions are granted.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   useEffect(() => {
     const fetchLatestBlogs = async () => {
@@ -349,10 +397,9 @@ export const CustomerPanel: React.FC = () => {
   // Coupon Logic
   const validCoupons: Record<string, number> = {
       'GET20': 10, 'SAVE10': 10, 'EASY10': 10, 'QUICK10': 10,
-      'SOFIYAN15': 15, 'CLEAN15': 15, 'SMART15': 15,
-      'SUPER20': 20, 'MUMBAI20': 20, 'RELAX20': 20,
-      'MEGA30': 30, 'VIP30': 30, 'FESTIVAL30': 30,
-      'WELCOME40': 40, 'FIRST40': 40, 'BUMPER40': 40
+      'CLEAN10': 10, 'SMART10': 10, 'SOFIYAN10': 10,
+      'SUPER10': 10, 'MUMBAI10': 10, 'RELAX10': 10,
+      'WELCOME10': 10, 'FIRST10': 10, 'BUMPER10': 10
   };
 
   const [couponCode, setCouponCode] = useState('');
@@ -369,11 +416,17 @@ export const CustomerPanel: React.FC = () => {
       if (validCoupons[code]) {
           setAppliedCoupon(code);
           setCouponCode(code);
+          // Link coupon to referral code for influencer tracking
+          setFormData(prev => ({ ...prev, referralCode: code }));
           const discount = Math.round((cartTotal * validCoupons[code]) / 100);
           setCouponMessage({ text: `🎉 Yay! Coupon applied. You saved ₹${discount}!`, type: 'success' });
       } else {
-          setAppliedCoupon(null);
-          setCouponMessage({ text: "❌ Invalid coupon code.", type: 'error' });
+          // If not a valid discount code, we still treat it as a referral code
+          // to attribute it to an influencer, even if there's no discount
+          setAppliedCoupon(code); // We "apply" it as the code entered
+          setCouponCode(code);
+          setFormData(prev => ({ ...prev, referralCode: code }));
+          setCouponMessage({ text: "✅ Referral code applied successfully!", type: 'success' });
       }
   };
 
@@ -381,6 +434,7 @@ export const CustomerPanel: React.FC = () => {
       setAppliedCoupon(null);
       setCouponCode('');
       setCouponMessage(null);
+      setFormData(prev => ({ ...prev, referralCode: '' }));
   };
 
   const handleBookService = (sub: SubService) => {
@@ -423,10 +477,8 @@ export const CustomerPanel: React.FC = () => {
 
   const formatAMPM = (hours: number) => {
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const strTime = hours.toString().padStart(2, '0') + ':00 ' + ampm;
-    return strTime;
+    const displayHour = hours % 12 || 12;
+    return `${displayHour} ${ampm}`;
   };
 
   const updateAvailableTimeSlots = (dateInput: string) => {
@@ -456,7 +508,7 @@ export const CustomerPanel: React.FC = () => {
         // No slots left for today
     } else {
         for (let i = startHourForSlots; i < closeHour; i++) {
-            slots.push(`${formatAMPM(i)} - ${formatAMPM(i + 1)}`);
+            slots.push(`${formatAMPM(i)} to ${formatAMPM(i + 1)}`);
         }
     }
     setAvailableTimeSlots(slots);
@@ -544,6 +596,7 @@ export const CustomerPanel: React.FC = () => {
             customer_name: formData.name,
             contact_number: formData.contact,
             address: formData.address,
+            area: formData.area,
             city: formData.city,
             pin_code: formData.pincode,
             cart_items: cart,
@@ -555,12 +608,34 @@ export const CustomerPanel: React.FC = () => {
             service_category: categoryName,
             sub_service_name: subServiceName,
             location_link: formData.locationLink,
+            lat: formData.lat,
+            lng: formData.lng,
             discount_amount: discountAmount,
             applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
           }
         ]);
 
       if (bookingError) throw bookingError;
+
+      // Forward to WhatsApp
+      try {
+        const whatsappMsg = `*New Lead Received!*%0A%0A` +
+          `*Customer:* ${formData.name}%0A` +
+          `*Phone:* ${formData.contact}%0A` +
+          `*Category:* ${categoryName}%0A` +
+          `*Sub Services:* ${subServiceName}%0A` +
+          `*Address:* ${formData.address}%0A` +
+          `*Area:* ${formData.area || 'N/A'}%0A` +
+          `*Pincode:* ${formData.pincode}%0A` +
+          `*Date:* ${formData.date}%0A` +
+          `*Time:* ${formData.time}%0A` +
+          `*Total:* ₹${finalTotal}%0A%0A` +
+          `*Location Link:* ${formData.locationLink || 'Not provided'}`;
+
+        window.open(`https://wa.me/919219345455?text=${whatsappMsg}`, '_blank');
+      } catch (e) {
+        console.warn("WhatsApp forward failed", e);
+      }
 
       // Success UI
       setBookingStep('success');
@@ -578,7 +653,7 @@ export const CustomerPanel: React.FC = () => {
   const resetFlow = () => {
     setIsBookingModalOpen(false);
     setSelectedService(null);
-    setFormData({ name: '', contact: '', address: '', locationLink: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '' });
+    setFormData({ name: '', contact: '', address: '', area: '', locationLink: '', city: '', pincode: '', description: '', date: '', time: '', referralCode: '', lat: null, lng: null });
   };
 
   return (
@@ -991,41 +1066,43 @@ export const CustomerPanel: React.FC = () => {
                   return (
                     <div
                       key={sub.id}
-                      className="relative p-4 pt-6 border border-gray-100 rounded-xl bg-white shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center group overflow-hidden"
+                      className="relative p-5 pt-7 border border-indigo-50 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center group overflow-hidden"
                     >
                       {tag && (
-                        <div className={`absolute top-0 left-0 ${tag.classes} text-[10px] font-bold px-2 py-1 rounded-br-lg shadow-sm z-10`}>
+                        <div className={`absolute top-0 left-0 ${tag.classes} text-[9px] font-black px-2.5 py-1 rounded-br-xl shadow-sm z-10 uppercase tracking-wider`}>
                           {tag.text}
                         </div>
                       )}
                       
-                      <div className="flex-1 w-full mb-3 sm:mb-0 pr-2">
-                        <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mt-1 sm:mt-0">{sub.name}</h4>
+                      <div className="flex-1 w-full mb-4 sm:mb-0 pr-4">
+                        <h4 className="font-black text-gray-900 group-hover:text-indigo-600 transition-colors text-lg leading-tight mb-2">{sub.name}</h4>
                         
-                        <div className="flex items-center flex-wrap gap-1 mt-1">
-                          <span className="text-lg font-bold text-gray-900">₹{sub.price}</span>
-                          <span className="text-xs text-gray-400 line-through ml-1">₹{fakeMRP}</span>
-                          <span className="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-200 ml-1">
+                        <div className="flex items-center flex-wrap gap-2">
+                          <span className="text-xl font-black text-indigo-950">₹{sub.price}</span>
+                          <span className="text-xs text-slate-400 line-through">₹{fakeMRP}</span>
+                          <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-100 uppercase tracking-tighter">
                             {discountPercentage}% OFF
                           </span>
                         </div>
-                        <p className="text-[11px] text-green-600 font-semibold mt-0.5">You save ₹{savings}!</p>
+                        <p className="text-[11px] text-emerald-600 font-bold mt-1.5 flex items-center gap-1.5 bg-emerald-50/50 w-fit px-2 py-0.5 rounded-md border border-emerald-100/30">
+                           <CheckCircle size={10} className="fill-emerald-600/10" /> Super Save: ₹{savings}
+                        </p>
                       </div>
                       
                       <div className="w-full sm:w-auto flex justify-end">
                         {cartItem ? (
-                          <div className="flex items-center gap-3 bg-white rounded-lg border border-indigo-200 px-2 py-1.5 shadow-sm">
-                              <button onClick={() => updateQuantity(cartItem.id, -1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Minus size={16}/></button>
-                              <span className="font-bold text-indigo-900 w-4 text-center">{cartItem.quantity}</span>
-                              <button onClick={() => updateQuantity(cartItem.id, 1)} className="p-1 hover:bg-indigo-50 rounded text-indigo-600"><Plus size={16}/></button>
+                          <div className="flex items-center gap-3 bg-indigo-50 rounded-xl border border-indigo-100 px-2 py-1.5 shadow-inner">
+                              <button onClick={() => updateQuantity(cartItem.id, -1)} className="w-8 h-8 flex items-center justify-center bg-white hover:bg-indigo-100 rounded-lg text-indigo-700 shadow-sm transition-all"><Minus size={14}/></button>
+                              <span className="font-black text-indigo-900 w-6 text-center text-sm">{cartItem.quantity}</span>
+                              <button onClick={() => updateQuantity(cartItem.id, 1)} className="w-8 h-8 flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white shadow-sm transition-all"><Plus size={14}/></button>
                           </div>
                         ) : (
                           <button
                             onClick={() => handleBookService(sub)}
-                            className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all active:scale-95 flex items-center gap-2"
+                            className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-indigo-600 to-indigo-800 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-indigo-100 hover:shadow-indigo-200 hover:from-indigo-700 hover:to-indigo-900 transition-all active:scale-95 flex items-center justify-center gap-2"
                           >
                             <Plus size={16} />
-                            Add to cart
+                            Add to Cart
                           </button>
                         )}
                       </div>
@@ -1080,322 +1157,483 @@ export const CustomerPanel: React.FC = () => {
           )}
 
           {bookingStep === 'form' && (
-            <form id="checkout-modal" onSubmit={handleSubmitBooking} className="space-y-6">
+            <form id="checkout-modal" onSubmit={handleSubmitBooking} className="space-y-8">
               
               {/* Trust Banner */}
-              <div className="bg-green-50 text-green-700 p-3 rounded-lg flex items-center gap-2 text-sm border border-green-100">
-                <Shield size={16} className="fill-current" />
-                <span className="font-medium">100% Safe & Secure | Verified Professionals</span>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-700 p-3.5 rounded-2xl flex items-center gap-3 text-xs sm:text-sm border border-emerald-100 shadow-sm">
+                <div className="bg-emerald-100 p-1.5 rounded-lg">
+                   <Shield size={18} className="fill-emerald-600/20" />
+                </div>
+                <span className="font-bold tracking-tight">100% Safe & Secure | ISO Certified Professionals</span>
               </div>
 
-              {/* Cart Summary */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wide">Order Summary</h4>
-                  {(() => {
-                    const cartRateCategory = cart.find(item => getRateCardCategory(item.categoryName))?.categoryName;
-                    const matchedCategory = cartRateCategory ? getRateCardCategory(cartRateCategory) : null;
-                    if (matchedCategory) {
-                      return (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setActiveRateCardCategory(matchedCategory);
-                            setIsRateCardModalOpen(true);
-                          }}
-                          className="text-xs font-semibold text-indigo-700 hover:text-indigo-800 flex items-center gap-1.5 bg-white border border-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-md transition-all shadow-sm"
-                        >
-                          <FileText size={14} />
-                          {matchedCategory} Rate Card
-                        </button>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
-                <div className="space-y-3 max-h-40 overflow-y-auto pr-1">
-                  {cart.map(item => (
-                    <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                      <div>
-                        <p className="font-semibold text-gray-800 text-sm">{item.name}</p>
-                        <p className="text-xs text-gray-500">₹{item.price} x {item.quantity}</p>
+              {/* Cart Summary Card */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                <div className="relative bg-white border border-indigo-50 border-opacity-50 rounded-2xl p-5 shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-xs font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2">
+                       <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
+                       Order Summary
+                    </h4>
+                    {(() => {
+                      const cartRateCategory = cart.find(item => getRateCardCategory(item.categoryName))?.categoryName;
+                      const matchedCategory = cartRateCategory ? getRateCardCategory(cartRateCategory) : null;
+                      if (matchedCategory) {
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveRateCardCategory(matchedCategory);
+                              setIsRateCardModalOpen(true);
+                            }}
+                            className="text-[10px] font-bold text-indigo-700 hover:text-white hover:bg-indigo-600 flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg transition-all"
+                          >
+                            <FileText size={12} />
+                            {matchedCategory} Rates
+                          </button>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                  
+                  <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                    {cart.map(item => (
+                      <div key={item.id} className="flex justify-between items-center bg-gray-50/50 p-3 rounded-xl border border-gray-100 group/item hover:bg-white hover:shadow-md transition-all">
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-800 text-sm leading-tight">{item.name}</p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                             <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">₹{item.price}</span>
+                             <span className="text-[10px] text-gray-400 font-medium">x {item.quantity}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center bg-white rounded-lg border border-gray-200 p-1 shadow-inner">
+                            <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-md text-gray-600 transition-colors">-</button>
+                            <span className="text-xs font-black w-6 text-center text-indigo-900">{item.quantity}</span>
+                            <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-md text-indigo-600 transition-colors">+</button>
+                          </div>
+                          <button type="button" onClick={() => removeFromCart(item.id)} className="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={16}/></button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600">-</button>
-                        <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
-                        <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 text-gray-600">+</button>
-                        <button type="button" onClick={() => removeFromCart(item.id)} className="ml-2 text-red-400 hover:text-red-600"><Trash2 size={14}/></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                {/* Coupon Section */}
-                <div className="mt-4 mb-4 bg-white p-3 rounded-lg border border-dashed border-gray-300">
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Have a Coupon Code?</label>
-                    <div className="flex space-x-2">
-                        <input 
-                            type="text" 
-                            value={couponCode}
-                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                            placeholder="Enter code here" 
-                            className="flex-1 border rounded-lg px-3 py-2 text-sm uppercase outline-none focus:border-indigo-500"
-                            disabled={!!appliedCoupon}
-                        />
-                        {appliedCoupon ? (
-                            <button type="button" onClick={removeCoupon} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200">REMOVE</button>
-                        ) : (
-                            <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">APPLY</button>
+                  {/* Coupon Section - Inlined for better flow */}
+                  <div className="mt-5 pt-4 border-t border-gray-100">
+                      <div className="bg-indigo-50/40 p-4 rounded-2xl border border-indigo-100/50">
+                        <label className="block text-[10px] font-black text-indigo-900 uppercase tracking-widest mb-2 ml-1">Promotional Offers</label>
+                        <div className="flex gap-2">
+                            <input 
+                                type="text" 
+                                value={couponCode}
+                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                placeholder="ENTER CODE" 
+                                className="flex-1 bg-white border-2 border-indigo-100 rounded-xl px-4 py-2.5 text-sm font-bold uppercase outline-none focus:border-indigo-500 shadow-sm transition-all text-indigo-900 placeholder:text-gray-300"
+                                disabled={!!appliedCoupon}
+                            />
+                            {appliedCoupon ? (
+                                <button type="button" onClick={removeCoupon} className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-md hover:bg-red-700 active:scale-95 transition-all uppercase letter-spacing-1 border-b-4 border-red-800">REMOVE</button>
+                            ) : (
+                                <button type="button" onClick={() => handleApplyCoupon()} className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-md hover:bg-indigo-700 active:scale-95 transition-all uppercase letter-spacing-1 border-b-4 border-indigo-800">APPLY</button>
+                            )}
+                        </div>
+                        {couponMessage && (
+                            <p className={`text-[11px] mt-2 font-bold px-2 py-1 rounded-md inline-block ${couponMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                                {couponMessage.text}
+                            </p>
                         )}
-                    </div>
-                    {couponMessage && (
-                        <p className={`text-xs mt-1 font-semibold ${couponMessage.type === 'success' ? 'text-green-600' : 'text-red-500'} block`}>
-                            {couponMessage.text}
-                        </p>
-                    )}
-                    
-                    {!appliedCoupon && (
-                        <div className="mt-2">
-                            <p className="text-[10px] text-gray-500 mb-1">Available Offers (Tap to apply):</p>
-                            <div className="flex flex-wrap gap-1">
-                                <span onClick={() => handleApplyCoupon('GET20')} className="cursor-pointer bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-blue-200 transition">
-                                    GET20 (10% OFF)
-                                </span>
+                        
+                        {!appliedCoupon && (
+                            <div className="mt-3">
+                                <div className="flex flex-wrap gap-2">
+                                    <span onClick={() => handleApplyCoupon('GET20')} className="cursor-pointer bg-white text-indigo-600 border-2 border-indigo-100 text-[10px] font-black px-3 py-1.5 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm">
+                                        GET20
+                                    </span>
 
-                                <span onClick={() => handleApplyCoupon('SAVE10')} className="cursor-pointer bg-green-100 text-green-700 border border-green-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-green-200 transition">
-                                    SAVE10 (10% OFF)
-                                </span>
-                                
-                                <span onClick={() => handleApplyCoupon('SOFIYAN15')} className="cursor-pointer bg-yellow-100 text-yellow-700 border border-yellow-200 text-[10px] font-bold px-2 py-1 rounded hover:bg-yellow-200 transition">
-                                    SOFIYAN15 (15% OFF)
-                                </span>
+                                    <span onClick={() => handleApplyCoupon('SAVE10')} className="cursor-pointer bg-white text-indigo-600 border-2 border-indigo-100 text-[10px] font-black px-3 py-1.5 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-all shadow-sm">
+                                        SAVE10
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                      </div>
+                  </div>
+
+                  <div className="mt-5 space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                          <span className="font-bold text-gray-500 uppercase tracking-wider text-[10px]">Cart Subtotal</span>
+                          <span className="font-bold text-gray-900">₹{cartTotal}</span>
+                      </div>
+                      <AnimatePresence>
+                        {discountAmount > 0 && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="flex justify-between items-center bg-green-50 px-3 py-2 rounded-xl border border-green-100"
+                            >
+                                <span className="font-bold text-green-700 text-xs">Discount Bonus ({appliedCoupon})</span>
+                                <span className="font-black text-green-700">-₹{discountAmount}</span>
+                            </motion.div>
+                        )}
+                      </AnimatePresence>
+                      <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-indigo-100 mt-2">
+                          <span className="font-black text-gray-900 uppercase tracking-tight">Final Payable</span>
+                          <div className="text-right">
+                             <span className="block font-black text-2xl text-indigo-600 drop-shadow-sm">₹{finalTotal}</span>
+                             <span className="text-[9px] text-green-600 font-bold uppercase tracking-widest">Pricing Inclusive of Tax</span>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customer Details Sections */}
+              <div className="space-y-8">
+                
+                {/* Section 1: Contact Info Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
+                      <span className="bg-indigo-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-indigo-200">1</span>
+                      Client Information
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Lead Name</label>
+                        <div className="relative group/input">
+                          <User className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            required
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
+                            placeholder="Full Name"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Direct Contact</label>
+                        <div className="relative group/input">
+                          <Phone className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            required
+                            name="contact"
+                            value={formData.contact}
+                            onChange={handleInputChange}
+                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
+                            placeholder="10-digit number"
+                            pattern="[0-9]{10}"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Service Location Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-2xl p-5 shadow-sm">
+                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
+                      <span className="bg-indigo-600 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-indigo-200">2</span>
+                      Venue Details
+                    </h4>
+                    
+                    <div className="space-y-6">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Manual Street Address</label>
+                        </div>
+                        <div className="relative group/input">
+                          <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            id="checkout-address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            onBlur={async () => {
+                              if (!formData.pincode && formData.address) {
+                                  setIsDetectingPincode(true);
+                                  const foundPin = await identifyPincode(formData.address);
+                                  if (foundPin) {
+                                      setFormData(p => ({ ...p, pincode: foundPin }));
+                                  }
+                                  setIsDetectingPincode(false);
+                              }
+                            }}
+                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
+                            placeholder="House / Building / Street / Landmark"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 my-2 w-full">
+                        <div className="h-[2px] bg-indigo-50 flex-1"></div>
+                        <span className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em]">Safety First</span>
+                        <div className="h-[2px] bg-indigo-50 flex-1"></div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Unique Highlighted Location Button */}
+                        <div className="relative group/loc">
+                          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-25 animate-pulse group-hover/loc:opacity-40 transition duration-1000"></div>
+                          <div className="relative bg-white border border-indigo-100 rounded-2xl p-5 shadow-sm overflow-hidden ring-1 ring-indigo-50">
+                             <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+                                <div className="flex items-center gap-4">
+                                   <div className="w-14 h-14 bg-gradient-to-br from-indigo-50 to-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner border border-indigo-100/50">
+                                      <motion.div
+                                        animate={isTrackingLocation ? { rotate: 360 } : {}}
+                                        transition={isTrackingLocation ? { repeat: Infinity, duration: 2, ease: "linear" } : {}}
+                                      >
+                                         <Navigation size={28} className="fill-indigo-600/10" />
+                                      </motion.div>
+                                   </div>
+                                   <div className="text-center sm:text-left">
+                                      <h5 className="font-black text-indigo-950 text-sm tracking-tight">Smart Geolocation</h5>
+                                      <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mt-0.5">Instant Maps Coordination</p>
+                                   </div>
+                                </div>
+
+                                <button 
+                                  type="button" 
+                                  onClick={handleTrackLocation} 
+                                  disabled={isTrackingLocation}
+                                  className={`relative group/btn min-w-[200px] h-12 flex items-center justify-center gap-2 px-8 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 z-10 overflow-hidden ${
+                                    formData.locationLink 
+                                      ? 'bg-emerald-600 text-white shadow-emerald-200 border-b-4 border-emerald-800' 
+                                      : 'bg-indigo-600 text-white shadow-indigo-200 hover:shadow-xl border-b-4 border-indigo-800'
+                                  } shadow-lg`}
+                                >
+                                  {isTrackingLocation ? (
+                                    <>
+                                      <Loader2 className="animate-spin" size={20} />
+                                      SYNCING...
+                                    </>
+                                  ) : formData.locationLink ? (
+                                    <>
+                                      <CheckCircle size={18} />
+                                      LOCKED IN
+                                    </>
+                                  ) : (
+                                    <>
+                                       <MapPin size={18} className="fill-current/20" />
+                                       AUTO-DETECT
+                                       <motion.div 
+                                         className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full"
+                                         animate={{ translateX: ['-100%', '200%'] }}
+                                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", repeatDelay: 1 }}
+                                       />
+                                    </>
+                                  )}
+                                </button>
+                             </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pinned Navigation Point</label>
+                          <div className="relative group/input">
+                            <MapPin className="absolute left-3.5 top-3.5 text-rose-400 group-focus-within/input:text-rose-600 transition-colors" size={18} />
+                            <input
+                              type="url"
+                              id="customerLocationLink"
+                              name="locationLink"
+                              value={formData.locationLink}
+                              onChange={handleInputChange}
+                              className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border-2 border-rose-50 rounded-xl focus:bg-white focus:ring-4 focus:ring-rose-100 focus:border-rose-300 outline-none transition-all font-bold text-xs text-rose-900 placeholder:text-rose-200"
+                              placeholder="Google Maps Sync Link"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current City</label>
+                          <div className="relative group/input">
+                              <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                              <select
+                                required
+                                name="city"
+                                value={formData.city}
+                                onChange={(e) => {
+                                   const newCity = e.target.value;
+                                   setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' }));
+                                   localStorage.setItem('preferredCity', newCity);
+                                   window.dispatchEvent(new Event('cityUpdated'));
+                                }}
+                                className="w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all appearance-none font-bold text-sm text-gray-900"
+                              >
+                                 <option value="">Select Region</option>
+                                 {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                              </select>
+                              <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area</label>
+                          <div className="relative group/input">
+                              <Map className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                              <select
+                                required
+                                name="area"
+                                value={formData.area}
+                                onChange={async (e) => {
+                                   const newArea = e.target.value;
+                                   setFormData(prev => ({ ...prev, area: newArea }));
+                                   if (newArea) {
+                                      setIsFetchingAreaPincode(true);
+                                      try {
+                                         const pins = await fetchPincodesByArea([newArea]);
+                                         if (pins && pins.length > 0) {
+                                            setFormData(prev => ({ ...prev, pincode: pins[0] }));
+                                         }
+                                      } finally {
+                                         setIsFetchingAreaPincode(false);
+                                      }
+                                   }
+                                }}
+                                className="w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all appearance-none font-bold text-sm text-gray-900"
+                                disabled={!formData.city}
+                              >
+                                 <option value="">Choose your area.</option>
+                                 {formData.city && PREDEFINED_AREAS[formData.city] ? PREDEFINED_AREAS[formData.city].map(area => (
+                                    <option key={area} value={area}>{area}</option>
+                                 )) : (
+                                    <option value="Other">Other</option>
+                                 )}
+                              </select>
+                              <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center justify-between">
+                          Postal Pin-Code
+                          {(isDetectingPincode || isFetchingAreaPincode) && <span className="text-indigo-500 lowercase flex items-center gap-1"><Loader2 size={10} className="animate-spin" />syncing...</span>}
+                        </label>
+                        <div className="relative group/input">
+                          <MapPin className="absolute left-3.5 top-3.5 text-indigo-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            required
+                            name="pincode"
+                            value={formData.pincode}
+                            onChange={handleInputChange}
+                            disabled={isDetectingPincode || isFetchingAreaPincode}
+                            className="w-full pl-11 pr-4 py-3.5 bg-indigo-50/20 border-2 border-indigo-100/30 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all disabled:opacity-60 font-black text-indigo-700 tracking-widest text-lg"
+                            placeholder="------"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Schedule Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-orange-50 rounded-2xl p-5 shadow-sm">
+                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
+                      <span className="bg-orange-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-orange-200">3</span>
+                      Time Slot
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Preferred Date</label>
+                            <div className="relative">
+                               <Calendar className="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none" size={18} />
+                               <input 
+                                   type="date" 
+                                   name="date"
+                                   value={formData.date}
+                                   onChange={handleInputChange}
+                                   min={minDate}
+                                   className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-orange-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-900" 
+                                   required 
+                               />
                             </div>
                         </div>
-                    )}
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-gray-200">
-                    <div className="flex justify-between items-center mt-2">
-                        <span className="font-bold text-gray-700">Subtotal:</span>
-                        <span className="font-bold text-gray-700">₹{cartTotal}</span>
-                    </div>
-                    {discountAmount > 0 && (
-                        <div className="flex justify-between items-center mt-1">
-                            <span className="font-bold text-green-600">Discount applied ({appliedCoupon}):</span>
-                            <span className="font-bold text-green-600">-₹{discountAmount}</span>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Preferred Timing</label>
+                            <div className="relative">
+                               <Clock className="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none" size={18} />
+                               <select 
+                                   name="time"
+                                   value={formData.time}
+                                   onChange={handleInputChange}
+                                   className="w-full pl-11 pr-12 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-orange-100 focus:border-orange-500 outline-none transition-all appearance-none font-bold text-gray-900 text-[13px] sm:text-sm"
+                                   required
+                               >
+                                   <option value="">Select</option>
+                                   {availableTimeSlots.length === 0 ? (
+                                       <option value="" disabled>Sold Out</option>
+                                   ) : (
+                                       availableTimeSlots.map(slot => (
+                                           <option key={slot} value={slot}>{slot}</option>
+                                       ))
+                                   )}
+                               </select>
+                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                            </div>
                         </div>
-                    )}
-                    <div className="flex justify-between items-center mt-1 text-lg">
-                        <span className="font-black text-gray-900">Final Total:</span>
-                        <span className="font-black text-indigo-700">₹{finalTotal}</span>
-                    </div>
-                </div>
-              </div>
-
-              {/* Customer Details - Redesigned */}
-              <div className="space-y-6">
-                
-                {/* Section 1: Contact Info */}
-                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-                    Contact Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Full Name <span className="text-red-500">*</span></label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                          required
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="John Doe"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Mobile Number <span className="text-red-500">*</span></label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                          required
-                          name="contact"
-                          value={formData.contact}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="10-digit mobile number"
-                          pattern="[0-9]{10}"
-                          title="Please enter a valid 10-digit mobile number"
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Section 2: Service Location */}
-                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                    Service Location
-                  </h4>
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Manual Address</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                          id="checkout-address"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="House No, Street, Landmark"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 my-2 w-full">
-                      <div className="h-px bg-gray-200 flex-1"></div>
-                      <span className="text-xs font-bold text-gray-400 uppercase">OR</span>
-                      <div className="h-px bg-gray-200 flex-1"></div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-indigo-600 uppercase ml-1 flex items-center gap-1">Fast Checkout: Google Maps Link</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-3.5 text-indigo-400" size={18} />
-                        <input
-                          type="url"
-                          id="customerLocationLink"
-                          name="locationLink"
-                          value={formData.locationLink}
-                          onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-3 bg-indigo-50/50 border border-indigo-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                          placeholder="Paste Google Maps Link here..."
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 pt-2">
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">City <span className="text-red-500">*</span></label>
-                        <div className="relative">
-                            <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input
-                              id="checkout-city"
-                              required
-                              name="city"
-                              value={formData.city}
-                              onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                              placeholder="e.g. Mumbai"
-                            />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Pincode</label>
-                        <div className="relative">
-                            <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input
-                              required
-                              name="pincode"
-                              value={formData.pincode}
-                              onChange={handleInputChange}
-                              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                              placeholder="e.g. 560001"
-                            />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 3: Schedule */}
-                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="bg-indigo-100 text-indigo-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
-                    Schedule Service
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                      <div>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase ml-1 mb-1">Date <span className="text-red-500">*</span></label>
-                          <input 
-                              type="date" 
-                              id="service-date" 
-                              name="date"
-                              value={formData.date}
-                              onChange={handleInputChange}
-                              min={minDate}
-                              className="w-full py-3 bg-gray-50 border border-gray-200 rounded-xl px-4 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
-                              required 
+                {/* Section 4: Extra Details Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl blur opacity-10 transition duration-1000"></div>
+                  <div className="relative bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-4">
+                       <div className="w-1.5 h-4 bg-gray-400 rounded-full"></div>
+                       Special Handover
+                    </h4>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Service Directives</label>
+                      <div className="relative group/input">
+                          <FileText className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-gray-900 placeholder:font-normal"
+                            placeholder="Any specific instructions for the team..."
                           />
                       </div>
-                      <div>
-                          <label className="block text-xs font-semibold text-gray-500 uppercase ml-1 mb-1">Time <span className="text-red-500">*</span></label>
-                          <select 
-                              id="selected-time-slot" 
-                              name="time"
-                              value={formData.time}
-                              onChange={handleInputChange}
-                              className="w-full py-3 bg-gray-50 border border-gray-200 rounded-xl px-4 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
-                              required
-                          >
-                              <option value="" disabled>Select Date First</option>
-                              {availableTimeSlots.length === 0 && formData.date ? (
-                                  <option value="" disabled>No slots available</option>
-                              ) : (
-                                  availableTimeSlots.map(slot => (
-                                      <option key={slot} value={slot}>{slot}</option>
-                                  ))
-                              )}
-                          </select>
-                      </div>
-                  </div>
-                </div>
-
-                {/* Section 4: Additional Info */}
-                <div className="bg-white border border-gray-100 shadow-sm rounded-xl p-4 space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Influencer Referral Code (Optional)</label>
-                    <div className="relative">
-                        <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                        name="referralCode"
-                        value={formData.referralCode}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase"
-                        placeholder="e.g. SOFIYAN20"
-                        />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Instructions (Optional)</label>
-                    <div className="relative">
-                        <FileText className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                        <input
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="Any specific needs or directions..."
-                        />
                     </div>
                   </div>
                 </div>
-
               </div>
 
-              <button
-                type="submit"
-                className="w-full mt-8 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] hover:from-indigo-700 hover:to-indigo-800 transition-all transform flex items-center justify-center gap-2 text-lg"
-              >
-                Confirm Booking - ₹{finalTotal} <ArrowRight size={20} />
-              </button>
+              {/* Submit Button */}
+              <div className="pt-8 flex flex-col items-center">
+                  <div className="w-full relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <button
+                      type="submit"
+                      className="relative w-full h-16 bg-indigo-600 text-white font-black text-xl rounded-2xl shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-3 overflow-hidden border-b-8 border-indigo-950 active:translate-y-2 active:border-b-0"
+                    >
+                      <span>CONFIRM BOOKING - ₹{finalTotal}</span>
+                      <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                      <motion.div 
+                        className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full"
+                        animate={{ translateX: ['-100%', '200%'] }}
+                        transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                      />
+                    </button>
+                  </div>
+                  <p className="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] flex items-center gap-2">
+                    <Shield size={12} className="text-emerald-500" /> SECURE END-TO-END ENCRYPTED CHECKOUT
+                  </p>
+              </div>
             </form>
           )}
         </Modal>

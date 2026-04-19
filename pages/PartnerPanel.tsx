@@ -2,13 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { Partner, Booking } from '../types';
-import { SERVICES } from '../constants';
+import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
 import { Modal } from '../components/Modal';
-import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star } from 'lucide-react';
+import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star, Navigation, Plus } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { Session } from '@supabase/supabase-js';
+import { fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
 
-import { getCoordinatesWithGemini } from '../services/geminiService';
+const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const toRadian = (angle: number) => (Math.PI / 180) * angle;
+  const earthRadius = 6371; // km
+  const dLat = toRadian(lat2 - lat1);
+  const dLon = toRadian(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadian(lat1)) * Math.cos(toRadian(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadius * c;
+};
 
 export const PartnerPanel: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +50,19 @@ export const PartnerPanel: React.FC = () => {
 
   // Partner Registration Modal State
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [regStep, setRegStep] = useState<'city' | 'details'>('city');
+  const [selectedAreasList, setSelectedAreasList] = useState<string[]>([]);
+  const [editSelectedAreasList, setEditSelectedAreasList] = useState<string[]>([]);
+  const [discoveredPincodesList, setDiscoveredPincodesList] = useState<string[]>([]);
+  const [editDiscoveredPincodesList, setEditDiscoveredPincodesList] = useState<string[]>([]);
+  const [fetchingPincodes, setFetchingPincodes] = useState(false);
+  const [customAreaInput, setCustomAreaInput] = useState('');
+  const [editCustomAreaInput, setEditCustomAreaInput] = useState('');
+  const [pincodeError, setPincodeError] = useState<string | null>(null);
+  const [pincodeAreas, setPincodeAreas] = useState<string[]>([]);
+  const [editPincodeError, setEditPincodeError] = useState<string | null>(null);
+  const [editPincodeAreas, setEditPincodeAreas] = useState<string[]>([]);
+  
   const [regData, setRegData] = useState({
     firstName: '',
     lastName: '',
@@ -49,8 +74,11 @@ export const PartnerPanel: React.FC = () => {
     city: '',
     customCity: '',
     pincode: '',
+    serviceAreas: '',
     categories: [] as string[],
-    subCategories: [] as string[]
+    subCategories: [] as string[],
+    lat: null as number | null,
+    lng: null as number | null
   });
 
   // Edit Profile State
@@ -64,8 +92,36 @@ export const PartnerPanel: React.FC = () => {
     categories: [] as string[],
     subCategories: [] as string[],
     experience: '',
-    gender: 'Male'
+    gender: 'Male',
+    lat: null as number | null,
+    lng: null as number | null
   });
+
+  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
+
+  const handleTrackLocation = (isEdit = false) => {
+    if (!navigator.geolocation) {
+      alert("Location tracking is not supported by your browser.");
+      return;
+    }
+    setIsTrackingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (isEdit) {
+            setEditData(prev => ({ ...prev, lat: position.coords.latitude, lng: position.coords.longitude }));
+        } else {
+            setRegData(prev => ({ ...prev, lat: position.coords.latitude, lng: position.coords.longitude }));
+        }
+        setIsTrackingLocation(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        setIsTrackingLocation(false);
+        alert("Unable to fetch location. Please ensure location permissions are granted.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
 
   const CATEGORY_LIST = ["Electrician", "Plumber", "Carpenters", "Cleaning & Pest Control", "Pooja", "Home Appliances"];
   const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
@@ -130,6 +186,124 @@ export const PartnerPanel: React.FC = () => {
         setIsSubmitting(false);
     }
   };
+
+  const handleAddArea = (area: string) => {
+    if (area && !selectedAreasList.includes(area)) {
+       setSelectedAreasList([...selectedAreasList, area]);
+    }
+  };
+
+  const handleRemoveArea = (area: string) => {
+      setSelectedAreasList(selectedAreasList.filter(a => a !== area));
+  };
+
+  const handleAddCustomArea = () => {
+     if (customAreaInput.trim() && !selectedAreasList.includes(customAreaInput.trim())) {
+         setSelectedAreasList([...selectedAreasList, customAreaInput.trim()]);
+         setCustomAreaInput('');
+     }
+  };
+
+  const handleEditAddArea = (area: string) => {
+    if (area && !editSelectedAreasList.includes(area)) {
+       setEditSelectedAreasList([...editSelectedAreasList, area]);
+    }
+  };
+
+  const handleEditRemoveArea = (area: string) => {
+      setEditSelectedAreasList(editSelectedAreasList.filter(a => a !== area));
+  };
+
+  const handleEditAddCustomArea = () => {
+     if (editCustomAreaInput.trim() && !editSelectedAreasList.includes(editCustomAreaInput.trim())) {
+         setEditSelectedAreasList([...editSelectedAreasList, editCustomAreaInput.trim()]);
+         setEditCustomAreaInput('');
+     }
+  };
+
+  useEffect(() => {
+    const fetchPins = async () => {
+      const computedAreasArray = selectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
+      if (computedAreasArray.length > 0) {
+        setFetchingPincodes(true);
+        const pins = await fetchPincodesByArea(computedAreasArray);
+        setDiscoveredPincodesList(pins);
+        setFetchingPincodes(false);
+      } else {
+        setDiscoveredPincodesList([]);
+      }
+    };
+    fetchPins();
+  }, [selectedAreasList]);
+
+  useEffect(() => {
+    const fetchEditPins = async () => {
+      const computedAreasArray = editSelectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
+      if (computedAreasArray.length > 0) {
+        setFetchingPincodes(true);
+        const pins = await fetchPincodesByArea(computedAreasArray);
+        setEditDiscoveredPincodesList(pins);
+        setFetchingPincodes(false);
+      } else {
+        setEditDiscoveredPincodesList([]);
+      }
+    };
+    fetchEditPins();
+  }, [editSelectedAreasList]);
+
+  useEffect(() => {
+    const fetchReverse = async () => {
+      const pin = regData.pincode;
+      if (pin.length === 6) {
+        setFetchingPincodes(true);
+        const res = await fetchAreasByPincode(pin);
+        setFetchingPincodes(false);
+        if (res.success) {
+           if (regData.city === 'Bangalore' && !res.isBangalore) {
+               setPincodeError("It is a pin code outside of Bangalore city.");
+               setPincodeAreas([]);
+           } else {
+               setPincodeError(null);
+               setPincodeAreas(res.areas);
+           }
+        } else {
+           setPincodeError("Invalid or unfound PIN code.");
+           setPincodeAreas([]);
+        }
+      } else {
+        setPincodeError(null);
+        setPincodeAreas([]);
+      }
+    };
+    fetchReverse();
+  }, [regData.pincode, regData.city]);
+
+  useEffect(() => {
+    const fetchReverseEdit = async () => {
+      const pin = editData.pincode;
+      if (pin && pin.length === 6) {
+        setFetchingPincodes(true);
+        const res = await fetchAreasByPincode(pin);
+        setFetchingPincodes(false);
+        if (res.success) {
+           if (editData.city === 'Bangalore' && !res.isBangalore) {
+               setEditPincodeError("It is a pin code outside of Bangalore city.");
+               setEditPincodeAreas([]);
+           } else {
+               setEditPincodeError(null);
+               setEditPincodeAreas(res.areas);
+           }
+        } else {
+           setEditPincodeError("Invalid or unfound PIN code.");
+           setEditPincodeAreas([]);
+        }
+      } else {
+        setEditPincodeError(null);
+        setEditPincodeAreas([]);
+      }
+    };
+    fetchReverseEdit();
+  }, [editData.pincode, editData.city]);
 
   const syncUserWithStore = async (email: string) => {
     try {
@@ -300,19 +474,21 @@ export const PartnerPanel: React.FC = () => {
       setIsSubmitting(true);
 
       try {
-        // 1. Convert Address to GPS Coordinates
-        const fullAddressQuery = `${regData.address.trim()}, ${regData.pincode.trim()}, ${finalCityValue}`;
-        let pLat = null;
-        let pLng = null;
-        
-        try {
-            const coords = await getCoordinatesWithGemini(fullAddressQuery);
-            if (coords) {
-                pLat = coords.lat;
-                pLng = coords.lng;
-            }
-        } catch (geocodeError) {
-            console.error("Geocoding error:", geocodeError);
+        const pLat = regData.lat;
+        const pLng = regData.lng;
+
+        // Auto-Discover Pincodes based on multiselect comma separated arrays
+        const computedAreasArray = selectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
+        let discoveredPincodes: string[] = [];
+        if (computedAreasArray.length > 0) {
+            discoveredPincodes = await fetchPincodesByArea(computedAreasArray);
+        }
+
+        // Merge reverse resolved areas and pincodes
+        const finalServiceAreas = Array.from(new Set([...computedAreasArray, ...pincodeAreas]));
+        const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
+        if (regData.pincode && regData.pincode.length === 6 && !pincodeError) {
+             finalServicePincodes.push(regData.pincode);
         }
 
         console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
@@ -334,6 +510,8 @@ export const PartnerPanel: React.FC = () => {
                    address: regData.address,
                    city: finalCityValue,
                    pincode: regData.pincode,
+                   service_areas: finalServiceAreas,
+                   service_pincodes: finalServicePincodes,
                    lat: pLat,
                    lng: pLng,
                    status: 'available',
@@ -379,8 +557,11 @@ export const PartnerPanel: React.FC = () => {
             categories: data.categories || [],
             subCategories: data.sub_categories || [],
             experience: data.experience || '',
-            gender: data.gender || 'Male'
+            gender: data.gender || 'Male',
+            lat: data.lat || null,
+            lng: data.lng || null
         });
+        setEditSelectedAreasList(Array.isArray(data.service_areas) ? data.service_areas : []);
         setIsEditingProfile(true);
     } catch (err: any) {
         console.error("Error fetching profile for edit:", err);
@@ -433,18 +614,20 @@ export const PartnerPanel: React.FC = () => {
       setIsSubmitting(true);
 
       try {
-        const fullAddressQuery = `${editData.address.trim()}, ${editData.pincode.trim()}, ${finalCityValue}`;
-        let pLat = null;
-        let pLng = null;
-        
-        try {
-            const coords = await getCoordinatesWithGemini(fullAddressQuery);
-            if (coords) {
-                pLat = coords.lat;
-                pLng = coords.lng;
-            }
-        } catch (geocodeError) {
-            console.error("Geocoding error:", geocodeError);
+        const pLat = editData.lat;
+        const pLng = editData.lng;
+
+        const computedAreasArray = editSelectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
+        let discoveredPincodes: string[] = [];
+        if (computedAreasArray.length > 0) {
+            discoveredPincodes = await fetchPincodesByArea(computedAreasArray);
+        }
+
+        // Merge reverse resolved areas and pincodes
+        const finalServiceAreas = Array.from(new Set([...computedAreasArray, ...editPincodeAreas]));
+        const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
+        if (editData.pincode && editData.pincode.length === 6 && !editPincodeError) {
+             finalServicePincodes.push(editData.pincode);
         }
 
         const { error } = await supabase
@@ -458,6 +641,8 @@ export const PartnerPanel: React.FC = () => {
                address: editData.address,
                city: finalCityValue,
                pincode: editData.pincode,
+               service_areas: finalServiceAreas,
+               service_pincodes: finalServicePincodes,
                lat: pLat,
                lng: pLng
            })
@@ -525,6 +710,38 @@ export const PartnerPanel: React.FC = () => {
          
          setNotification(`Lead accepted! Contact the customer now.`);
          setLeadToAccept(null);
+
+         // Forwarding Logic: Inform Admin about the acceptance
+         let servicesText = "Services";
+         if (updatedBooking.cartItems && Array.isArray(updatedBooking.cartItems) && updatedBooking.cartItems.length > 0) {
+           servicesText = updatedBooking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
+         } else {
+             servicesText = updatedBooking.subServiceName;
+         }
+
+         let waText = `✅ *LEAD ACCEPTED BY PARTNER* ✅\n\n`;
+         waText += `*👤 PARTNER DETAILS*\n`;
+         waText += `🛠️ *Name:* ${updatedPartner.name}\n`;
+         waText += `📞 *Phone:* ${updatedPartner.phone}\n`;
+         waText += `📍 *Base City:* ${updatedPartner.city}\n\n`;
+
+         waText += `*📋 LEAD DETAILS*\n`;
+         waText += `🎟️ *Order ID:* #${updatedBooking.id.substring(0,6).toUpperCase()}\n`;
+         waText += `👤 *Customer:* ${updatedBooking.customerName}\n`;
+         waText += `📞 *Customer Phone:* ${updatedBooking.contactNumber}\n`;
+         waText += `📍 *Service Address:* ${updatedBooking.address}, ${updatedBooking.pinCode}\n`;
+         waText += `🛠️ *Services:* ${servicesText}\n`;
+         waText += `📅 *Schedule:* ${updatedBooking.date} | ${updatedBooking.time}\n`;
+         waText += `💵 *Price:* ₹${updatedBooking.price}\n\n`;
+         waText += `🔗 *Map:* ${updatedBooking.location_link || 'Not provided'}`;
+
+         const encodedWaText = encodeURIComponent(waText);
+         const adminWaLink = `https://wa.me/919219345455?text=${encodedWaText}`;
+         
+         // Trigger redirect after a short delay so the user sees the notification
+         setTimeout(() => {
+            window.open(adminWaLink, '_blank');
+         }, 1500);
 
     } catch (error) {
          console.error('Error accepting lead:', error);
@@ -718,9 +935,27 @@ export const PartnerPanel: React.FC = () => {
   
   // Filter leads by city as requested
   const availableLeads = bookings.filter(b => {
-      const partnerCity = currentUser?.city || localStorage.getItem('loggedInPartnerCity');
-      if (!partnerCity) return false;
-      return b.status === 'pending' && b.city?.toLowerCase() === partnerCity.toLowerCase();
+      if (!currentUser) return false;
+      if (b.status !== 'pending' && b.status !== 'Forwarded') return false;
+
+      // 1. Category Matching
+      // We check if any of the partner's categories match the lead's service category
+      const partnerCategories = currentUser.categories || [];
+      const categoryMatch = partnerCategories.some(cat => 
+        b.serviceCategory?.toLowerCase().includes(cat.toLowerCase()) || 
+        cat.toLowerCase().includes(b.serviceCategory?.toLowerCase())
+      );
+      
+      if (!categoryMatch) return false;
+
+      // 2. Location Matching: Pincode or Area
+      const partnerPincodes = currentUser.service_pincodes || [];
+      const partnerAreas = currentUser.service_areas || [];
+      
+      const pincodeMatch = b.pinCode && partnerPincodes.includes(b.pinCode);
+      const areaMatch = b.area && partnerAreas.some(a => a.toLowerCase() === b.area!.toLowerCase());
+
+      return pincodeMatch || areaMatch;
   });
 
   const { total: modalTotal, commission: modalCommission } = paymentModal ? { total: paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0), commission: (paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0)) * 0.25 } : { total: 0, commission: 0 };
@@ -822,6 +1057,16 @@ export const PartnerPanel: React.FC = () => {
                   >
                     <i className="fas fa-phone-alt"></i> Call Customer
                   </a>
+                  {(myActiveJob.location_link || (myActiveJob.lat && myActiveJob.lng)) && (
+                    <a 
+                      href={myActiveJob.location_link || `https://www.google.com/maps?q=${myActiveJob.lat},${myActiveJob.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-rose-100 text-rose-600 font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2 hover:bg-rose-200 transition border border-rose-200"
+                    >
+                      <Navigation size={18} /> Track Location
+                    </a>
+                  )}
                   <button
                     onClick={() => handleCompleteService(myActiveJob)}
                     className="flex-1 bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-green-700 transition-all flex justify-center items-center gap-2"
@@ -867,8 +1112,27 @@ export const PartnerPanel: React.FC = () => {
                   <div className="space-y-2 text-sm text-gray-600 mb-6 border-t border-gray-50 pt-3">
                     <p className="flex items-center gap-2 font-medium">
                         <MapPin size={16} className="text-red-400" /> 
-                        {lead.address} - {lead.pinCode}
+                        {lead.address} {lead.area ? `- ${lead.area}` : ''} - {lead.pinCode}
                     </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {lead.lat && lead.lng && currentUser?.lat && currentUser?.lng && (
+                        <p className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
+                          <Navigation size={12} className="animate-pulse" />
+                          {calculateDistanceKM(currentUser.lat, currentUser.lng, lead.lat, lead.lng).toFixed(1)} KM AWAY
+                        </p>
+                      )}
+                      {(lead.location_link || (lead.lat && lead.lng)) && (
+                        <a 
+                          href={lead.location_link || `https://www.google.com/maps?q=${lead.lat},${lead.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 hover:bg-blue-200 transition-colors"
+                        >
+                          <Navigation size={12} />
+                          Track Lead Location
+                        </a>
+                      )}
+                    </div>
                     <p className="flex items-center gap-2"><Clock size={14} className="text-indigo-400" /> {lead.date} | {lead.time}</p>
                   </div>
                   <button
@@ -886,11 +1150,71 @@ export const PartnerPanel: React.FC = () => {
 
       {isRegistrationOpen && (
           <div id="partner-reg-modal" className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex justify-center items-center px-4 animate-fadeIn backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
-              <div className="p-6">
+            
+            {regStep === 'city' ? (
+              <div className="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
+                 <div className="p-8">
+                   <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                     <div>
+                       <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Where do you work? 📍</h2>
+                       <p className="text-gray-500 mt-1">Select your primary city to discover service areas.</p>
+                     </div>
+                     <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
+                       <span className="sr-only">Close</span>
+                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                     </button>
+                   </div>
+
+                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                     {CITY_DATA.map((city) => (
+                        <div 
+                           key={city.name}
+                           onClick={() => {
+                              setRegData(prev => ({ ...prev, city: city.name }));
+                              setRegStep('details');
+                           }}
+                           className="group cursor-pointer rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 transition-all duration-300 relative bg-white"
+                        >
+                           <div className="h-32 overflow-hidden relative">
+                              <img src={city.img} alt={city.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/10 to-transparent"></div>
+                              <div className="absolute bottom-3 left-3 text-white">
+                                 <h3 className="font-bold text-lg leading-tight">{city.name}</h3>
+                                 <p className="text-[10px] font-medium text-gray-200 uppercase tracking-wider">{city.areasCount} active areas</p>
+                              </div>
+                           </div>
+                        </div>
+                     ))}
+                     
+                     <div 
+                        onClick={() => {
+                           setRegData(prev => ({ ...prev, city: 'Others', customCity: '' }));
+                           setRegStep('details');
+                        }}
+                        className="group cursor-pointer rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-300 bg-gray-50 flex flex-col items-center justify-center h-32"
+                     >
+                        <MapPin className="w-8 h-8 text-indigo-400 mb-2 group-hover:text-indigo-600 transition-colors" />
+                        <h3 className="font-bold text-gray-700 text-sm">Other City</h3>
+                     </div>
+                   </div>
+                 </div>
+              </div>
+            ) : (
+            
+            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
+              <div className="p-6 md:p-8">
                 <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-                   <h2 className="text-2xl font-bold text-gray-800">Complete Your Partner Profile 🛠️</h2>
-                   <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:text-gray-600">
+                   <div className="flex flex-col">
+                      <button 
+                        onClick={() => setRegStep('city')}
+                        className="text-xs text-indigo-600 font-bold hover:text-indigo-800 flex items-center mb-1 w-fit"
+                      >
+                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                         Back to Cities
+                      </button>
+                      <h2 className="text-2xl font-bold text-gray-800">Complete Your Partner Profile 🛠️</h2>
+                   </div>
+                   <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
                      <span className="sr-only">Close</span>
                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                    </button>
@@ -998,71 +1322,155 @@ export const PartnerPanel: React.FC = () => {
                           />
                        </div>
                     </div>
-                    <div>
-                       <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Location Details</h3>
-                       <div className="space-y-3">
-                          <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Select Your City <span className="text-red-500">*</span></label>
-                              <select 
-                                id="partner-city" 
-                                required 
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none bg-white cursor-pointer appearance-none"
-                                value={regData.city}
-                                onChange={(e) => setRegData({...regData, city: e.target.value})}
-                              >
-                                  <option value="" disabled>Tap to select your city...</option>
-                                  <option value="Ahmedabad">Ahmedabad</option>
-                                  <option value="Bangalore">Bangalore</option>
-                                  <option value="Bhubaneswar">Bhubaneswar</option>
-                                  <option value="Chennai">Chennai</option>
-                                  <option value="Delhi">Delhi</option>
-                                  <option value="Faridabad">Faridabad</option>
-                                  <option value="Ghaziabad">Ghaziabad</option>
-                                  <option value="Gurgaon">Gurgaon</option>
-                                  <option value="Hyderabad">Hyderabad</option>
-                                  <option value="Kochi">Kochi</option>
-                                  <option value="Kolkata">Kolkata</option>
-                                  <option value="Lucknow">Lucknow</option>
-                                  <option value="Mysore">Mysore</option>
-                                  <option value="NCR">NCR</option>
-                                  <option value="Noida">Noida</option>
-                                  <option value="Patna">Patna</option>
-                                  <option value="Pune">Pune</option>
-                                  <option value="Mumbai">Mumbai</option>
-                                  <option value="Surat">Surat</option>
-                                  <option value="Vadodara">Vadodara</option>
-                                  <option value="Vizag">Vizag</option>
-                                  <option value="Others" className="font-bold text-indigo-600">Others (Please specify)</option>
-                              </select>
-                              
-                              {regData.city === 'Others' && (
+                     <div>
+                       <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Service Areas ({regData.city === 'Others' ? regData.customCity : regData.city})</h3>
+                       
+                       {regData.city === 'Others' && (
+                           <input 
+                               type="text" 
+                               id="other-city-input" 
+                               placeholder="Type your city name" 
+                               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
+                               value={regData.customCity}
+                               onChange={(e) => setRegData({...regData, customCity: e.target.value})}
+                               required
+                           />
+                       )}
+
+                       <div className="space-y-4">
+                          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Available Areas</label>
+                             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).map(area => (
+                                   <div 
+                                      key={area}
+                                      onClick={() => handleAddArea(area)}
+                                      className="bg-white border border-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-full cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center gap-1 shadow-sm"
+                                   >
+                                      <Plus size={14} /> {area}
+                                   </div>
+                                ))}
+                                {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).length === 0 && (
+                                   <span className="text-sm text-gray-400 italic py-1">No predefined areas left to select.</span>
+                                )}
+                             </div>
+                             
+                             <div className="mt-4 flex gap-2">
                                 <input 
-                                    type="text" 
-                                    id="other-city-input" 
-                                    placeholder="Type your city name" 
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
-                                    value={regData.customCity}
-                                    onChange={(e) => setRegData({...regData, customCity: e.target.value})}
-                                    required
+                                   type="text"
+                                   placeholder="Add a custom area..."
+                                   className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                   value={customAreaInput}
+                                   onChange={(e) => setCustomAreaInput(e.target.value)}
+                                   onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                         e.preventDefault();
+                                         handleAddCustomArea();
+                                      }
+                                   }}
                                 />
-                              )}
+                                <button
+                                   type="button"
+                                   onClick={handleAddCustomArea}
+                                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700"
+                                >
+                                   Add
+                                </button>
+                             </div>
                           </div>
+
+                          <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 min-h-[100px]">
+                             <label className="block text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center justify-between">
+                                Selected Service Areas
+                                <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">{selectedAreasList.length}</span>
+                             </label>
+                             {selectedAreasList.length === 0 ? (
+                                <div className="text-center py-6 border-2 border-dashed border-indigo-200 rounded-lg text-indigo-400 text-sm">
+                                   Click '+' to add areas or type below.
+                                </div>
+                             ) : (
+                                <div className="flex flex-wrap gap-2">
+                                   {selectedAreasList.map(area => (
+                                      <div 
+                                         key={area}
+                                         className="bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 group"
+                                      >
+                                         {area}
+                                         <button 
+                                            type="button" 
+                                            onClick={() => handleRemoveArea(area)}
+                                            className="w-4 h-4 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center transition"
+                                         >
+                                            <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                         </button>
+                                      </div>
+                                   ))}
+                                </div>
+                             )}
+                          </div>
+                          
                           <input 
                             type="number" 
-                            placeholder="Area Pincode" 
-                            required 
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="Other service area pin code" 
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none mt-2 ${pincodeError ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}`}
                             value={regData.pincode}
                             onChange={(e) => setRegData({...regData, pincode: e.target.value})}
                           />
-                          <textarea 
-                             placeholder="Full Address" 
-                             required
-                             rows={2}
-                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                             value={regData.address}
-                             onChange={(e) => setRegData({...regData, address: e.target.value})}
-                          ></textarea>
+                          {pincodeError && <p className="text-red-500 text-xs mt-1 font-medium">{pincodeError}</p>}
+                          {pincodeAreas.length > 0 && !pincodeError && (
+                             <p className="text-emerald-600 text-xs mt-1 font-medium bg-emerald-50 p-1.5 rounded inline-block">
+                                📍 Areas found: {pincodeAreas.join(', ')}
+                             </p>
+                          )}
+                          
+                          {/* Auto Discovered Pincodes Display */}
+                          {selectedAreasList.length > 0 && (
+                            <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
+                               <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
+                                  Auto-Fetched Pincodes
+                                  {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
+                               </label>
+                               <div className="text-sm text-green-700">
+                                  {fetchingPincodes ? (
+                                      <span className="opacity-70">Fetching from India Post...</span>
+                                  ) : discoveredPincodesList.length > 0 ? (
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                         {discoveredPincodesList.map(pin => (
+                                            <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
+                                              {pin}
+                                            </span>
+                                         ))}
+                                      </div>
+                                  ) : (
+                                      <span className="opacity-70">No pincodes found for selected areas.</span>
+                                  )}
+                               </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-bold text-gray-500 uppercase ml-1">Home Address</label>
+                              <button 
+                                type="button" 
+                                onClick={() => handleTrackLocation(false)} 
+                                disabled={isTrackingLocation || !!(regData.lat && regData.lng)}
+                                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-green-600 flex items-center gap-1"
+                              >
+                                {regData.lat && regData.lng ? '✓ Location Saved' : isTrackingLocation ? 'Locating...' : '📍 Auto-Detect Location'}
+                              </button>
+                            </div>
+                            <textarea 
+                              placeholder="Full Address" 
+                              required
+                              rows={2}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                              value={regData.address}
+                              onChange={(e) => setRegData({...regData, address: e.target.value})}
+                            ></textarea>
+                          </div>
                        </div>
                     </div>
                   </div>
@@ -1081,6 +1489,7 @@ export const PartnerPanel: React.FC = () => {
                 </form>
               </div>
             </div>
+            )}
           </div>
         )}
 
@@ -1169,68 +1578,154 @@ export const PartnerPanel: React.FC = () => {
 
                   {/* Location */}
                   <div>
-                     <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Location Details</h3>
-                     <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Your City <span className="text-red-500">*</span></label>
-                            <select 
-                              required 
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none bg-white cursor-pointer appearance-none"
-                              value={editData.city}
-                              onChange={(e) => setEditData({...editData, city: e.target.value})}
+                     <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Service Areas ({editData.city === 'Others' ? editData.customCity : editData.city})</h3>
+                       
+                       {editData.city === 'Others' && (
+                           <input 
+                               type="text" 
+                               id="edit-other-city-input" 
+                               placeholder="Type your city name" 
+                               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
+                               value={editData.customCity}
+                               onChange={(e) => setEditData({...editData, customCity: e.target.value})}
+                               required
+                           />
+                       )}
+
+                       <div className="space-y-4">
+                          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Available Areas in {editData.city}</label>
+                             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                {(PREDEFINED_AREAS[editData.city] || []).filter(a => !editSelectedAreasList.includes(a)).map(area => (
+                                   <div 
+                                      key={area}
+                                      onClick={() => handleEditAddArea(area)}
+                                      className="bg-white border border-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-full cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center gap-1 shadow-sm"
+                                   >
+                                      <Plus size={14} /> {area}
+                                   </div>
+                                ))}
+                                {(PREDEFINED_AREAS[editData.city] || []).filter(a => !editSelectedAreasList.includes(a)).length === 0 && (
+                                   <span className="text-sm text-gray-400 italic py-1">No predefined areas left to select.</span>
+                                )}
+                             </div>
+                             
+                             <div className="mt-4 flex gap-2">
+                                <input 
+                                   type="text"
+                                   placeholder="Add a custom area..."
+                                   className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                   value={editCustomAreaInput}
+                                   onChange={(e) => setEditCustomAreaInput(e.target.value)}
+                                   onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                         e.preventDefault();
+                                         handleEditAddCustomArea();
+                                      }
+                                   }}
+                                />
+                                <button
+                                   type="button"
+                                   onClick={handleEditAddCustomArea}
+                                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700"
+                                >
+                                   Add
+                                </button>
+                             </div>
+                          </div>
+
+                          <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 min-h-[100px]">
+                             <label className="block text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center justify-between">
+                                Selected Service Areas
+                                <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">{editSelectedAreasList.length}</span>
+                             </label>
+                             {editSelectedAreasList.length === 0 ? (
+                                <div className="text-center py-6 border-2 border-dashed border-indigo-200 rounded-lg text-indigo-400 text-sm">
+                                   Click '+' to add areas or type below.
+                                </div>
+                             ) : (
+                                <div className="flex flex-wrap gap-2">
+                                   {editSelectedAreasList.map(area => (
+                                      <div 
+                                         key={area}
+                                         className="bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 group"
+                                      >
+                                         {area}
+                                         <button 
+                                            type="button" 
+                                            onClick={() => handleEditRemoveArea(area)}
+                                            className="w-4 h-4 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center transition"
+                                         >
+                                            <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                         </button>
+                                      </div>
+                                   ))}
+                                </div>
+                             )}
+                          </div>
+                          
+                          <input 
+                            type="number" 
+                            placeholder="Other service area pin code" 
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none mt-2 ${editPincodeError ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}`}
+                            value={editData.pincode}
+                            onChange={(e) => setEditData({...editData, pincode: e.target.value})}
+                          />
+                          {editPincodeError && <p className="text-red-500 text-xs mt-1 font-medium">{editPincodeError}</p>}
+                          {editPincodeAreas.length > 0 && !editPincodeError && (
+                             <p className="text-emerald-600 text-xs mt-1 font-medium bg-emerald-50 p-1.5 rounded inline-block">
+                                📍 Areas found: {editPincodeAreas.join(', ')}
+                             </p>
+                          )}
+                          
+                          {/* Auto Discovered Pincodes Display */}
+                          {editSelectedAreasList.length > 0 && (
+                            <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
+                               <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
+                                  Auto-Fetched Pincodes
+                                  {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
+                               </label>
+                               <div className="text-sm text-green-700">
+                                  {fetchingPincodes ? (
+                                      <span className="opacity-70">Fetching from India Post...</span>
+                                  ) : editDiscoveredPincodesList.length > 0 ? (
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                         {editDiscoveredPincodesList.map(pin => (
+                                            <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
+                                              {pin}
+                                            </span>
+                                         ))}
+                                      </div>
+                                  ) : (
+                                      <span className="opacity-70">No pincodes found for selected areas.</span>
+                                  )}
+                               </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Manual Address</label>
+                            <button 
+                              type="button" 
+                              onClick={() => handleTrackLocation(true)} 
+                              disabled={isTrackingLocation || !!(editData.lat && editData.lng)}
+                              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-green-600 flex items-center gap-1"
                             >
-                                <option value="" disabled>Tap to select your city...</option>
-                                <option value="Ahmedabad">Ahmedabad</option>
-                                <option value="Bangalore">Bangalore</option>
-                                <option value="Bhubaneswar">Bhubaneswar</option>
-                                <option value="Chennai">Chennai</option>
-                                <option value="Delhi">Delhi</option>
-                                <option value="Faridabad">Faridabad</option>
-                                <option value="Ghaziabad">Ghaziabad</option>
-                                <option value="Gurgaon">Gurgaon</option>
-                                <option value="Hyderabad">Hyderabad</option>
-                                <option value="Kochi">Kochi</option>
-                                <option value="Kolkata">Kolkata</option>
-                                <option value="Lucknow">Lucknow</option>
-                                <option value="Mysore">Mysore</option>
-                                <option value="NCR">NCR</option>
-                                <option value="Noida">Noida</option>
-                                <option value="Patna">Patna</option>
-                                <option value="Pune">Pune</option>
-                                <option value="Mumbai">Mumbai</option>
-                                <option value="Surat">Surat</option>
-                                <option value="Vadodara">Vadodara</option>
-                                <option value="Vizag">Vizag</option>
-                                <option value="Others" className="font-bold text-indigo-600">Others (Please specify)</option>
-                            </select>
-                            
-                            {editData.city === 'Others' && (
-                              <input 
-                                  type="text" 
-                                  placeholder="Type your city name" 
-                                  className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-2 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
-                                  value={editData.customCity}
-                                  onChange={(e) => setEditData({...editData, customCity: e.target.value})}
-                                  required
-                              />
-                            )}
+                              {editData.lat && editData.lng ? '✓ Location Saved' : isTrackingLocation ? 'Locating...' : '📍 Auto-Detect Location'}
+                            </button>
+                          </div>
+                          <textarea 
+                             placeholder="Full Address" 
+                             required
+                             rows={2}
+                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                             value={editData.address}
+                             onChange={(e) => setEditData({...editData, address: e.target.value})}
+                          ></textarea>
                         </div>
-                        <input 
-                          type="number" 
-                          placeholder="Area Pincode" 
-                          required 
-                          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                          value={editData.pincode}
-                          onChange={(e) => setEditData({...editData, pincode: e.target.value})}
-                        />
-                        <textarea 
-                           placeholder="Full Address" 
-                           required
-                           rows={2}
-                           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                           value={editData.address}
-                           onChange={(e) => setEditData({...editData, address: e.target.value})}
-                        ></textarea>
                      </div>
                   </div>
 

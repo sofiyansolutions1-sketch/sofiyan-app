@@ -11,25 +11,27 @@ export const useStore = () => {
   const mapBookingFromDB = (data: any): Booking => ({
     id: data.id,
     customerName: data.customer_name,
-    contactNumber: data.contact_number,
-    address: data.address,
+    contactNumber: data.customer_phone || data.contact_number,
+    address: data.customer_address || data.address,
+    area: data.area || '', 
     city: data.city,
     location_link: data.location_link,
-    pinCode: data.pin_code,
+    pinCode: data.pincode || data.pin_code,
     description: '', // Not in schema
-    date: data.date,
-    time: data.time,
+    date: data.service_date || data.date,
+    time: data.service_time || data.time,
     serviceCategory: data.service_category,
     subServiceName: data.sub_service_name,
     cartItems: data.cart_items,
-    price: data.price,
+    price: data.total_price || data.price,
     status: data.status,
     assignedPartnerId: data.assigned_partner_id,
     assignedPartnerName: data.assigned_partner_name,
     assignedPartnerPhone: data.assigned_partner_phone,
-    commissionPaid: false, // Not in schema
+    assignedPartnerArea: data.assigned_partner_area || '', 
+    commissionPaid: data.commission_paid || false,
     createdAt: data.created_at,
-    couponUsed: '', // Not in schema
+    couponUsed: data.coupon_used || '',
     discountAmount: data.discount_amount,
     appliedReferralCode: data.applied_referral_code
   });
@@ -128,8 +130,9 @@ export const useStore = () => {
         assigned_partner_id: updatedBooking.assignedPartnerId || null,
         assigned_partner_name: updatedBooking.assignedPartnerName || null,
         assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
-        date: updatedBooking.date,
-        time: updatedBooking.time
+        assigned_partner_area: updatedBooking.assignedPartnerArea || null,
+        service_date: updatedBooking.date,
+        service_time: updatedBooking.time
     }).eq('id', updatedBooking.id);
     
     if (error) {

@@ -31,6 +31,7 @@ export interface Booking {
   customerName: string;
   contactNumber: string;
   address: string;
+  area?: string; // Added area field
   city: string; // Added city field
   location?: string;
   location_link?: string;
@@ -48,6 +49,7 @@ export interface Booking {
   assignedPartnerId?: string;
   assignedPartnerName?: string;
   assignedPartnerPhone?: string;
+  assignedPartnerArea?: string;
   commissionPaid: boolean;
   createdAt: string;
   couponUsed?: string;
@@ -72,6 +74,8 @@ export interface Partner {
   categories?: string[];
   sub_categories?: string[];
   experience?: string;
+  service_areas?: string[];
+  service_pincodes?: string[];
   password?: string;
   status: 'available' | 'busy' | 'on_hold' | 'blocked';
   rating?: number;

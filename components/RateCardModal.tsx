@@ -8,7 +8,7 @@ interface RateCardItem {
   price: string;
 }
 
-export const rateCardDatabase: Record<string, Record<string, RateCardItem[]>> = {
+const rateCardDatabase: Record<string, Record<string, RateCardItem[]>> = {
   "AC Service": {
     "Electrical Parts": [
       { name: "Non-Inverter PCB repaired", price: "₹1650" },

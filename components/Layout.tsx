@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star, FileText } from 'lucide-react';
-import { BUSINESS_NAME } from '../constants';
+import { BUSINESS_NAME, CITY_DATA } from '../constants';
+import { Modal } from './Modal';
+import { CheckCircle, MapPin } from 'lucide-react';
 
 const siteContent = {
   about: {
@@ -45,22 +47,37 @@ const siteContent = {
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [activeContent, setActiveContent] = useState<keyof typeof siteContent | null>(null);
-  const [userLocation, setUserLocation] = useState<string | null>(null);
+  const [userCity, setUserCity] = useState<string | null>(localStorage.getItem('preferredCity'));
+  const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
   React.useEffect(() => {
-    // Check for saved location on mount
-    const saved = sessionStorage.getItem('userLocation');
-    if (saved) {
-      setUserLocation(saved);
+    // Show city modal if none is selected
+    if (!userCity) {
+      setIsCityModalOpen(true);
     }
 
     // Listen for custom event if we want to update it from outside React
     const handleLocationUpdate = () => {
-      setUserLocation(sessionStorage.getItem('userLocation'));
+      setUserCity(localStorage.getItem('preferredCity'));
     };
     window.addEventListener('locationUpdated', handleLocationUpdate);
-    return () => window.removeEventListener('locationUpdated', handleLocationUpdate);
-  }, []);
+    window.addEventListener('cityUpdated', handleLocationUpdate);
+    
+    // Polyfill global openLocationModal to open our React City Modal
+    (window as any).openLocationModal = () => setIsCityModalOpen(true);
+
+    return () => {
+      window.removeEventListener('locationUpdated', handleLocationUpdate);
+      window.removeEventListener('cityUpdated', handleLocationUpdate);
+    };
+  }, [userCity]);
+
+  const handleCitySelect = (cityName: string) => {
+    setUserCity(cityName);
+    localStorage.setItem('preferredCity', cityName);
+    window.dispatchEvent(new Event('cityUpdated'));
+    setIsCityModalOpen(false);
+  };
 
   const openContent = (key: keyof typeof siteContent) => {
     setActiveContent(key);
@@ -89,11 +106,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             
             {/* Desktop Menu */}
             <div className="hidden lg:flex items-center space-x-4 xl:space-x-8">
-              <button onClick={() => {
-                if ((window as any).openLocationModal) (window as any).openLocationModal();
-              }} className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition text-sm font-bold mr-2">
-                  <i className="fas fa-map-marker-alt text-indigo-500"></i>
-                  <span id="header-location-display" className="truncate max-w-[100px] xl:max-w-[150px]">{userLocation ? userLocation.split(',')[0] : "Select Location"}</span>
+              <button 
+                onClick={() => setIsCityModalOpen(true)} 
+                className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition text-sm font-bold mr-2 border border-transparent hover:border-indigo-200"
+              >
+                  <MapPin size={16} className="text-indigo-500" />
+                  <span className="truncate max-w-[100px] xl:max-w-[150px]">{userCity || "Select City"}</span>
                   <i className="fas fa-chevron-down text-xs ml-1"></i>
               </button>
               <NavLink to="/" icon={<Home size={18} />} label="Customer" />
@@ -259,6 +277,47 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
         </div>
       )}
+
+      {/* Global City Selection Modal */}
+      <Modal
+          isOpen={isCityModalOpen}
+          onClose={() => { if (userCity) setIsCityModalOpen(false); }}
+          title="📍 Choose Your City"
+        >
+           <div className="py-4">
+              <p className="text-center text-gray-500 mb-8 max-w-sm mx-auto">
+                 Unlock expert home services in your neighborhood. Start by selecting your city.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                 {CITY_DATA.map(city => (
+                    <button
+                       key={city.name}
+                       onClick={() => handleCitySelect(city.name)}
+                       className="group relative rounded-2xl overflow-hidden aspect-square shadow-md border hover:border-indigo-500 transition-all transform hover:-translate-y-1"
+                    >
+                       <img 
+                          src={city.img} 
+                          alt={city.name} 
+                          className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                       />
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-3">
+                          <p className="text-white font-bold text-sm tracking-tight">{city.name}</p>
+                          <p className="text-white/70 text-[10px]">{city.areasCount}+ areas</p>
+                       </div>
+                    </button>
+                 ))}
+              </div>
+              <div className="mt-8 bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex items-center gap-3">
+                 <div className="bg-white p-2 rounded-lg text-indigo-600 shadow-sm">
+                    <CheckCircle size={20} />
+                 </div>
+                 <p className="text-xs text-indigo-800 font-medium italic">
+                    "Trusted by 50,000+ households for quality home maintenance."
+                 </p>
+              </div>
+           </div>
+        </Modal>
     </div>
   );
 };

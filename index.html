@@ -63,43 +63,6 @@
   <body>
     <div id="root"></div>
 
-    <!-- Premium Location Picker Modal -->
-    <div id="location-picker-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-            <div class="bg-indigo-500 p-5 text-white relative">
-                <button onclick="closeLocationModal()" class="absolute top-4 right-4 text-white hover:text-gray-200">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-                <div class="flex items-center space-x-3 mb-1">
-                    <div class="bg-white bg-opacity-20 p-2 rounded-full">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold">Choose your Location</h3>
-                </div>
-                <p class="text-indigo-100 text-xs ml-11">Search for your location or use current location</p>
-            </div>
-            
-            <div class="p-6">
-                <div class="relative mb-5">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                    <input type="text" id="location-search-input" placeholder="Choose your Location" class="w-full border-2 border-indigo-100 rounded-xl pl-10 pr-4 py-3 text-sm outline-none focus:border-indigo-500 transition-colors font-medium text-gray-700" oninput="handleLocationSearch(this.value)">
-                    
-                    <div id="location-suggestions" class="absolute z-10 w-full bg-white border border-gray-100 shadow-lg rounded-xl mt-1 hidden max-h-48 overflow-y-auto"></div>
-                </div>
-                
-                <button onclick="autoDetectGPS()" class="w-full bg-gray-50 hover:bg-indigo-50 border border-gray-100 rounded-xl p-4 flex items-center space-x-4 transition-colors group">
-                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                        <i class="fas fa-location-arrow"></i>
-                    </div>
-                    <div class="text-left">
-                        <h4 class="font-bold text-gray-800 group-hover:text-indigo-700">Get Current Location</h4>
-                        <p class="text-xs text-gray-500">Using GPS</p>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Smart Address Matcher Modal -->
     <div id="text-match-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-all">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col scale-100 transition-transform">
@@ -144,27 +107,32 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="flex flex-1 overflow-hidden relative pb-20">
-            <!-- Sidebar (Subcategories) -->
-            <div id="full-modal-sidebar" class="w-1/3 md:w-64 bg-slate-100 border-r border-slate-200 overflow-y-auto custom-scrollbar">
+        <div class="flex flex-1 flex-col md:flex-row overflow-hidden relative pb-20">
+            <!-- Sidebar / Top Categories (Responsive) -->
+            <div id="full-modal-sidebar" class="flex flex-row md:flex-col w-full md:w-64 bg-white md:bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 overflow-x-auto md:overflow-y-auto custom-scrollbar flex-shrink-0 z-10">
                 <!-- Subcategory items injected here -->
             </div>
 
             <!-- Services List -->
-            <div id="full-modal-services-content" class="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar scroll-smooth">
+            <div id="full-modal-services-content" class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-6 custom-scrollbar scroll-smooth bg-slate-50/30">
                 <!-- Service sections injected here -->
             </div>
         </div>
 
         <!-- Sticky Bottom Bar -->
-        <div id="full-modal-bottom-bar" class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] hidden z-20">
-            <div class="max-w-3xl mx-auto flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wider"><span id="full-modal-total-items">0 items</span></p>
-                    <p id="full-modal-total-price" class="text-xl font-bold text-slate-900">₹0</p>
+        <div id="full-modal-bottom-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 shadow-[0_-10px_40px_-5px_rgba(79,70,229,0.1)] hidden z-20">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-100 hidden sm:block">
+                        <i class="fas fa-shopping-bag text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1"><span id="full-modal-total-items">0 items</span> in cart</p>
+                        <p id="full-modal-total-price" class="text-2xl font-black text-indigo-950">₹0</p>
+                    </div>
                 </div>
-                <button onclick="proceedToCheckout()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-700 transition-colors shadow-md">
-                    Continue <i class="fas fa-arrow-right"></i>
+                <button onclick="proceedToCheckout()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-xl shadow-indigo-200 active:scale-95 text-sm uppercase tracking-wider">
+                    Checkout <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -324,145 +292,6 @@
           }
       };
 
-      document.addEventListener("DOMContentLoaded", function() {
-          // Check sessionStorage instead of localStorage
-          const hasSeenLocationModal = sessionStorage.getItem('locationModalSeen');
-          
-          if (!hasSeenLocationModal) {
-              // Add a small delay for a smooth effect
-              setTimeout(() => {
-                  openLocationModal();
-              }, 500);
-          }
-      });
-
-      window.openLocationModal = function() {
-          document.getElementById('location-picker-modal').classList.remove('hidden');
-      };
-
-      window.closeLocationModal = function() {
-          document.getElementById('location-picker-modal').classList.add('hidden');
-          // Mark as seen for this specific browsing session only
-          sessionStorage.setItem('locationModalSeen', 'true');
-      };
-
-      let locationSearchTimeout = null;
-
-      window.handleLocationSearch = function(query) {
-          clearTimeout(locationSearchTimeout);
-          const suggestionsBox = document.getElementById('location-suggestions');
-          
-          if (!query || query.length < 3) {
-              suggestionsBox.classList.add('hidden');
-              return;
-          }
-
-          // Show loading text
-          suggestionsBox.innerHTML = '<div class="p-3 text-sm text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
-          suggestionsBox.classList.remove('hidden');
-
-          // Debounce for 500ms
-          locationSearchTimeout = setTimeout(async () => {
-              try {
-                  const data = await window.getAddressSuggestions(query);
-                  
-                  suggestionsBox.innerHTML = '';
-                  
-                  if (!data || data.length === 0) {
-                      suggestionsBox.innerHTML = '<div class="p-3 text-sm text-red-500">No results found</div>';
-                      return;
-                  }
-
-                  data.forEach(place => {
-                      // Make the address look cleaner
-                      const cleanAddress = place.display_name.split(',').slice(0, 3).join(', ');
-                      
-                      const div = document.createElement('div');
-                      div.className = "p-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-100 flex items-start space-x-2 transition";
-                      div.innerHTML = `
-                          <i class="fas fa-map-pin text-gray-400 mt-1"></i>
-                          <div>
-                              <p class="text-sm font-bold text-gray-800">${place.name || place.display_name.split(',')[0]}</p>
-                              <p class="text-xs text-gray-500">${cleanAddress}</p>
-                          </div>
-                      `;
-                      div.onclick = () => selectLocation(cleanAddress);
-                      suggestionsBox.appendChild(div);
-                  });
-              } catch (error) {
-                  console.error("Search Error:", error);
-                  suggestionsBox.innerHTML = '<div class="p-3 text-sm text-red-500">Error fetching results.</div>';
-              }
-          }, 500);
-      };
-
-      window.selectLocation = function(addressText) {
-          // 1. Update the Header UI
-          const headerDisplay = document.getElementById('header-location-display');
-          if(headerDisplay) headerDisplay.innerText = addressText.split(',')[0];
-          
-          // 2. ONLY update the CITY input in the checkout form (extract city name)
-          const cityInput = document.getElementById('checkout-city'); // Ensure this ID matches your City input
-          if(cityInput) {
-              // We use the native setter to ensure React picks up the change if it's a controlled component
-              const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-              nativeInputValueSetter.call(cityInput, addressText.split(',')[0]);
-              cityInput.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-          
-          // Also update session storage and dispatch event for React to pick up
-          sessionStorage.setItem('userLocation', addressText);
-          window.dispatchEvent(new Event('locationUpdated'));
-          
-          // 3. Clear the search and close modal
-          document.getElementById('location-search-input').value = '';
-          document.getElementById('location-suggestions').classList.add('hidden');
-          closeLocationModal();
-      };
-
-      window.autoDetectGPS = function() {
-          const btnText = document.querySelector('button[onclick="autoDetectGPS()"] h4');
-          const originalText = btnText.innerText;
-          btnText.innerHTML = 'Locating... <i class="fas fa-spinner fa-spin ml-2"></i>';
-          
-          if (!navigator.geolocation) {
-              alert("Your browser doesn't support GPS location.");
-              btnText.innerText = originalText;
-              return;
-          }
-
-          navigator.geolocation.getCurrentPosition(
-              async (position) => {
-                  const lat = position.coords.latitude;
-                  const lng = position.coords.longitude;
-                  
-                  try {
-                      // Reverse geocode to get the text address
-                      const address = await window.reverseGeocodeWithGemini(lat, lng);
-                      if (address) {
-                          const cleanAddress = address.split(',').slice(0, 3).join(', ');
-                          selectLocation(cleanAddress);
-                      } else {
-                          throw new Error("Address not found");
-                      }
-                  } catch (error) {
-                      alert("Could not fetch address details for your location.");
-                      btnText.innerText = originalText;
-                  }
-              },
-              (error) => {
-                  console.error("GPS Error:", error);
-                  let msg = "Location error.";
-                  if (error.code === 1) msg = "You denied location permission. Please allow it in your browser settings.";
-                  if (error.code === 2) msg = "Location unavailable. Check your device GPS.";
-                  if (error.code === 3) msg = "Request timed out.";
-                  alert(msg);
-                  btnText.innerText = originalText;
-              },
-              { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-          );
-      };
-
       // --- Simplified Full-Screen Modal Logic ---
       window.masterServicesData = {
   "Electrician": {
@@ -484,7 +313,7 @@
   },
   "AC": {
     "Service": [ {name: "AC Basic Check-up/Cooling", price: 399}, {name: "AC Power Issue Repair", price: 499}, {name: "Premium AC Service (Split)", price: 499}, {name: "Premium AC Service (Window)", price: 399}, {name: "Foam & Power Jet AC Service (Split)", price: 799}, {name: "Foam & Power Jet AC Service (Window)", price: 699}, {name: "Anti-Rust Deep Clean AC Service (Split)", price: 999}, {name: "Anti-Rust Deep Clean AC Service (Window)", price: 899} ],
-    "Repair": [ {name: "AC Repair (Split)", price: 499}, {name: "AC Repair (Window)", price: 399}, {name: "Gas Leak Fix & Refill (Split)", price: 2499}, {name: "Gas Leak Fix & Refill (Window)", price: 2299}, {name: "AC PCB Repair", price: 1499}, {name: "AC Compressor Replacement", price: 3499} ],
+    "Repair": [ {name: "AC Checkup (Split)", price: 499}, {name: "AC Checkup (Window)", price: 399}, {name: "Gas Leak Fix & Refill (Split)", price: 2499}, {name: "Gas Leak Fix & Refill (Window)", price: 2299}, {name: "AC PCB Repair", price: 1499}, {name: "AC Compressor Replacement", price: 3499} ],
     "Install/Uninstall": [ {name: "AC Installation (Split)", price: 1499}, {name: "AC Installation (Window)", price: 999}, {name: "AC Uninstallation (Split)", price: 699}, {name: "AC Uninstallation (Window)", price: 499} ]
   },
   "WashingMachine": {
@@ -543,14 +372,15 @@
           // Render Sidebar
           subcategories.forEach((subcat, index) => {
               const btn = document.createElement('button');
-              btn.className = `w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors ${index === 0 ? 'bg-white text-indigo-700 border-l-4 border-l-indigo-600' : 'text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent'}`;
+              // Responsive classes: flex-shrink-0 for mobile horizontal scroll, w-full for desktop vertical list
+              btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 ${index === 0 ? 'bg-indigo-50/50 text-indigo-700 border-indigo-600 md:border-l-4' : 'text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent'}`;
               btn.textContent = subcat;
               btn.onclick = () => {
                   // Update active state
                   Array.from(sidebar.children).forEach(c => {
-                      c.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent';
+                      c.className = 'flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent';
                   });
-                  btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors bg-white text-indigo-700 border-l-4 border-l-indigo-600';
+                  btn.className = 'flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4';
                   
                   // Scroll to section
                   const section = document.getElementById(`section-${subcat.replace(/\s+/g, '-')}`);
@@ -568,17 +398,17 @@
           subcategories.forEach(subcat => {
               const section = document.createElement('div');
               section.id = `section-${subcat.replace(/\s+/g, '-')}`;
-              section.className = 'mb-8';
+              section.className = 'mb-10';
               
-              const sectionTitle = document.createElement('h3');
-              sectionTitle.className = 'font-bold text-lg text-slate-800 mb-4 sticky top-0 bg-slate-50 py-2 z-10';
-              sectionTitle.textContent = subcat;
+              const sectionTitle = document.createElement('div');
+              sectionTitle.className = 'sticky top-0 bg-white/80 backdrop-blur-md py-3 px-4 -mx-4 mb-4 z-10 border-b border-slate-100 flex items-center gap-2';
+              sectionTitle.innerHTML = `<div class="w-1.5 h-5 bg-indigo-600 rounded-full"></div><h3 class="font-black text-slate-900 uppercase tracking-tight">${subcat}</h3>`;
               section.appendChild(sectionTitle);
 
               const servicesList = document.createElement('div');
-              servicesList.className = 'space-y-3';
+              servicesList.className = 'grid grid-cols-1 gap-4';
 
-              categoryData[subcat].forEach(service => {
+              categoryData[subcat].forEach((service, index) => {
                   // Generate a unique ID if not present
                   const serviceId = service.id || `${categoryName}-${subcat}-${service.name}`.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
                   
@@ -590,34 +420,42 @@
                   }
 
                   const card = document.createElement('div');
-                  card.className = 'bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex justify-between items-center';
+                  card.className = 'relative bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-all flex justify-between items-center group overflow-hidden';
                   
-                  const originalPriceHtml = service.originalPrice ? `<span class="text-sm text-slate-400 line-through">₹${service.originalPrice}</span>` : '';
+                  // Add pseudo-random badge
+                  const hasBadge = (index + subcat.length) % 3 === 0;
+                  const badgeHtml = hasBadge ? `<div class="absolute top-0 left-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded-br-lg shadow-sm z-[5]">⭐ BESTSELLER</div>` : '';
+
+                  const originalPrice = Math.round(service.price * 1.35);
+                  const discount = 26;
                   
                   let buttonHtml = '';
                   if (qty > 0) {
                       buttonHtml = `
-                          <div class="flex items-center bg-indigo-50 rounded-lg border border-indigo-200 overflow-hidden h-10">
-                              <button onclick="decreaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-8 h-full flex items-center justify-center text-indigo-700 font-bold hover:bg-indigo-100 transition-colors">-</button>
-                              <span class="w-8 text-center font-bold text-indigo-900 text-sm flex items-center justify-center">${qty}</span>
-                              <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-8 h-full flex items-center justify-center text-indigo-700 font-bold hover:bg-indigo-100 transition-colors">+</button>
+                          <div class="flex items-center bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 overflow-hidden h-11 ring-2 ring-indigo-50">
+                              <button onclick="decreaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">-</button>
+                              <span class="w-8 text-center font-black text-white text-sm flex items-center justify-center">${qty}</span>
+                              <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">+</button>
                           </div>
                       `;
                   } else {
                       buttonHtml = `
-                          <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-6 py-2 bg-white border-2 border-indigo-100 text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 shadow-sm transition-colors h-10">
+                          <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-7 py-2.5 bg-white border-2 border-indigo-100 text-indigo-700 font-black rounded-xl hover:border-indigo-600 hover:bg-indigo-50 shadow-sm transition-all h-11 uppercase text-xs tracking-wider">
                               ADD
                           </button>
                       `;
                   }
 
                   card.innerHTML = `
+                      ${badgeHtml}
                       <div class="flex-1 pr-4">
-                          <h4 class="font-bold text-slate-800 text-base mb-1">${service.name}</h4>
-                          <div class="flex items-center gap-2">
-                              <span class="font-extrabold text-slate-900">₹${service.price}</span>
-                              ${originalPriceHtml}
+                          <h4 class="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-indigo-600 transition-colors">${service.name}</h4>
+                          <div class="flex items-center gap-2 mt-2">
+                              <span class="font-black text-xl text-slate-900">₹${service.price}</span>
+                              <span class="text-xs text-slate-400 line-through">₹${originalPrice}</span>
+                              <span class="bg-green-50 text-green-600 text-[10px] font-black px-1.5 py-0.5 rounded border border-green-100 uppercase tracking-tighter">${discount}% OFF</span>
                           </div>
+                          <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1 font-medium"><i class="fas fa-history text-[8px] text-indigo-400"></i> Takes approx. 45-60 mins</p>
                       </div>
                       <div class="flex-shrink-0">
                           ${buttonHtml}
@@ -643,10 +481,15 @@
               
               if (current) {
                  Array.from(sidebar.children).forEach(btn => {
+                     const isDesktop = window.innerWidth >= 768;
                      if (btn.textContent.toLowerCase() === current.toLowerCase()) {
-                         btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors bg-white text-indigo-700 border-l-4 border-l-indigo-600';
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4`;
+                         // Ensure active button is visible in horizontal scroll on mobile
+                         if (!isDesktop) {
+                             btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                         }
                      } else {
-                         btn.className = 'w-full text-left px-4 py-4 border-b border-slate-200 text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50 border-l-4 border-l-transparent';
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent`;
                      }
                  });
               }
