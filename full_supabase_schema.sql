@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     address TEXT NOT NULL,
     location_link TEXT,
     city TEXT,
+    area TEXT,
     pin_code TEXT,
     lat NUMERIC,
     lng NUMERIC,
@@ -100,6 +101,8 @@ CREATE TABLE IF NOT EXISTS primary_partners (
     city TEXT,
     address TEXT,
     pincode TEXT,
+    service_areas JSONB DEFAULT '[]',
+    service_pincodes JSONB DEFAULT '[]',
     categories JSONB DEFAULT '[]',
     sub_categories JSONB DEFAULT '[]',
     experience TEXT,
@@ -127,6 +130,8 @@ CREATE TABLE IF NOT EXISTS secondary_partners (
     city TEXT,
     address TEXT,
     pincode TEXT,
+    service_areas JSONB DEFAULT '[]',
+    service_pincodes JSONB DEFAULT '[]',
     categories JSONB DEFAULT '[]',
     sub_categories JSONB DEFAULT '[]',
     experience TEXT,
@@ -181,6 +186,25 @@ CREATE TABLE IF NOT EXISTS influencer_referrals (
 );
 
 -- ==========================================
+-- 10. WEB DEV LEADS & CRM 
+-- ==========================================
+CREATE TABLE IF NOT EXISTS web_dev_leads (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact_number TEXT NOT NULL,
+    service_type TEXT NOT NULL,
+    service_charge NUMERIC,
+    amount_paid NUMERIC DEFAULT 0,
+    requirement TEXT,
+    follow_up_datetime TIMESTAMP WITH TIME ZONE,
+    notes TEXT,
+    status TEXT DEFAULT 'Pending',
+    project_status TEXT DEFAULT 'Lead',
+    payment_status TEXT DEFAULT 'Unpaid',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ==========================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==========================================
 -- Enable RLS on all tables
@@ -193,6 +217,7 @@ ALTER TABLE secondary_partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
 ALTER TABLE influencers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE influencer_referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE web_dev_leads ENABLE ROW LEVEL SECURITY;
 
 -- Create basic policies to allow public/authenticated access for the MVP
 -- Note: For a production app, you should restrict these using Supabase Auth (auth.uid())
@@ -205,6 +230,7 @@ CREATE POLICY "Allow public access to secondary_partners" ON secondary_partners 
 CREATE POLICY "Allow public access to admins" ON admins FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public access to influencers" ON influencers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public access to influencer_referrals" ON influencer_referrals FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to web_dev_leads" ON web_dev_leads FOR ALL USING (true) WITH CHECK (true);
 
 -- Enable Realtime for all tables (so the dashboard updates instantly)
 -- Note: supabase_realtime publication exists by default in Supabase.
@@ -213,3 +239,4 @@ ALTER PUBLICATION supabase_realtime ADD TABLE secondary_partners;
 ALTER PUBLICATION supabase_realtime ADD TABLE bookings;
 ALTER PUBLICATION supabase_realtime ADD TABLE leads;
 ALTER PUBLICATION supabase_realtime ADD TABLE blog_posts;
+ALTER PUBLICATION supabase_realtime ADD TABLE web_dev_leads;

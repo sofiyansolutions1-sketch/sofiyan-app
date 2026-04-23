@@ -10,12 +10,13 @@ import {
 import { supabase } from '../supabaseClient';
 import { BlogManager } from '../components/BlogManager';
 import { PartnerManager } from '../components/PartnerManager';
+import { WebDevLeadsManager } from '../components/WebDevLeadsManager';
 
 export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement'>('Dashboard');
+  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'WebDevLeads'>('Dashboard');
   
   const [rescheduleData, setRescheduleData] = useState<{ booking: Booking | null, date: string, time: string }>({ 
     booking: null, date: '', time: '' 
@@ -135,14 +136,16 @@ export const AdminPanel: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex space-x-1 mb-10 bg-gray-100 p-1 rounded-2xl w-fit">
-        <button onClick={() => setMainTab('Dashboard')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'Dashboard' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
-        <button onClick={() => setMainTab('BlogManager')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'BlogManager' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
-        <button onClick={() => setMainTab('PartnerManagement')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${mainTab === 'PartnerManagement' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
+      <div className="flex space-x-1 mb-10 bg-gray-100 p-1 rounded-2xl w-fit overflow-x-auto">
+        <button onClick={() => setMainTab('Dashboard')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'Dashboard' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
+        <button onClick={() => setMainTab('WebDevLeads')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'WebDevLeads' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>IT Leads</button>
+        <button onClick={() => setMainTab('BlogManager')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'BlogManager' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
+        <button onClick={() => setMainTab('PartnerManagement')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'PartnerManagement' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
       </div>
 
       {mainTab === 'BlogManager' && <BlogManager />}
       {mainTab === 'PartnerManagement' && <PartnerManager />}
+      {mainTab === 'WebDevLeads' && <WebDevLeadsManager />}
 
       {mainTab === 'Dashboard' && (
         <div className="space-y-10">

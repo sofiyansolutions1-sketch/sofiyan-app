@@ -2,6 +2,7 @@
   "name": "Sofiyan Home Service",
   "description": "A comprehensive home service application featuring customer booking, partner lead management, and an administrative dashboard.",
   "requestFramePermissions": [
-    "geolocation"
+    "geolocation",
+    "microphone"
   ]
 }
