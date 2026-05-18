@@ -6,7 +6,7 @@ import { Service, SubService, CartItem } from '../types';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map, Navigation, ShieldCheck, Lock } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 // Specific Customer Reviews Data
@@ -70,7 +70,7 @@ const featuredServicesData = [
     { name: "Inverter installation", price: 699, img: "https://i.postimg.cc/k57Kv2Wc/Whats-App-Image-2026-01-13-at-1-49-20-AM-(1).jpg", desc: "Professional power backup setup & wiring." },
     { name: "Inverter servicing", price: 349, img: "https://i.postimg.cc/Vsh9PLcS/Whats-App-Image-2026-01-13-at-1-49-21-AM.jpg", desc: "Battery health check & inverter maintenance." },
     { name: "Inverter repair", price: 299, img: "https://i.postimg.cc/Vsh9PLcS/Whats-App-Image-2026-01-13-at-1-49-21-AM.jpg", desc: "Fix inverter overloads & charging issues fast." },
-    { name: "Full Gas Refill", price: 2599, img: "https://i.postimg.cc/5NZmL9PZ/Whats-App-Image-2026-01-12-at-11-13-43-PM-(1).jpg", desc: "Premium AC gas refill with leak testing." },
+    { name: "Gas Leak Fix and Refilling", price: 2800, img: "https://i.postimg.cc/5NZmL9PZ/Whats-App-Image-2026-01-12-at-11-13-43-PM-(1).jpg", desc: "Premium AC gas refill with leak testing." },
     { name: "AC Installation – Split", price: 1499, img: "https://i.postimg.cc/zfwpJmFk/Whats-App-Image-2026-01-12-at-11-13-40-PM-(1).jpg", desc: "Flawless split AC mounting & installation." },
     { name: "AC Installation – Window", price: 799, img: "https://i.postimg.cc/0Q8njttm/Whats-App-Image-2026-01-12-at-11-13-41-PM.jpg", desc: "Secure window AC fitting by verified pros." },
     { name: "Kitchen Deep Cleaning", price: 1599, img: "https://i.postimg.cc/SsfmkPwM/Whats-App-Image-2026-01-12-at-11-52-48-PM.jpg", desc: "Remove tough grease & stains completely." },
@@ -113,6 +113,9 @@ export const CustomerPanel: React.FC = () => {
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Tonnage State
+  const [tonnagePrompt, setTonnagePrompt] = useState<{ sub: SubService, category: string } | null>(null);
   
   // Rate Card Modal State
   const [isRateCardModalOpen, setIsRateCardModalOpen] = useState(false);
@@ -438,12 +441,20 @@ export const CustomerPanel: React.FC = () => {
   };
 
   const handleBookService = (sub: SubService) => {
+    if (sub.name === "Gas Leak Fix and Refilling") {
+        setTonnagePrompt({ sub, category: selectedService?.name || 'AC' });
+        return;
+    }
     addToCart(sub, selectedService?.name || 'General');
     // We don't open modal immediately anymore, we add to cart
   };
 
   // 3. Handle Direct Booking from Search Dropdown
   const handleDirectBooking = (item: typeof allSubServices[0]) => {
+    if (item.name === "Gas Leak Fix and Refilling") {
+        setTonnagePrompt({ sub: { id: item.id, name: item.name, price: item.price }, category: item.categoryName });
+        return;
+    }
     addToCart(item, item.categoryName);
     if ((window as any).openCartSidebar) {
       (window as any).openCartSidebar();
@@ -456,7 +467,11 @@ export const CustomerPanel: React.FC = () => {
   
   // 4. Handle Direct Booking from Featured Section
   const handleFeaturedBooking = (name: string, price: number) => {
-      const subService: SubService = {
+    if (name === "Gas Leak Fix and Refilling") {
+        setTonnagePrompt({ sub: { id: `featured-${Date.now()}`, name, price }, category: "AC" });
+        return;
+    }
+    const subService: SubService = {
           id: `featured-${Date.now()}`,
           name: name,
           price: price
@@ -468,6 +483,21 @@ export const CustomerPanel: React.FC = () => {
         setIsBookingModalOpen(true);
         setBookingStep('form');
       }
+  };
+
+  const onTonnageSelect = (ton: string, price: number) => {
+    if (tonnagePrompt) {
+        const sub = {
+            ...tonnagePrompt.sub,
+            name: `${tonnagePrompt.sub.name} (${ton})`,
+            price: price
+        };
+        addToCart(sub, tonnagePrompt.category);
+        setTonnagePrompt(null);
+        if ((window as any).openCartSidebar) {
+           (window as any).openCartSidebar();
+        }
+    }
   };
 
 
@@ -547,8 +577,19 @@ export const CustomerPanel: React.FC = () => {
     if (cart.length === 0) return;
     
     // Validate Location
-    if (!formData.address.trim() && !formData.locationLink.trim()) {
-      alert("Please provide either your full address or a map location link.");
+    const hasLocationLink = formData.locationLink.trim() !== '';
+    const hasFullAddress = formData.address.trim() !== '' && formData.city.trim() !== '' && formData.area.trim() !== '' && formData.pincode.trim() !== '';
+
+    if (!hasLocationLink && !hasFullAddress) {
+      if (!formData.city.trim()) {
+        alert("Please select your City OR paste a Google Maps Location Link.");
+      } else if (!formData.address.trim()) {
+        alert("Please provide your full address (flat/house no) OR paste a Google Maps Location Link.");
+      } else if (!formData.area.trim()) {
+        alert("Please select your Area/Locality OR paste a Google Maps Location Link.");
+      } else if (!formData.pincode.trim()) {
+        alert("Please enter your Pincode OR paste a Location Link.");
+      }
       return;
     }
 
@@ -619,22 +660,42 @@ export const CustomerPanel: React.FC = () => {
 
       // Forward to WhatsApp
       try {
-        const whatsappMsg = `*New Lead Received!*%0A%0A` +
-          `*Customer:* ${formData.name}%0A` +
-          `*Phone:* ${formData.contact}%0A` +
-          `*Category:* ${categoryName}%0A` +
-          `*Sub Services:* ${subServiceName}%0A` +
-          `*Address:* ${formData.address}%0A` +
-          `*Area:* ${formData.area || 'N/A'}%0A` +
-          `*Pincode:* ${formData.pincode}%0A` +
-          `*Date:* ${formData.date}%0A` +
-          `*Time:* ${formData.time}%0A` +
-          `*Total:* ₹${finalTotal}%0A%0A` +
-          `*Location Link:* ${formData.locationLink || 'Not provided'}`;
+        const templateMsg = `🆕 NEW ONLINE BOOKING\n` +
+          `───────────────────\n` +
+          `👤 Customer Info:\n` +
+          `Name: ${formData.name}\n` +
+          `Phone: ${formData.contact}\n\n` +
+          `🛠️ Service Details:\n` +
+          `Category: ${categoryName}\n` +
+          `Items: ${subServiceName}\n` +
+          `Total Amount: ₹${finalTotal}\n\n` +
+          `📍 Address:\n` +
+          `City: ${formData.city} -\n` +
+          `Detail: ${formData.address}\n\n` +
+          (formData.locationLink ? `🔗 Location: ${formData.locationLink}\n\n` : '') +
+          `⏰ Schedule:\n` +
+          `Date: ${formData.date}\n` +
+          `Time: ${formData.time}\n\n` +
+          `───────────────────\n` +
+          `Sent via Sofiyan Home Service App`;
 
-        window.open(`https://wa.me/919219345455?text=${whatsappMsg}`, '_blank');
+        // 1. Automatic send to admin via Server API
+        const adminPhone = (import.meta.env.VITE_ADMIN_PHONE || '919219345455').replace(/\+/g, '');
+        
+        fetch('/api/send-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            number: adminPhone,
+            message: templateMsg
+          })
+        }).catch(err => console.error("Auto WhatsApp Error:", err));
+
+        // 2. User-initiated send (for fallback/visibility)
+        const encodedMsg = encodeURIComponent(templateMsg);
+        window.open(`https://wa.me/${adminPhone}?text=${encodedMsg}`, '_blank');
       } catch (e) {
-        console.warn("WhatsApp forward failed", e);
+        console.warn("WhatsApp logic failed", e);
       }
 
       // Success UI
@@ -736,14 +797,14 @@ export const CustomerPanel: React.FC = () => {
                     <div className="space-y-5">
                        <div>
                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Address</label>
-                         <input required name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => { if (!formData.pincode && formData.address) { setIsDetectingPincode(true); const foundPin = await identifyPincode(formData.address); if (foundPin) setFormData(p => ({ ...p, pincode: foundPin })); setIsDetectingPincode(false); } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
+                         <input name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => { if (!formData.pincode && formData.address) { setIsDetectingPincode(true); const foundPin = await identifyPincode(formData.address); if (foundPin) setFormData(p => ({ ...p, pincode: foundPin })); setIsDetectingPincode(false); } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
                        </div>
                        
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">City</label>
                             <div className="relative">
-                               <select required name="city" value={formData.city} onChange={(e) => { const newCity = e.target.value; setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' })); localStorage.setItem('preferredCity', newCity); window.dispatchEvent(new Event('cityUpdated')); }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
+                               <select name="city" value={formData.city} onChange={(e) => { const newCity = e.target.value; setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' })); localStorage.setItem('preferredCity', newCity); window.dispatchEvent(new Event('cityUpdated')); }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
                                   <option value="">Select City</option>
                                   {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                                </select>
@@ -753,7 +814,7 @@ export const CustomerPanel: React.FC = () => {
                           <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area / Locality</label>
                             <div className="relative">
-                               <select required name="area" value={formData.area} onChange={async (e) => { const newArea = e.target.value; setFormData(prev => ({ ...prev, area: newArea })); if (newArea) { setIsFetchingAreaPincode(true); try { const pins = await fetchPincodesByArea([newArea]); if (pins && pins.length > 0) setFormData(prev => ({ ...prev, pincode: pins[0] })); } finally { setIsFetchingAreaPincode(false); } } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium" disabled={!formData.city}>
+                               <select name="area" value={formData.area} onChange={async (e) => { const newArea = e.target.value; setFormData(prev => ({ ...prev, area: newArea })); if (newArea) { setIsFetchingAreaPincode(true); try { const pins = await fetchPincodesByArea([newArea]); if (pins && pins.length > 0) setFormData(prev => ({ ...prev, pincode: pins[0] })); } finally { setIsFetchingAreaPincode(false); } } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium" disabled={!formData.city}>
                                   <option value="">Select Area</option>
                                   {formData.city && PREDEFINED_AREAS[formData.city] ? PREDEFINED_AREAS[formData.city].map(area => <option key={area} value={area}>{area}</option>) : <option value="Other">Other</option>}
                                </select>
@@ -764,15 +825,40 @@ export const CustomerPanel: React.FC = () => {
 
                        <div>
                          <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 flex items-center gap-2">Pincode {(isDetectingPincode || isFetchingAreaPincode) && <Loader2 size={12} className="animate-spin text-indigo-600" />}</label>
-                         <input required name="pincode" value={formData.pincode} onChange={handleInputChange} disabled={isDetectingPincode || isFetchingAreaPincode} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:opacity-50 text-gray-900 font-medium" placeholder="6-digit pincode" />
+                         <input name="pincode" value={formData.pincode} onChange={handleInputChange} disabled={isDetectingPincode || isFetchingAreaPincode} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:opacity-50 text-gray-900 font-medium" placeholder="6-digit pincode" />
                        </div>
+                    </div>
+                 </div>
+
+                 {/* Current Location */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
+                       Current Location
+                    </h3>
+                    <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
+                       <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
+                          <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                       </div>
+                       <div className="relative group/input">
+                          <MapIcon className="absolute left-4 top-3.5 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            name="locationLink"
+                            value={formData.locationLink}
+                            onChange={handleInputChange}
+                            className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="Paste Google Maps link here..."
+                           />
+                       </div>
+                       <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section above optional.</p>
                     </div>
                  </div>
 
                  {/* Time Slot */}
                  <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">4</span>
                        Preference Time
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -796,7 +882,7 @@ export const CustomerPanel: React.FC = () => {
                  {/* Extra Info */}
                  <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">4</span>
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">5</span>
                        Additional Info
                     </h3>
                     <div>
@@ -898,6 +984,58 @@ export const CustomerPanel: React.FC = () => {
 
   return (
     <>
+      {/* Tonnage Prompt Modal */}
+      <Modal 
+        isOpen={!!tonnagePrompt} 
+        onClose={() => setTonnagePrompt(null)} 
+        title="Select AC Tonnage"
+      >
+        <div className="space-y-4">
+            <p className="text-gray-600 mb-4">Please select the tonnage of your AC to continue with Gas Leak Fix and Refilling service.</p>
+            <div className="grid grid-cols-1 gap-3">
+                <button 
+                    onClick={() => onTonnageSelect("1 Ton", 2800)}
+                    className="flex items-center justify-between p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group"
+                >
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-800">1 Ton AC</span>
+                        <span className="text-sm text-gray-500">Standard 1 ton cooling capacity</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold text-indigo-600">₹2800</span>
+                        <ChevronRight className="text-gray-400 group-hover:text-indigo-500" size={20} />
+                    </div>
+                </button>
+                <button 
+                    onClick={() => onTonnageSelect("1.5 Ton", 3200)}
+                    className="flex items-center justify-between p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group"
+                >
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-800">1.5 Ton AC</span>
+                        <span className="text-sm text-gray-500">Standard 1.5 ton cooling capacity</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold text-indigo-600">₹3200</span>
+                        <ChevronRight className="text-gray-400 group-hover:text-indigo-500" size={20} />
+                    </div>
+                </button>
+                <button 
+                    onClick={() => onTonnageSelect("2 Ton", 3500)}
+                    className="flex items-center justify-between p-4 bg-white border-2 border-gray-100 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group"
+                >
+                    <div className="flex flex-col">
+                        <span className="font-bold text-gray-800">2 Ton AC</span>
+                        <span className="text-sm text-gray-500">Heavy duty 2 ton cooling capacity</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold text-indigo-600">₹3500</span>
+                        <ChevronRight className="text-gray-400 group-hover:text-indigo-500" size={20} />
+                    </div>
+                </button>
+            </div>
+        </div>
+      </Modal>
+
       {/* Mobile-Friendly Urban Company Style Hero Content */}
       <div className="bg-indigo-600 sm:bg-transparent pb-8 pt-6 sm:pt-8 transition-all duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1652,93 +1790,12 @@ export const CustomerPanel: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 my-2 w-full">
-                        <div className="h-[2px] bg-indigo-50 flex-1"></div>
-                        <span className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em]">Safety First</span>
-                        <div className="h-[2px] bg-indigo-50 flex-1"></div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {/* Unique Highlighted Location Button */}
-                        <div className="relative group/loc">
-                          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-25 animate-pulse group-hover/loc:opacity-40 transition duration-1000"></div>
-                          <div className="relative bg-white border border-indigo-100 rounded-2xl p-5 shadow-sm overflow-hidden ring-1 ring-indigo-50">
-                             <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
-                                <div className="flex items-center gap-4">
-                                   <div className="w-14 h-14 bg-gradient-to-br from-indigo-50 to-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner border border-indigo-100/50">
-                                      <motion.div
-                                        animate={isTrackingLocation ? { rotate: 360 } : {}}
-                                        transition={isTrackingLocation ? { repeat: Infinity, duration: 2, ease: "linear" } : {}}
-                                      >
-                                         <Navigation size={28} className="fill-indigo-600/10" />
-                                      </motion.div>
-                                   </div>
-                                   <div className="text-center sm:text-left">
-                                      <h5 className="font-black text-indigo-950 text-sm tracking-tight uppercase">Precision Geolocation</h5>
-                                      <p className="text-[10px] text-indigo-400 font-black uppercase tracking-[0.2em] mt-0.5 whitespace-nowrap">Instant Real-Time Sync</p>
-                                   </div>
-                                </div>
-
-                                <button 
-                                  type="button" 
-                                  onClick={handleTrackLocation} 
-                                  disabled={isTrackingLocation}
-                                  className={`relative group/btn min-w-[200px] h-12 flex items-center justify-center gap-2 px-8 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 z-10 overflow-hidden ${
-                                    formData.locationLink 
-                                      ? 'bg-emerald-600 text-white shadow-emerald-100 border-b-4 border-emerald-800' 
-                                      : 'bg-indigo-950 text-white shadow-indigo-200 hover:shadow-xl border-b-4 border-black'
-                                  } shadow-lg`}
-                                >
-                                  {isTrackingLocation ? (
-                                    <>
-                                      <Loader2 className="animate-spin" size={20} />
-                                      SYNCING...
-                                    </>
-                                  ) : formData.locationLink ? (
-                                    <>
-                                      <CheckCircle size={18} />
-                                      LOCKED IN
-                                    </>
-                                  ) : (
-                                    <>
-                                       <MapPin size={18} className="fill-current/20" />
-                                       AUTO-DETECT
-                                       <motion.div 
-                                         className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full"
-                                         animate={{ translateX: ['-100%', '200%'] }}
-                                         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", repeatDelay: 1 }}
-                                       />
-                                    </>
-                                  )}
-                                </button>
-                             </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pinned Navigation Point</label>
-                          <div className="relative group/input">
-                            <MapPin className="absolute left-3.5 top-3.5 text-rose-400 group-focus-within/input:text-rose-600 transition-colors" size={18} />
-                            <input
-                              type="url"
-                              id="customerLocationLink"
-                              name="locationLink"
-                              value={formData.locationLink}
-                              onChange={handleInputChange}
-                              className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border-2 border-rose-50 rounded-xl focus:bg-white focus:ring-4 focus:ring-rose-100 focus:border-rose-300 outline-none transition-all font-bold text-xs text-rose-900 placeholder:text-rose-200"
-                              placeholder="Google Maps Sync Link"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current City</label>
                           <div className="relative group/input">
                               <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                               <select
-                                required
                                 name="city"
                                 value={formData.city}
                                 onChange={(e) => {
@@ -1759,9 +1816,8 @@ export const CustomerPanel: React.FC = () => {
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area</label>
                           <div className="relative group/input">
-                              <Map className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                              <MapIcon className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                               <select
-                                required
                                 name="area"
                                 value={formData.area}
                                 onChange={async (e) => {
@@ -1802,7 +1858,6 @@ export const CustomerPanel: React.FC = () => {
                         <div className="relative group/input">
                           <MapPin className="absolute left-4 top-4 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
                           <input
-                            required
                             name="pincode"
                             value={formData.pincode}
                             onChange={handleInputChange}
@@ -1816,12 +1871,66 @@ export const CustomerPanel: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Section 3: Current Location Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-950 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
+                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">3</span>
+                      Current Location
+                    </h4>
+                    
+                    <div className="space-y-6">
+                        <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
+                           <div className="flex items-center justify-between">
+                              <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
+                              <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                           </div>
+                           <div className="relative group/input">
+                              <MapIcon className="absolute left-4 top-3.5 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                              <input
+                                name="locationLink"
+                                value={formData.locationLink}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                                placeholder="Paste Google Maps link here..."
+                              />
+                           </div>
+                           <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Deployment Address" section above optional.</p>
+                        </div>
+
+                        {/* Precision detection from modal */}
+                        <div className="relative bg-indigo-950 rounded-2xl p-4 shadow-lg border border-white/10">
+                           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white">
+                                    <Navigation size={20} className={isTrackingLocation ? "animate-spin" : ""} />
+                                 </div>
+                                 <div>
+                                    <h5 className="font-bold text-white text-xs uppercase tracking-tight">Precision Geolocation</h5>
+                                    <p className="text-[8px] text-indigo-300 font-black uppercase tracking-[0.2em]">Live Sync</p>
+                                 </div>
+                              </div>
+                              <button 
+                                type="button" 
+                                onClick={handleTrackLocation} 
+                                disabled={isTrackingLocation}
+                                className="bg-white text-indigo-950 px-5 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95 disabled:opacity-50"
+                              >
+                                {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'LOCKED' : 'AUTO-DETECT'}
+                              </button>
+                           </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Section 3: Schedule Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-amber-400 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
                   <div className="relative bg-white border border-orange-50 rounded-2xl p-4 sm:p-5 shadow-sm">
                     <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-5">
-                      <span className="bg-orange-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-orange-200">3</span>
+                      <span className="bg-orange-500 text-white w-6 h-6 rounded-lg flex items-center justify-center text-xs shadow-md shadow-orange-200">4</span>
                       Time Slot
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

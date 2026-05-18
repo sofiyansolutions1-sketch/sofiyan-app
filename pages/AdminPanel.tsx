@@ -5,18 +5,18 @@ import { Booking } from '../types';
 import { Modal } from '../components/Modal';
 import { 
   Lock, Users, Calendar, Activity, Clock, Phone, DollarSign,
-  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle
+  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, Share2, Map as MapIcon
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { BlogManager } from '../components/BlogManager';
 import { PartnerManager } from '../components/PartnerManager';
-import { WebDevLeadsManager } from '../components/WebDevLeadsManager';
+import { FollowUpManager } from '../components/FollowUpManager';
 
 export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'WebDevLeads'>('Dashboard');
+  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'FollowUps'>('Dashboard');
   
   const [rescheduleData, setRescheduleData] = useState<{ booking: Booking | null, date: string, time: string }>({ 
     booking: null, date: '', time: '' 
@@ -138,14 +138,14 @@ export const AdminPanel: React.FC = () => {
 
       <div className="flex space-x-1 mb-10 bg-gray-100 p-1 rounded-2xl w-fit overflow-x-auto">
         <button onClick={() => setMainTab('Dashboard')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'Dashboard' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
-        <button onClick={() => setMainTab('WebDevLeads')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'WebDevLeads' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>IT Leads</button>
+        <button onClick={() => setMainTab('FollowUps')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'FollowUps' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Follow-ups</button>
         <button onClick={() => setMainTab('BlogManager')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'BlogManager' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
         <button onClick={() => setMainTab('PartnerManagement')} className={`py-2.5 px-6 rounded-xl font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'PartnerManagement' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
       </div>
 
+      {mainTab === 'FollowUps' && <FollowUpManager />}
       {mainTab === 'BlogManager' && <BlogManager />}
       {mainTab === 'PartnerManagement' && <PartnerManager />}
-      {mainTab === 'WebDevLeads' && <WebDevLeadsManager />}
 
       {mainTab === 'Dashboard' && (
         <div className="space-y-10">
@@ -247,6 +247,34 @@ export const AdminPanel: React.FC = () => {
                       >
                         <MessageCircle size={12} /> WhatsApp
                       </a>
+                       <button 
+                         onClick={() => {
+                          const msg = `🆕 NEW ONLINE BOOKING\n` +
+                                     `───────────────────\n` +
+                                     `👤 Customer Info:\n` +
+                                     `Name: ${booking.customerName}\n` +
+                                     `Phone: ${booking.contactNumber}\n\n` +
+                                     `🛠️ Service Details:\n` +
+                                     `Category: ${booking.serviceCategory}\n` +
+                                     `Items: ${booking.subServiceName}\n` +
+                                     `Total Amount: ₹${booking.price}\n\n` +
+                                     `📍 Address:\n` +
+                                     `City: ${booking.city || 'Bangalore'} -\n` +
+                                     `Detail: ${booking.address || ''}\n\n` +
+                                     (booking.location_link ? `🔗 Location: ${booking.location_link}\n\n` : '') +
+                                     `⏰ Schedule:\n` +
+                                     `Date: ${booking.date}\n` +
+                                     `Time: ${booking.time}\n\n` +
+                                     `───────────────────\n` +
+                                     `Sent via Sofiyan Home Service App`;
+                          
+                          window.open(`https://wa.me/919219345455?text=${encodeURIComponent(msg)}`, '_blank');
+                        }}
+                        className="h-9 w-9 bg-indigo-50 text-indigo-700 rounded-lg flex items-center justify-center hover:bg-indigo-600 hover:text-white hover:shadow-md border border-indigo-200 transition-all shrink-0"
+                        title="Forward to Admin WhatsApp"
+                      >
+                        <Share2 size={12} />
+                      </button>
                     </div>
                   </div>
 
@@ -275,9 +303,21 @@ export const AdminPanel: React.FC = () => {
                          <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center text-sky-500 shrink-0">
                            <MapPin size={14} />
                          </div>
-                         <div className="min-w-0">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">City</p>
-                           <p className="text-[11px] font-black text-gray-900 truncate">{booking.area || booking.city}</p>
+                         <div className="min-w-0 flex-1">
+                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Venue Details</p>
+                           <p className="text-[11px] font-black text-gray-900 leading-tight">
+                             {booking.address ? `${booking.address}, ${booking.area}` : 'Address via Link'}
+                           </p>
+                           {booking.location_link && (
+                             <a 
+                               href={booking.location_link} 
+                               target="_blank" 
+                               rel="noreferrer" 
+                               className="text-[9px] font-black text-indigo-600 flex items-center gap-1 mt-1 hover:underline"
+                             >
+                               <MapIcon size={10} /> View Map
+                             </a>
+                           )}
                          </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -335,7 +375,7 @@ export const AdminPanel: React.FC = () => {
                            onClick={() => setDispatchBooking(booking)} 
                            className="flex-1 bg-indigo-900 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-md flex items-center justify-center gap-2"
                          >
-                           <Send size={12} /> Partner Assignment
+                           <Send size={12} /> Assign Technician
                          </button>
                        )}
                        {booking.status === 'completed' && (
@@ -394,7 +434,7 @@ export const AdminPanel: React.FC = () => {
           </form>
       </Modal>
 
-      <Modal isOpen={!!dispatchBooking} onClose={() => { setDispatchBooking(null); setPartnerSearchResults([]); setHasSearched(false); }} title="Partner Acquisition">
+      <Modal isOpen={!!dispatchBooking} onClose={() => { setDispatchBooking(null); setPartnerSearchResults([]); setHasSearched(false); }} title="Assign Technician">
         <div className="space-y-8 pt-4">
             <div className="flex gap-2">
                 <input type="text" value={partnerSearchQuery} onChange={e => setPartnerSearchQuery(e.target.value)} placeholder="Search Area / Service / Pincode..." className="flex-1 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold" />

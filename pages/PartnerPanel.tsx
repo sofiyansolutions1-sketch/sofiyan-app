@@ -127,6 +127,13 @@ export const PartnerPanel: React.FC = () => {
   const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
 
   useEffect(() => {
+    // Check for mode in URL
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    if (mode === 'signup' || mode === 'signin') {
+      setAuthMode(mode as 'signin' | 'signup');
+    }
+
     // Check Supabase Connection
     const checkConnection = async () => {
         try {
@@ -804,7 +811,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="bg-indigo-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
               <Briefcase className="text-indigo-600 w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">Partner Portal</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Technician Portal</h2>
             <p className="text-gray-500">Join our network of professionals</p>
           </div>
           

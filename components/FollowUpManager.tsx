@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { Modal } from './Modal';
 import { 
-  Plus, Search, Phone, MessageCircle, Calendar, Clock, DollarSign, 
-  AlertCircle, CheckCircle, Briefcase, FileText, Mic, Trash2
+  Plus, Phone, MessageCircle, Calendar, Clock, DollarSign, 
+  AlertCircle, CheckCircle, Briefcase, FileText, Mic, Trash2,
+  List, Share2, BellRing
 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+// import { GoogleGenAI } from '@google/genai';
 
 interface WebDevLead {
   id: string;
@@ -17,6 +18,9 @@ interface WebDevLead {
   requirement: string;
   follow_up_datetime: string;
   notes: string;
+  address?: string;
+  city?: string;
+  location_url?: string;
   status: string;
   project_status: string; // 'Lead', 'In Progress', 'Built', 'Delivered'
   payment_status: string; // 'Unpaid', 'Partial', 'Paid'
@@ -35,7 +39,7 @@ const AMPMDateTimePicker = ({ value, onChange, required = false }: { value: stri
           dateVal = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
           timeVal = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
@@ -114,22 +118,25 @@ const AMPMDateTimePicker = ({ value, onChange, required = false }: { value: stri
   );
 };
 
-export const WebDevLeadsManager: React.FC = () => {
+export const FollowUpManager: React.FC = () => {
   const [leads, setLeads] = useState<WebDevLead[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'Dashboard' | 'Pipeline' | 'ActiveProjects' | 'Completed' | 'Payments'>('Dashboard');
+  const [activeTab, setActiveTab] = useState<'Pipeline' | 'Dashboard'>('Pipeline');
   const [rescheduleData, setRescheduleData] = useState<{ lead: WebDevLead | null, datetime: string }>({ lead: null, datetime: '' });
   
   const [formData, setFormData] = useState({
     name: '',
     contact_number: '',
-    service_type: 'Website Development',
+    service_type: 'AC Service',
     service_charge: '',
     amount_paid: '',
     requirement: '',
     follow_up_datetime: '',
     notes: '',
+    address: '',
+    city: '',
+    location_url: '',
     project_status: 'Lead',
     payment_status: 'Unpaid'
   });
@@ -215,50 +222,23 @@ export const WebDevLeadsManager: React.FC = () => {
   const processSpeechToFormWithAI = async (text: string) => {
     setIsProcessingAI(true);
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('Missing Gemini API Key in environment.');
-      }
-      
-      const ai = new GoogleGenAI({ apiKey });
-      const prompt = `You are an expert AI assistant that flawlessly extracts customer lead information from messy, dictated speech.
-User's raw, continuous speech transcript: "${text}"
-
-Current system time is: ${new Date().toISOString()}
-
-Extract the following information and return ONLY a pure JSON object. If a field isn't mentioned or is unclear, leave it null.
-- name: (string) Customer's full name.
-- contact_number: (string) Phone number, strip non-numeric characters.
-- service_type: (string) Must be one of: "Website Development", "E-Commerce App", "Custom Software", "SEO & Marketing", or "Other". Map it best to their request.
-- service_charge: (number) Extract the total quoted price/cost. Return as a number.
-- amount_paid: (number) Extract any initial/advance payment made. Return as a number.
-- requirement: (string) An excellent, professional summary of the project requirements and features requested.
-- follow_up_datetime: (string) Convert any mentioned follow-up time into a local datetime string (YYYY-MM-DDTHH:mm format), interpreting words like "tomorrow", "next Monday", "in 3 days" accurately based on system time. If no explicit time is given but a day is, default to 10:00.
-- notes: (string) Any additional context, personality traits, or instructions.
-
-Remember, ONLY return a raw JSON object and NOTHING else.`;
-
-      const response = await ai.models.generateContent({
-         model: 'gemini-3.1-pro-preview',
-         contents: prompt,
-         config: {
-           responseMimeType: 'application/json'
-         }
+      const response = await fetch('/api/extract-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
       });
       
-      const data = JSON.parse(response.text || '{}');
+      if (!response.ok) throw new Error('Server error during extraction');
+      const data = await response.json();
+      
       setFormData(prev => ({
         ...prev,
-        ...Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== null && v !== ''))
+        ...Object.fromEntries(Object.entries(data).filter(([key, v]) => key && v !== null && v !== ''))
       }));
 
     } catch(err: any) {
       console.error(err);
-      if (err?.message?.includes('429') || err?.message?.includes('quota') || err?.status === 'RESOURCE_EXHAUSTED' || err?.status === 429) {
-          alert("AI Quota Exceeded API Limit: You have reached the usage limit for Google Voice AI on your current plan. Please wait before trying voice dictation again.");
-      } else {
-          alert('Failed to extract form data from speech.');
-      }
+      alert('Failed to extract form data from speech.');
     } finally {
       setIsProcessingAI(false);
     }
@@ -294,6 +274,9 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
         requirement: formData.requirement,
         follow_up_datetime: formData.follow_up_datetime,
         notes: formData.notes,
+        address: formData.address,
+        city: formData.city,
+        location_url: formData.location_url,
         status: 'Pending',
         project_status: formData.project_status,
         payment_status: formData.payment_status
@@ -305,8 +288,9 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
     } else {
       setIsModalOpen(false);
       setFormData({
-        name: '', contact_number: '', service_type: 'Website Development',
-        service_charge: '', amount_paid: '', requirement: '', follow_up_datetime: '', notes: '', project_status: 'Lead', payment_status: 'Unpaid'
+        name: '', contact_number: '', service_type: 'AC Service',
+        service_charge: '', amount_paid: '', requirement: '', follow_up_datetime: '', notes: '', 
+        address: '', city: '', location_url: '', project_status: 'Lead', payment_status: 'Unpaid'
       });
       fetchLeads();
     }
@@ -333,6 +317,53 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
       fetchLeads();
     } else {
       alert("Failed to delete lead");
+    }
+  };
+
+  const handleSendWhatsApp = async (lead: WebDevLead, recipientType: 'customer' | 'technician') => {
+    const followUpDate = new Date(lead.follow_up_datetime);
+    const time = followUpDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const date = followUpDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    // For WhatsApp Cloud API, you typically use Templates for pro-active alerts.
+    // This logic assumes you have a template named 'followup_reminder' approved in Meta.
+    // For this example, we'll try to send a template-based message.
+    
+    const number = recipientType === 'customer' ? lead.contact_number : process.env.VITE_ADMIN_PHONE || '919219345455';
+    
+    const payload = {
+      number: number,
+      isTemplate: true,
+      templateName: "followup_reminder", // Replace with your approved template name
+      languageCode: "en_US",
+      components: [
+        {
+          type: "body",
+          parameters: [
+            { type: "text", text: lead.name },
+            { type: "text", text: lead.service_type },
+            { type: "text", text: `${date} at ${time}` }
+          ]
+        }
+      ]
+    };
+
+    try {
+      const response = await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const resData = await response.json();
+      if (response.ok) {
+        alert(`WhatsApp Utility Notification sent to ${recipientType}!`);
+      } else {
+        alert(`WhatsApp API Error: ${resData.details?.error?.message || resData.error}. Note: This requires Meta API setup.`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while sending WhatsApp.');
     }
   };
 
@@ -378,24 +409,21 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">Web Dev CRM</h2>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Advanced IT Lead Routing</p>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">Follow-up Manager</h2>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Reminders & Customer Follow-up System</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-200"
         >
-          <Plus size={16} /> New Entry
+          <Plus size={16} /> New Follow-up
         </button>
       </div>
 
-      {/* Navigation Sub-Tabs */}
+      {/* Navigation Sub-Tabs - Simplified */}
       <div className="flex space-x-2 overflow-x-auto pb-2">
-        <button onClick={() => setActiveTab('Dashboard')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap ${activeTab === 'Dashboard' ? 'bg-gray-900 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}>Overview</button>
-        <button onClick={() => setActiveTab('Pipeline')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap ${activeTab === 'Pipeline' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}>Follow-ups</button>
-        <button onClick={() => setActiveTab('ActiveProjects')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap ${activeTab === 'ActiveProjects' ? 'bg-amber-500 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}>In Progress</button>
-        <button onClick={() => setActiveTab('Payments')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap ${activeTab === 'Payments' ? 'bg-blue-500 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}>Pending Payment</button>
-        <button onClick={() => setActiveTab('Completed')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition whitespace-nowrap ${activeTab === 'Completed' ? 'bg-emerald-500 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}>Completed</button>
+        <button onClick={() => setActiveTab('Pipeline')} className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'Pipeline' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-white text-gray-400 hover:bg-gray-50 border border-gray-100'}`}>Current Reminders</button>
+        <button onClick={() => setActiveTab('Dashboard')} className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === 'Dashboard' ? 'bg-gray-900 text-white shadow-lg shadow-gray-200' : 'bg-white text-gray-400 hover:bg-gray-50 border border-gray-100'}`}>Insights</button>
       </div>
 
       {isLoading ? (
@@ -436,6 +464,53 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
                     <div className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest mt-1">Fully Done & Paid</div>
                  </div>
               </div>
+
+              {/* Financial & Targets Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-gray-200">
+                   <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full"></div>
+                   <div className="relative z-10">
+                      <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-6">Revenue Performance</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                         <div>
+                            <span className="block text-3xl font-black tracking-tighter">₹{leads.reduce((acc, l) => acc + (Number(l.service_charge) || 0), 0).toLocaleString()}</span>
+                            <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Total Pipeline</span>
+                         </div>
+                         <div>
+                            <span className="block text-3xl font-black tracking-tighter text-emerald-400">₹{leads.reduce((acc, l) => acc + (Number(l.amount_paid) || 0), 0).toLocaleString()}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Revenue Collected</span>
+                         </div>
+                         <div className="hidden md:block">
+                            <span className="block text-3xl font-black tracking-tighter text-amber-400">₹{leads.filter(l => l.payment_status !== 'Paid').reduce((acc, l) => acc + ((Number(l.service_charge) || 0) - (Number(l.amount_paid) || 0)), 0).toLocaleString()}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Outstanding</span>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                   <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Monthly Target</h4>
+                   <div className="space-y-4">
+                      <div className="flex justify-between items-end">
+                         <span className="text-3xl font-black text-gray-900 leading-none">
+                            {Math.min(100, Math.round((completedProjects.length / 50) * 100))}%
+                         </span>
+                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            {completedProjects.length} / 50 Services
+                         </span>
+                      </div>
+                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                         <div 
+                           className="h-full bg-indigo-600 rounded-full transition-all duration-1000" 
+                           style={{ width: `${Math.min(100, (completedProjects.length / 50) * 100)}%` }}
+                         ></div>
+                      </div>
+                      <p className="text-[9px] font-bold text-gray-400 leading-relaxed italic">
+                        "Your current pace suggests you'll hit the monthly volume target."
+                      </p>
+                   </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -454,10 +529,10 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
                        <LeadCard 
                          key={lead.id} 
                          lead={lead} 
-                         onUpdate={handleUpdateLeadField} 
                          onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} 
                          onDelete={handleDeleteLead} 
                          isUrgent={true} 
+                         onSendWhatsApp={handleSendWhatsApp}
                        />
                     ))}
                   </div>
@@ -474,11 +549,11 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
                      <LeadCard 
                        key={absoluteNextLead.id} 
                        lead={absoluteNextLead} 
-                       onUpdate={handleUpdateLeadField} 
                        onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} 
                        onDelete={handleDeleteLead} 
                        isUrgent={false} 
                        highlightAsNext={true} 
+                       onSendWhatsApp={handleSendWhatsApp}
                      />
                   </div>
                 </div>
@@ -495,12 +570,12 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
                        <LeadCard 
                          key={lead.id} 
                          lead={lead} 
-                         onUpdate={handleUpdateLeadField} 
                          onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} 
                          onDelete={handleDeleteLead} 
                          isUrgent={false} 
                          highlightAsNext={false} 
                          sequenceIndex={index + 2} // offset because the Next lead was sequence 1
+                         onSendWhatsApp={handleSendWhatsApp}
                        />
                     ))}
                   </div>
@@ -524,11 +599,11 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
                        <LeadCard 
                          key={lead.id} 
                          lead={lead} 
-                         onUpdate={handleUpdateLeadField} 
                          onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} 
                          onDelete={handleDeleteLead} 
                          isUrgent={false} 
                          sequenceIndex={todaysUpcomingLeads.length + index + 2} // Continue from today's list count
+                         onSendWhatsApp={handleSendWhatsApp}
                        />
                     ))}
                   </div>
@@ -537,54 +612,11 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
             </div>
           )}
 
-          {/* Active Projects Tab */}
-          {activeTab === 'ActiveProjects' && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
-                <Briefcase size={18} /> Websites Being Built
-              </h3>
-              {websitesBeingBuilt.length === 0 ? (
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No active builds.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {websitesBeingBuilt.map(lead => <LeadCard key={lead.id} lead={lead} onUpdate={handleUpdateLeadField} onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} onDelete={handleDeleteLead} isUrgent={false} />)}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Built, Pending Payment Tab */}
-          {activeTab === 'Payments' && (
-             <div className="space-y-4">
-              <h3 className="text-sm font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-                <DollarSign size={18} /> Built / Pending Payment
-              </h3>
-              {websitesBuiltPendingPayment.length === 0 ? (
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No pending payments.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {websitesBuiltPendingPayment.map(lead => <LeadCard key={lead.id} lead={lead} onUpdate={handleUpdateLeadField} onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} onDelete={handleDeleteLead} isUrgent={false} />)}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Completed Section (Fully Done) */}
-          {activeTab === 'Completed' && completedProjects.length > 0 && (
-            <div className="space-y-4 opacity-75">
-              <h3 className="text-sm font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2">
-                <CheckCircle size={18} /> Completed Leads
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {completedProjects.map(lead => <LeadCard key={lead.id} lead={lead} onUpdate={handleUpdateLeadField} onReschedule={(lead) => setRescheduleData({ lead, datetime: lead.follow_up_datetime })} onDelete={handleDeleteLead} isUrgent={false} />)}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
       {/* New Lead Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="New Web Dev Lead">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Follow-up Reminder">
         
         <div className="pt-2">
            <button 
@@ -613,10 +645,12 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
             <div className="space-y-1 text-left">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Service Type</label>
               <select required value={formData.service_type} onChange={e => setFormData({...formData, service_type: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-gray-900">
-                <option value="Website Development">Website Development</option>
-                <option value="E-Commerce App">E-Commerce App</option>
-                <option value="Custom Software">Custom Software</option>
-                <option value="SEO & Marketing">SEO & Marketing</option>
+                <option value="AC Service">AC Service</option>
+                <option value="Washing Machine">Washing Machine</option>
+                <option value="Refrigerator">Refrigerator</option>
+                <option value="Water Purifier">Water Purifier</option>
+                <option value="Chimney">Chimney</option>
+                <option value="Geyser">Geyser</option>
                 <option value="Other">Other</option>
               </select>
             </div>
@@ -627,6 +661,18 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
             <div className="space-y-1 text-left">
               <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Initial Payment (₹) (Optional)</label>
               <input type="number" value={formData.amount_paid} onChange={e => setFormData({...formData, amount_paid: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-gray-900" placeholder="e.g. 0" />
+            </div>
+            <div className="space-y-1 text-left md:col-span-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Full Address</label>
+              <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-gray-900" placeholder="e.g. House No, Street, Landmark" />
+            </div>
+            <div className="space-y-1 text-left">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">City</label>
+              <input type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-gray-900" placeholder="e.g. Bangalore" />
+            </div>
+            <div className="space-y-1 text-left md:col-span-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Maps Location URL</label>
+              <input type="text" value={formData.location_url} onChange={e => setFormData({...formData, location_url: e.target.value})} className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-bold text-gray-900" placeholder="Paste Google Maps link here..." />
             </div>
           </div>
 
@@ -646,7 +692,7 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
           </div>
 
           <button type="submit" className="w-full bg-indigo-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-indigo-100 hover:bg-black transition-all mt-4">
-            Generate Lead
+            Set Reminder
           </button>
         </form>
       </Modal>
@@ -667,10 +713,8 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
   );
 };
 
-const LeadCard = ({ lead, onUpdate, onReschedule, onDelete, isUrgent, highlightAsNext = false, sequenceIndex }: { lead: WebDevLead, onUpdate: (id: string, updates: Partial<WebDevLead>) => void, onReschedule: (lead: WebDevLead) => void, onDelete: (id: string) => void, isUrgent: boolean, highlightAsNext?: boolean, sequenceIndex?: number }) => {
+const LeadCard = ({ lead, onReschedule, onDelete, isUrgent, highlightAsNext = false, sequenceIndex, onSendWhatsApp }: { lead: WebDevLead, onReschedule: (lead: WebDevLead) => void, onDelete: (id: string) => void, isUrgent: boolean, highlightAsNext?: boolean, sequenceIndex?: number, onSendWhatsApp: (lead: WebDevLead, type: 'customer' | 'technician') => void }) => {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  const [isLoggingPayment, setIsLoggingPayment] = useState(false);
-  const [paymentAmt, setPaymentAmt] = useState('');
 
   const followUpDate = new Date(lead.follow_up_datetime);
   const formattedDate = followUpDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -704,9 +748,50 @@ const LeadCard = ({ lead, onUpdate, onReschedule, onDelete, isUrgent, highlightA
                </span>
              </div>
           </div>
-          {isUrgent && <span className="bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md animate-pulse shadow-sm">OVERDUE</span>}
-          {highlightAsNext && <span className="bg-white text-indigo-700 shadow-sm text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md">1ST UP NEXT</span>}
-          {!isUrgent && !highlightAsNext && sequenceIndex && <span className="bg-gray-100 text-gray-500 shadow-sm text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md border border-gray-200">{getOrdinal(sequenceIndex)} UP NEXT</span>}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => onSendWhatsApp(lead, 'technician')}
+              className={`p-2.5 rounded-xl border flex items-center justify-center transition-all shadow-sm ${highlightAsNext ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' : 'bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100'}`}
+              title="Notify Technician (WhatsApp)"
+            >
+              <BellRing size={16} />
+            </button>
+            <button 
+              onClick={() => {
+                const followUp = new Date(lead.follow_up_datetime);
+                const time = followUp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                const date = followUp.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const msg = `🆕 NEW ONLINE BOOKING\n` +
+                           `───────────────────\n` +
+                           `👤 Customer Info:\n` +
+                           `Name: ${lead.name}\n` +
+                           `Phone: ${lead.contact_number}\n\n` +
+                           `🛠️ Service Details:\n` +
+                           `Category: ${lead.service_type}\n` +
+                           `Items: ${lead.requirement}\n` +
+                           `Total Amount: ₹${lead.service_charge}\n\n` +
+                           `📍 Address:\n` +
+                           `City: ${lead.city || 'Bangalore'} -\n` +
+                           `Detail: ${lead.address || ''}\n\n` +
+                           (lead.location_url ? `🔗 Location: ${lead.location_url}\n\n` : '') +
+                           `⏰ Schedule:\n` +
+                           `Date: ${date}\n` +
+                           `Time: ${time}\n\n` +
+                           `───────────────────\n` +
+                           `Sent via Sofiyan Home Service App`;
+                
+                window.open(`https://wa.me/919219345455?text=${encodeURIComponent(msg)}`, '_blank');
+              }}
+              className={`p-2.5 rounded-xl border flex items-center justify-center transition-all shadow-sm ${highlightAsNext ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' : 'bg-indigo-50 border-indigo-100 text-indigo-600 hover:bg-indigo-100'}`}
+              title="Forward to Admin (WhatsApp)"
+            >
+              <Share2 size={16} />
+            </button>
+            {isUrgent && <span className="bg-rose-600 text-white text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md animate-pulse shadow-sm">OVERDUE</span>}
+            {highlightAsNext && <span className="bg-white text-indigo-700 shadow-sm text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md">1ST UP NEXT</span>}
+            {!isUrgent && !highlightAsNext && sequenceIndex && <span className="bg-gray-100 text-gray-500 shadow-sm text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md border border-gray-200">{getOrdinal(sequenceIndex)} UP NEXT</span>}
+          </div>
       </div>
       )}
 
@@ -742,7 +827,28 @@ const LeadCard = ({ lead, onUpdate, onReschedule, onDelete, isUrgent, highlightA
             <div className="bg-amber-100 p-2 rounded-xl border border-amber-200 shrink-0">
                <FileText size={16} className="text-amber-700" />
             </div>
-            <p className="text-[13px] font-medium leading-relaxed line-clamp-3 text-gray-800">{lead.requirement}</p>
+            <div className="flex-1">
+              <p className="text-[13px] font-medium leading-relaxed line-clamp-2 text-gray-800">{lead.requirement}</p>
+              {(lead.address || lead.city || lead.location_url) && (
+                <div className="mt-2 pt-2 border-t border-amber-100/50 flex flex-wrap gap-2">
+                  {lead.address && (
+                    <span className="text-[10px] w-full text-gray-500 font-medium mb-1">
+                      {lead.address}
+                    </span>
+                  )}
+                  {lead.city && (
+                    <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-amber-100 text-amber-600 font-bold uppercase tracking-widest">
+                      {lead.city}
+                    </span>
+                  )}
+                  {lead.location_url && (
+                    <a href={lead.location_url} target="_blank" rel="noreferrer" className="text-[10px] bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 text-indigo-600 font-bold uppercase tracking-widest flex items-center gap-1">
+                      Map Link
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           {lead.notes && (
             <div className="p-4 bg-indigo-50/50 rounded-2xl text-[12px] font-medium text-gray-700 italic border border-indigo-100 relative mt-4 shadow-sm">
@@ -770,11 +876,20 @@ const LeadCard = ({ lead, onUpdate, onReschedule, onDelete, isUrgent, highlightA
             }}
             href="#"
             className="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center hover:bg-emerald-100 hover:shadow-sm border border-emerald-100 transition-all shrink-0 cursor-pointer"
-            title="WhatsApp"
+            title="WhatsApp Chat"
           >
             <MessageCircle size={16} />
           </a>
           
+          {/* WhatsApp Utility Notify Button */}
+          <button 
+            onClick={() => onSendWhatsApp(lead, 'customer')}
+            className="w-11 h-11 bg-green-50 text-green-600 rounded-xl flex items-center justify-center hover:bg-green-100 hover:shadow-sm border border-green-100 transition-all shrink-0"
+            title="WhatsApp Utility Alert"
+          >
+            <BellRing size={16} />
+          </button>
+
           {/* Reschedule Button */}
           {lead.project_status === 'Lead' && (
             <button 
@@ -809,62 +924,23 @@ const LeadCard = ({ lead, onUpdate, onReschedule, onDelete, isUrgent, highlightA
           </div>
         </div>
         
-        {/* Action Buttons based on status */}
+        {/* Action Suggestions */}
         <div className="flex flex-col gap-2 mt-4 pt-1">
-           {lead.project_status === 'Lead' && (
-             <button 
-               onClick={() => onUpdate(lead.id, { project_status: 'In Progress' })}
-               className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-black hover:shadow-md transition-all shadow-sm"
-             >
-               Start Build Project
-             </button>
-           )}
-           {lead.project_status === 'In Progress' && (
-             <button 
-               onClick={() => onUpdate(lead.id, { project_status: 'Built' })}
-               className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-blue-700 hover:shadow-md transition-all shadow-sm"
-             >
-               Mark as Built
-             </button>
-           )}
-           {lead.project_status === 'Built' && (
-             isLoggingPayment ? (
-               <div className="flex gap-2">
-                 <input 
-                   type="number" 
-                   value={paymentAmt}
-                   onChange={e => setPaymentAmt(e.target.value)}
-                   className="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm font-bold text-gray-900 text-center"
-                   placeholder={`Total: ₹${lead.service_charge}`}
-                   autoFocus
-                 />
-                 <button 
-                   onClick={() => {
-                     if (paymentAmt && !isNaN(Number(paymentAmt))) {
-                        onUpdate(lead.id, { amount_paid: Number(paymentAmt), payment_status: 'Paid', project_status: 'Delivered', status: 'Completed' });
-                     } else {
-                        setIsLoggingPayment(false);
-                     }
-                   }}
-                   className="bg-emerald-600 text-white px-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-sm"
-                 >
-                   Save
-                 </button>
+             <div className="bg-indigo-50 p-3 rounded-2xl border border-indigo-100">
+               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                 <List size={10} /> Progress & Reminders
+               </p>
+               <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-[11px] font-bold text-indigo-700">
+                     <div className="w-4 h-4 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[8px]">1</div>
+                     <span>Next Follow-up Call</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] font-bold text-indigo-400">
+                     <div className="w-4 h-4 bg-indigo-200 text-indigo-600 rounded-full flex items-center justify-center text-[8px]">2</div>
+                     <span>Requirement Finalization</span>
+                  </div>
                </div>
-             ) : (
-               <button 
-                 onClick={() => setIsLoggingPayment(true)}
-                 className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-emerald-700 hover:shadow-md transition-all shadow-sm"
-               >
-                 Log Final Payment
-               </button>
-             )
-           )}
-           {lead.project_status === 'Delivered' && (
-             <div className="w-full py-3.5 bg-gray-50 text-gray-400 rounded-xl font-black text-[11px] uppercase tracking-widest flex items-center justify-center border border-gray-200 border-dashed">
-               Project Closed & Paid
              </div>
-           )}
         </div>
       </div>
     </div>

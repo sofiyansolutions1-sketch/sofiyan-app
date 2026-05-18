@@ -166,7 +166,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                   <Lock size={16} />
                               </div>
-                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Admin panel</span>
+                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Founder Portal</span>
                           </Link>
 
                           <Link 
@@ -177,7 +177,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                   <Users size={16} />
                               </div>
-                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Partner panel</span>
+                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Technician Portal</span>
                           </Link>
 
                           <Link 
@@ -188,7 +188,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                   <FileText size={16} />
                               </div>
-                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Blog panel</span>
+                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Our Blogs</span>
                           </Link>
 
                           <a 
@@ -199,7 +199,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                   <Star size={16} />
                               </div>
-                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Influencer panel</span>
+                              <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Influencer Portal</span>
                           </a>
                       </div>
                       <div className="bg-indigo-950 p-4">
@@ -305,45 +305,47 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       {/* Content Modal Overlay */}
       {activeContent && (
-        <div className="fixed inset-0 z-[100] bg-white animate-fadeIn overflow-y-auto">
-          {/* Header of Modal */}
-          <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-indigo-50 px-4 py-4 flex justify-between items-center z-10 shadow-sm">
-             <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl overflow-hidden shadow-indigo-100 shadow-lg border border-indigo-50">
-                    <img 
-                      src="https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg" 
-                      alt="Logo" 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                </div>
-                <span className="font-black text-indigo-950 tracking-tighter uppercase text-sm">{BUSINESS_NAME}</span>
-             </div>
-             <button 
-               onClick={closeContent}
-               className="w-10 h-10 flex items-center justify-center bg-indigo-50 rounded-xl hover:bg-indigo-600 group transition-all"
-             >
-               <X size={20} className="text-indigo-600 group-hover:text-white transition-colors" />
-             </button>
-          </div>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all animate-scaleIn">
+            {/* Header of Modal */}
+            <div className="bg-white border-b border-indigo-50 px-6 py-4 flex justify-between items-center z-10 shadow-sm shrink-0">
+               <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden shadow-indigo-100 shadow-lg border border-indigo-50">
+                      <img 
+                        src="https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg" 
+                        alt="Logo" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                  </div>
+                  <span className="font-black text-indigo-950 tracking-tighter uppercase text-sm">{BUSINESS_NAME}</span>
+               </div>
+               <button 
+                 onClick={closeContent}
+                 className="w-10 h-10 flex items-center justify-center bg-indigo-50 rounded-xl hover:bg-indigo-600 group transition-all"
+               >
+                 <X size={20} className="text-indigo-600 group-hover:text-white transition-colors" />
+               </button>
+            </div>
 
-          <div className="max-w-3xl mx-auto px-4 py-12">
-            <h1 className="text-3xl md:text-5xl font-black text-indigo-950 mb-8 pb-4 border-b border-indigo-50 tracking-tighter uppercase">
-              {siteContent[activeContent].title}
-            </h1>
-            <div 
-              className="prose prose-lg prose-indigo max-w-none text-gray-600 leading-loose"
-              dangerouslySetInnerHTML={{ __html: siteContent[activeContent].text }}
-            />
-            
-             <div className="mt-16 pt-8 border-t border-indigo-50 text-center">
-                <button 
-                  onClick={closeContent}
-                  className="px-10 py-4 bg-indigo-950 text-white rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl shadow-indigo-100"
-                >
-                  Back to Website
-                </button>
-             </div>
+            <div className="flex-1 overflow-y-auto px-6 py-10">
+              <h1 className="text-3xl md:text-4xl font-black text-indigo-950 mb-6 pb-4 border-b border-indigo-50 tracking-tighter uppercase">
+                {siteContent[activeContent].title}
+              </h1>
+              <div 
+                className="prose prose-sm md:prose-base prose-indigo max-w-none text-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: siteContent[activeContent].text }}
+              />
+              
+               <div className="mt-12 pt-8 border-t border-indigo-50 text-center">
+                  <button 
+                    onClick={closeContent}
+                    className="px-10 py-4 bg-indigo-950 text-white rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl shadow-indigo-100"
+                  >
+                    Close
+                  </button>
+               </div>
+            </div>
           </div>
         </div>
       )}
@@ -352,13 +354,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <Modal
           isOpen={isCityModalOpen}
           onClose={() => { if (userCity) setIsCityModalOpen(false); }}
-          title="⚡ Select Operational Hub"
+          title="Select Your City"
         >
            <div className="py-4">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-black text-indigo-950 tracking-tighter uppercase mb-2">Regional Selection</h3>
+                <h3 className="text-2xl font-black text-indigo-950 tracking-tighter uppercase mb-2">Service Location</h3>
                 <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] max-w-sm mx-auto">
-                    Choose your geographic territory to begin deployment.
+                    Select your city to see available services in your area.
                 </p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
