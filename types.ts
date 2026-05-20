@@ -51,6 +51,7 @@ export interface Booking {
   assignedPartnerPhone?: string;
   assignedPartnerArea?: string;
   commissionPaid: boolean;
+  partner_rating?: number; // Job-specific technician rating (1-5)
   createdAt: string;
   couponUsed?: string;
   discountAmount?: number;
@@ -70,14 +71,18 @@ export interface Partner {
   city?: string;
   lat?: number;
   lng?: number;
-  partner_type?: 'Primary' | 'Secondary';
+  partner_type?: 'Primary'; // Kept only Primary partner
   categories?: string[];
   sub_categories?: string[];
   experience?: string;
   service_areas?: string[];
   service_pincodes?: string[];
   password?: string;
-  status: 'available' | 'busy' | 'on_hold' | 'blocked';
+  aadhar_number?: string; // Aadhaar card number
+  id_proof_url?: string;   // Identity verification document
+  status: 'pending' | 'available' | 'busy' | 'on_hold' | 'blocked';
+  age?: number;
+  alt_phone?: string;
   rating?: number;
   review_count?: number;
   earnings: number;

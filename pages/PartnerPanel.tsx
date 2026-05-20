@@ -4,7 +4,8 @@ import { useStore } from '../hooks/useStore';
 import { Partner, Booking } from '../types';
 import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
 import { Modal } from '../components/Modal';
-import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star, Navigation, Plus } from 'lucide-react';
+import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star, Navigation, Plus, ShieldCheck, PartyPopper } from 'lucide-react';
+import { motion } from 'motion/react';
 import { supabase } from '../supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
@@ -50,7 +51,7 @@ export const PartnerPanel: React.FC = () => {
 
   // Partner Registration Modal State
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [regStep, setRegStep] = useState<'city' | 'details'>('city');
+  const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verification' | 'success'>('personal');
   const [selectedAreasList, setSelectedAreasList] = useState<string[]>([]);
   const [editSelectedAreasList, setEditSelectedAreasList] = useState<string[]>([]);
   const [discoveredPincodesList, setDiscoveredPincodesList] = useState<string[]>([]);
@@ -67,7 +68,9 @@ export const PartnerPanel: React.FC = () => {
     firstName: '',
     lastName: '',
     phone: '',
+    altPhone: '', // Added altPhone
     email: '',
+    age: '', // Added age
     gender: 'Male',
     experience: '',
     address: '',
@@ -77,6 +80,7 @@ export const PartnerPanel: React.FC = () => {
     serviceAreas: '',
     categories: [] as string[],
     subCategories: [] as string[],
+    aadharNumber: '',
     lat: null as number | null,
     lng: null as number | null
   });
@@ -85,6 +89,7 @@ export const PartnerPanel: React.FC = () => {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editData, setEditData] = useState({
     phone: '',
+    altPhone: '',
     address: '',
     city: '',
     customCity: '',
@@ -93,6 +98,7 @@ export const PartnerPanel: React.FC = () => {
     subCategories: [] as string[],
     experience: '',
     gender: 'Male',
+    age: '',
     lat: null as number | null,
     lng: null as number | null
   });
@@ -338,6 +344,10 @@ export const PartnerPanel: React.FC = () => {
                sub_categories: data.sub_categories || [],
                experience: data.experience,
                status: data.status,
+               age: data.age,
+               alt_phone: data.alt_phone,
+               aadhar_number: data.aadhar_number,
+               id_proof_url: data.id_proof_url,
                earnings: data.earnings || 0,
                completedJobs: data.completed_jobs || 0,
                rating: data.rating || 0,
@@ -502,15 +512,17 @@ export const PartnerPanel: React.FC = () => {
 
         const { error } = await supabase
            .from('primary_partners')
-           .insert([
+           .upsert([
                { 
                    id: session.user.id,
                    name: `${regData.firstName} ${regData.lastName}`.trim(),
                    first_name: regData.firstName, 
                    last_name: regData.lastName,
                    phone: regData.phone,
+                   alt_phone: regData.altPhone,
                    email: session.user.email,
                    gender: regData.gender,
+                   age: parseInt(regData.age) || null,
                    categories: regData.categories, 
                    sub_categories: regData.subCategories, 
                    experience: regData.experience,
@@ -521,7 +533,8 @@ export const PartnerPanel: React.FC = () => {
                    service_pincodes: finalServicePincodes,
                    lat: pLat,
                    lng: pLng,
-                   status: 'available',
+                   aadhar_number: regData.aadharNumber,
+                   status: 'available', // Changed from 'pending' to 'available' for prompt verification
                    earnings: 0,
                    completed_jobs: 0
                }
@@ -532,9 +545,7 @@ export const PartnerPanel: React.FC = () => {
         // Force sync after insertion
         await syncUserWithStore(session.user.email);
         
-        setIsRegistrationOpen(false);
-        setNotification("Registration Successful! Welcome to Sofiyan Home Service.");
-
+        setRegStep('success');
       } catch (error: any) {
         console.error("Error saving partner:", error);
         alert("Registration failed: " + (error.message || "Unknown error"));
@@ -945,6 +956,11 @@ export const PartnerPanel: React.FC = () => {
       if (!currentUser) return false;
       if (b.status !== 'pending' && b.status !== 'Forwarded') return false;
 
+      // If a lead is Forwarded, it must be assigned to this partner explicitly
+      if (b.status === 'Forwarded') {
+        return b.assignedPartnerId === currentUser.id;
+      }
+
       // 1. Category Matching
       // We check if any of the partner's categories match the lead's service category
       const partnerCategories = currentUser.categories || [];
@@ -955,15 +971,26 @@ export const PartnerPanel: React.FC = () => {
       
       if (!categoryMatch) return false;
 
-      // 2. Location Matching: Pincode or Area
+      // 2. Location Matching: Pincode, Area, or City
       const partnerPincodes = currentUser.service_pincodes || [];
       const partnerAreas = currentUser.service_areas || [];
+      const partnerCity = currentUser.city || '';
       
       const pincodeMatch = b.pinCode && partnerPincodes.includes(b.pinCode);
       const areaMatch = b.area && partnerAreas.some(a => a.toLowerCase() === b.area!.toLowerCase());
+      const cityMatch = b.city && partnerCity && b.city.toLowerCase() === partnerCity.toLowerCase();
 
-      return pincodeMatch || areaMatch;
+      return pincodeMatch || areaMatch || cityMatch;
   });
+
+  const groupedLeads = availableLeads.reduce((acc, lead) => {
+    const areaName = lead.area || lead.city || 'Other Areas';
+    if (!acc[areaName]) {
+      acc[areaName] = [];
+    }
+    acc[areaName].push(lead);
+    return acc;
+  }, {} as Record<string, Booking[]>);
 
   const { total: modalTotal, commission: modalCommission } = paymentModal ? { total: paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0), commission: (paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0)) * 0.25 } : { total: 0, commission: 0 };
 
@@ -979,6 +1006,7 @@ export const PartnerPanel: React.FC = () => {
                 currentUser?.status === 'available' ? 'bg-green-100 text-green-700' : 
                 currentUser?.status === 'busy' ? 'bg-blue-100 text-blue-700' :
                 currentUser?.status === 'on_hold' ? 'bg-orange-100 text-orange-700' :
+                currentUser?.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                 'bg-red-100 text-red-700'
               }`}>
                 {currentUser?.status.replace('_', ' ').toUpperCase()}
@@ -1009,7 +1037,29 @@ export const PartnerPanel: React.FC = () => {
         </div>
       </div>
 
-      {notification && (
+      {currentUser?.status === 'pending' ? (
+        <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm mb-10 overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-600"></div>
+          <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+             <Clock size={32} className="text-indigo-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification in Progress ⏳</h2>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Your profile is currently under review. We verify all partners to keep our platform safe. 
+            Usually this takes 24-48 hours.
+          </p>
+          <div className="mt-8 flex justify-center gap-4">
+             <div className="flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-100">
+                <CheckCircle size={14} /> Profile Submitted
+             </div>
+             <div className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-4 py-2 rounded-lg border border-amber-100">
+                <Loader2 size={14} className="animate-spin" /> Review Pending
+             </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {notification && (
         <Modal isOpen={!!notification} onClose={() => setNotification(null)} title="Notice">
           <div className="text-center py-6">
              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1087,67 +1137,77 @@ export const PartnerPanel: React.FC = () => {
         </div>
       ) : (
         <div>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Available Leads</h2>
-          {availableLeads.length === 0 ? (
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Available Leads by Area</h2>
+          {Object.keys(groupedLeads).length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
               <p className="text-gray-500">No new leads available at the moment.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {availableLeads.map(lead => (
-                <div key={lead.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
-                     New Lead
-                  </div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-full">
-                      <div className="flex justify-between items-center mb-2">
-                          <span className="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded uppercase">
-                            {lead.city || 'City N/A'}
-                          </span>
-                          <span className="text-2xl font-bold text-gray-900">₹{lead.price}</span>
-                      </div>
-                      
-                      <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                        <Briefcase size={16} className="text-gray-400" />
-                        {lead.cartItems && Array.isArray(lead.cartItems) ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
-                      </h3>
-                      <p className="text-xs text-gray-500 mb-2">{lead.serviceCategory}</p>
-                    </div>
-                  </div>
+            <div className="space-y-8">
+              {Object.entries(groupedLeads).map(([area, leads]) => (
+                <div key={area} className="space-y-4">
+                  <h3 className="text-lg font-bold text-gray-700 border-b pb-2 flex items-center gap-2">
+                    <MapPin size={20} className="text-indigo-500" /> {area}
+                    <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full ml-2">{leads.length}</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {leads.map(lead => (
+                      <div key={lead.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden">
+                        <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
+                          New Lead
+                        </div>
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="w-full">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded uppercase">
+                                  {lead.city || 'City N/A'}
+                                </span>
+                                <span className="text-2xl font-bold text-gray-900">₹{lead.price}</span>
+                            </div>
+                            
+                            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                              <Briefcase size={16} className="text-gray-400" />
+                              {lead.cartItems && Array.isArray(lead.cartItems) ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
+                            </h3>
+                            <p className="text-xs text-gray-500 mb-2">{lead.serviceCategory}</p>
+                          </div>
+                        </div>
 
-                  <div className="space-y-2 text-sm text-gray-600 mb-6 border-t border-gray-50 pt-3">
-                    <p className="flex items-center gap-2 font-medium">
-                        <MapPin size={16} className="text-red-400" /> 
-                        {lead.address} {lead.area ? `- ${lead.area}` : ''} - {lead.pinCode}
-                    </p>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {lead.lat && lead.lng && currentUser?.lat && currentUser?.lng && (
-                        <p className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
-                          <Navigation size={12} className="animate-pulse" />
-                          {calculateDistanceKM(currentUser.lat, currentUser.lng, lead.lat, lead.lng).toFixed(1)} KM AWAY
-                        </p>
-                      )}
-                      {(lead.location_link || (lead.lat && lead.lng)) && (
-                        <a 
-                          href={lead.location_link || `https://www.google.com/maps?q=${lead.lat},${lead.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 hover:bg-blue-200 transition-colors"
+                        <div className="space-y-2 text-sm text-gray-600 mb-6 border-t border-gray-50 pt-3">
+                          <p className="flex items-center gap-2 font-medium">
+                              <MapPin size={16} className="text-red-400" /> 
+                              {lead.address} {lead.area ? `- ${lead.area}` : ''} - {lead.pinCode}
+                          </p>
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            {lead.lat && lead.lng && currentUser?.lat && currentUser?.lng && (
+                              <p className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
+                                <Navigation size={12} className="animate-pulse" />
+                                {calculateDistanceKM(currentUser.lat, currentUser.lng, lead.lat, lead.lng).toFixed(1)} KM AWAY
+                              </p>
+                            )}
+                            {(lead.location_link || (lead.lat && lead.lng)) && (
+                              <a 
+                                href={lead.location_link || `https://www.google.com/maps?q=${lead.lat},${lead.lng}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 hover:bg-blue-200 transition-colors"
+                              >
+                                <Navigation size={12} />
+                                Track Lead Location
+                              </a>
+                            )}
+                          </div>
+                          <p className="flex items-center gap-2"><Clock size={14} className="text-gray-400" /> {lead.date} | {lead.time}</p>
+                        </div>
+                        <button
+                          onClick={() => handleAcceptLead(lead)}
+                          className="w-full py-2.5 bg-gray-950 text-white rounded-lg font-bold hover:bg-black transition-colors shadow-sm"
                         >
-                          <Navigation size={12} />
-                          Track Lead Location
-                        </a>
-                      )}
-                    </div>
-                    <p className="flex items-center gap-2"><Clock size={14} className="text-gray-400" /> {lead.date} | {lead.time}</p>
+                          Accept Lead
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                  <button
-                    onClick={() => handleAcceptLead(lead)}
-                    className="w-full py-2.5 bg-gray-950 text-white rounded-lg font-bold hover:bg-black transition-colors shadow-sm"
-                  >
-                    Accept Lead
-                  </button>
                 </div>
               ))}
             </div>
@@ -1157,346 +1217,463 @@ export const PartnerPanel: React.FC = () => {
 
       {isRegistrationOpen && (
           <div id="partner-reg-modal" className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex justify-center items-center px-4 animate-fadeIn backdrop-blur-sm">
-            
-            {regStep === 'city' ? (
-              <div className="bg-white rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
-                 <div className="p-8">
-                   <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
-                     <div>
-                       <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Where do you work? 📍</h2>
-                       <p className="text-gray-500 mt-1">Select your primary city to discover service areas.</p>
-                     </div>
-                     <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
-                       <span className="sr-only">Close</span>
-                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                     </button>
-                   </div>
+            <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
+              <div className="p-8">
+                {/* Stepper Header */}
+                <div className="mb-8">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Partner Onboarding 👋</h2>
+                      <p className="text-gray-500 text-sm">Join our network of expert professionals</p>
+                    </div>
+                    <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
+                      <span className="sr-only">Close</span>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
 
-                   <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                     {CITY_DATA.map((city) => (
-                        <div 
-                           key={city.name}
-                           onClick={() => {
-                              setRegData(prev => ({ ...prev, city: city.name }));
-                              setRegStep('details');
-                           }}
-                           className="group cursor-pointer rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 transition-all duration-300 relative bg-white"
-                        >
-                           <div className="h-32 overflow-hidden relative">
-                              <img src={city.img} alt={city.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/10 to-transparent"></div>
-                              <div className="absolute bottom-3 left-3 text-white">
-                                 <h3 className="font-bold text-lg leading-tight">{city.name}</h3>
-                                 <p className="text-[10px] font-medium text-gray-200 uppercase tracking-wider">{city.areasCount} active areas</p>
-                              </div>
-                           </div>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { id: 'personal', label: 'Personal', icon: <User size={14} /> },
+                      { id: 'expertise', label: 'Expertise', icon: <Briefcase size={14} /> },
+                      { id: 'location', label: 'Service Areas', icon: <MapPin size={14} /> },
+                      { id: 'verification', label: 'Verify', icon: <CheckCircle size={14} /> }
+                    ].map((step, idx) => (
+                      <React.Fragment key={step.id}>
+                        <div className={`flex flex-col items-center gap-1.5 flex-1`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                            regStep === step.id ? 'bg-indigo-600 text-white shadow-lg ring-4 ring-indigo-100' : 
+                            ['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
+                          }`}>
+                            {['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? <CheckCircle size={16} /> : step.icon}
+                          </div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${regStep === step.id ? 'text-indigo-600' : 'text-gray-400'}`}>{step.label}</span>
                         </div>
-                     ))}
-                     
-                     <div 
-                        onClick={() => {
-                           setRegData(prev => ({ ...prev, city: 'Others', customCity: '' }));
-                           setRegStep('details');
-                        }}
-                        className="group cursor-pointer rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-300 bg-gray-50 flex flex-col items-center justify-center h-32"
-                     >
-                        <MapPin className="w-8 h-8 text-indigo-400 mb-2 group-hover:text-indigo-600 transition-colors" />
-                        <h3 className="font-bold text-gray-700 text-sm">Other City</h3>
-                     </div>
-                   </div>
-                 </div>
-              </div>
-            ) : (
-            
-            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
-              <div className="p-6 md:p-8">
-                <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-                   <div className="flex flex-col">
-                      <button 
-                        onClick={() => setRegStep('city')}
-                        className="text-xs text-indigo-600 font-bold hover:text-indigo-800 flex items-center mb-1 w-fit"
-                      >
-                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                         Back to Cities
-                      </button>
-                      <h2 className="text-2xl font-bold text-gray-800">Complete Your Partner Profile 🛠️</h2>
-                   </div>
-                   <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
-                     <span className="sr-only">Close</span>
-                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                   </button>
+                        {idx < 3 && <div className={`h-px flex-1 mb-5 transition-colors duration-500 ${['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500' : 'bg-gray-100'}`} />}
+                      </React.Fragment>
+                    ))}
+                  </div>
                 </div>
 
-                <form onSubmit={submitPartnerRegistration} className="space-y-6">
-                  {/* Personal Info */}
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Personal Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input 
-                        type="text" 
-                        placeholder="First Name" 
-                        required 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        value={regData.firstName}
-                        onChange={(e) => setRegData({...regData, firstName: e.target.value})}
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="Last Name" 
-                        required 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        value={regData.lastName}
-                        onChange={(e) => setRegData({...regData, lastName: e.target.value})}
-                      />
-                      <input 
-                        type="tel" 
-                        placeholder="Phone Number" 
-                        readOnly 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                        value={regData.phone}
-                      />
-                      <input 
-                        type="email" 
-                        placeholder="Email Address" 
-                        readOnly 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                        value={regData.email}
-                      />
-                      <select 
-                         className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
-                         value={regData.gender}
-                         onChange={(e) => setRegData({...regData, gender: e.target.value})}
-                      >
-                         <option value="Male">Male</option>
-                         <option value="Female">Female</option>
-                         <option value="Other">Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Work Categories */}
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Select Your Expertise</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                       {CATEGORY_LIST.map((cat) => (
-                         <label key={cat} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                           <input 
-                             type="checkbox" 
-                             id={cat === "Home Appliances" ? "cat-home-appliances" : undefined}
-                             className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                             checked={regData.categories.includes(cat)}
-                             onChange={() => handleCategoryChange(cat)}
-                           />
-                           <span className="text-sm font-medium text-gray-700">{cat}</span>
-                         </label>
-                       ))}
-                    </div>
-
-                    {/* Conditional Sub-Categories */}
-                    {regData.categories.includes("Home Appliances") && (
-                      <div id="sub-home-appliances" className="bg-blue-50 p-4 rounded-xl mt-4 border border-blue-100 animate-fadeIn">
-                         <h4 className="text-sm font-bold text-blue-800 mb-3">Select Appliances you can repair:</h4>
-                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                           {APPLIANCE_LIST.map((sub) => (
-                             <label key={sub} className="flex items-center gap-2">
-                               <input 
-                                 type="checkbox" 
-                                 className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
-                                 checked={regData.subCategories.includes(sub)}
-                                 onChange={() => handleSubCategoryChange(sub)}
-                               />
-                               <span className="text-sm text-blue-700">{sub}</span>
-                             </label>
-                           ))}
-                         </div>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  if (regStep === 'personal') setRegStep('expertise');
+                  else if (regStep === 'expertise') {
+                    if (regData.categories.length === 0) {
+                      alert("Please select at least one category of expertise.");
+                      return;
+                    }
+                    setRegStep('location');
+                  }
+                  else if (regStep === 'location') {
+                    if (!regData.city) {
+                      alert("Please select a city.");
+                      return;
+                    }
+                    setRegStep('verification');
+                  }
+                  else {
+                    if (!regData.aadharNumber || regData.aadharNumber.length !== 12) {
+                      alert("Please enter a valid 12-digit Aadhaar Card Number.");
+                      return;
+                    }
+                    submitPartnerRegistration(e);
+                  }
+                }} className="space-y-6">
+                  
+                  {/* STEP 1: PERSONAL DETAILS */}
+                  {regStep === 'personal' && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">First Name</label>
+                          <input 
+                            type="text" 
+                            required 
+                            placeholder="e.g., Salman"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={regData.firstName}
+                            onChange={(e) => setRegData({...regData, firstName: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Last Name</label>
+                          <input 
+                            type="text" 
+                            required 
+                            placeholder="e.g., Khan"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={regData.lastName}
+                            onChange={(e) => setRegData({...regData, lastName: e.target.value})}
+                          />
+                        </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Professional & Location */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                       <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Professional Details</h3>
-                       <div className="relative">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Age</label>
                           <input 
                             type="number" 
-                            placeholder="Work Experience (Years)" 
                             required 
-                            min="0"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                            value={regData.experience}
-                            onChange={(e) => setRegData({...regData, experience: e.target.value})}
+                            min="18"
+                            max="70"
+                            placeholder="Years"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={regData.age}
+                            onChange={(e) => setRegData({...regData, age: e.target.value})}
                           />
-                       </div>
-                    </div>
-                     <div>
-                       <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Service Areas ({regData.city === 'Others' ? regData.customCity : regData.city})</h3>
-                       
-                       {regData.city === 'Others' && (
-                           <input 
-                               type="text" 
-                               id="other-city-input" 
-                               placeholder="Type your city name" 
-                               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
-                               value={regData.customCity}
-                               onChange={(e) => setRegData({...regData, customCity: e.target.value})}
-                               required
-                           />
-                       )}
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Gender</label>
+                          <select 
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white transition-all appearance-none"
+                            value={regData.gender}
+                            onChange={(e) => setRegData({...regData, gender: e.target.value})}
+                          >
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      </div>
 
-                       <div className="space-y-4">
-                          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Available Areas</label>
-                             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                                {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).map(area => (
-                                   <div 
-                                      key={area}
-                                      onClick={() => handleAddArea(area)}
-                                      className="bg-white border border-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-full cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center gap-1 shadow-sm"
-                                   >
-                                      <Plus size={14} /> {area}
-                                   </div>
-                                ))}
-                                {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).length === 0 && (
-                                   <span className="text-sm text-gray-400 italic py-1">No predefined areas left to select.</span>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-400 uppercase ml-1">Alternative Phone (Optional)</label>
+                        <input 
+                          type="tel" 
+                          placeholder="Secondary contact number"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                          value={regData.altPhone}
+                          onChange={(e) => setRegData({...regData, altPhone: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* STEP 2: EXPERTISE */}
+                  {regStep === 'expertise' && (
+                    <div className="space-y-6 animate-fadeIn">
+                      <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Categories of Expertise</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {CATEGORY_LIST.map((cat) => (
+                            <label key={cat} className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
+                              regData.categories.includes(cat) ? 'border-indigo-600 bg-indigo-50 shadow-sm ring-1 ring-indigo-600' : 'border-gray-100 hover:border-gray-300'
+                            }`}>
+                              <input 
+                                type="checkbox" 
+                                className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                                checked={regData.categories.includes(cat)}
+                                onChange={() => handleCategoryChange(cat)}
+                              />
+                              <span className={`text-sm font-bold ${regData.categories.includes(cat) ? 'text-indigo-700' : 'text-gray-700'}`}>{cat}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {regData.categories.includes("Home Appliances") && (
+                        <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                          <h4 className="text-xs font-bold text-blue-800 uppercase mb-3 flex items-center gap-2">
+                             <Briefcase size={14} /> Appliances you repair
+                          </h4>
+                          <div className="grid grid-cols-2 gap-2">
+                            {APPLIANCE_LIST.map((sub) => (
+                              <label key={sub} className="flex items-center gap-2 p-1.5 cursor-pointer group">
+                                <input 
+                                  type="checkbox" 
+                                  className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
+                                  checked={regData.subCategories.includes(sub)}
+                                  onChange={() => handleSubCategoryChange(sub)}
+                                />
+                                <span className="text-xs text-blue-700 group-hover:text-blue-900 transition-colors">{sub}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-gray-400 uppercase ml-1">Years of Experience</label>
+                        <input 
+                          type="number" 
+                          required 
+                          placeholder="e.g., 5"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                          value={regData.experience}
+                          onChange={(e) => setRegData({...regData, experience: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* STEP 3: LOCATION */}
+                  {regStep === 'location' && (
+                    <div className="space-y-6 animate-fadeIn">
+                      <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Primary Work City</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {CITY_DATA.map(city => (
+                            <button
+                              key={city.name}
+                              type="button"
+                              onClick={() => setRegData({...regData, city: city.name})}
+                              className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all ${
+                                regData.city === city.name ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-white'
+                              }`}
+                            >
+                              {city.name}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setRegData({...regData, city: 'Others', customCity: ''})}
+                            className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all ${
+                              regData.city === 'Others' ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-white'
+                            }`}
+                          >
+                            Other
+                          </button>
+                        </div>
+                      </div>
+
+                      {regData.city === 'Others' && (
+                        <div className="space-y-1 animate-fadeIn">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Type City Name</label>
+                          <input 
+                            type="text" 
+                            placeholder="Your city"
+                            required
+                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            value={regData.customCity}
+                            onChange={(e) => setRegData({...regData, customCity: e.target.value})}
+                          />
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Service Delivery Areas</label>
+                        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
+                          <div className="flex flex-wrap gap-2 mb-4 max-h-24 overflow-y-auto">
+                            {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).map(area => (
+                               <button 
+                                  key={area}
+                                  type="button"
+                                  onClick={() => handleAddArea(area)}
+                                  className="bg-white border border-gray-200 text-gray-700 text-[10px] px-2.5 py-1 rounded-full hover:border-indigo-500 transition-colors shadow-sm flex items-center gap-1 font-bold"
+                               >
+                                  <Plus size={10} /> {area}
+                               </button>
+                            ))}
+                          </div>
+                          
+                          <div className="flex gap-2">
+                             <input 
+                                type="text"
+                                placeholder="Add custom area..."
+                                className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                value={customAreaInput}
+                                onChange={(e) => setCustomAreaInput(e.target.value)}
+                             />
+                             <button
+                                type="button"
+                                onClick={handleAddCustomArea}
+                                className="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-lg"
+                             >
+                                Add
+                             </button>
+                          </div>
+                        </div>
+
+                        {selectedAreasList.length > 0 && (
+                          <div className="mt-4 flex flex-wrap gap-1.5">
+                            {selectedAreasList.map(area => (
+                              <span key={area} className="bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-full font-bold flex items-center gap-1.5 group shadow-sm">
+                                {area}
+                                <button type="button" onClick={() => handleRemoveArea(area)} className="hover:bg-white/20 rounded-full p-0.5">
+                                  <LogOut size={10} className="rotate-180" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Auto Discovered Pincodes Display */}
+                        {selectedAreasList.length > 0 && (
+                          <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
+                             <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
+                                Auto-Fetched Pincodes
+                                {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
+                             </label>
+                             <div className="text-sm text-green-700">
+                                {fetchingPincodes ? (
+                                    <span className="opacity-70">Fetching from India Post...</span>
+                                ) : discoveredPincodesList.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                       {discoveredPincodesList.map(pin => (
+                                          <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
+                                            {pin}
+                                          </span>
+                                       ))}
+                                    </div>
+                                ) : (
+                                    <span className="opacity-70">No pincodes found for selected areas.</span>
                                 )}
                              </div>
-                             
-                             <div className="mt-4 flex gap-2">
-                                <input 
-                                   type="text"
-                                   placeholder="Add a custom area..."
-                                   className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                   value={customAreaInput}
-                                   onChange={(e) => setCustomAreaInput(e.target.value)}
-                                   onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                         e.preventDefault();
-                                         handleAddCustomArea();
-                                      }
-                                   }}
-                                />
-                                <button
-                                   type="button"
-                                   onClick={handleAddCustomArea}
-                                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700"
-                                >
-                                   Add
-                                </button>
-                             </div>
                           </div>
+                        )}
+                      </div>
 
-                          <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 min-h-[100px]">
-                             <label className="block text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center justify-between">
-                                Selected Service Areas
-                                <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">{selectedAreasList.length}</span>
-                             </label>
-                             {selectedAreasList.length === 0 ? (
-                                <div className="text-center py-6 border-2 border-dashed border-indigo-200 rounded-lg text-indigo-400 text-sm">
-                                   Click '+' to add areas or type below.
-                                </div>
-                             ) : (
-                                <div className="flex flex-wrap gap-2">
-                                   {selectedAreasList.map(area => (
-                                      <div 
-                                         key={area}
-                                         className="bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 group"
-                                      >
-                                         {area}
-                                         <button 
-                                            type="button" 
-                                            onClick={() => handleRemoveArea(area)}
-                                            className="w-4 h-4 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center transition"
-                                         >
-                                            <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                            </svg>
-                                         </button>
-                                      </div>
-                                   ))}
-                                </div>
-                             )}
-                          </div>
-                          
-                          <input 
-                            type="number" 
-                            placeholder="Other service area pin code" 
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none mt-2 ${pincodeError ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}`}
-                            value={regData.pincode}
-                            onChange={(e) => setRegData({...regData, pincode: e.target.value})}
-                          />
-                          {pincodeError && <p className="text-red-500 text-xs mt-1 font-medium">{pincodeError}</p>}
-                          {pincodeAreas.length > 0 && !pincodeError && (
-                             <p className="text-emerald-600 text-xs mt-1 font-medium bg-emerald-50 p-1.5 rounded inline-block">
-                                📍 Areas found: {pincodeAreas.join(', ')}
-                             </p>
-                          )}
-                          
-                          {/* Auto Discovered Pincodes Display */}
-                          {selectedAreasList.length > 0 && (
-                            <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
-                               <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
-                                  Auto-Fetched Pincodes
-                                  {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
-                               </label>
-                               <div className="text-sm text-green-700">
-                                  {fetchingPincodes ? (
-                                      <span className="opacity-70">Fetching from India Post...</span>
-                                  ) : discoveredPincodesList.length > 0 ? (
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                         {discoveredPincodesList.map(pin => (
-                                            <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
-                                              {pin}
-                                            </span>
-                                         ))}
-                                      </div>
-                                  ) : (
-                                      <span className="opacity-70">No pincodes found for selected areas.</span>
-                                  )}
-                               </div>
-                            </div>
-                          )}
-
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-xs font-bold text-gray-500 uppercase ml-1">Home Address</label>
-                              <button 
-                                type="button" 
-                                onClick={() => handleTrackLocation(false)} 
-                                disabled={isTrackingLocation || !!(regData.lat && regData.lng)}
-                                className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-green-600 flex items-center gap-1"
-                              >
-                                {regData.lat && regData.lng ? '✓ Location Saved' : isTrackingLocation ? 'Locating...' : '📍 Auto-Detect Location'}
-                              </button>
-                            </div>
-                            <textarea 
-                              placeholder="Full Address" 
-                              required
-                              rows={2}
-                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                              value={regData.address}
-                              onChange={(e) => setRegData({...regData, address: e.target.value})}
-                            ></textarea>
-                          </div>
-                       </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Home Address</label>
+                          <button 
+                            type="button" 
+                            onClick={() => handleTrackLocation(false)} 
+                            disabled={isTrackingLocation || !!(regData.lat && regData.lng)}
+                            className={`text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
+                              regData.lat && regData.lng ? 'bg-green-100 text-green-700 border-green-200' : 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100'
+                            }`}
+                          >
+                            {regData.lat && regData.lng ? <><CheckCircle size={12} /> Location Saved</> : isTrackingLocation ? <><Loader2 className="animate-spin" size={12} /> Locating...</> : <><Navigation size={12} /> GPS Detect</>}
+                          </button>
+                        </div>
+                        <textarea 
+                          placeholder="Complete residence address" 
+                          required
+                          rows={2}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
+                          value={regData.address}
+                          onChange={(e) => setRegData({...regData, address: e.target.value})}
+                        ></textarea>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className={`w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all active:scale-95 text-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  >
-                    {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <Loader2 className="w-6 h-6 animate-spin" /> Saving Profile...
-                        </span>
-                    ) : 'Submit Registration'}
-                  </button>
+                  {/* STEP 4: VERIFICATION */}
+                  {regStep === 'verification' && (
+                    <div className="space-y-6 animate-fadeIn">
+                      <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col items-center text-center gap-4">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                           <ShieldCheck className="text-indigo-600" size={32} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-indigo-900 uppercase tracking-wide">Identity Verification</p>
+                          <p className="text-xs text-indigo-700 leading-relaxed mt-1">Please provide your 12-digit Aadhaar number below to verify your identity and activate your account.</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-750 block">Aadhaar Card Number <span className="text-rose-500 font-bold">*</span></label>
+                        <input 
+                          type="text" 
+                          placeholder="Enter 12-digit Aadhaar Number" 
+                          required
+                          maxLength={12}
+                          minLength={12}
+                          pattern="[0-9]{12}"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono tracking-widest text-center text-lg font-bold text-indigo-950"
+                          value={regData.aadharNumber}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            if (value.length <= 12) {
+                              setRegData({ ...regData, aadharNumber: value });
+                            }
+                          }}
+                        />
+                        <p className="text-[10px] text-gray-400">Your Aadhaar number is secure and only used for background validation.</p>
+                      </div>
+
+                      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-3 text-gray-600 text-[10px] leading-relaxed">
+                         <Star size={14} className="flex-shrink-0 text-indigo-600 mt-0.5" />
+                         <p>By submitting, you agree to our <span className="font-bold underline cursor-pointer">Partner Terms of Service</span> and consent to identity verification.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {regStep === 'success' && (
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-center py-8 animate-fadeIn"
+                    >
+                       <motion.div 
+                         initial={{ y: 20, opacity: 0 }}
+                         animate={{ y: 0, opacity: 1 }}
+                         transition={{ delay: 0.2 }}
+                         className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 relative"
+                       >
+                          <CheckCircle size={48} className="text-green-600 relative z-10" />
+                          <motion.div 
+                            animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className="absolute inset-0 bg-green-400 rounded-full"
+                          />
+                       </motion.div>
+                       
+                       <motion.div
+                         initial={{ y: 20, opacity: 0 }}
+                         animate={{ y: 0, opacity: 1 }}
+                         transition={{ delay: 0.4 }}
+                       >
+                         <h2 className="text-3xl font-bold text-gray-800 mb-2">Congratulations! 🎉</h2>
+                         <div className="flex justify-center gap-1 mb-4">
+                            <PartyPopper className="text-yellow-500" size={24} />
+                            <p className="text-indigo-600 font-bold">You are now a Verified Partner!</p>
+                            <PartyPopper className="text-yellow-500" size={24} />
+                         </div>
+                         <p className="text-gray-600 mb-8 px-4 text-sm leading-relaxed max-w-sm mx-auto">
+                            Your account is active and you can now start receiving leads. Welcome to the professional network of Sofiyan Home Service!
+                         </p>
+                       </motion.div>
+
+                       <motion.button 
+                         initial={{ y: 20, opacity: 0 }}
+                         animate={{ y: 0, opacity: 1 }}
+                         transition={{ delay: 0.6 }}
+                         type="button"
+                         onClick={() => {
+                            setIsRegistrationOpen(false);
+                         }}
+                         className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"
+                       >
+                         Go to Dashboard
+                       </motion.button>
+                    </motion.div>
+                  )}
+
+                  {/* Navigation Buttons */}
+                  {regStep !== 'success' && (
+                    <div className="flex gap-3 pt-4">
+                      {regStep !== 'personal' && (
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            if (regStep === 'expertise') setRegStep('personal');
+                            else if (regStep === 'location') setRegStep('expertise');
+                            else if (regStep === 'verification') setRegStep('location');
+                          }}
+                          className="flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-all text-sm"
+                        >
+                          Back
+                        </button>
+                      )}
+                      <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className={`flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95 text-sm ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      >
+                        {isSubmitting ? (
+                            <span className="flex items-center justify-center gap-2">
+                              <Loader2 className="w-5 h-5 animate-spin" /> Processing...
+                            </span>
+                        ) : regStep === 'verification' ? 'Finish & Join' : 'Continue'}
+                      </button>
+                    </div>
+                  )}
                 </form>
               </div>
             </div>
-            )}
           </div>
         )}
 
@@ -1949,6 +2126,8 @@ export const PartnerPanel: React.FC = () => {
                 </div>
             </div>
         )}
+        </>
+      )}
     </div>
   );
 };

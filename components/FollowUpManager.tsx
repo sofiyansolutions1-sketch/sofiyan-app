@@ -247,7 +247,7 @@ export const FollowUpManager: React.FC = () => {
   const fetchLeads = async () => {
     setIsLoading(true);
     const { data, error } = await supabase
-      .from('web_dev_leads')
+      .from('customer_followups')
       .select('*')
       .order('follow_up_datetime', { ascending: true });
       
@@ -264,7 +264,7 @@ export const FollowUpManager: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error } = await supabase
-      .from('web_dev_leads')
+      .from('customer_followups')
       .insert([{
         name: formData.name,
         contact_number: formData.contact_number,
@@ -298,7 +298,7 @@ export const FollowUpManager: React.FC = () => {
 
   const handleUpdateLeadField = async (id: string, updates: Partial<WebDevLead>) => {
     const { error } = await supabase
-      .from('web_dev_leads')
+      .from('customer_followups')
       .update(updates)
       .eq('id', id);
     if (!error) {
@@ -310,7 +310,7 @@ export const FollowUpManager: React.FC = () => {
 
   const handleDeleteLead = async (id: string) => {
     const { error } = await supabase
-      .from('web_dev_leads')
+      .from('customer_followups')
       .delete()
       .eq('id', id);
     if (!error) {

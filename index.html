@@ -197,29 +197,18 @@
           loadingDiv.classList.remove('hidden');
 
           try {
-              // Fetch Primary and Secondary Partners
-              const [primaryResponse, secondaryResponse] = await Promise.all([
-                  window.supabase.from('primary_partners').select('*').eq('status', 'available'),
-                  window.supabase.from('secondary_partners').select('*').eq('status', 'available')
-              ]);
+              // Fetch Primary Partners
+              const primaryResponse = await window.supabase.from('primary_partners').select('*').eq('status', 'available');
               
               if (primaryResponse.error) throw primaryResponse.error;
-              if (secondaryResponse.error) throw secondaryResponse.error;
 
               // Map and Combine
-              const primaryPartners = (primaryResponse.data || []).map(p => ({
+              const allPartners = (primaryResponse.data || []).map(p => ({
                   ...p,
-                  display_name: `${p.first_name} ${p.last_name || ''}`.trim(),
+                  display_name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || p.name,
                   partner_type: 'Primary'
               }));
 
-              const secondaryPartners = (secondaryResponse.data || []).map(p => ({
-                  ...p,
-                  display_name: p.name || 'Unknown',
-                  partner_type: 'Secondary'
-              }));
-
-              const allPartners = [...primaryPartners, ...secondaryPartners];
               let qualifiedPartners = [];
 
               // Matching
@@ -245,12 +234,7 @@
               });
 
               // Filter & Sort
-              qualifiedPartners.sort((a, b) => {
-                  if (b.match_score !== a.match_score) return b.match_score - a.match_score;
-                  if (a.partner_type === 'Primary' && b.partner_type !== 'Primary') return -1;
-                  if (a.partner_type !== 'Primary' && b.partner_type === 'Primary') return 1;
-                  return 0;
-              });
+              qualifiedPartners.sort((a, b) => b.match_score - a.match_score);
 
               loadingDiv.classList.add('hidden');
 
@@ -262,9 +246,7 @@
 
               // Render Results
               qualifiedPartners.forEach(p => {
-                  let badge = p.partner_type === 'Primary' 
-                      ? '<span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded uppercase border border-indigo-200 tracking-wider"><i class="fas fa-star text-yellow-500 mr-1"></i> Primary</span>'
-                      : '<span class="bg-gray-100 text-gray-600 text-[10px] font-black px-2.5 py-1 rounded uppercase border border-gray-200 tracking-wider">Secondary</span>';
+                  let badge = '<span class="bg-indigo-100 text-indigo-800 text-[10px] font-black px-2.5 py-1 rounded uppercase border border-indigo-200 tracking-wider"><i class="fas fa-star text-yellow-500 mr-1"></i> Partner</span>';
 
                   let safePartnerName = p.display_name.replace(/'/g, "\\'");
                   let servicesDisplay = (p.categories && Array.isArray(p.categories)) ? p.categories.join(', ') : 'Generalist';
