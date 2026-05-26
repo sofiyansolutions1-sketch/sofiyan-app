@@ -51,7 +51,8 @@ export const PartnerPanel: React.FC = () => {
 
   // Partner Registration Modal State
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verification' | 'success'>('personal');
+  const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verification' | 'payment' | 'success'>('personal');
+  const [regFeeScreenshot, setRegFeeScreenshot] = useState<File | null>(null);
   const [selectedAreasList, setSelectedAreasList] = useState<string[]>([]);
   const [editSelectedAreasList, setEditSelectedAreasList] = useState<string[]>([]);
   const [discoveredPincodesList, setDiscoveredPincodesList] = useState<string[]>([]);
@@ -375,6 +376,23 @@ export const PartnerPanel: React.FC = () => {
 
     try {
       if (authMode === 'signup') {
+        const cleanPhone = authData.phone?.trim();
+        if (cleanPhone) {
+          const { data: phoneCheck, error: phoneCheckError } = await supabase
+            .from('primary_partners')
+            .select('id')
+            .eq('phone', cleanPhone);
+          
+          if (phoneCheckError) {
+             console.error("Error checking phone availability:", phoneCheckError);
+          } else if (phoneCheck && phoneCheck.length > 0) {
+             setAuthError("This mobile number is already registered with another technician account. Please sign in or use a different number.");
+             setIsSubmitting(false);
+             submittingRef.current = false;
+             return;
+          }
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email: authData.email,
           password: authData.password,
@@ -506,6 +524,24 @@ export const PartnerPanel: React.FC = () => {
         const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
         if (regData.pincode && regData.pincode.length === 6 && !pincodeError) {
              finalServicePincodes.push(regData.pincode);
+        }
+
+        // Validate that phone number does not belong to another ID in database
+        const cleanRegPhone = regData.phone?.trim();
+        if (cleanRegPhone) {
+            const { data: phoneCheck, error: phoneCheckError } = await supabase
+                .from('primary_partners')
+                .select('id')
+                .eq('phone', cleanRegPhone)
+                .neq('id', session.user.id);
+            
+            if (phoneCheckError) {
+                console.error("Error precheck registration phone:", phoneCheckError);
+            } else if (phoneCheck && phoneCheck.length > 0) {
+                alert("Registration failed: The phone number " + cleanRegPhone + " is already registered with another technician account. Please use a different phone number.");
+                setIsSubmitting(false);
+                return;
+            }
         }
 
         console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
@@ -646,6 +682,24 @@ export const PartnerPanel: React.FC = () => {
         const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
         if (editData.pincode && editData.pincode.length === 6 && !editPincodeError) {
              finalServicePincodes.push(editData.pincode);
+        }
+
+        // Validate that phone number does not belong to another ID in database
+        const cleanEditPhone = editData.phone?.trim();
+        if (cleanEditPhone) {
+            const { data: phoneCheck, error: phoneCheckError } = await supabase
+                .from('primary_partners')
+                .select('id')
+                .eq('phone', cleanEditPhone)
+                .neq('id', currentUser.id);
+            
+            if (phoneCheckError) {
+                console.error("Error precheck edit phone:", phoneCheckError);
+            } else if (phoneCheck && phoneCheck.length > 0) {
+                alert("Update failed: The phone number " + cleanEditPhone + " is already registered with another technician account. Please use a different phone number.");
+                setIsSubmitting(false);
+                return;
+            }
         }
 
         const { error } = await supabase
@@ -1237,19 +1291,20 @@ export const PartnerPanel: React.FC = () => {
                       { id: 'personal', label: 'Personal', icon: <User size={14} /> },
                       { id: 'expertise', label: 'Expertise', icon: <Briefcase size={14} /> },
                       { id: 'location', label: 'Service Areas', icon: <MapPin size={14} /> },
-                      { id: 'verification', label: 'Verify', icon: <CheckCircle size={14} /> }
+                      { id: 'verification', label: 'Verify', icon: <CheckCircle size={14} /> },
+                      { id: 'payment', label: 'Payment', icon: <ShieldCheck size={14} /> }
                     ].map((step, idx) => (
                       <React.Fragment key={step.id}>
                         <div className={`flex flex-col items-center gap-1.5 flex-1`}>
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                             regStep === step.id ? 'bg-indigo-600 text-white shadow-lg ring-4 ring-indigo-100' : 
-                            ['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
+                            ['personal', 'expertise', 'location', 'verification', 'payment'].indexOf(regStep) > idx ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
                           }`}>
-                            {['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? <CheckCircle size={16} /> : step.icon}
+                            {['personal', 'expertise', 'location', 'verification', 'payment'].indexOf(regStep) > idx ? <CheckCircle size={16} /> : step.icon}
                           </div>
                           <span className={`text-[10px] font-bold uppercase tracking-wider ${regStep === step.id ? 'text-indigo-600' : 'text-gray-400'}`}>{step.label}</span>
                         </div>
-                        {idx < 3 && <div className={`h-px flex-1 mb-5 transition-colors duration-500 ${['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500' : 'bg-gray-100'}`} />}
+                        {idx < 4 && <div className={`h-px flex-1 mb-5 transition-colors duration-500 ${['personal', 'expertise', 'location', 'verification', 'payment'].indexOf(regStep) > idx ? 'bg-green-500' : 'bg-gray-100'}`} />}
                       </React.Fragment>
                     ))}
                   </div>
@@ -1272,9 +1327,16 @@ export const PartnerPanel: React.FC = () => {
                     }
                     setRegStep('verification');
                   }
-                  else {
+                  else if (regStep === 'verification') {
                     if (!regData.aadharNumber || regData.aadharNumber.length !== 12) {
                       alert("Please enter a valid 12-digit Aadhaar Card Number.");
+                      return;
+                    }
+                    setRegStep('payment');
+                  }
+                  else {
+                    if (!regFeeScreenshot) {
+                      alert("Please upload the registration fee payment screenshot.");
                       return;
                     }
                     submitPartnerRegistration(e);
@@ -1591,6 +1653,78 @@ export const PartnerPanel: React.FC = () => {
                     </div>
                   )}
 
+                  {/* STEP 5: REGISTRATION FEE PAYMENT */}
+                  {regStep === 'payment' && (
+                    <div className="space-y-6 animate-fadeIn">
+                      <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col items-center text-center gap-4">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
+                           <ShieldCheck className="text-indigo-600" size={32} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-indigo-900 uppercase tracking-wide">Account Activation & Registration Fee</p>
+                          <p className="text-3xl font-black text-indigo-950 mt-1">₹499</p>
+                          <p className="text-xs text-indigo-700 leading-relaxed mt-2">
+                            To complete your professional technician onboarding and activate your live leads access, a one-time registration fee of ₹499 ($499) is required.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-150 text-center">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Scan QR Code to Pay</p>
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <img 
+                            src="https://i.postimg.cc/rp5bjHh2/Whats-App-Image-2026-05-22-at-1-26-42-PM.jpg" 
+                            alt="Payment QR Code"
+                            referrerPolicy="no-referrer"
+                            className="max-h-64 object-contain rounded-xl border border-gray-100 shadow-inner"
+                          />
+                          <a 
+                            href="https://i.postimg.cc/rp5bjHh2/Whats-App-Image-2026-05-22-at-1-26-42-PM.jpg" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-xs text-indigo-600 hover:text-indigo-800 underline font-medium"
+                          >
+                            Open QR Code in New Tab ↗
+                          </a>
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-2">Non-refundable platform setup & security fee</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-700 block">
+                          Upload Payment Screenshot <span className="text-rose-500 font-bold">*</span>
+                        </label>
+                        <div className="relative">
+                          <input 
+                            type="file" 
+                            id="reg-payment-screenshot"
+                            accept="image/*"
+                            required
+                            onChange={(e) => setRegFeeScreenshot(e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                          <label 
+                            htmlFor="reg-payment-screenshot"
+                            className={`flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${regFeeScreenshot ? 'border-green-500 bg-green-50 text-green-700 font-bold' : 'border-gray-300 hover:border-indigo-500 text-gray-550 hover:bg-gray-50'}`}
+                          >
+                            <Upload size={18} />
+                            {regFeeScreenshot ? regFeeScreenshot.name : 'Choose Payment Screenshot'}
+                          </label>
+                        </div>
+                        {regFeeScreenshot && (
+                          <p className="text-xs text-green-700 font-semibold flex items-center gap-1">
+                            <CheckCircle size={14} /> Selected: {regFeeScreenshot.name}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex gap-3 text-amber-800 text-[10px] leading-relaxed">
+                         <AlertCircle size={14} className="flex-shrink-0 text-amber-600 mt-0.5" />
+                         <p>Our backend team will manually verify the screenshot confirmation against active banking logs. Account activations typically process within 10 to 30 minutes after registration is submitted.</p>
+                      </div>
+                    </div>
+                  )}
+
                   {regStep === 'success' && (
                     <motion.div 
                       initial={{ scale: 0.9, opacity: 0 }}
@@ -1652,6 +1786,7 @@ export const PartnerPanel: React.FC = () => {
                             if (regStep === 'expertise') setRegStep('personal');
                             else if (regStep === 'location') setRegStep('expertise');
                             else if (regStep === 'verification') setRegStep('location');
+                            else if (regStep === 'payment') setRegStep('verification');
                           }}
                           className="flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-all text-sm"
                         >
@@ -1667,7 +1802,7 @@ export const PartnerPanel: React.FC = () => {
                             <span className="flex items-center justify-center gap-2">
                               <Loader2 className="w-5 h-5 animate-spin" /> Processing...
                             </span>
-                        ) : regStep === 'verification' ? 'Finish & Join' : 'Continue'}
+                        ) : regStep === 'payment' ? 'Complete & Submit' : regStep === 'verification' ? 'Proceed to Payment' : 'Continue'}
                       </button>
                     </div>
                   )}

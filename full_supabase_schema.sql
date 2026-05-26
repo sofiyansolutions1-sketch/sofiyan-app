@@ -192,12 +192,17 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     content TEXT NOT NULL,
     excerpt TEXT,
     image_url TEXT,
+    author TEXT DEFAULT 'Admin',
     author_name TEXT DEFAULT 'Admin',
+    sub_heading TEXT,
+    target_keywords TEXT,
     target_locations JSONB DEFAULT '[]', -- Cities/Areas targeted
     service_category TEXT,
+    related_service TEXT,
     meta_title TEXT,
     meta_description TEXT,
     published BOOLEAN DEFAULT true,
+    status TEXT DEFAULT 'published',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -328,3 +333,43 @@ CREATE POLICY "Public full access admins" ON admins FOR ALL USING (true) WITH CH
 CREATE POLICY "Public full access influencers" ON influencers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access influencer_referrals" ON influencer_referrals FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access customer_followups" ON customer_followups FOR ALL USING (true) WITH CHECK (true);
+
+
+-- =============================================================
+-- MIGRATION & CACHE ALIGNMENT (RUN THESE TO FIX CACHE/MISSING COLUMN ERRORS)
+-- =============================================================
+-- If you have an existing database, copy and run these ALTER TABLE statements
+-- in your Supabase SQL Editor to make sure all expected fields are present:
+
+-- 1. Fix blog_posts table columns (Expected by local BlogManager component)
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS author TEXT DEFAULT 'Admin';
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS author_name TEXT DEFAULT 'Admin';
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS sub_heading TEXT;
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS target_keywords TEXT;
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS related_service TEXT;
+ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
+
+-- 2. Fix primary_partners table columns (Expected by self-registration & edit profiles)
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS first_name TEXT;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS last_name TEXT;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS alt_phone TEXT;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS age INTEGER;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS service_areas JSONB DEFAULT '[]';
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS service_pincodes JSONB DEFAULT '[]';
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS categories JSONB DEFAULT '[]';
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS sub_categories JSONB DEFAULT '[]';
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS aadhar_number TEXT;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS id_proof_url TEXT;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS completed_jobs INTEGER DEFAULT 0;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS earnings NUMERIC DEFAULT 0;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS lat NUMERIC;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS lng NUMERIC;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 5.0;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'available';
+
+-- 3. Fix bookings table columns (For assigned technician service area tracking)
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS assigned_partner_area TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS area TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS city TEXT;
+

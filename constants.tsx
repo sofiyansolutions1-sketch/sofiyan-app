@@ -20,7 +20,8 @@ export const CITY_DATA = [
   { name: 'Ahmedabad', img: 'https://i.postimg.cc/65FqZJm8/Chat-GPT-Image-Apr-19-2026-02-40-08-AM.png', areasCount: 15 },
   { name: 'Gurgaon', img: 'https://i.postimg.cc/sxXxYVzh/Chat-GPT-Image-Apr-19-2026-02-42-24-AM.png', areasCount: 23 },
   { name: 'Noida', img: 'https://i.postimg.cc/ZKnv3LK4/Chat-GPT-Image-Apr-19-2026-02-43-16-AM.png', areasCount: 16 },
-  { name: 'Varanasi', img: 'https://i.postimg.cc/DfPYmLBD/Chat-GPT-Image-Apr-19-2026-01-17-09-PM.png', areasCount: 12 }
+  { name: 'Varanasi', img: 'https://i.postimg.cc/DfPYmLBD/Chat-GPT-Image-Apr-19-2026-01-17-09-PM.png', areasCount: 12 },
+  { name: 'Gorakhpur', img: 'https://images.unsplash.com/photo-1568849676085-51415703900f?auto=format&fit=crop&w=500&q=80', areasCount: 12 }
 ];
 
 export const PREDEFINED_AREAS: Record<string, string[]> = {
@@ -34,7 +35,8 @@ export const PREDEFINED_AREAS: Record<string, string[]> = {
   Ahmedabad: ["SG Highway", "Navrangpura", "Satellite", "Vastrapur", "Bopal", "Paldi", "Maninagar", "Prahlad Nagar", "Gota", "Thaltej"],
   Gurgaon: ["Cyber City", "Sohna Road", "DLF Phase 1", "DLF Phase 2", "DLF Phase 3", "Golf Course Road", "Sector 56", "Sector 14", "Palam Vihar"],
   Noida: ["Sector 18", "Sector 62", "Sector 15", "Sector 63", "Greater Noida", "Sector 137", "Sector 50", "Sector 16"],
-  Varanasi: ["Ghats", "Lanka", "Godowlia", "Sigra", "Sarnath", "Cantonment", "Bhelupur", "Pandeypur", "Mahmoorganj", "Jaitpura", "Chaitganj", "Adampura"]
+  Varanasi: ["Ghats", "Lanka", "Godowlia", "Sigra", "Sarnath", "Cantonment", "Bhelupur", "Pandeypur", "Mahmoorganj", "Jaitpura", "Chaitganj", "Adampura"],
+  Gorakhpur: ["Gorakhnath", "Golghar", "Medical College Road", "Asuran", "Shahpur", "Rapti Nagar", "Mohaddipur", "Buxipur", "Taramandal", "Pipraich", "Sardar Nagar", "Gida"]
 };
 
 // Custom Image Mapping
