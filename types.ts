@@ -87,4 +87,6 @@ export interface Partner {
   review_count?: number;
   earnings: number;
   completedJobs: number;
+  registration_fee_paid?: boolean;
+  registration_fee_screenshot?: string;
 }

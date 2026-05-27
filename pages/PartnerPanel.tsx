@@ -53,6 +53,8 @@ export const PartnerPanel: React.FC = () => {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verification' | 'payment' | 'success'>('personal');
   const [regFeeScreenshot, setRegFeeScreenshot] = useState<File | null>(null);
+  const [modalScreenshot, setModalScreenshot] = useState<File | null>(null);
+  const [modalSubmittingPayment, setModalSubmittingPayment] = useState(false);
   const [selectedAreasList, setSelectedAreasList] = useState<string[]>([]);
   const [editSelectedAreasList, setEditSelectedAreasList] = useState<string[]>([]);
   const [discoveredPincodesList, setDiscoveredPincodesList] = useState<string[]>([]);
@@ -353,6 +355,8 @@ export const PartnerPanel: React.FC = () => {
                completedJobs: data.completed_jobs || 0,
                rating: data.rating || 0,
                review_count: data.review_count || 0,
+               registration_fee_paid: data.registration_fee_paid || false,
+               registration_fee_screenshot: data.registration_fee_screenshot,
                partner_type: 'Primary'
            };
            setCurrentUser(partner);
@@ -546,6 +550,20 @@ export const PartnerPanel: React.FC = () => {
 
         console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
 
+        let screenshotBase64 = '';
+        if (regFeeScreenshot) {
+          try {
+            screenshotBase64 = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(regFeeScreenshot);
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = (error) => reject(error);
+            });
+          } catch (err) {
+            console.error("Error reading payment screenshot:", err);
+          }
+        }
+
         const { error } = await supabase
            .from('primary_partners')
            .upsert([
@@ -572,7 +590,9 @@ export const PartnerPanel: React.FC = () => {
                    aadhar_number: regData.aadharNumber,
                    status: 'available', // Changed from 'pending' to 'available' for prompt verification
                    earnings: 0,
-                   completed_jobs: 0
+                   completed_jobs: 0,
+                   registration_fee_paid: true,
+                   registration_fee_screenshot: screenshotBase64 || null
                }
            ]);
 
@@ -588,6 +608,48 @@ export const PartnerPanel: React.FC = () => {
       } finally {
         setIsSubmitting(false);
       }
+  };
+
+  const handleSubmitPaymentModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser?.email) return;
+    if (!modalScreenshot) {
+      alert("Please upload the payment screenshot first.");
+      return;
+    }
+    setModalSubmittingPayment(true);
+    try {
+      let screenshotBase64 = '';
+      try {
+        screenshotBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(modalScreenshot);
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = (error) => reject(error);
+        });
+      } catch (err) {
+        console.error("Error reading modal payment screenshot:", err);
+      }
+
+      const { error } = await supabase
+        .from('primary_partners')
+        .update({
+          registration_fee_paid: true,
+          registration_fee_screenshot: screenshotBase64 || null
+        })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      await syncUserWithStore(currentUser.email);
+      setNotification("Payment submitted successfully! Your account will be verified shortly.");
+      setModalScreenshot(null);
+    } catch (error: any) {
+      console.error("Error submitting manual payment:", error);
+      alert("Submission failed: " + (error.message || "Unknown error"));
+    } finally {
+      setModalSubmittingPayment(false);
+    }
   };
 
   const handleEditProfile = async () => {
@@ -1049,7 +1111,108 @@ export const PartnerPanel: React.FC = () => {
   const { total: modalTotal, commission: modalCommission } = paymentModal ? { total: paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0), commission: (paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0)) * 0.25 } : { total: 0, commission: 0 };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 relative">
+      {/* COMPULSORY REGISTERED FREE PARTNERS ONBOARDING FEE POP-UP & OVERLAY */}
+      {currentUser && !currentUser.registration_fee_paid && (
+        <div className="fixed inset-0 bg-slate-900/90 [backdrop-filter:blur(8px)] z-[200] flex justify-center items-center px-4 overflow-y-auto pt-10 pb-10">
+          <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl border border-gray-100 transform transition-all p-6 md:p-8 space-y-6 my-auto">
+            <div className="bg-indigo-50 border border-indigo-150 rounded-2xl p-6 flex flex-col items-center text-center gap-4">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md animate-bounce">
+                <ShieldCheck className="text-indigo-600" size={32} />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-indigo-950 uppercase tracking-wide">Account Activation & Registration Fee</h3>
+                <p className="text-4xl font-black text-indigo-950 mt-1">₹499</p>
+                <p className="text-xs text-indigo-700 leading-relaxed mt-2 font-medium">
+                  We noticed your professional technician account is registered on the free tier. To unlock full access to live leads, manage bookings, and start receiving job notifications, a one-time setup activation fee of ₹499 ($499) is required.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-5 rounded-2xl border border-gray-150 text-center">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Scan Official QR Code to Pay</p>
+              <div className="flex flex-col items-center justify-center gap-3">
+                <img 
+                  src="https://i.postimg.cc/rp5bjHh2/Whats-App-Image-2026-05-22-at-1-26-42-PM.jpg" 
+                  alt="Official Payment QR Code"
+                  referrerPolicy="no-referrer"
+                  className="max-h-64 object-contain rounded-2xl border border-gray-150 shadow-md"
+                />
+                <a 
+                  href="https://i.postimg.cc/rp5bjHh2/Whats-App-Image-2026-05-22-at-1-26-42-PM.jpg" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-xs text-indigo-600 hover:text-indigo-800 underline font-semibold flex items-center gap-1 mt-1"
+                >
+                  View full resolution QR code ↗
+                </a>
+              </div>
+              <p className="text-[10px] text-gray-400 mt-2 font-medium">Safe & secure instant platform setup gateway</p>
+            </div>
+
+            <form onSubmit={handleSubmitPaymentModal} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-700 block">
+                  Upload Payment Screenshot <span className="text-rose-500 font-bold">*</span>
+                </label>
+                <div className="relative">
+                  <input 
+                    type="file" 
+                    id="modal-payment-screenshot"
+                    accept="image/*"
+                    required
+                    onChange={(e) => setModalScreenshot(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                  <label 
+                    htmlFor="modal-payment-screenshot"
+                    className={`flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${modalScreenshot ? 'border-green-500 bg-green-50 text-green-700 font-bold' : 'border-gray-200 hover:border-indigo-500 text-gray-550 hover:bg-gray-50'}`}
+                  >
+                    <Upload size={18} />
+                    {modalScreenshot ? modalScreenshot.name : 'Choose Successful Payment Screenshot'}
+                  </label>
+                </div>
+                {modalScreenshot && (
+                  <p className="text-xs text-green-700 font-semibold flex items-center gap-1">
+                    <CheckCircle size={14} /> Selected: {modalScreenshot.name}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex gap-3 text-amber-800 text-[10px] leading-relaxed">
+                <AlertCircle size={14} className="flex-shrink-0 text-amber-600 mt-0.5" />
+                <p>Payment confirmations are matched automatically and verified manually against active banking logs. Instantly activates in 10-30 minutes.</p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex-1 bg-gray-100 text-gray-650 font-bold py-4 rounded-2xl hover:bg-gray-200 hover:text-red-600 transition-all text-sm flex items-center justify-center gap-2"
+                >
+                  <LogOut size={16} /> Sign Out
+                </button>
+                <button
+                  type="submit"
+                  disabled={modalSubmittingPayment || !modalScreenshot}
+                  className={`flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-xl ${(!modalScreenshot || modalSubmittingPayment) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {modalSubmittingPayment ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" /> Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={16} /> Complete & Active Now
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Welcome, {currentUser?.name}</h1>

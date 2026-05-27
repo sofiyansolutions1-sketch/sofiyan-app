@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS primary_partners (
     review_count INTEGER DEFAULT 0,       -- Count of total completed ratings
     earnings NUMERIC DEFAULT 0,           -- Total earnings payouts
     completed_jobs INTEGER DEFAULT 0,     -- Total completed orders
+    registration_fee_paid BOOLEAN DEFAULT false,
+    registration_fee_screenshot TEXT,
     
     -- Audit Timestamps
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -367,6 +369,8 @@ ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS lng NUMERIC;
 ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 5.0;
 ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0;
 ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'available';
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS registration_fee_paid BOOLEAN DEFAULT false;
+ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS registration_fee_screenshot TEXT;
 
 -- 3. Fix bookings table columns (For assigned technician service area tracking)
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS assigned_partner_area TEXT;
