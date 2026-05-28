@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import axios from "axios";
 import dotenv from "dotenv";
+import https from "https";
 
 dotenv.config();
 
@@ -108,6 +109,35 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
         error: "Failed to send WhatsApp message.", 
         details: error.response?.data || error.message 
       });
+    }
+  });
+
+  // Pincode Proxy to bypass CORS issues in browsers
+  app.get("/api/pincode/postoffice/:area", async (req, res) => {
+    try {
+      const { area } = req.params;
+      const response = await axios.get(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`, {
+        timeout: 6000,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false })
+      });
+      res.json(response.data);
+    } catch (error: any) {
+      console.error(`Pincode API Error for area "${req.params.area}":`, error.message);
+      res.status(502).json({ error: "Failed to query India Post API" });
+    }
+  });
+
+  app.get("/api/pincode/code/:pincode", async (req, res) => {
+    try {
+      const { pincode } = req.params;
+      const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`, {
+        timeout: 6000,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false })
+      });
+      res.json(response.data);
+    } catch (error: any) {
+      console.error(`Pincode API Error for PIN "${req.params.pincode}":`, error.message);
+      res.status(502).json({ error: "Failed to query India Post API" });
     }
   });
 

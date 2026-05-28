@@ -51,6 +51,7 @@ export interface Booking {
   assignedPartnerPhone?: string;
   assignedPartnerArea?: string;
   commissionPaid: boolean;
+  commission_screenshot?: string;
   partner_rating?: number; // Job-specific technician rating (1-5)
   createdAt: string;
   couponUsed?: string;

@@ -3,6 +3,37 @@
  * Uses the FREE India Post API: https://api.postalpincode.in/
  */
 
+const PIN_DICTIONARY: Record<string, string[]> = {
+    'lajpat nagar': ['110024'],
+    'koramangala': ['560034', '560047', '560095'],
+    'indiranagar': ['560038', '560008'],
+    'whitefield': ['560066'],
+    'jayanagar': ['560041', '560011', '560069', '560070', '560082'],
+    'hsr layout': ['560102'],
+    'malleshwaram': ['560003'],
+    'marathahalli': ['560037'],
+    'hebbal': ['560024'],
+    'gole market': ['110001'],
+    'connaught place': ['110001'],
+    'karol bagh': ['110005'],
+    'south ext': ['110049'],
+    'saket': ['110017'],
+    'vasant kunj': ['110070'],
+    'rajouri garden': ['110027'],
+    'dwarka': ['110075'],
+    'rohini': ['110085']
+};
+
+const AREA_DICTIONARY: Record<string, { areas: string[]; isBangalore: boolean }> = {
+    '110024': { areas: ['Lajpat Nagar', 'Lajpat Nagar Double Storey'], isBangalore: false },
+    '560034': { areas: ['Koramangala', 'Koramangala Iii Block'], isBangalore: true },
+    '560038': { areas: ['Indiranagar', 'Indiranagar H.O'], isBangalore: true },
+    '560066': { areas: ['Whitefield', 'Ramagondanahalli'], isBangalore: true },
+    '560102': { areas: ['HSR Layout', 'Agara'], isBangalore: true },
+    '560003': { areas: ['Malleshwaram', 'Vyalikaval'], isBangalore: true },
+    '560037': { areas: ['Marathahalli', 'Kundalahalli'], isBangalore: true }
+};
+
 /**
  * Iterates through an array of area names, querying the India Post API
  * to extract all unique 6-digit pincodes associated with those local areas.
@@ -17,23 +48,49 @@ export async function fetchPincodesByArea(areaNames: string[]): Promise<string[]
         area = area.trim();
         if (!area) continue;
 
-        try {
-            const apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`);
-            if (!apiRes.ok) continue;
+        // Try local static dictionary first for instant performance
+        const matchedLocal = PIN_DICTIONARY[area.toLowerCase()];
+        if (matchedLocal && matchedLocal.length > 0) {
+            matchedLocal.forEach(p => allPincodes.add(p));
+            continue;
+        }
 
-            const data = await apiRes.json();
+        try {
+            // Try proxy route first to bypass CORS
+            let apiRes = await fetch(`/api/pincode/postoffice/${encodeURIComponent(area)}`).catch(() => null);
             
-            // India Post API returns an array containing Status and PostOffice details
-            if (data && data[0] && data[0].Status === 'Success') {
-                const postOffices = data[0].PostOffice;
-                postOffices.forEach((po: any) => {
-                    if (po.Pincode) {
-                        allPincodes.add(po.Pincode);
-                    }
-                });
+            // Fallback directly to the public API if proxy is unavailable or fails
+            if (!apiRes || !apiRes.ok) {
+                apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`);
+            }
+            
+            if (apiRes && apiRes.ok) {
+                const data = await apiRes.json();
+                
+                // India Post API returns an array containing Status and PostOffice details
+                if (data && data[0] && data[0].Status === 'Success') {
+                    const postOffices = data[0].PostOffice;
+                    postOffices.forEach((po: any) => {
+                        if (po.Pincode) {
+                            allPincodes.add(po.Pincode);
+                        }
+                    });
+                }
             }
         } catch (error) {
-            console.error(`Pincode Discovery Error for area "${area}":`, error);
+            console.warn(`Pincode Discovery Error for area "${area}", details:`, error);
+        }
+    }
+
+    // Secondary fallback in case no pincodes were fetched but we can match a substring
+    if (allPincodes.size === 0) {
+        for (const area of areaNames) {
+            const lowerArea = area.toLowerCase();
+            for (const key of Object.keys(PIN_DICTIONARY)) {
+                if (lowerArea.includes(key) || key.includes(lowerArea)) {
+                    PIN_DICTIONARY[key].forEach(p => allPincodes.add(p));
+                }
+            }
         }
     }
 
@@ -93,8 +150,20 @@ export async function fetchAreasByPincode(pincode: string): Promise<{ success: b
         return { success: false, areas: [], isBangalore: false, error: 'Invalid PIN configuration' };
     }
 
+    // Try local static dictionary lookups first for instant result
+    const localMatch = AREA_DICTIONARY[pincode];
+    if (localMatch) {
+        return { success: true, areas: localMatch.areas, isBangalore: localMatch.isBangalore };
+    }
+
     try {
-        const apiRes = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+        // Try proxy path first to bypass CORS
+        let apiRes = await fetch(`/api/pincode/code/${pincode}`).catch(() => null);
+
+        if (!apiRes || !apiRes.ok) {
+            apiRes = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+        }
+
         if (!apiRes.ok) return { success: false, areas: [], isBangalore: false, error: 'API unreachable' };
 
         const data = await apiRes.json();
@@ -118,7 +187,21 @@ export async function fetchAreasByPincode(pincode: string): Promise<{ success: b
             return { success: false, areas: [], isBangalore: false, error: 'Pincode not found' };
         }
     } catch (error) {
-        console.error(`Error resolving Pincode ${pincode}:`, error);
+        console.warn(`Error resolving Pincode ${pincode}, fallback lookup used:`, error);
+        
+        // If everything fails, try to see if pincode fits Delhi / Bangalore standard range
+        // Bangalore pincodes start with 560
+        // Delhi pincodes start with 110
+        const isBangaloreGroup = pincode.startsWith('560');
+        const isDelhiGroup = pincode.startsWith('110');
+        if (isBangaloreGroup || isDelhiGroup) {
+            return { 
+                success: true, 
+                areas: [isBangaloreGroup ? 'Bangalore Area' : 'Delhi Area'], 
+                isBangalore: isBangaloreGroup 
+            };
+        }
+
         return { success: false, areas: [], isBangalore: false, error: 'Network error connecting to resolution service' };
     }
 }

@@ -30,6 +30,7 @@ export const useStore = () => {
     assignedPartnerPhone: data.assigned_partner_phone,
     assignedPartnerArea: data.assigned_partner_area || '', 
     commissionPaid: data.commission_paid || false,
+    commission_screenshot: data.commission_screenshot || '',
     createdAt: data.created_at,
     couponUsed: data.coupon_used || '',
     discountAmount: data.discount_amount,
@@ -117,7 +118,9 @@ export const useStore = () => {
         service_date: updatedBooking.date,
         service_time: updatedBooking.time,
         date: updatedBooking.date,
-        time: updatedBooking.time
+        time: updatedBooking.time,
+        commission_paid: updatedBooking.commissionPaid,
+        commission_screenshot: updatedBooking.commission_screenshot || null
     }).eq('id', updatedBooking.id);
     
     if (error) {

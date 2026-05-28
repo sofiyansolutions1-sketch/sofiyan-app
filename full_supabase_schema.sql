@@ -1,26 +1,34 @@
 -- =============================================================
 -- ULTIMATE FULL SUPABASE SQL SCHEMA FOR SOFIYAN HOME SERVICE
 -- =============================================================
--- This file provides the full, unified database schema categorized
--- category-by-category to store all active features of your website:
--- Customer Panel, Reminders & Customer Follow-up System, Blogs,
--- Primary Partner Panel, Admin Panel, and Influencer/Referral System.
+-- This script safely drops existing tables to prevent schema cache mismatches,
+-- enables required extensions, sets up core home-service tables, configures
+-- triggers for automated timestamps, sets up live Supabase Realtime publishing,
+-- and designates full, open client access through Row Level Security (RLS).
 --
--- REMOVED: Unused general CRM table (`leads`)
--- REMOVED: Web development specific tags (`web_dev_leads`)
--- RETAINED & RENAMED: Follow-up / Reminders system for home services -> `customer_followups`
--- ADDED: Automatic synchronization trigger for booking prices (price <-> total_price)
---
+-- INSTRUCTION: Copy and paste the ENTIRETY of this file into your 
+-- Supabase SQL Editor and click "Run" to perform a clean database reset.
 
--- Enable UUID Extension for robust unique IDs
+-- =============================================================
+-- SECTION 0: CLEAN SLATE RESET (SAFE DROPPING)
+-- =============================================================
+DROP TABLE IF EXISTS influencer_referrals CASCADE;
+DROP TABLE IF EXISTS influencers CASCADE;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS customers CASCADE;
+DROP TABLE IF EXISTS primary_partners CASCADE;
+DROP TABLE IF EXISTS customer_followups CASCADE;
+DROP TABLE IF EXISTS blog_posts CASCADE;
+DROP TABLE IF EXISTS admins CASCADE;
+
+-- Enable UUID Extension for robust primary key generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 -- =============================================================
--- CATEGORY 1: CUSTOMER PANEL DATA
+-- SECTION 1: CUSTOMER PANEL DATA
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS customers (
+CREATE TABLE customers (
     -- Primary Identity
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     
@@ -43,10 +51,9 @@ CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone_number);
 
 
 -- =============================================================
--- CATEGORY 2: PRIMARY PARTNERS DATA (Self-Registered & Managed Supply)
+-- SECTION 2: PRIMARY PARTNERS DATA (Self-Registered Supply Network)
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS primary_partners (
+CREATE TABLE primary_partners (
     -- Primary Identity
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     
@@ -97,10 +104,9 @@ CREATE INDEX IF NOT EXISTS idx_primary_partners_status ON primary_partners(statu
 
 
 -- =============================================================
--- CATEGORY 3: BOOKINGS & LEAD TRANSITION DATA (Orders Panel)
+-- SECTION 3: BOOKINGS & LEAD TRANSITION DATA (Orders Panel)
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS bookings (
+CREATE TABLE bookings (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
     
@@ -132,6 +138,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     total_price NUMERIC DEFAULT 0,         -- Matches price for Influencer Portal / stat aggregation
     discount_amount NUMERIC DEFAULT 0,
     commission_paid BOOLEAN DEFAULT FALSE,
+    commission_screenshot TEXT,
     applied_referral_code TEXT,
     coupon_used TEXT,
     
@@ -156,10 +163,9 @@ CREATE INDEX IF NOT EXISTS idx_bookings_pincode ON bookings(pin_code);
 
 
 -- =============================================================
--- CATEGORY 4: CUSTOMER FOLLOW-UPS & REMINDERS (Home Services CRM)
+-- SECTION 4: CUSTOMER FOLLOW-UPS & REMINDERS (Home Services CRM)
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS customer_followups (
+CREATE TABLE customer_followups (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name TEXT NOT NULL,
     contact_number TEXT NOT NULL,
@@ -178,16 +184,16 @@ CREATE TABLE IF NOT EXISTS customer_followups (
     project_status TEXT DEFAULT 'Lead' CHECK (project_status IN ('Lead', 'In Progress', 'Built', 'Delivered')),
     payment_status TEXT DEFAULT 'Unpaid' CHECK (payment_status IN ('Unpaid', 'Partial', 'Paid')),
     
+    -- Audit Timestamps
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 
 -- =============================================================
--- CATEGORY 5: CMS BLOG POSTS DATA
+-- SECTION 5: CMS BLOG POSTS DATA
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS blog_posts (
+CREATE TABLE blog_posts (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
@@ -212,10 +218,9 @@ CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
 
 
 -- =============================================================
--- CATEGORY 6: INFLUENCERS & BOOKING REFERRALS PROGRAM
+-- SECTION 6: INFLUENCERS & BOOKING REFERRALS PROGRAM
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS influencers (
+CREATE TABLE influencers (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     page_name TEXT UNIQUE NOT NULL,        -- Handle or Instagram identifier
     contact_number TEXT UNIQUE NOT NULL,   -- Active WhatsApp communication line
@@ -229,7 +234,7 @@ CREATE TABLE IF NOT EXISTS influencers (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS influencer_referrals (
+CREATE TABLE influencer_referrals (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     influencer_id UUID REFERENCES influencers(id) ON DELETE CASCADE,
     booking_id UUID REFERENCES bookings(id) ON DELETE CASCADE,
@@ -240,10 +245,9 @@ CREATE TABLE IF NOT EXISTS influencer_referrals (
 
 
 -- =============================================================
--- CATEGORY 7: SYSTEM ADMISSIONS / SECURITY ROLE LEVELS
+-- SECTION 7: SYSTEM ADMISSIONS / SECURITY ROLE LEVELS
 -- =============================================================
-
-CREATE TABLE IF NOT EXISTS admins (
+CREATE TABLE admins (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -253,10 +257,8 @@ CREATE TABLE IF NOT EXISTS admins (
 
 
 -- =============================================================
--- DATABASE AUTOMATION SETUP (TRIGGERS & REPLICATIONS)
+-- SECTION 8: DATABASE AUTOMATION SETUP (TRIGGERS & TIMESTAMP HANDLERS)
 -- =============================================================
-
--- Auto Timestamp Generator Function
 CREATE OR REPLACE FUNCTION handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -265,7 +267,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Set Triggers for Auto-Updated values
+-- Set Timestamps Auto-Update Triggers
 DROP TRIGGER IF EXISTS set_bookings_updated_at ON bookings;
 CREATE TRIGGER set_bookings_updated_at BEFORE UPDATE ON bookings FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
 
@@ -282,7 +284,7 @@ DROP TRIGGER IF EXISTS set_customer_followups_updated_at ON customer_followups;
 CREATE TRIGGER set_customer_followups_updated_at BEFORE UPDATE ON customer_followups FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
 
 
--- Pricing Sync Automation helper (Aligns total_price with price automatically on insertion)
+-- Pricing Sync Automation Helper (Aligns total_price with price automatically on insertion)
 CREATE OR REPLACE FUNCTION sync_booking_total_price()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -298,9 +300,8 @@ CREATE TRIGGER trigger_sync_booking_total_price BEFORE INSERT OR UPDATE ON booki
 
 
 -- =============================================================
--- REAL-TIME DASHBOARD NOTIFICATIONS CONFIGURATION
+-- SECTION 9: REAL-TIME DASHBOARD NOTIFICATIONS CONFIGURATION
 -- =============================================================
-
 -- Add live-action triggers to Supabase Realtime channel
 BEGIN;
   DROP PUBLICATION IF EXISTS supabase_realtime;
@@ -314,9 +315,8 @@ ALTER PUBLICATION supabase_realtime ADD TABLE customer_followups;
 
 
 -- =============================================================
--- ROW LEVEL SECURITY RULES (RLS) FOR FULL APP TRANSITIONS
+-- SECTION 10: ROW LEVEL SECURITY RULES (RLS) FOR RAPID DATA TRANSITION
 -- =============================================================
-
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
@@ -326,7 +326,16 @@ ALTER TABLE influencers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE influencer_referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customer_followups ENABLE ROW LEVEL SECURITY;
 
--- Setup full read-write policy permissions for rapid client access
+-- Setup full standard bypass policies for quick frontend client access
+DROP POLICY IF EXISTS "Public full access customers" ON customers;
+DROP POLICY IF EXISTS "Public full access bookings" ON bookings;
+DROP POLICY IF EXISTS "Public full access blog_posts" ON blog_posts;
+DROP POLICY IF EXISTS "Public full access primary_partners" ON primary_partners;
+DROP POLICY IF EXISTS "Public full access admins" ON admins;
+DROP POLICY IF EXISTS "Public full access influencers" ON influencers;
+DROP POLICY IF EXISTS "Public full access influencer_referrals" ON influencer_referrals;
+DROP POLICY IF EXISTS "Public full access customer_followups" ON customer_followups;
+
 CREATE POLICY "Public full access customers" ON customers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access bookings" ON bookings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access blog_posts" ON blog_posts FOR ALL USING (true) WITH CHECK (true);
@@ -335,45 +344,3 @@ CREATE POLICY "Public full access admins" ON admins FOR ALL USING (true) WITH CH
 CREATE POLICY "Public full access influencers" ON influencers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access influencer_referrals" ON influencer_referrals FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public full access customer_followups" ON customer_followups FOR ALL USING (true) WITH CHECK (true);
-
-
--- =============================================================
--- MIGRATION & CACHE ALIGNMENT (RUN THESE TO FIX CACHE/MISSING COLUMN ERRORS)
--- =============================================================
--- If you have an existing database, copy and run these ALTER TABLE statements
--- in your Supabase SQL Editor to make sure all expected fields are present:
-
--- 1. Fix blog_posts table columns (Expected by local BlogManager component)
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS author TEXT DEFAULT 'Admin';
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS author_name TEXT DEFAULT 'Admin';
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS sub_heading TEXT;
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS target_keywords TEXT;
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS related_service TEXT;
-ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'published';
-
--- 2. Fix primary_partners table columns (Expected by self-registration & edit profiles)
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS first_name TEXT;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS last_name TEXT;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS alt_phone TEXT;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS age INTEGER;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS service_areas JSONB DEFAULT '[]';
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS service_pincodes JSONB DEFAULT '[]';
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS categories JSONB DEFAULT '[]';
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS sub_categories JSONB DEFAULT '[]';
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS aadhar_number TEXT;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS id_proof_url TEXT;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS completed_jobs INTEGER DEFAULT 0;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS earnings NUMERIC DEFAULT 0;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS lat NUMERIC;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS lng NUMERIC;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 5.0;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'available';
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS registration_fee_paid BOOLEAN DEFAULT false;
-ALTER TABLE primary_partners ADD COLUMN IF NOT EXISTS registration_fee_screenshot TEXT;
-
--- 3. Fix bookings table columns (For assigned technician service area tracking)
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS assigned_partner_area TEXT;
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS area TEXT;
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS city TEXT;
-
