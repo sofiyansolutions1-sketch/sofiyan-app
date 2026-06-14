@@ -154,6 +154,8 @@ export const DB_DATA = {
       {name: "AC Noise / Smell Repair", price: 499},
       {name: "Stabilizer Connection/Wiring", price: 299},
       {name: "PCB Repair Labor", price: 499},
+      {name: "Non-inverter PCB Repair", price: 3000},
+      {name: "Inverter PCB Repair", price: 4000},
       {name: "Compressor Relay/Capacitor", price: 299},
       {name: "AC Shifting (same site)", price: 1299},
       {name: "AC Shifting (new location)", price: 1699},

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation & Footer Components</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        /* Mobile menu slide animation */
+        #mobile-menu {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobile-menu.open {
+            max-height: 500px; /* arbitrary large max-height */
+            opacity: 1;
+        }
+
+        /* Dropdown animation for desktop */
+        .group:hover .dropdown-menu {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+<!-- ============================================== -->
+<!-- COPY FROM HERE TO REPLACE YOUR <header>        -->
+<!-- ============================================== -->
+<header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo / BrandName -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-2xl font-extrabold tracking-tight hover:text-indigo-100 transition">
+                    Sofiyan Home Service
+                </a>
+            </div>
+
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="/" class="text-white hover:text-indigo-200 font-medium py-2 transition">Home</a>
+                
+                <!-- Services Dropdown -->
+                <div class="relative group py-2">
+                    <button class="text-white hover:text-indigo-200 font-medium flex items-center gap-1 transition outline-none">
+                        Services <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="dropdown-menu absolute hidden left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                        <a href="/ac-repair-lucknow" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 font-medium transition"><i class="fa fa-snowflake w-5 text-indigo-500"></i> AC Repair</a>
+                        <a href="/fridge-repair-lucknow" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 font-medium transition"><i class="fa fa-cube w-5 text-indigo-500"></i> Fridge Repair</a>
+                        <a href="/washing-machine-repair-lucknow" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 font-medium transition"><i class="fa fa-tshirt w-5 text-indigo-500"></i> Washing Machine</a>
+                        <a href="/ro-repair-lucknow" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 font-medium transition"><i class="fa fa-tint w-5 text-indigo-500"></i> RO Repair</a>
+                    </div>
+                </div>
+
+                <!-- Locations Dropdown -->
+                <div class="relative group py-2">
+                    <button class="text-white hover:text-indigo-200 font-medium flex items-center gap-1 transition outline-none">
+                        Locations <i class="fa fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="dropdown-menu absolute hidden left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                        <a href="/ac-repair-gomti-nagar" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition">Gomti Nagar</a>
+                        <a href="/ac-repair-hazratganj" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition">Hazratganj</a>
+                        <a href="/ac-repair-indira-nagar" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition">Indira Nagar</a>
+                        <a href="/ac-repair-alambagh" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition">Alambagh</a>
+                        <a href="/ac-repair-aashiyana" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition">Aashiyana</a>
+                    </div>
+                </div>
+
+                <a href="tel:+919219345455" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-full font-bold shadow transition flex items-center gap-2 transform hover:scale-105 active:scale-95">
+                    <i class="fa fa-phone-alt"></i> Call Now
+                </a>
+            </nav>
+
+            <!-- Mobile Menu Toggle Button -->
+            <div class="flex items-center md:hidden">
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-white hover:text-indigo-200 outline-none p-2 focus:ring-2 focus:ring-inset focus:ring-white rounded-md transition" aria-label="Toggle Navigation">
+                    <i class="fa fa-bars text-2xl" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden bg-indigo-700 border-t border-indigo-500 shadow-inner">
+        <div class="px-4 pt-2 pb-6 space-y-1">
+            <a href="/" class="block px-3 py-2.5 rounded-md text-base font-medium text-white hover:bg-indigo-600 transition">Home</a>
+            
+            <!-- Mobile Services Label -->
+            <div class="px-3 py-2 text-indigo-200 text-xs font-bold uppercase tracking-wider mt-2">Our Services</div>
+            <a href="/ac-repair-lucknow" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition pl-6"><i class="fa fa-snowflake w-5"></i> AC Repair</a>
+            <a href="/fridge-repair-lucknow" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition pl-6"><i class="fa fa-cube w-5"></i> Fridge Repair</a>
+            <a href="/washing-machine-repair-lucknow" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition pl-6"><i class="fa fa-tshirt w-5"></i> Washing Machine</a>
+            <a href="/ro-repair-lucknow" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition pl-6"><i class="fa fa-tint w-5"></i> RO Repair</a>
+            
+            <!-- Mobile Locations Label -->
+            <div class="px-3 py-2 text-indigo-200 text-xs font-bold uppercase tracking-wider mt-2">Service Areas</div>
+            <div class="grid grid-cols-2 gap-1 px-3">
+                <a href="/ac-repair-gomti-nagar" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition">Gomti Nagar</a>
+                <a href="/ac-repair-hazratganj" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition">Hazratganj</a>
+                <a href="/ac-repair-indira-nagar" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition">Indira Nagar</a>
+                <a href="/ac-repair-alambagh" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition">Alambagh</a>
+                <a href="/ac-repair-aashiyana" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-600 transition">Aashiyana</a>
+            </div>
+
+            <div class="mt-6 px-3">
+                <a href="tel:+919219345455" class="w-full flex justify-center items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl font-bold shadow transition">
+                    <i class="fa fa-phone-alt"></i> +91 9219345455
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const icon = document.getElementById('menu-icon');
+        
+        menu.classList.toggle('open');
+        
+        if (menu.classList.contains('open')) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    }
+</script>
+<!-- ============================================== -->
+<!-- END HEADER CODE                                -->
+<!-- ============================================== -->
+
+<main class="flex-grow p-10 text-center">
+    <!-- Just some spacing so the demo looks okay -->
+    <h1 class="text-3xl font-bold text-gray-400">Content goes here...</h1>
+</main>
+
+
+<!-- ============================================== -->
+<!-- COPY FROM HERE TO REPLACE YOUR <footer>        -->
+<!-- ============================================== -->
+<footer class="bg-gray-900 border-t border-gray-800 text-gray-300 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            
+            <!-- Company Detail Box -->
+            <div class="space-y-4">
+                <h3 class="text-2xl font-extrabold text-white tracking-tight">Sofiyan Home Service</h3>
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    Lucknow's most trusted home appliance repair and service experts. We provide reliable doorstep solutions for your AC, Fridge, Washing Machine, and RO systems.
+                </p>
+                <div class="pt-2 space-y-2">
+                    <a href="tel:+919219345455" class="flex items-center gap-3 text-gray-300 hover:text-white transition">
+                        <div class="bg-indigo-600/20 text-indigo-400 p-2 rounded-full"><i class="fa fa-phone w-4 text-center"></i></div>
+                        <span class="font-semibold">+91 9219345455</span>
+                    </a>
+                    <div class="flex items-start gap-3 text-gray-300">
+                        <div class="bg-indigo-600/20 text-indigo-400 p-2 rounded-full mt-1"><i class="fa fa-map-marker-alt w-4 text-center"></i></div>
+                        <span class="text-sm">Lucknow, Uttar Pradesh, India - Fast service everywhere!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links / Services -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-5 uppercase tracking-wider text-sm border-l-4 border-indigo-500 pl-3">Our Services</h4>
+                <ul class="space-y-3">
+                    <li><a href="/ac-repair-lucknow" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-chevron-right text-[10px]"></i> AC Repair & Service</a></li>
+                    <li><a href="/fridge-repair-lucknow" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-chevron-right text-[10px]"></i> Refrigerator Repair</a></li>
+                    <li><a href="/washing-machine-repair-lucknow" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-chevron-right text-[10px]"></i> Washing Machine Service</a></li>
+                    <li><a href="/ro-repair-lucknow" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-chevron-right text-[10px]"></i> RO Water Purifier Repair</a></li>
+                </ul>
+            </div>
+
+            <!-- Top Service Areas -->
+            <div>
+                <h4 class="text-lg font-bold text-white mb-5 uppercase tracking-wider text-sm border-l-4 border-indigo-500 pl-3">Top Service Areas</h4>
+                <div class="grid grid-cols-1 gap-3">
+                    <a href="/ac-repair-gomti-nagar" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-map-marker-alt text-[10px] text-gray-500"></i> Gomti Nagar</a>
+                    <a href="/ac-repair-hazratganj" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-map-marker-alt text-[10px] text-gray-500"></i> Hazratganj</a>
+                    <a href="/ac-repair-indira-nagar" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-map-marker-alt text-[10px] text-gray-500"></i> Indira Nagar</a>
+                    <a href="/ac-repair-alambagh" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-map-marker-alt text-[10px] text-gray-500"></i> Alambagh</a>
+                    <a href="/ac-repair-aashiyana" class="text-gray-400 hover:text-indigo-400 transition flex items-center gap-2"><i class="fa fa-map-marker-alt text-[10px] text-gray-500"></i> Aashiyana</a>
+                </div>
+            </div>
+
+            <!-- CTA Box -->
+             <div>
+                <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-lg">
+                    <h4 class="text-white font-bold mb-2">Need Emergency Repair?</h4>
+                    <p class="text-sm text-gray-400 mb-5">We offer rapid doorstep services across all areas of Lucknow.</p>
+                    <a href="tel:+919219345455" class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/20 uppercase tracking-wide text-sm">
+                        Book Technician Now
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Copyright line -->
+        <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sm text-gray-500">
+                &copy; <span id="currentYear"></span> Sofiyan Home Service. All rights reserved.
+            </p>
+            <div class="flex gap-4">
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex justify-center items-center text-gray-400 hover:text-white hover:bg-indigo-600 transition"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex justify-center items-center text-gray-400 hover:text-white hover:bg-indigo-600 transition"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/919219345455" class="w-10 h-10 rounded-full bg-gray-800 flex justify-center items-center text-gray-400 hover:text-white hover:bg-green-600 transition"><i class="fab fa-whatsapp text-lg"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Set dynamic copyright year
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
+<!-- ============================================== -->
+<!-- END FOOTER CODE                                -->
+<!-- ============================================== -->
+
+</body>
+</html>
