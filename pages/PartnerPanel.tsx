@@ -706,6 +706,7 @@ export const PartnerPanel: React.FC = () => {
         
         setEditData({
             phone: data.phone || '',
+            altPhone: data.alternate_phone || '',
             address: data.address || '',
             city: data.city || '',
             customCity: '',
@@ -714,6 +715,7 @@ export const PartnerPanel: React.FC = () => {
             subCategories: data.sub_categories || [],
             experience: data.experience || '',
             gender: data.gender || 'Male',
+            age: data.age || '',
             lat: data.lat || null,
             lng: data.lng || null
         });

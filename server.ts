@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import axios from "axios";
 import dotenv from "dotenv";
@@ -8,14 +7,13 @@ import https from "https";
 
 dotenv.config();
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+export { app };
 
-  app.use(express.json());
+app.use(express.json());
 
-  // AI Lead Extraction API
-  app.post("/api/extract-lead", async (req, res) => {
+// AI Lead Extraction API
+app.post("/api/extract-lead", async (req, res) => {
     try {
       const { text } = req.body;
       const apiKey = process.env.GEMINI_API_KEY;
@@ -42,10 +40,11 @@ Extract the following information and return ONLY a pure JSON object. If a field
 
 Remember, ONLY return a raw JSON object and NOTHING else.`;
 
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      let responseText = response.text().trim();
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: prompt
+      });
+      let responseText = response.text?.trim() || "";
       
       // Clean up markdown if present
       if (responseText.startsWith("```json")) {
@@ -141,8 +140,12 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
     }
   });
 
+async function startServer() {
+  const PORT = process.env.PORT || 3000;
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -156,9 +159,12 @@ Remember, ONLY return a raw JSON object and NOTHING else.`;
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(PORT as number, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer();
+// Only start the server if not running in a serverless environment like Netlify
+if (!process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+  startServer();
+}

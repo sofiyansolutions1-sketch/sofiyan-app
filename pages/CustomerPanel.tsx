@@ -690,7 +690,7 @@ export const CustomerPanel: React.FC = () => {
           `Sent via Sofiyan Home Service App`;
 
         // 1. Automatic send to admin via Server API
-        const adminPhone = (import.meta.env.VITE_ADMIN_PHONE || '919219345455').replace(/\+/g, '');
+        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '919219345455').replace(/\+/g, '');
         
         fetch('/api/send-whatsapp', {
           method: 'POST',
