@@ -1,205 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta name="google-site-verification" content="UmTbZg7YFRoaCSRALoE9MHVsK97M9sYav1VVsdtDoMw" />
 
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AC Repair Lucknow | Sofiyan Home Service</title>
-    <meta name="description" content="Expert AC, fridge, washing machine & RO repair in Lucknow. Call Sofiyan Home Service for fast, reliable doorstep service today!" />
-    <link rel="canonical" href="https://www.sofiyansolutions.com/" />
-    <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <meta property="og:title" content="AC Repair Lucknow | Sofiyan Home Service" />
-    <meta property="og:description" content="Expert AC, fridge, washing machine & RO repair in Lucknow. Call Sofiyan Home Service for fast, reliable doorstep service today!" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.sofiyansolutions.com/" />
-    
-    <!-- Local Business Schema Markup (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Sofiyan Home Service",
-      "telephone": "+919219345455",
-      "url": "https://www.sofiyansolutions.com/",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Lucknow",
-        "addressRegion": "Uttar Pradesh",
-        "addressCountry": "IN"
-      },
-      "areaServed": [
-        "Gomti Nagar",
-        "Hazratganj",
-        "Indira Nagar",
-        "Alambagh",
-        "Aashiyana"
-      ],
-      "makesOffer": [
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "AC Repair"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Refrigerator Repair"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "Washing Machine Repair"
-          }
-        },
-        {
-          "@type": "Offer",
-          "itemOffered": {
-            "@type": "Service",
-            "name": "RO Repair"
-          }
-        }
-      ]
-    }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons (Spinner, Check, etc.) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Poppins', sans-serif;
-      }
-      /* Custom scrollbar for better aesthetics */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      /* Specific class for smaller areas like Time Slot container */
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-      
-      /* Featured Services Auto-Scroll Animation */
-      @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); } /* Scrolls half the width (original content) */
-      }
-      .animate-scroll {
-          animation: scroll 80s linear infinite;
-          width: max-content;
-      }
-      .animate-scroll:hover {
-          animation-play-state: paused; /* Pauses when user hovers to book */
-      }
-      
-      /* Snap-fast animations for Modals */
-      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-      .animate-fadeIn { animation: fadeIn 0.15s ease-out forwards; }
-      .animate-scaleIn { animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    </style>
-
-</head>
-  <body>
-    <div id="root"></div>
-
-    <!-- Smart Address Matcher Modal -->
-    <div id="text-match-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-all">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col scale-100 transition-transform">
-            <div class="flex justify-between items-center border-b pb-3 mb-3">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900">🔍 Smart Address Matcher</h3>
-                    <p id="match-customer-address" class="text-xs text-indigo-600 font-semibold mt-1"></p>
-                </div>
-                <button onclick="closeMatchModal()" class="text-gray-400 hover:text-red-500 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <input type="hidden" id="match-lead-id">
-            <input type="hidden" id="match-lead-data">
-            
-            <div class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100 shadow-inner">
-                <label class="text-xs font-bold text-indigo-800 block mb-1">Live Filter (e.g., Area, City, or Pincode):</label>
-                <div class="relative">
-                    <i class="fas fa-keyboard absolute left-3 top-2.5 text-indigo-400"></i>
-                    <input type="text" id="live-keyword-search" onkeyup="runKeywordMatch()" placeholder="Type 'Mau' to instantly filter..." class="w-full border border-indigo-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-indigo-500 font-medium">
-                </div>
-            </div>
-
-            <div id="match-loading" class="text-center text-indigo-600 font-bold py-10 hidden">
-                <i class="fas fa-sync fa-spin text-3xl mb-2 block"></i> Matching address words...
-            </div>
-            <div id="match-results" class="overflow-y-auto space-y-3 flex-1 pr-1 custom-scrollbar"></div>
-        </div>
-    </div>
-
-    <!-- Full-Screen Service Modal -->
-    <div id="full-service-modal" class="hidden fixed inset-0 z-[100] w-full h-full bg-slate-50 flex-col">
-        <!-- Sticky Header -->
-        <div class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm flex-shrink-0">
-            <button onclick="closeCategoryView()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
-                <i class="fas fa-arrow-left text-xl"></i>
-            </button>
-            <h2 id="full-modal-title" class="text-lg font-bold text-slate-800">Category Name</h2>
-            <div class="relative p-2 text-slate-600">
-                <i class="fas fa-shopping-cart text-xl"></i>
-                <span id="full-modal-cart-count" class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="flex flex-1 flex-col md:flex-row overflow-hidden relative pb-20">
-            <!-- Sidebar / Top Categories (Responsive) -->
-            <div id="full-modal-sidebar" class="flex flex-row md:flex-col w-full md:w-64 bg-white md:bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 overflow-x-auto md:overflow-y-auto custom-scrollbar flex-shrink-0 z-10">
-                <!-- Subcategory items injected here -->
-            </div>
-
-            <!-- Services List -->
-            <div id="full-modal-services-content" class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-6 custom-scrollbar scroll-smooth bg-slate-50/30">
-                <!-- Service sections injected here -->
-            </div>
-        </div>
-
-        <!-- Sticky Bottom Bar -->
-        <div id="full-modal-bottom-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 shadow-[0_-10px_40px_-5px_rgba(79,70,229,0.1)] hidden z-20">
-            <div class="max-w-4xl mx-auto flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-100 hidden sm:block">
-                        <i class="fas fa-shopping-bag text-indigo-600"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1"><span id="full-modal-total-items">0 items</span> in cart</p>
-                        <p id="full-modal-total-price" class="text-2xl font-black text-indigo-950">₹0</p>
-                    </div>
-                </div>
-                <button onclick="proceedToCheckout()" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-xl shadow-indigo-200 active:scale-95 text-sm uppercase tracking-wider">
-                    Checkout <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
       window.calculateWordMatchScore = function(searchQuery, partnerString) {
           if (!searchQuery || !partnerString) return 0;
           
@@ -512,231 +311,6 @@
           });
 
                     // Add location-specific SEO content for AC in Noida
-          
-          // Add location-specific SEO content for AC in Gorakhpur
-          if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    AC Repair & Service in Gorakhpur | Expert AC Repair, Gas Refilling, Installation & Maintenance by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Air conditioners are no longer a luxury—they are an essential part of comfortable living and productive working environments. In a city like Gorakhpur, where summers can be hot and humid, a properly functioning AC system is crucial for homes, offices, hospitals, educational institutions, hotels, and commercial establishments.</p>
-                    
-                    <p>When an AC starts losing cooling efficiency or develops technical faults, timely servicing can prevent major breakdowns and reduce electricity consumption.</p>
-
-                    <p>If you're searching for trusted AC Repair & Service in Gorakhpur, Sofiyan provides professional doorstep AC repair, installation, maintenance, gas charging, deep cleaning, and troubleshooting solutions for residential and commercial customers.</p>
-
-                    <p>Whether your AC is not cooling, leaking water, producing unusual noises, displaying error codes, consuming excessive power, or facing compressor issues, our experienced technicians provide dependable and cost-effective solutions.</p>
-
-                    <p>We offer same-day AC service in Gorakhpur for homes, apartments, hostels, hospitals, clinics, coaching institutes, schools, offices, hotels, restaurants, retail shops, and commercial properties.</p>
-
-                    <p>Our technicians service Split ACs, Window ACs, Inverter ACs, Tower ACs, Cassette ACs, Ductable AC Systems, VRV/VRF Units, Commercial Cooling Systems, and Central Air Conditioning Units.</p>
-
-                    <p>We repair all major brands including Daikin, LG, Voltas, Blue Star, Samsung, Panasonic, Hitachi, Carrier, Whirlpool, Lloyd, Godrej, Haier, O General, Mitsubishi Electric, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">AC Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>AC Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">AC Servicing</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Split AC Service</strong> – Starting from ₹449*</li>
-                      <li><strong>Window AC Service</strong> – Starting from ₹399*</li>
-                      <li><strong>AC Deep Cleaning</strong> – Starting from ₹499*</li>
-                      <li><strong>Jet Pump AC Cleaning</strong> – Starting from ₹549*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>AC Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>AC Gas Refilling</strong> – Starting from ₹2,499*</li>
-                      <li><strong>Refrigerant Leak Detection</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Split AC Installation</strong> – Starting from ₹1,829*</li>
-                      <li><strong>Window AC Installation</strong> – Starting from ₹999*</li>
-                      <li><strong>AC Uninstallation</strong> – Starting from ₹699*</li>
-                      <li><strong>AC Relocation Service</strong> – Starting from ₹1,499*</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on AC type, refrigerant requirements, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan AC Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Fast Same-Day Support</strong>
-                        <p>Quick technician dispatch for urgent cooling issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Humidity & Heat Management Expertise</strong>
-                        <p>Solutions optimized for Gorakhpur's hot weather and humidity conditions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Services available for homes, hospitals, schools, offices, hotels, and retail establishments.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Inverter AC Specialists</strong>
-                        <p>Expert technicians trained in modern inverter AC diagnostics and repairs.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement components ensure long-term performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>No hidden charges. Clear estimates before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records for future reference.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your AC Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">AC Is Not Cooling Properly</strong>
-                        <p>Low refrigerant levels, dirty coils, or compressor issues may reduce cooling performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage from Indoor Unit</strong>
-                        <p>Blocked drain pipes or drainage faults may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">AC Produces Warm Air</strong>
-                        <p>Gas leakage or cooling circuit problems may affect cooling efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noises During Operation</strong>
-                        <p>Loose components, motor faults, or compressor issues may generate abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">AC Consumes Excessive Electricity</strong>
-                        <p>Poor maintenance can significantly increase energy consumption.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Weak Airflow</strong>
-                        <p>Clogged filters or blower issues may restrict airflow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Frequent Auto Shutdowns</strong>
-                        <p>Electrical faults or overheating may trigger automatic shutdowns.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">AC Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ AC Not Cooling</li>
-                      <li>✓ AC Gas Refilling</li>
-                      <li>✓ Refrigerant Leak Detection</li>
-                      <li>✓ Water Leakage Repair</li>
-                      <li>✓ Compressor Repair</li>
-                      <li>✓ PCB Board Repair</li>
-                      <li>✓ Capacitor Replacement</li>
-                      <li>✓ Fan Motor Repair</li>
-                      <li>✓ Indoor Unit Repairs</li>
-                      <li>✓ Outdoor Unit Repairs</li>
-                      <li>✓ Temperature Sensor Problems</li>
-                      <li>✓ Thermostat Faults</li>
-                      <li>✓ Split AC Repairs</li>
-                      <li>✓ Window AC Repairs</li>
-                      <li>✓ Inverter AC Repairs</li>
-                      <li>✓ AC Deep Cleaning</li>
-                      <li>✓ AC Installation</li>
-                      <li>✓ AC Reinstallation</li>
-                      <li>✓ AC Relocation</li>
-                      <li>✓ Commercial AC Maintenance</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur AC Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your AC service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The AC system is thoroughly inspected.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, cleaning, gas charging, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Cooling efficiency, airflow, drainage, and safety systems are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular AC Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Cooling Efficiency</li>
-                       <li>Reduce Electricity Bills</li>
-                       <li>Extend AC Lifespan</li>
-                       <li>Improve Indoor Air Quality</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Airflow</li>
-                       <li>Maintain Comfortable Temperatures</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend servicing AC units every 3–4 months during peak summer usage.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of AC repair in Gorakhpur?</strong>
-                        <p>AC repair services start from ₹299*. Final pricing depends on the fault and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide same-day AC service in Gorakhpur?</strong>
-                        <p>Yes. Same-day AC repair and servicing support is available across most Gorakhpur locations.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair inverter ACs?</strong>
-                        <p>Yes. We repair inverter ACs, split ACs, window ACs, and commercial cooling systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide AC gas refilling?</strong>
-                        <p>Absolutely. We provide refrigerant leak detection and professional gas charging services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which AC brands do you repair?</strong>
-                        <p>We repair Daikin, LG, Voltas, Blue Star, Samsung, Panasonic, Hitachi, Carrier, Lloyd, Whirlpool, Godrej, Haier, and more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency AC repair, gas refilling, deep cleaning, installation support, inverter AC troubleshooting, or preventive maintenance, Sofiyan provides reliable AC repair and service solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Stay cool and comfortable throughout the year with Gorakhpur’s trusted AC repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -2786,239 +2360,6 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
           }
 
                     // Add location-specific SEO content for WashingMachine in Noida
-          
-          // Add location-specific SEO content for Washing Machine in Gorakhpur
-          if (categoryName === 'WashingMachine' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Washing Machine Repair Service in Gorakhpur | Expert Front Load, Top Load & Fully Automatic Washing Machine Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A washing machine is one of the most frequently used appliances in modern households. From busy families and students to hotels and commercial establishments, washing machines help save time, improve convenience, and maintain hygiene standards.</p>
-                    
-                    <p>When a washing machine develops technical issues, laundry routines are disrupted and appliance efficiency declines. Professional servicing helps restore performance while extending machine lifespan.</p>
-
-                    <p>If you're searching for trusted Washing Machine Repair Services in Gorakhpur, Sofiyan provides professional doorstep washing machine repair, maintenance, installation, troubleshooting, and preventive servicing solutions for residential and commercial customers.</p>
-
-                    <p>Whether your washing machine is not spinning, leaking water, making unusual noises, stopping during cycles, displaying error codes, vibrating excessively, or failing to drain properly, our experienced technicians provide dependable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day washing machine service in Gorakhpur for homes, apartments, hostels, PG accommodations, hospitals, hotels, guest houses, laundry businesses, educational institutions, and commercial establishments.</p>
-
-                    <p>Our specialists repair Front Load Washing Machines, Top Load Washing Machines, Fully Automatic Washing Machines, Semi-Automatic Washing Machines, Inverter Washing Machines, Smart Washing Machines, Washer-Dryer Combos, and Commercial Laundry Equipment.</p>
-
-                    <p>We service all major brands including LG, Samsung, IFB, Whirlpool, Bosch, Haier, Godrej, Panasonic, Siemens, Voltas Beko, Toshiba, Onida, Videocon, Electrolux, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Washing Machine Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Inspection</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Front Load Washing Machine Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>Top Load Washing Machine Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Drum Deep Cleaning</strong> – Starting from ₹449*</li>
-                      <li><strong>Washing Machine Sanitization</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Installation</strong> – Starting from ₹799*</li>
-                      <li><strong>Washing Machine Uninstallation</strong> – Starting from ₹599*</li>
-                      <li><strong>Washing Machine Relocation</strong> – Starting from ₹899*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Motor Repair</strong> – Custom Pricing</li>
-                      <li><strong>PCB Board Repair</strong> – Inspection Based</li>
-                      <li><strong>Door Lock Replacement</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on machine type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Washing Machine Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Assistance</strong>
-                        <p>Fast support for urgent laundry appliance breakdowns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Services available for homes, hostels, hotels, hospitals, PGs, and commercial laundry operations.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Appliance Diagnostics</strong>
-                        <p>Modern troubleshooting techniques help identify faults accurately.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement components improve reliability and machine lifespan.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Experienced Washing Machine Technicians</strong>
-                        <p>Professionals trained to repair both conventional and smart laundry appliances.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records provided after service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after repair completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Washing Machine Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Washing Machine Is Not Spinning</strong>
-                        <p>Motor, belt, PCB, or sensor problems may affect spinning performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Is Not Draining Properly</strong>
-                        <p>Blocked pumps or drainage systems may prevent water discharge.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Noise During Washing</strong>
-                        <p>Bearing wear, drum issues, or loose components may create unusual sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around Machine</strong>
-                        <p>Damaged hoses, valves, or internal components may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Machine Stops Mid-Cycle</strong>
-                        <p>Control board issues or electrical faults may interrupt washing cycles.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Washing Machine Vibrates Excessively</strong>
-                        <p>Drum imbalance or suspension system problems may affect stability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Error Codes Appear on Display</strong>
-                        <p>Electronic systems may indicate internal faults through error codes.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Clothes Are Not Cleaning Properly</strong>
-                        <p>Water circulation or drum performance issues may reduce cleaning quality.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Washing Machine Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Washing Machine Not Starting</li>
-                      <li>✓ Washing Machine Not Spinning</li>
-                      <li>✓ Drainage Problems</li>
-                      <li>✓ Water Leakage Repair</li>
-                      <li>✓ Drum Cleaning Services</li>
-                      <li>✓ Excessive Vibration Issues</li>
-                      <li>✓ Door Lock Repairs</li>
-                      <li>✓ Motor Repairs</li>
-                      <li>✓ PCB Board Repairs</li>
-                      <li>✓ Error Code Troubleshooting</li>
-                      <li>✓ Control Panel Repairs</li>
-                      <li>✓ Drain Pump Replacement</li>
-                      <li>✓ Inlet Valve Repairs</li>
-                      <li>✓ Belt Replacement</li>
-                      <li>✓ Front Load Repairs</li>
-                      <li>✓ Top Load Repairs</li>
-                      <li>✓ Semi-Automatic Repairs</li>
-                      <li>✓ Fully Automatic Repairs</li>
-                      <li>✓ Washing Machine Installation</li>
-                      <li>✓ Smart Washing Machine Repairs</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Washing Machine Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your washing machine service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The appliance is thoroughly inspected to identify the exact issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Washing, spinning, drainage, and safety systems are thoroughly tested.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Washing Machine Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Washing Performance</li>
-                       <li>Reduce Water Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Energy Efficiency</li>
-                       <li>Maintain Hygiene Standards</li>
-                       <li>Detect Problems Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional servicing every 6–12 months depending on usage frequency.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of washing machine repair in Gorakhpur?</strong>
-                        <p>Washing machine repair services start from ₹299*. Final pricing depends on the fault and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair front load washing machines?</strong>
-                        <p>Yes. We repair front load, top load, semi-automatic, fully automatic, inverter, and smart washing machines.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my washing machine not draining water?</strong>
-                        <p>Common causes include blocked pumps, drainage hose issues, control board faults, or filter blockages.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide installation services?</strong>
-                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which washing machine brands do you repair?</strong>
-                        <p>We repair LG, Samsung, IFB, Whirlpool, Bosch, Haier, Godrej, Panasonic, Siemens, Voltas Beko, Toshiba, Onida, Videocon, Electrolux, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency repairs, drum cleaning, motor troubleshooting, PCB repairs, installation support, drainage solutions, or preventive maintenance, Sofiyan delivers dependable washing machine repair solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your laundry routine smooth and hassle-free with Gorakhpur’s trusted washing machine repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'WashingMachine' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -4929,470 +4270,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
               content.appendChild(seoDiv);
           }
 
-                              // Add location-specific SEO content for Washing Machine in Varanasi
-          if (categoryName === 'WashingMachine' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Washing Machine Repair Service in Varanasi | Expert Front Load, Top Load & Fully Automatic Washing Machine Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Modern lifestyles demand convenience, efficiency, and time-saving solutions. Washing machines have become an essential appliance for households, hostels, guest houses, hotels, and commercial laundry operations throughout Varanasi.</p>
-                    
-                    <p>When a washing machine develops technical issues, laundry routines are disrupted and appliance efficiency declines. Professional servicing helps restore performance while extending machine lifespan.</p>
-
-                    <p>If you're searching for trusted Washing Machine Repair Services in Varanasi, Sofiyan provides professional doorstep repair, maintenance, installation, troubleshooting, and preventive servicing solutions for all major washing machine brands and models.</p>
-
-                    <p>Whether your washing machine is not spinning, leaking water, making unusual noises, stopping mid-cycle, showing error codes, vibrating excessively, or failing to drain properly, our experienced technicians provide reliable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day washing machine service in Varanasi for homes, apartments, hostels, PG accommodations, hotels, guest houses, laundry businesses, educational institutions, and commercial properties.</p>
-
-                    <p>Our specialists repair Front Load Washing Machines, Top Load Washing Machines, Fully Automatic Machines, Semi-Automatic Machines, Inverter Washing Machines, Smart Washing Machines, Washer Dryer Combos, and Commercial Laundry Equipment.</p>
-
-                    <p>We service all major brands including LG, Samsung, IFB, Whirlpool, Bosch, Haier, Godrej, Panasonic, Siemens, Voltas Beko, Onida, Toshiba, Videocon, Electrolux, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Washing Machine Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Inspection</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Front Load Washing Machine Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>Top Load Washing Machine Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Drum Deep Cleaning</strong> – Starting from ₹449*</li>
-                      <li><strong>Complete Machine Sanitization</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Washing Machine Installation</strong> – Starting from ₹799*</li>
-                      <li><strong>Washing Machine Uninstallation</strong> – Starting from ₹599*</li>
-                      <li><strong>Washing Machine Relocation</strong> – Starting from ₹899*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Motor Repair</strong> – Custom Pricing</li>
-                      <li><strong>PCB Repair</strong> – Inspection Based</li>
-                      <li><strong>Door Lock Replacement</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on machine type, spare parts, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Washing Machine Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Fast response for urgent washing machine breakdowns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Local Appliance Experts</strong>
-                        <p>Technicians trained to repair modern washing machines used in residential and commercial environments.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Support available for homes, hostels, hotels, PGs, laundries, and institutions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement parts improve machine reliability and lifespan.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear estimates before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Diagnostics</strong>
-                        <p>Accurate troubleshooting helps identify faults quickly.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records for future reference.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Washing Machine Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Machine Is Not Spinning</strong>
-                        <p>Motor issues, belt damage, PCB faults, or sensor failures may affect spinning.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Is Not Draining</strong>
-                        <p>Blocked pumps, filters, or drainage systems may prevent water discharge.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around Machine</strong>
-                        <p>Damaged hoses, valves, or seals may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Noise or Vibration</strong>
-                        <p>Drum imbalance, bearing wear, or suspension issues may affect operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Error Codes on Display</strong>
-                        <p>Electronic faults often trigger system-generated error messages.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Machine Stops During Wash Cycle</strong>
-                        <p>Control board or electrical issues may interrupt washing cycles.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Clothes Are Not Cleaning Properly</strong>
-                        <p>Poor water circulation or drum performance issues may reduce washing quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Machine Does Not Start</strong>
-                        <p>Power supply issues or internal faults may prevent operation.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Washing Machine Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Washing Machine Not Starting</li>
-                      <li>✓ Washing Machine Not Spinning</li>
-                      <li>✓ Water Drainage Problems</li>
-                      <li>✓ Water Leakage Repairs</li>
-                      <li>✓ Drum Cleaning Services</li>
-                      <li>✓ Excessive Vibration Issues</li>
-                      <li>✓ Door Lock Repairs</li>
-                      <li>✓ Motor Repairs</li>
-                      <li>✓ PCB Board Repairs</li>
-                      <li>✓ Error Code Troubleshooting</li>
-                      <li>✓ Control Panel Faults</li>
-                      <li>✓ Drain Pump Replacement</li>
-                      <li>✓ Inlet Valve Repairs</li>
-                      <li>✓ Belt Replacement</li>
-                      <li>✓ Front Load Repairs</li>
-                      <li>✓ Top Load Repairs</li>
-                      <li>✓ Semi-Automatic Repairs</li>
-                      <li>✓ Fully Automatic Repairs</li>
-                      <li>✓ Washing Machine Installation</li>
-                      <li>✓ Smart Washing Machine Repairs</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Washing Machine Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your washing machine service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The appliance is inspected thoroughly to identify the root cause of the issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Washing, spinning, drainage, and safety systems are tested thoroughly.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Washing Machine Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Washing Performance</li>
-                       <li>Reduce Water Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Energy Efficiency</li>
-                       <li>Maintain Hygiene Standards</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                       <li>Detect Problems Early</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional servicing every 6–12 months depending on usage frequency.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of washing machine repair in Varanasi?</strong>
-                        <p>Washing machine repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair front load washing machines?</strong>
-                        <p>Yes. We repair front load, top load, fully automatic, semi-automatic, inverter, and smart washing machines.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my washing machine not spinning?</strong>
-                        <p>Common causes include motor failure, belt damage, PCB faults, sensor issues, and load imbalance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide installation services?</strong>
-                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which washing machine brands do you repair?</strong>
-                        <p>We repair LG, Samsung, IFB, Whirlpool, Bosch, Haier, Godrej, Panasonic, Siemens, Voltas Beko, Onida, Toshiba, Videocon, Electrolux, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Varanasi Today</h3>
-                      <p>Whether you need emergency repairs, drum cleaning, motor troubleshooting, PCB repairs, installation support, drainage solutions, or preventive maintenance, Sofiyan delivers dependable washing machine repair services throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your laundry routine smooth and hassle-free with Varanasi’s trusted washing machine repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-// Add location-specific SEO content for Electrician in Noida
-          
-          // Add location-specific SEO content for Electrician in Gorakhpur
-          if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Electrician Service in Gorakhpur | Expert Electrical Repair, House Wiring & Power Solutions by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Electricity powers every modern home, office, hospital, educational institution, hotel, and commercial establishment. A safe and properly maintained electrical system ensures uninterrupted power supply, appliance protection, energy efficiency, and overall safety.</p>
-                    
-                    <p>In a rapidly growing city like Gorakhpur, increasing electrical loads, inverter installations, air conditioning systems, and modern appliances require professional electrical maintenance and expert troubleshooting services.</p>
-
-                    <p>If you're searching for trusted Electrician Services in Gorakhpur, Sofiyan provides professional doorstep electrical repair, installation, maintenance, fault diagnosis, safety inspection, and wiring solutions for residential and commercial customers.</p>
-
-                    <p>Whether you need switchboard repairs, fan installation, complete house wiring, MCB replacement, electrical fault troubleshooting, inverter wiring, decorative lighting installation, power backup connections, or emergency electrician support, our experienced electricians provide reliable and safety-focused solutions.</p>
-
-                    <p>We offer same-day electrician service in Gorakhpur for homes, apartments, hospitals, coaching institutes, schools, offices, hotels, restaurants, retail stores, warehouses, and commercial buildings.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Electrician Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Basic Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Electrician Visit & Inspection</strong> – Starting from ₹149*</li>
-                      <li><strong>Switch Repair & Replacement</strong> – Starting from ₹149*</li>
-                      <li><strong>Socket Repair & Replacement</strong> – Starting from ₹149*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Fan & Lighting Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Ceiling Fan Installation</strong> – Starting from ₹199*</li>
-                      <li><strong>Fan Repair Service</strong> – Starting from ₹199*</li>
-                      <li><strong>LED Light Installation</strong> – Starting from ₹149*</li>
-                      <li><strong>Decorative Lighting Installation</strong> – Starting from ₹249*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Electrical Safety Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>MCB Replacement</strong> – Starting from ₹249*</li>
-                      <li><strong>Distribution Board Service</strong> – Custom Pricing</li>
-                      <li><strong>Short Circuit Troubleshooting</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Wiring Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>New House Wiring</strong> – Custom Pricing</li>
-                      <li><strong>Rewiring Services</strong> – Custom Pricing</li>
-                      <li><strong>Electrical Point Installation</strong> – Affordable Pricing</li>
-                      <li><strong>Commercial Electrical Projects</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on wiring length, materials required, electrical load, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Electrician Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Electrical Assistance</strong>
-                        <p>Quick response for urgent electrical breakdowns and safety concerns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Electrical solutions for homes, offices, hospitals, schools, hotels, and commercial properties.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Skilled & Verified Electricians</strong>
-                        <p>Professionally trained electricians with experience in modern electrical systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Safety-Focused Services</strong>
-                        <p>Every repair and installation follows electrical safety standards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Modern Electrical Solutions</strong>
-                        <p>Support for smart homes, inverter systems, power backup setups, and energy-efficient installations.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records provided after service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer support after project completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs You Need Professional Electrician Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Frequent MCB Tripping</strong>
-                        <p>Overloaded circuits or wiring faults may cause repeated power interruptions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Flickering Lights</strong>
-                        <p>Loose connections or voltage fluctuations may affect lighting performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Burning Smell from Switchboards</strong>
-                        <p>Overheated wires can become a serious safety hazard.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Electrical Sockets Not Working</strong>
-                        <p>Internal wiring faults may affect power points.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Voltage Fluctuation Issues</strong>
-                        <p>Unstable voltage can damage expensive appliances.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Fan Running Slowly</strong>
-                        <p>Capacitor or electrical circuit problems may affect fan performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sparking Switches</strong>
-                        <p>Immediate professional inspection is recommended for safety.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sudden Power Failure</strong>
-                        <p>Hidden wiring faults may disrupt electricity supply in specific areas.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Electrical Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ MCB Tripping Issues</li>
-                      <li>✓ Switchboard Repair</li>
-                      <li>✓ Switch Replacement</li>
-                      <li>✓ Socket Repair</li>
-                      <li>✓ Ceiling Fan Installation</li>
-                      <li>✓ Fan Repair Services</li>
-                      <li>✓ Decorative Lighting Installation</li>
-                      <li>✓ LED Light Installation</li>
-                      <li>✓ Chandelier Installation</li>
-                      <li>✓ Exhaust Fan Installation</li>
-                      <li>✓ Doorbell Installation</li>
-                      <li>✓ House Wiring</li>
-                      <li>✓ Rewiring Services</li>
-                      <li>✓ Short Circuit Repairs</li>
-                      <li>✓ Power Failure Diagnosis</li>
-                      <li>✓ Electrical Load Balancing</li>
-                      <li>✓ Inverter Wiring</li>
-                      <li>✓ UPS Installation</li>
-                      <li>✓ Commercial Electrical Maintenance</li>
-                      <li>✓ Electrical Safety Inspections</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Electrician Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your electrician service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan electrician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The electrical issue is carefully diagnosed.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Installation:</strong> Repairs, replacements, wiring work, or installations are completed professionally.</li>
-                      <li><strong>Safety Testing:</strong> All electrical systems are tested thoroughly to ensure safe operation.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Electrical Maintenance</h3>
-                    <p>Routine electrical inspections help:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Prevent Short Circuits</li>
-                       <li>Improve Electrical Safety</li>
-                       <li>Protect Appliances</li>
-                       <li>Reduce Fire Risks</li>
-                       <li>Improve Energy Efficiency</li>
-                       <li>Detect Hidden Faults Early</li>
-                       <li>Extend Wiring Lifespan</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend periodic electrical inspections for both residential and commercial properties.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of electrician service in Gorakhpur?</strong>
-                        <p>Electrician services start from ₹149*. Final pricing depends on the work and materials required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide same-day electrician service?</strong>
-                        <p>Yes. Same-day electrical repair and installation services are available across Gorakhpur.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair switchboards and sockets?</strong>
-                        <p>Absolutely. We repair and replace switches, sockets, and complete switchboards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide house wiring services?</strong>
-                        <p>Yes. We provide new wiring, rewiring, and electrical point installation services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you install fans and lighting systems?</strong>
-                        <p>Yes. We install ceiling fans, LED lights, chandeliers, decorative lights, and exhaust fans.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide commercial electrical services?</strong>
-                        <p>Yes. We provide electrical maintenance and installation support for offices, schools, hospitals, hotels, and commercial establishments.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency electrical repairs, house wiring, MCB replacement, lighting installation, inverter wiring, switchboard repairs, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Experience safe, affordable, and professional electrical services designed to keep your home and business powered efficiently.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
+                    // Add location-specific SEO content for Electrician in Noida
           if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -7062,212 +5940,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
           }
 
           // Add location-specific SEO content for Electrician in Gurgaon
-                    // Add location-specific SEO content for Electrician in Varanasi
-          if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Electrician Service in Varanasi | Expert Electrical Repair, Wiring, Installation & Maintenance by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Electricity is the backbone of modern homes, businesses, hotels, hospitals, educational institutions, and commercial establishments. A well-maintained electrical system ensures safety, uninterrupted operations, and efficient energy usage.</p>
-                    
-                    <p>In a growing city like Varanasi, electrical issues such as faulty wiring, overloaded circuits, MCB tripping, switchboard failures, voltage fluctuations, and power outages can affect both comfort and productivity.</p>
-
-                    <p>If you're searching for trusted Electrician Services in Varanasi, Sofiyan provides professional doorstep electrical repair, installation, maintenance, troubleshooting, and safety inspection solutions for residential and commercial properties.</p>
-
-                    <p>Whether you need switchboard repairs, fan installation, house wiring, electrical fault diagnosis, inverter wiring, power backup setup, lighting installation, MCB replacement, or emergency electrical support, our experienced electricians provide safe and reliable solutions.</p>
-
-                    <p>We offer same-day electrician service in Varanasi for homes, apartments, hotels, guest houses, offices, coaching institutes, hospitals, retail stores, restaurants, and commercial buildings.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Electrician Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Basic Electrical Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Electrician Visit & Inspection</strong> – Starting from ₹149*</li>
-                      <li><strong>Switch Repair & Replacement</strong> – Starting from ₹149*</li>
-                      <li><strong>Socket Repair & Replacement</strong> – Starting from ₹149*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Fan & Lighting Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Ceiling Fan Installation</strong> – Starting from ₹199*</li>
-                      <li><strong>Fan Repair Service</strong> – Starting from ₹199*</li>
-                      <li><strong>Decorative Light Installation</strong> – Starting from ₹249*</li>
-                      <li><strong>LED Light Installation</strong> – Starting from ₹149*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Protection & Safety Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>MCB Replacement</strong> – Starting from ₹249*</li>
-                      <li><strong>Distribution Board Service</strong> – Custom Pricing</li>
-                      <li><strong>Short Circuit Troubleshooting</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Wiring Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>New House Wiring</strong> – Custom Pricing</li>
-                      <li><strong>Rewiring Services</strong> – Custom Pricing</li>
-                      <li><strong>Electrical Point Installation</strong> – Affordable Pricing</li>
-                      <li><strong>Commercial Electrical Projects</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on wiring length, materials required, electrical load, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Electrician Services</h3>
-                    <ul class="space-y-3">
-                      <li>★ <strong>Same-Day Electrical Support</strong> – Quick response for urgent electrical faults and emergencies.</li>
-                      <li>★ <strong>Old & New Property Expertise</strong> – Specialized solutions for both heritage properties and modern residential buildings.</li>
-                      <li>★ <strong>Residential & Commercial Coverage</strong> – Electrical support for homes, offices, shops, hospitals, schools, and hotels.</li>
-                      <li>★ <strong>Safety-Focused Repairs</strong> – Every service follows proper electrical safety standards.</li>
-                      <li>★ <strong>Transparent Pricing</strong> – Clear estimates before work begins.</li>
-                      <li>★ <strong>Skilled & Verified Electricians</strong> – Experienced professionals trained in modern electrical systems.</li>
-                      <li>★ <strong>Digital Service Reports</strong> – Invoices and service records delivered instantly through WhatsApp.</li>
-                      <li>★ <strong>Reliable After-Service Support</strong> – Dedicated customer assistance after service completion.</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs You Need Professional Electrician Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">MCB Trips Frequently</strong>
-                        <p>Overloaded circuits or faulty wiring may cause repeated tripping.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Flickering Lights</strong>
-                        <p>Voltage fluctuations or loose connections may affect lighting.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Burning Smell from Switches</strong>
-                        <p>Overheated wires can become a serious safety hazard.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Power Sockets Not Working</strong>
-                        <p>Internal wiring faults may affect electrical points.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Frequent Voltage Fluctuations</strong>
-                        <p>Electrical instability can damage appliances.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Fan Running Slowly</strong>
-                        <p>Capacitor issues or electrical faults may affect performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sparking from Switchboards</strong>
-                        <p>Electrical sparks require immediate professional attention.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sudden Power Failure in Specific Areas</strong>
-                        <p>Faulty circuits or damaged wiring may interrupt electricity supply.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Electrical Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ MCB Tripping Issues</li>
-                      <li>✓ Switchboard Repair</li>
-                      <li>✓ Switch Replacement</li>
-                      <li>✓ Socket Repair</li>
-                      <li>✓ Ceiling Fan Installation</li>
-                      <li>✓ Fan Repair Services</li>
-                      <li>✓ Decorative Lighting Installation</li>
-                      <li>✓ LED Light Installation</li>
-                      <li>✓ Chandelier Installation</li>
-                      <li>✓ Exhaust Fan Installation</li>
-                      <li>✓ Doorbell Installation</li>
-                      <li>✓ House Wiring</li>
-                      <li>✓ Rewiring Services</li>
-                      <li>✓ Short Circuit Repairs</li>
-                      <li>✓ Power Failure Diagnosis</li>
-                      <li>✓ Electrical Load Balancing</li>
-                      <li>✓ Inverter Wiring</li>
-                      <li>✓ UPS Installation</li>
-                      <li>✓ Commercial Electrical Maintenance</li>
-                      <li>✓ Electrical Safety Inspections</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Electrician Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your electrician service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan electrician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The electrical issue is carefully diagnosed.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Installation:</strong> Repairs, replacements, wiring work, or installations are completed professionally.</li>
-                      <li><strong>Safety Testing:</strong> All electrical systems are tested thoroughly.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Electrical Maintenance</h3>
-                    <p>Routine inspections help:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Prevent Short Circuits</li>
-                       <li>Improve Electrical Safety</li>
-                       <li>Protect Expensive Appliances</li>
-                       <li>Reduce Fire Risks</li>
-                       <li>Improve Energy Efficiency</li>
-                       <li>Detect Hidden Faults Early</li>
-                       <li>Extend Wiring Lifespan</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend periodic electrical inspections, especially in older residential and commercial buildings.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of electrician service in Varanasi?</strong>
-                        <p>Electrician services start from ₹149*. Final pricing depends on the work and materials required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide same-day electrician service?</strong>
-                        <p>Yes. Same-day electrical repair and installation services are available across Varanasi.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair switchboards and sockets?</strong>
-                        <p>Absolutely. We repair and replace switches, sockets, and complete switchboards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide house wiring services?</strong>
-                        <p>Yes. We provide new wiring, rewiring, and electrical point installation services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you install fans and lighting systems?</strong>
-                        <p>Yes. We install ceiling fans, LED lights, chandeliers, decorative lighting, and exhaust fans.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide commercial electrical services?</strong>
-                        <p>Yes. We provide electrical maintenance and installation support for offices, shops, hotels, hospitals, and commercial establishments.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Varanasi Today</h3>
-                      <p>Whether you need emergency electrical repairs, house wiring, MCB replacement, lighting installation, inverter wiring, switchboard repairs, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Experience safe, affordable, and professional electrical services designed to keep your home and business powered efficiently.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 'Gurgaon') {
+          if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 'Gurgaon') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
               seoDiv.innerHTML = `
@@ -7467,242 +6140,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                     // Add location-specific SEO content for Plumbing in Noida
-          
-          // Add location-specific SEO content for Plumbing in Gorakhpur
-          if (categoryName === 'Plumbing' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Plumbing Services in Gorakhpur | Expert Plumber for Pipe Leakage Repair, Drain Cleaning & Bathroom Fittings by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A properly functioning plumbing system is essential for maintaining comfort, hygiene, and efficient water management in every property. From kitchens and bathrooms to water tanks and drainage systems, professional plumbing services help prevent water damage, improve efficiency, and reduce costly repairs.</p>
-                    
-                    <p>In a growing city like Gorakhpur, residential and commercial properties frequently face plumbing challenges such as pipe leakages, drainage blockages, low water pressure, concealed water seepage, overflowing tanks, and bathroom fitting failures.</p>
-
-                    <p>If you're searching for trusted Plumbing Services in Gorakhpur, Sofiyan provides professional doorstep plumbing repair, installation, maintenance, leak detection, drainage solutions, and water management services for homes and businesses.</p>
-
-                    <p>Whether you need pipe leakage repair, concealed leak detection, bathroom fitting installation, kitchen plumbing work, drain cleaning, toilet repairs, water tank plumbing, or emergency plumbing support, our experienced plumbers provide dependable and long-lasting solutions.</p>
-
-                    <p>We offer same-day plumbing service in Gorakhpur for homes, apartments, hospitals, hostels, schools, coaching institutes, hotels, restaurants, retail stores, offices, and commercial establishments.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Plumbing Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Basic Plumbing Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Plumber Visit & Inspection</strong> – Starting from ₹149*</li>
-                      <li><strong>Minor Plumbing Repairs</strong> – Starting from ₹149*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Bathroom Plumbing Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Tap Repair & Replacement</strong> – Starting from ₹149*</li>
-                      <li><strong>Shower Installation</strong> – Starting from ₹199*</li>
-                      <li><strong>Health Faucet Installation</strong> – Starting from ₹149*</li>
-                      <li><strong>Flush Tank Repair</strong> – Starting from ₹249*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Leak Detection & Repair</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Pipe Leakage Repair</strong> – Custom Pricing</li>
-                      <li><strong>Concealed Leak Detection</strong> – Inspection Based</li>
-                      <li><strong>Water Seepage Inspection</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Drainage Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Drain Cleaning</strong> – Starting from ₹249*</li>
-                      <li><strong>Kitchen Sink Blockage Removal</strong> – Affordable Pricing</li>
-                      <li><strong>Bathroom Drain Cleaning</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Water Tank Plumbing Work</strong> – Custom Pricing</li>
-                      <li><strong>Bathroom Fittings Installation</strong> – Custom Pricing</li>
-                      <li><strong>Complete Plumbing Installation</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on pipe condition, material requirements, property type, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Plumbing Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Emergency Support</strong>
-                        <p>Quick assistance for urgent water leakage and plumbing issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, apartments, hospitals, schools, hotels, restaurants, and offices.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Leak Detection Technology</strong>
-                        <p>Professional inspection methods help identify hidden water leaks accurately.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Skilled & Verified Plumbers</strong>
-                        <p>Experienced plumbing professionals trained in modern water systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Long-Term Plumbing Solutions</strong>
-                        <p>Repairs designed to minimize repeat problems and water wastage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after project completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs You Need Professional Plumbing Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage from Pipes</strong>
-                        <p>Even small leaks can lead to major property damage if ignored.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Low Water Pressure</strong>
-                        <p>Clogged pipes, hidden leaks, or valve issues may affect water flow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Drainage</strong>
-                        <p>Blocked drainage systems may cause water accumulation and bad odors.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Damp Walls & Water Seepage</strong>
-                        <p>Hidden plumbing leaks often damage walls and ceilings.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Overflowing Water Tanks</strong>
-                        <p>Faulty float valves may cause unnecessary water wastage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Toilet Flushing Problems</strong>
-                        <p>Damaged flush systems can affect daily convenience.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unpleasant Drain Smells</strong>
-                        <p>Blocked drainage systems may create hygiene issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Continuous Water Dripping</strong>
-                        <p>Worn-out taps and fittings can increase water bills.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Plumbing Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Pipe Leakage Repair</li>
-                      <li>✓ Concealed Leak Detection</li>
-                      <li>✓ Tap Repair & Replacement</li>
-                      <li>✓ Shower Installation</li>
-                      <li>✓ Health Faucet Installation</li>
-                      <li>✓ Toilet Flush Repair</li>
-                      <li>✓ Bathroom Plumbing Repairs</li>
-                      <li>✓ Kitchen Sink Blockage Removal</li>
-                      <li>✓ Drain Cleaning Services</li>
-                      <li>✓ Water Pressure Problems</li>
-                      <li>✓ Water Tank Plumbing</li>
-                      <li>✓ Pipe Replacement</li>
-                      <li>✓ Water Seepage Repairs</li>
-                      <li>✓ Drain Blockage Removal</li>
-                      <li>✓ Bathroom Fittings Installation</li>
-                      <li>✓ Emergency Plumbing Repairs</li>
-                      <li>✓ Commercial Plumbing Services</li>
-                      <li>✓ Residential Plumbing Maintenance</li>
-                      <li>✓ Pipeline Troubleshooting</li>
-                      <li>✓ Complete Plumbing Renovation Support</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Plumbing Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your plumbing service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan plumber is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The plumbing issue is thoroughly diagnosed.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Installation:</strong> Repairs, replacements, cleaning, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Water flow, leakage points, drainage systems, and fittings are tested thoroughly.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Plumbing Maintenance</h3>
-                    <p>Routine inspections help:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Prevent Water Damage</li>
-                       <li>Improve Water Flow</li>
-                       <li>Reduce Water Wastage</li>
-                       <li>Extend Plumbing Lifespan</li>
-                       <li>Detect Hidden Leaks Early</li>
-                       <li>Improve Drainage Efficiency</li>
-                       <li>Avoid Emergency Repairs</li>
-                       <li>Reduce Long-Term Maintenance Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend periodic plumbing inspections, especially for older residential and commercial properties.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of plumbing service in Gorakhpur?</strong>
-                        <p>Plumbing services start from ₹149*. Final pricing depends on the issue and materials required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide same-day plumbing service?</strong>
-                        <p>Yes. Same-day plumbing repair and installation support is available across Gorakhpur.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair concealed pipe leaks?</strong>
-                        <p>Absolutely. We diagnose and repair hidden leakage issues using professional inspection techniques.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair toilets and flush systems?</strong>
-                        <p>Yes. We repair flush tanks, toilet leaks, flushing mechanisms, and installation issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you unblock kitchen sinks and drains?</strong>
-                        <p>Yes. We provide drain cleaning and blockage removal services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide commercial plumbing services?</strong>
-                        <p>Yes. We serve hospitals, schools, hotels, offices, restaurants, and commercial properties.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, concealed leak detection, toilet repairs, water tank connections, or complete plumbing maintenance, Sofiyan delivers dependable plumbing solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Experience professional, affordable, and reliable plumbing services designed to keep your property leak-free and your water systems operating efficiently.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Plumbing' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -7908,217 +6345,7 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
               content.appendChild(seoDiv);
           }
 
-// Add location-specific SEO content for Plumbing in Varanasi
-          if (categoryName === 'Plumbing' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Plumbing Services in Varanasi | Expert Plumber for Pipe Leakage Repair, Bathroom Fittings & Drain Solutions by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A reliable plumbing system is essential for maintaining comfort, hygiene, and efficient water management in homes and commercial properties. Even a minor plumbing issue can lead to water wastage, structural damage, increased utility costs, and hygiene concerns if left unresolved.</p>
-                    
-                    <p>In a city like Varanasi, where both heritage buildings and modern residential developments coexist, professional plumbing maintenance is important to keep water supply and drainage systems functioning efficiently.</p>
-
-                    <p>If you're searching for trusted Plumbing Services in Varanasi, Sofiyan provides professional doorstep plumbing repair, installation, maintenance, inspection, and troubleshooting solutions for residential and commercial properties.</p>
-
-                    <p>Whether you need pipe leakage repair, concealed leak detection, bathroom fitting installation, kitchen plumbing work, drain cleaning, toilet repairs, water tank plumbing, or emergency plumbing assistance, our experienced plumbers deliver dependable and long-lasting solutions.</p>
-
-                    <p>We offer same-day plumbing service in Varanasi for homes, apartments, guest houses, hotels, hostels, offices, hospitals, restaurants, retail stores, educational institutions, and commercial buildings.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Plumbing Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Basic Plumbing</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Plumber Visit & Inspection</strong> – Starting from ₹149*</li>
-                      <li><strong>Minor Plumbing Repairs</strong> – Starting from ₹149*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Bathroom Plumbing Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Tap Repair & Replacement</strong> – Starting from ₹149*</li>
-                      <li><strong>Shower Installation</strong> – Starting from ₹199*</li>
-                      <li><strong>Health Faucet Installation</strong> – Starting from ₹149*</li>
-                      <li><strong>Flush Tank Repair</strong> – Starting from ₹249*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Leak Detection & Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Pipe Leakage Repair</strong> – Custom Pricing</li>
-                      <li><strong>Concealed Leak Detection</strong> – Inspection Based</li>
-                      <li><strong>Water Seepage Inspection</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Drainage Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Drain Cleaning</strong> – Starting from ₹249*</li>
-                      <li><strong>Kitchen Sink Blockage Removal</strong> – Affordable Pricing</li>
-                      <li><strong>Bathroom Drain Cleaning</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Water Tank Plumbing Work</strong> – Custom Pricing</li>
-                      <li><strong>Bathroom Fittings Installation</strong> – Custom Pricing</li>
-                      <li><strong>Complete Plumbing Installation</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final charges depend on pipe condition, material requirements, property type, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Plumbing Services</h3>
-                    <ul class="space-y-3">
-                      <li>★ <strong>Same-Day Emergency Support</strong> – Quick assistance for urgent plumbing problems and water leakage issues.</li>
-                      <li>★ <strong>Old & Modern Building Expertise</strong> – Solutions available for heritage properties, apartments, villas, and commercial buildings.</li>
-                      <li>★ <strong>Residential & Commercial Coverage</strong> – Plumbing services for homes, offices, hotels, hospitals, restaurants, and shops.</li>
-                      <li>★ <strong>Advanced Leak Detection Methods</strong> – Professional inspection techniques help locate hidden leaks accurately.</li>
-                      <li>★ <strong>Transparent Pricing</strong> – Clear estimates before work begins.</li>
-                      <li>★ <strong>Experienced Plumbing Professionals</strong> – Skilled plumbers trained to handle modern and traditional plumbing systems.</li>
-                      <li>★ <strong>Digital Service Reports</strong> – WhatsApp invoices and service records for convenience.</li>
-                      <li>★ <strong>Reliable After-Service Support</strong> – Dedicated customer assistance after service completion.</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs You Need Professional Plumbing Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage from Pipes</strong>
-                        <p>Even small leaks can lead to significant property damage over time.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Low Water Pressure</strong>
-                        <p>Hidden leaks, clogged pipes, or valve issues may reduce water flow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Drainage</strong>
-                        <p>Accumulated debris and waste materials can block drainage systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Damp Walls or Water Seepage</strong>
-                        <p>Concealed leaks often cause moisture damage to walls and ceilings.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Overflowing Water Tanks</strong>
-                        <p>Faulty float valves can waste large amounts of water.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Toilet Flushing Problems</strong>
-                        <p>Damaged flush mechanisms may affect functionality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unpleasant Drain Odors</strong>
-                        <p>Blocked drainage systems can create hygiene issues and foul smells.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Continuous Water Dripping</strong>
-                        <p>Worn-out taps and fittings may lead to unnecessary water wastage.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Plumbing Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Pipe Leakage Repair</li>
-                      <li>✓ Concealed Leak Detection</li>
-                      <li>✓ Tap Repair & Replacement</li>
-                      <li>✓ Shower Installation</li>
-                      <li>✓ Health Faucet Installation</li>
-                      <li>✓ Toilet Flush Repair</li>
-                      <li>✓ Bathroom Plumbing Repairs</li>
-                      <li>✓ Kitchen Sink Blockage Removal</li>
-                      <li>✓ Drain Cleaning Services</li>
-                      <li>✓ Water Pressure Problems</li>
-                      <li>✓ Water Tank Plumbing</li>
-                      <li>✓ Pipe Replacement</li>
-                      <li>✓ Water Seepage Repairs</li>
-                      <li>✓ Drain Blockage Removal</li>
-                      <li>✓ Bathroom Fittings Installation</li>
-                      <li>✓ Emergency Plumbing Repairs</li>
-                      <li>✓ Commercial Plumbing Services</li>
-                      <li>✓ Residential Plumbing Maintenance</li>
-                      <li>✓ Pipeline Troubleshooting</li>
-                      <li>✓ Complete Plumbing Renovation Support</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Plumbing Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your plumbing service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan plumber is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The plumbing issue is carefully diagnosed.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Installation:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Water flow, leakage points, and drainage systems are tested thoroughly.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Plumbing Maintenance</h3>
-                    <p>Routine inspections help:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Prevent Water Damage</li>
-                       <li>Improve Water Flow</li>
-                       <li>Reduce Water Wastage</li>
-                       <li>Extend Plumbing Lifespan</li>
-                       <li>Detect Hidden Leaks Early</li>
-                       <li>Improve Drainage Performance</li>
-                       <li>Avoid Emergency Repairs</li>
-                       <li>Reduce Long-Term Maintenance Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend periodic plumbing inspections, especially for older residential and commercial properties.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of plumbing service in Varanasi?</strong>
-                        <p>Plumbing services start from ₹149*. Final pricing depends on the issue and materials required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide same-day plumbing service?</strong>
-                        <p>Yes. Same-day plumbing repair and installation support is available across Varanasi.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair concealed pipe leaks?</strong>
-                        <p>Absolutely. We diagnose and repair hidden leakage issues using professional inspection methods.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair toilets and flush systems?</strong>
-                        <p>Yes. We repair flush tanks, toilet leaks, flushing mechanisms, and installation issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you unblock kitchen sinks and drains?</strong>
-                        <p>Yes. We provide drain cleaning and blockage removal services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide commercial plumbing services?</strong>
-                        <p>Yes. We serve hotels, hospitals, offices, restaurants, educational institutions, and commercial properties.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Varanasi Today</h3>
-                      <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, concealed leak detection, toilet repairs, water tank connections, or complete plumbing maintenance, Sofiyan delivers dependable plumbing solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Experience professional, affordable, and reliable plumbing services designed to keep your property leak-free and your water systems running smoothly.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-          // Add location-specific SEO content for Plumbing in Gurgaon
+// Add location-specific SEO content for Plumbing in Gurgaon
           if (categoryName === 'Plumbing' && localStorage.getItem('preferredCity') === 'Gurgaon') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -9820,471 +8047,7 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
               content.appendChild(seoDiv);
           }
 
-                              // Add location-specific SEO content for Refrigerator in Varanasi
-          if (categoryName === 'Refrigerator' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Refrigerator Repair Service in Varanasi | Expert Fridge Repair, Cooling Restoration & Gas Refilling by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A refrigerator is one of the most important appliances in every home and business. It protects food, beverages, dairy products, medicines, and frozen items by maintaining consistent cooling throughout the day.</p>
-                    
-                    <p>In a city like Varanasi, where summers can be extremely hot and commercial food businesses operate continuously, refrigerator performance is critical for both households and businesses.</p>
-
-                    <p>If you're searching for trusted Refrigerator Repair Services in Varanasi, Sofiyan provides professional doorstep refrigerator repair, maintenance, gas refilling, cooling restoration, installation, and troubleshooting solutions for residential and commercial customers.</p>
-
-                    <p>Whether your refrigerator is not cooling, leaking water, making unusual noises, producing excessive frost, consuming too much electricity, or failing to start, our experienced technicians provide dependable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day refrigerator service in Varanasi for homes, apartments, hostels, hotels, guest houses, restaurants, bakeries, sweet shops, medical stores, supermarkets, and commercial establishments.</p>
-
-                    <p>Our specialists repair Single Door Refrigerators, Double Door Refrigerators, Side-by-Side Refrigerators, French Door Refrigerators, Inverter Refrigerators, Smart Refrigerators, Deep Freezers, Commercial Coolers, Mini Fridges, and Commercial Refrigeration Systems.</p>
-
-                    <p>We service all major brands including LG, Samsung, Whirlpool, Godrej, Haier, Bosch, Panasonic, Hitachi, IFB, Blue Star, Voltas, Toshiba, Siemens, Electrolux, Liebherr, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Refrigerator Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Cooling Problem Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Gas Charging Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Gas Refilling</strong> – Starting from ₹2,499*</li>
-                      <li><strong>Refrigerant Leak Detection</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Compressor Repair</strong> – Custom Pricing</li>
-                      <li><strong>Thermostat Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Fan Motor Repair</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Installation</strong> – Starting from ₹699*</li>
-                      <li><strong>Refrigerator Relocation</strong> – Starting from ₹899*</li>
-                      <li><strong>Refrigerator Uninstallation</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on refrigerator type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Refrigerator Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Quick assistance to prevent food spoilage and cooling failures.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions for homes, hotels, restaurants, bakeries, and commercial refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Modern Cooling Technology Specialists</strong>
-                        <p>Experienced technicians trained on inverter and smart refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve reliability and performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Fault Diagnosis</strong>
-                        <p>Accurate troubleshooting helps identify the root cause quickly.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records provided after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated support after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Refrigerator Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Is Not Cooling Properly</strong>
-                        <p>Low refrigerant levels, compressor issues, or thermostat faults may affect cooling.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Frost Build-Up</strong>
-                        <p>Defrost system problems can cause heavy ice accumulation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around Refrigerator</strong>
-                        <p>Blocked drain lines may result in water leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
-                        <p>Compressor, fan motor, or internal component issues may create abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Runs Continuously</strong>
-                        <p>Cooling inefficiency may force the compressor to work constantly.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Is Not Starting</strong>
-                        <p>Electrical faults, PCB failures, or compressor problems may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Food Spoils Faster Than Normal</strong>
-                        <p>Temperature fluctuations may indicate hidden cooling system issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Consumes Excessive Electricity</strong>
-                        <p>Poor cooling efficiency often increases power consumption.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Refrigerator Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Refrigerator Not Cooling</li>
-                      <li>✓ Refrigerator Gas Refilling</li>
-                      <li>✓ Refrigerant Leak Detection</li>
-                      <li>✓ Compressor Repair</li>
-                      <li>✓ Thermostat Repair</li>
-                      <li>✓ Defrost System Repair</li>
-                      <li>✓ Ice Build-Up Problems</li>
-                      <li>✓ Refrigerator Water Leakage</li>
-                      <li>✓ Fan Motor Repair</li>
-                      <li>✓ Refrigerator Not Starting</li>
-                      <li>✓ PCB Board Repair</li>
-                      <li>✓ Door Gasket Replacement</li>
-                      <li>✓ Temperature Control Problems</li>
-                      <li>✓ Deep Freezer Repairs</li>
-                      <li>✓ Side-by-Side Refrigerator Repairs</li>
-                      <li>✓ Commercial Refrigerator Repairs</li>
-                      <li>✓ Refrigerator Installation</li>
-                      <li>✓ Refrigerator Relocation</li>
-                      <li>✓ Smart Refrigerator Repairs</li>
-                      <li>✓ Inverter Refrigerator Repairs</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Refrigerator Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your refrigerator repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The appliance is inspected thoroughly to identify the exact issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, gas charging, replacements, or installations are completed professionally.</li>
-                      <li><strong>Cooling Performance Testing:</strong> Cooling efficiency, compressor performance, airflow, and safety systems are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Refrigerator Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Maintain Consistent Cooling</li>
-                       <li>Protect Food Quality</li>
-                       <li>Reduce Electricity Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Cooling Efficiency</li>
-                       <li>Detect Refrigerant Leaks Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend refrigerator servicing every 6–12 months depending on usage intensity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of refrigerator repair in Varanasi?</strong>
-                        <p>Refrigerator repair services start from ₹299*. Final pricing depends on the fault and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide refrigerator gas refilling?</strong>
-                        <p>Yes. We provide refrigerant leak detection and professional gas charging services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my refrigerator not cooling properly?</strong>
-                        <p>Common causes include gas leakage, compressor faults, thermostat issues, condenser problems, and airflow restrictions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair side-by-side refrigerators?</strong>
-                        <p>Yes. We repair single door, double door, French door, side-by-side, inverter, and commercial refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which refrigerator brands do you repair?</strong>
-                        <p>We service LG, Samsung, Whirlpool, Godrej, Haier, Bosch, Panasonic, Hitachi, IFB, Blue Star, Voltas, Toshiba, Siemens, Electrolux, Liebherr, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Varanasi Today</h3>
-                      <p>Whether you need emergency cooling repairs, gas refilling, compressor troubleshooting, cooling restoration, installation support, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your food fresh, beverages chilled, and cooling systems running efficiently with Varanasi’s trusted refrigerator repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-// Add location-specific SEO content for Refrigerator in Noida
-          
-          
-          // Add location-specific SEO content for Refrigerator in Gorakhpur
-          if (categoryName === 'Refrigerator' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Refrigerator Repair Service in Gorakhpur | Expert Fridge Repair, Cooling Restoration & Gas Refilling by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A refrigerator is one of the most important appliances in every household and commercial establishment. It helps preserve food, beverages, medicines, dairy products, frozen items, and other temperature-sensitive products while maintaining freshness and safety.</p>
-                    
-                    <p>In a city like Gorakhpur, where summers can be extremely warm and humidity levels remain high, a properly functioning refrigerator is essential for both homes and businesses.</p>
-
-                    <p>If you're searching for trusted Refrigerator Repair Services in Gorakhpur, Sofiyan provides professional doorstep refrigerator repair, maintenance, gas refilling, cooling restoration, installation, and troubleshooting solutions for residential and commercial customers.</p>
-
-                    <p>Whether your refrigerator is not cooling properly, leaking water, producing excessive frost, making unusual noises, consuming excess electricity, or failing to start, our experienced technicians provide reliable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day refrigerator service in Gorakhpur for homes, apartments, hostels, hospitals, hotels, restaurants, bakeries, sweet shops, medical stores, supermarkets, and commercial establishments.</p>
-
-                    <p>Our specialists repair Single Door Refrigerators, Double Door Refrigerators, Side-by-Side Refrigerators, French Door Refrigerators, Inverter Refrigerators, Smart Refrigerators, Deep Freezers, Commercial Coolers, Beverage Chillers, and Commercial Refrigeration Systems.</p>
-
-                    <p>We service all major brands including LG, Samsung, Whirlpool, Godrej, Haier, Bosch, Panasonic, Hitachi, IFB, Blue Star, Voltas, Toshiba, Siemens, Electrolux, Liebherr, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Refrigerator Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Cooling Problem Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Gas Charging Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Gas Refilling</strong> – Starting from ₹2,499*</li>
-                      <li><strong>Refrigerant Leak Detection</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Compressor Repair</strong> – Custom Pricing</li>
-                      <li><strong>Thermostat Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Fan Motor Repair</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Refrigerator Installation</strong> – Starting from ₹699*</li>
-                      <li><strong>Refrigerator Relocation</strong> – Starting from ₹899*</li>
-                      <li><strong>Refrigerator Uninstallation</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on refrigerator type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Refrigerator Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Cooling Assistance</strong>
-                        <p>Fast response to prevent food spoilage and business losses.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions for homes, restaurants, hospitals, supermarkets, bakeries, and commercial refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Cooling Diagnostics</strong>
-                        <p>Modern troubleshooting methods help identify cooling system faults accurately.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve performance and durability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear estimates before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Experienced Refrigeration Technicians</strong>
-                        <p>Experts trained in both domestic and commercial refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after repair completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Refrigerator Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Is Not Cooling Properly</strong>
-                        <p>Low refrigerant levels, compressor faults, or thermostat problems may affect cooling.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Ice Formation</strong>
-                        <p>Defrost system issues may cause frost accumulation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around Refrigerator</strong>
-                        <p>Blocked drain pipes may result in water leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
-                        <p>Fan motors, compressors, or internal components may create abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Runs Continuously</strong>
-                        <p>Cooling inefficiency may force the compressor to work constantly.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Refrigerator Is Not Starting</strong>
-                        <p>Electrical faults, PCB failures, or compressor issues may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Food Spoils Faster Than Normal</strong>
-                        <p>Temperature fluctuations may indicate cooling system faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Increased Electricity Consumption</strong>
-                        <p>Poor cooling efficiency often leads to higher energy usage.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Refrigerator Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Refrigerator Not Cooling</li>
-                      <li>✓ Refrigerator Gas Refilling</li>
-                      <li>✓ Refrigerant Leak Detection</li>
-                      <li>✓ Compressor Repair</li>
-                      <li>✓ Thermostat Repair</li>
-                      <li>✓ Defrost System Repair</li>
-                      <li>✓ Excessive Ice Build-Up Issues</li>
-                      <li>✓ Refrigerator Water Leakage</li>
-                      <li>✓ Fan Motor Repair</li>
-                      <li>✓ Refrigerator Not Starting</li>
-                      <li>✓ PCB Board Repair</li>
-                      <li>✓ Door Gasket Replacement</li>
-                      <li>✓ Temperature Control Problems</li>
-                      <li>✓ Deep Freezer Repairs</li>
-                      <li>✓ Side-by-Side Refrigerator Repairs</li>
-                      <li>✓ Commercial Refrigerator Repairs</li>
-                      <li>✓ Refrigerator Installation</li>
-                      <li>✓ Refrigerator Relocation</li>
-                      <li>✓ Smart Refrigerator Repairs</li>
-                      <li>✓ Inverter Refrigerator Repairs</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Refrigerator Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your refrigerator repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The refrigerator is thoroughly inspected to identify the exact fault.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, gas charging, replacements, or installations are completed professionally.</li>
-                      <li><strong>Cooling Performance Testing:</strong> Cooling efficiency, airflow, compressor performance, and safety systems are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Refrigerator Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Maintain Consistent Cooling</li>
-                       <li>Protect Food Quality</li>
-                       <li>Reduce Electricity Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Cooling Efficiency</li>
-                       <li>Detect Refrigerant Leaks Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend refrigerator servicing every 6–12 months depending on usage intensity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of refrigerator repair in Gorakhpur?</strong>
-                        <p>Refrigerator repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide refrigerator gas refilling?</strong>
-                        <p>Yes. We provide refrigerant leak detection and professional gas charging services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my refrigerator not cooling properly?</strong>
-                        <p>Common causes include gas leakage, compressor faults, thermostat issues, condenser problems, and airflow restrictions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair side-by-side refrigerators?</strong>
-                        <p>Yes. We repair single door, double door, French door, side-by-side, inverter, and commercial refrigeration systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which refrigerator brands do you repair?</strong>
-                        <p>We service LG, Samsung, Whirlpool, Godrej, Haier, Bosch, Panasonic, Hitachi, IFB, Blue Star, Voltas, Toshiba, Siemens, Electrolux, Liebherr, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency cooling repairs, gas refilling, compressor troubleshooting, cooling restoration, installation support, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your food fresh, beverages chilled, and cooling systems operating efficiently with Gorakhpur’s trusted refrigerator repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
+                    // Add location-specific SEO content for Refrigerator in Noida
           if (categoryName === 'Refrigerator' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -12197,474 +9960,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                     // Add location-specific SEO content for Geyser in Noida
-          
-          // Add location-specific SEO content for Geyser in Varanasi
-          if (categoryName === 'Geyser' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Geyser Repair Service in Varanasi | Expert Water Heater Repair, Installation & Maintenance by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Hot water is an essential part of daily life, especially during the winter season. Whether it's for bathing, cleaning, hospitality services, healthcare facilities, or commercial operations, a properly functioning geyser ensures comfort, convenience, and efficiency.</p>
-                    
-                    <p>In Varanasi, where winters can be chilly and water heating systems are heavily used, regular maintenance and timely repairs help prevent unexpected breakdowns and costly replacements.</p>
-
-                    <p>If you're searching for trusted Geyser Repair Services in Varanasi, Sofiyan provides professional doorstep repair, maintenance, installation, troubleshooting, and preventive servicing solutions for all major geyser brands and models.</p>
-
-                    <p>Whether your geyser is not heating water, leaking, tripping the MCB, making unusual noises, consuming excessive electricity, or delivering inconsistent temperatures, our experienced technicians provide dependable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day geyser service in Varanasi for homes, apartments, hostels, hotels, guest houses, hospitals, clinics, salons, gyms, offices, and commercial establishments.</p>
-
-                    <p>Our specialists repair and service Instant Geysers, Storage Water Heaters, Vertical Geysers, Horizontal Geysers, Smart Geysers, Electric Water Heaters, Solar Water Heating Support Systems, and Commercial Water Heating Units.</p>
-
-                    <p>We service all major brands including Racold, AO Smith, Havells, Bajaj, Crompton, V-Guard, Venus, Usha, Orient, Kenstar, Jaquar, Longway, Maharaja Whiteline, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Geyser Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Repair Service</strong> – Starting from ₹299*</li>
-                      <li><strong>Water Heater Troubleshooting</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Replacement</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Heating Element Replacement</strong> – Custom Pricing</li>
-                      <li><strong>Thermostat Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Safety Valve Replacement</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Installation</strong> – Starting from ₹499*</li>
-                      <li><strong>Geyser Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>Geyser Relocation Service</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Cleaning & Descaling</strong> – Starting from ₹349*</li>
-                      <li><strong>Preventive Maintenance Plans</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on geyser type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Geyser Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Quick assistance for urgent hot water problems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Winter Season Specialists</strong>
-                        <p>Solutions designed for heavy seasonal geyser usage and water heating requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Services available for homes, hotels, hospitals, hostels, salons, gyms, and offices.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve durability and heating performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before service begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Safety-Focused Repairs</strong>
-                        <p>Every electrical and heating component is carefully inspected.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records provided after service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer support after repair completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Geyser Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Water Is Not Heating Properly</strong>
-                        <p>Heating element or thermostat failures may affect performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage from Geyser</strong>
-                        <p>Tank corrosion, loose fittings, or valve issues may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">MCB Trips Frequently</strong>
-                        <p>Electrical faults or internal short circuits may create safety concerns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Temperature Fluctuations</strong>
-                        <p>Thermostat problems may result in inconsistent heating.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Sounds During Operation</strong>
-                        <p>Sediment buildup inside the tank may reduce efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Rust-Colored Water</strong>
-                        <p>Internal tank corrosion may affect water quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Increased Electricity Bills</strong>
-                        <p>An inefficient heating system may consume more power than normal.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Water Heating</strong>
-                        <p>Heating elements may require repair or replacement.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Geyser Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Geyser Not Heating Water</li>
-                      <li>✓ Heating Element Replacement</li>
-                      <li>✓ Thermostat Repair</li>
-                      <li>✓ Water Leakage Repair</li>
-                      <li>✓ Instant Geyser Repairs</li>
-                      <li>✓ Storage Geyser Repairs</li>
-                      <li>✓ Safety Valve Replacement</li>
-                      <li>✓ MCB Tripping Issues</li>
-                      <li>✓ Internal Wiring Faults</li>
-                      <li>✓ Temperature Control Problems</li>
-                      <li>✓ Indicator Light Failures</li>
-                      <li>✓ Tank Cleaning & Descaling</li>
-                      <li>✓ Water Heater Repairs</li>
-                      <li>✓ Geyser Installation</li>
-                      <li>✓ Geyser Reinstallation</li>
-                      <li>✓ Geyser Relocation</li>
-                      <li>✓ Smart Geyser Troubleshooting</li>
-                      <li>✓ Electrical Safety Inspections</li>
-                      <li>✓ Commercial Water Heater Repairs</li>
-                      <li>✓ Preventive Maintenance Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Geyser Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your geyser service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The geyser is thoroughly inspected to identify the root cause of the problem.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Safety & Performance Testing:</strong> Heating efficiency, electrical safety, leakage checks, and thermostat operation are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Geyser Maintenance</h3>
-                    <p>Routine maintenance helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Heating Efficiency</li>
-                       <li>Reduce Electricity Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Water Quality</li>
-                       <li>Reduce Scale Build-Up</li>
-                       <li>Detect Problems Early</li>
-                       <li>Ensure Safe Operation</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional servicing every 6–12 months, especially before winter begins.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of geyser repair in Varanasi?</strong>
-                        <p>Geyser repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my geyser not heating water?</strong>
-                        <p>Common causes include heating element failure, thermostat faults, electrical issues, or sediment buildup.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair instant geysers?</strong>
-                        <p>Yes. We repair instant geysers, storage water heaters, smart geysers, and commercial heating systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide geyser installation services?</strong>
-                        <p>Absolutely. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which geyser brands do you repair?</strong>
-                        <p>We service Racold, AO Smith, Havells, Bajaj, Crompton, V-Guard, Venus, Usha, Orient, Kenstar, Jaquar, Longway, and many others.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should a geyser be serviced?</strong>
-                        <p>Professional maintenance every 6–12 months helps improve efficiency and extend appliance lifespan.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Varanasi Today</h3>
-                      <p>Whether you need emergency geyser repairs, thermostat replacement, heating element replacement, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy reliable hot water and energy-efficient performance with Varanasi’s trusted geyser repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-          
-          // Add location-specific SEO content for Geyser in Gorakhpur
-          if (categoryName === 'Geyser' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Geyser Repair Service in Gorakhpur | Expert Water Heater Repair, Installation & Maintenance by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A geyser is an essential appliance that provides instant access to hot water for bathing, cleaning, healthcare facilities, hospitality businesses, and daily household activities. During the winter season, a properly functioning water heater becomes even more important for comfort and convenience.</p>
-                    
-                    <p>In Gorakhpur, where winter temperatures drop significantly and hot water requirements increase, regular maintenance and professional repairs help ensure reliable performance and energy efficiency.</p>
-
-                    <p>If you're searching for trusted Geyser Repair Services in Gorakhpur, Sofiyan provides professional doorstep geyser repair, maintenance, installation, troubleshooting, and preventive servicing solutions for residential and commercial customers.</p>
-
-                    <p>Whether your geyser is not heating water, leaking, tripping the MCB, making unusual sounds, consuming excessive electricity, or delivering inconsistent temperatures, our experienced technicians provide reliable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day geyser service in Gorakhpur for homes, apartments, hospitals, clinics, hostels, hotels, guest houses, salons, gyms, offices, and commercial establishments.</p>
-
-                    <p>Our specialists repair and service Instant Geysers, Storage Water Heaters, Vertical Geysers, Horizontal Geysers, Smart Geysers, Electric Water Heaters, Solar Water Heating Support Systems, and Commercial Water Heating Units.</p>
-
-                    <p>We service all major brands including Racold, AO Smith, Havells, Bajaj, Crompton, V-Guard, Venus, Usha, Orient, Kenstar, Jaquar, Longway, Maharaja Whiteline, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Geyser Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Repair Service</strong> – Starting from ₹299*</li>
-                      <li><strong>Water Heater Troubleshooting</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Replacement</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Heating Element Replacement</strong> – Custom Pricing</li>
-                      <li><strong>Thermostat Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Safety Valve Replacement</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Installation</strong> – Starting from ₹499*</li>
-                      <li><strong>Geyser Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>Geyser Relocation Service</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Geyser Cleaning & Descaling</strong> – Starting from ₹349*</li>
-                      <li><strong>Preventive Maintenance Plans</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on geyser type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Geyser Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Fast assistance for urgent hot water problems during winter.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Services available for homes, hotels, hospitals, hostels, salons, gyms, and offices.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Hot Water System Specialists</strong>
-                        <p>Technicians trained on modern storage and instant water heating systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components ensure durability and performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Safety-Focused Repairs</strong>
-                        <p>Every electrical and heating component is carefully inspected.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records provided after service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after repair completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Geyser Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Water Is Not Heating Properly</strong>
-                        <p>Heating element or thermostat failures may affect heating efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage from Geyser</strong>
-                        <p>Tank corrosion, loose fittings, or safety valve issues may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">MCB Trips Frequently</strong>
-                        <p>Electrical faults or internal short circuits may create safety concerns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Temperature Fluctuations</strong>
-                        <p>Thermostat problems may result in inconsistent heating.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Sounds During Operation</strong>
-                        <p>Sediment buildup inside the tank may reduce efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Rust-Colored Water</strong>
-                        <p>Internal corrosion may affect water quality and appliance health.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Increased Electricity Bills</strong>
-                        <p>An inefficient heating system may consume excessive power.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Water Heating</strong>
-                        <p>Heating elements may require repair or replacement.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Geyser Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Geyser Not Heating Water</li>
-                      <li>✓ Heating Element Replacement</li>
-                      <li>✓ Thermostat Repair</li>
-                      <li>✓ Water Leakage Repair</li>
-                      <li>✓ Instant Geyser Repairs</li>
-                      <li>✓ Storage Geyser Repairs</li>
-                      <li>✓ Safety Valve Replacement</li>
-                      <li>✓ MCB Tripping Issues</li>
-                      <li>✓ Internal Wiring Faults</li>
-                      <li>✓ Temperature Control Problems</li>
-                      <li>✓ Indicator Light Failures</li>
-                      <li>✓ Tank Cleaning & Descaling</li>
-                      <li>✓ Water Heater Repairs</li>
-                      <li>✓ Geyser Installation</li>
-                      <li>✓ Geyser Reinstallation</li>
-                      <li>✓ Geyser Relocation</li>
-                      <li>✓ Smart Geyser Troubleshooting</li>
-                      <li>✓ Electrical Safety Inspections</li>
-                      <li>✓ Commercial Water Heater Repairs</li>
-                      <li>✓ Preventive Maintenance Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Geyser Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your geyser service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The geyser is thoroughly inspected to identify the root cause of the problem.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Safety & Performance Testing:</strong> Heating efficiency, electrical safety, leakage checks, and thermostat operation are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Geyser Maintenance</h3>
-                    <p>Routine maintenance helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Heating Efficiency</li>
-                       <li>Reduce Electricity Consumption</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Water Quality</li>
-                       <li>Reduce Scale Build-Up</li>
-                       <li>Detect Problems Early</li>
-                       <li>Ensure Safe Operation</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional servicing every 6–12 months, especially before winter begins.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of geyser repair in Gorakhpur?</strong>
-                        <p>Geyser repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my geyser not heating water?</strong>
-                        <p>Common causes include heating element failure, thermostat faults, electrical issues, or sediment buildup.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair instant geysers?</strong>
-                        <p>Yes. We repair instant geysers, storage water heaters, smart geysers, and commercial heating systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide geyser installation services?</strong>
-                        <p>Absolutely. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which geyser brands do you repair?</strong>
-                        <p>We service Racold, AO Smith, Havells, Bajaj, Crompton, V-Guard, Venus, Usha, Orient, Kenstar, Jaquar, Longway, and many others.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency geyser repairs, thermostat replacement, heating element replacement, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy reliable hot water and energy-efficient performance with Gorakhpur’s trusted geyser repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Geyser' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -14575,470 +11870,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                     // Add location-specific SEO content for Microwave in Noida
-          
-          // Add location-specific SEO content for Microwave in Varanasi
-          if (categoryName === 'Microwave' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Microwave Oven Repair Service in Varanasi | Expert Microwave, Convection Oven & OTG Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Microwave ovens have become an essential part of modern kitchens, helping families, students, restaurants, bakeries, and food businesses prepare meals quickly and efficiently. Whether used for reheating, grilling, baking, or cooking, a properly functioning microwave saves time and improves kitchen productivity.</p>
-                    
-                    <p>When a microwave develops technical issues, professional servicing helps restore performance, improve safety, and extend appliance lifespan.</p>
-
-                    <p>If you're searching for trusted Microwave Oven Repair Services in Varanasi, Sofiyan provides professional doorstep microwave repair, maintenance, installation, troubleshooting, and preventive servicing solutions for all major microwave brands and models.</p>
-
-                    <p>Whether your microwave is not heating, sparking inside, displaying error codes, making unusual noises, showing touch panel issues, failing to start, or experiencing convection heating problems, our experienced technicians provide reliable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day microwave repair service in Varanasi for homes, apartments, hostels, guest houses, bakeries, cafés, restaurants, cloud kitchens, offices, educational institutions, and commercial establishments.</p>
-
-                    <p>Our specialists repair Solo Microwaves, Grill Microwaves, Convection Microwaves, Built-In Microwave Ovens, Smart Microwave Ovens, OTGs (Oven Toaster Grills), Commercial Microwave Systems, and Multi-Function Cooking Appliances.</p>
-
-                    <p>We service all major brands including LG, Samsung, IFB, Panasonic, Whirlpool, Bosch, Godrej, Haier, Bajaj, Morphy Richards, Siemens, Toshiba, Sharp, Glen, Electrolux, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Microwave Repair Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Microwave Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Microwave Oven Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Convection Microwave Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>OTG Repair Service</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Magnetron Replacement</strong> – Custom Pricing</li>
-                      <li><strong>Door Switch Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>High Voltage Circuit Repair</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Built-In Microwave Installation</strong> – Starting from ₹599*</li>
-                      <li><strong>Microwave Relocation Service</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                       <li><strong>Microwave Cleaning & Maintenance</strong> – Starting from ₹349*</li>
-                       <li><strong>Commercial Microwave Maintenance</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on appliance type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Microwave Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Quick assistance for urgent kitchen appliance breakdowns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart Appliance Specialists</strong>
-                        <p>Technicians trained on modern microwave and convection technologies.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Services available for homes, restaurants, bakeries, hostels, cafés, and commercial kitchens.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve reliability and lifespan.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Fault Diagnosis</strong>
-                        <p>Accurate troubleshooting minimizes downtime and repeat issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every repair.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated support after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Microwave Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Microwave Runs But Does Not Heat</strong>
-                        <p>Magnetron, capacitor, diode, or high-voltage system failures may affect heating.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Microwave Does Not Turn On</strong>
-                        <p>Electrical faults, fuse failures, or PCB issues may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sparking Inside the Microwave</strong>
-                        <p>Waveguide damage or electrical faults may create sparks.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Turntable Is Not Rotating</strong>
-                        <p>Motor or drive system failures may affect cooking performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Touch Panel Is Not Responding</strong>
-                        <p>Control board or display faults may affect usability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Door Is Not Closing Properly</strong>
-                        <p>Door latch or safety switch failures may create operational issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Sounds During Operation</strong>
-                        <p>Internal component wear may indicate developing faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Food Is Heating Unevenly</strong>
-                        <p>Heating system performance may require professional inspection.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Microwave Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Microwave Not Heating</li>
-                      <li>✓ Microwave Not Starting</li>
-                      <li>✓ Magnetron Replacement</li>
-                      <li>✓ Microwave Sparking Issues</li>
-                      <li>✓ Turntable Motor Repair</li>
-                      <li>✓ Door Switch Repair</li>
-                      <li>✓ Touch Panel Repair</li>
-                      <li>✓ PCB Board Troubleshooting</li>
-                      <li>✓ Control Panel Repair</li>
-                      <li>✓ Fuse Replacement</li>
-                      <li>✓ Fan Motor Repair</li>
-                      <li>✓ Grill Function Repairs</li>
-                      <li>✓ Convection Heating Problems</li>
-                      <li>✓ OTG Repairs</li>
-                      <li>✓ Built-In Microwave Installation</li>
-                      <li>✓ Timer Malfunctions</li>
-                      <li>✓ Sensor Fault Repairs</li>
-                      <li>✓ Smart Microwave Repairs</li>
-                      <li>✓ Commercial Microwave Repairs</li>
-                      <li>✓ Preventive Maintenance Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Microwave Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your microwave repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The appliance is thoroughly inspected to identify the exact issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, replacements, servicing, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Heating efficiency, controls, safety systems, and cooking functions are thoroughly tested.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Microwave Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Heating Performance</li>
-                       <li>Ensure Uniform Cooking</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Reduce Energy Consumption</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Kitchen Safety</li>
-                       <li>Detect Problems Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional inspections whenever heating performance begins to decline.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of microwave repair in Varanasi?</strong>
-                        <p>Microwave repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my microwave not heating food?</strong>
-                        <p>Common causes include magnetron failure, capacitor defects, diode problems, or high-voltage circuit faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair convection microwaves and OTGs?</strong>
-                        <p>Yes. We repair Solo, Grill, Convection Microwaves, OTGs, Built-In Ovens, and commercial microwave systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair sparking issues?</strong>
-                        <p>Absolutely. We diagnose and repair waveguide damage, electrical faults, and internal component failures.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which microwave brands do you repair?</strong>
-                        <p>We service LG, Samsung, IFB, Panasonic, Whirlpool, Bosch, Godrej, Haier, Bajaj, Morphy Richards, Siemens, Toshiba, Sharp, Glen, Electrolux, and many others.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Varanasi Today</h3>
-                      <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, touch panel troubleshooting, installation support, or preventive maintenance, Sofiyan delivers dependable microwave repair solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your kitchen running efficiently with Varanasi’s trusted microwave repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-          
-          // Add location-specific SEO content for Microwave in Gorakhpur
-          if (categoryName === 'Microwave' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Microwave Oven Repair Service in Gorakhpur | Expert Microwave, Convection Oven & OTG Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Microwave ovens have become an important part of modern kitchens, helping families, students, restaurants, bakeries, cafés, and food businesses prepare meals quickly and efficiently. Whether used for reheating, grilling, baking, defrosting, or cooking, a properly functioning microwave improves convenience and kitchen productivity.</p>
-                    
-                    <p>When a microwave develops technical issues, professional servicing helps restore performance, improve safety, and extend appliance lifespan.</p>
-
-                    <p>If you're searching for trusted Microwave Oven Repair Services in Gorakhpur, Sofiyan provides professional doorstep microwave repair, maintenance, installation, troubleshooting, and preventive servicing solutions for residential and commercial customers.</p>
-
-                    <p>Whether your microwave is not heating, sparking inside, displaying error codes, making unusual noises, showing touch panel issues, failing to start, or experiencing convection heating problems, our experienced technicians provide reliable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day microwave repair service in Gorakhpur for homes, apartments, hostels, hospitals, guest houses, bakeries, cafés, restaurants, cloud kitchens, offices, educational institutions, and commercial establishments.</p>
-
-                    <p>Our specialists repair Solo Microwaves, Grill Microwaves, Convection Microwaves, Built-In Microwave Ovens, Smart Microwave Ovens, OTGs (Oven Toaster Grills), Commercial Microwave Systems, and Multi-Function Cooking Appliances.</p>
-
-                    <p>We service all major brands including LG, Samsung, IFB, Panasonic, Whirlpool, Bosch, Godrej, Haier, Bajaj, Morphy Richards, Siemens, Toshiba, Sharp, Glen, Electrolux, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Microwave Repair Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Microwave Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Microwave Oven Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Convection Microwave Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>OTG Repair Service</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Magnetron Replacement</strong> – Custom Pricing</li>
-                      <li><strong>Door Switch Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>High Voltage Circuit Repair</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Built-In Microwave Installation</strong> – Starting from ₹599*</li>
-                      <li><strong>Microwave Relocation Service</strong> – Starting from ₹499*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Microwave Cleaning & Maintenance</strong> – Starting from ₹349*</li>
-                      <li><strong>Commercial Microwave Maintenance</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on appliance type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Microwave Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Fast assistance for urgent kitchen appliance breakdowns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart Appliance Specialists</strong>
-                        <p>Technicians trained on advanced microwave and convection technologies.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, restaurants, bakeries, cafés, hostels, and commercial kitchens.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve performance and reliability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Diagnostics</strong>
-                        <p>Accurate troubleshooting minimizes downtime and repeat issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every repair.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Microwave Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Microwave Runs But Does Not Heat</strong>
-                        <p>Magnetron, capacitor, diode, or high-voltage system failures may affect heating.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Microwave Does Not Turn On</strong>
-                        <p>Electrical faults, fuse failures, or PCB issues may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Sparking Inside the Microwave</strong>
-                        <p>Waveguide damage or electrical faults may create sparks.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Turntable Is Not Rotating</strong>
-                        <p>Motor or drive system failures may affect cooking performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Touch Panel Is Not Responding</strong>
-                        <p>Control board or display faults may affect usability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Door Is Not Closing Properly</strong>
-                        <p>Door latch or safety switch failures may create operational issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Sounds During Operation</strong>
-                        <p>Internal component wear may indicate developing faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Food Is Heating Unevenly</strong>
-                        <p>Heating system performance may require professional inspection.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Microwave Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Microwave Not Heating</li>
-                      <li>✓ Microwave Not Starting</li>
-                      <li>✓ Magnetron Replacement</li>
-                      <li>✓ Microwave Sparking Issues</li>
-                      <li>✓ Turntable Motor Repair</li>
-                      <li>✓ Door Switch Repair</li>
-                      <li>✓ Touch Panel Repair</li>
-                      <li>✓ PCB Board Troubleshooting</li>
-                      <li>✓ Control Panel Repair</li>
-                      <li>✓ Fuse Replacement</li>
-                      <li>✓ Fan Motor Repair</li>
-                      <li>✓ Grill Function Repairs</li>
-                      <li>✓ Convection Heating Problems</li>
-                      <li>✓ OTG Repairs</li>
-                      <li>✓ Built-In Microwave Installation</li>
-                      <li>✓ Timer Malfunctions</li>
-                      <li>✓ Sensor Fault Repairs</li>
-                      <li>✓ Smart Microwave Repairs</li>
-                      <li>✓ Commercial Microwave Repairs</li>
-                      <li>✓ Preventive Maintenance Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Microwave Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your microwave repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The appliance is thoroughly inspected to identify the exact issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, replacements, servicing, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Heating efficiency, controls, safety systems, and cooking functions are thoroughly tested.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Microwave Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Heating Performance</li>
-                       <li>Ensure Uniform Cooking</li>
-                       <li>Extend Appliance Lifespan</li>
-                       <li>Reduce Energy Consumption</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Kitchen Safety</li>
-                       <li>Detect Problems Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional inspection whenever heating performance begins to decline.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of microwave repair in Gorakhpur?</strong>
-                        <p>Microwave repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my microwave not heating food?</strong>
-                        <p>Common causes include magnetron failure, capacitor defects, diode problems, or high-voltage circuit faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair convection microwaves and OTGs?</strong>
-                        <p>Yes. We repair Solo, Grill, Convection Microwaves, OTGs, Built-In Ovens, and commercial microwave systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you repair sparking issues?</strong>
-                        <p>Absolutely. We diagnose and repair waveguide damage, electrical faults, and internal component failures.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which microwave brands do you repair?</strong>
-                        <p>We service LG, Samsung, IFB, Panasonic, Whirlpool, Bosch, Godrej, Haier, Bajaj, Morphy Richards, Siemens, Toshiba, Sharp, Glen, Electrolux, and many others.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, touch panel troubleshooting, installation support, or preventive maintenance, Sofiyan delivers dependable microwave repair solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Keep your kitchen running efficiently with Gorakhpur’s trusted microwave repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Microwave' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -16966,472 +13797,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                     // Add location-specific SEO content for Television in Noida
-          
-          // Add location-specific SEO content for Television in Varanasi
-          if (categoryName === 'Television' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    TV Repair Service in Varanasi | Expert LED TV, Smart TV & Android TV Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Television has evolved from a simple entertainment device into a complete digital experience hub for streaming, gaming, online learning, video conferencing, and family entertainment. Whether it's a Smart TV, Android TV, OLED TV, QLED TV, or LED television, uninterrupted performance is essential for modern lifestyles.</p>
-                    
-                    <p>When a TV develops display issues, sound problems, software faults, or connectivity errors, professional repair services help restore functionality while extending device lifespan.</p>
-
-                    <p>If you're searching for trusted TV Repair Services in Varanasi, Sofiyan provides professional doorstep television repair, installation, maintenance, troubleshooting, and performance optimization solutions for residential and commercial customers.</p>
-
-                    <p>Whether your TV has a black screen, display lines, no sound, Wi-Fi connectivity issues, software errors, HDMI problems, screen flickering, power failures, or motherboard faults, our experienced technicians provide dependable and long-lasting repair solutions.</p>
-
-                    <p>We offer same-day TV repair service in Varanasi for homes, apartments, hostels, hotels, guest houses, coaching institutes, offices, gaming zones, retail outlets, and commercial establishments.</p>
-
-                    <p>Our specialists repair LED TVs, Smart TVs, Android TVs, OLED TVs, QLED TVs, LCD TVs, Google TVs, 4K Ultra HD TVs, Curved TVs, Home Theatre Displays, and Commercial Display Panels.</p>
-
-                    <p>We service all major brands including Samsung, LG, Sony, Mi, OnePlus, TCL, Panasonic, Vu, Philips, Toshiba, Kodak, Thomson, Acer, Blaupunkt, Hisense, Haier, Realme, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">TV Repair Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>LED TV Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Smart TV Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>Android TV Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Backlight Replacement</strong> – Custom Pricing</li>
-                      <li><strong>Motherboard Repair</strong> – Inspection Based</li>
-                      <li><strong>Power Supply Board Repair</strong> – Affordable Pricing</li>
-                      <li><strong>T-Con Board Repair</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Wall Mount Installation</strong> – Starting from ₹499*</li>
-                      <li><strong>TV Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>TV Relocation Service</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Performance Check-Up</strong> – Starting from ₹349*</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on TV model, display technology, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan TV Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Quick assistance for urgent TV breakdowns and entertainment interruptions.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart TV Technology Experts</strong>
-                        <p>Technicians trained on Android TV, Google TV, WebOS, Tizen OS, and modern smart TV platforms.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Support available for homes, coaching institutes, hotels, offices, and commercial spaces.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement components improve reliability and viewing performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear estimates before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Diagnostics</strong>
-                        <p>Accurate fault detection helps reduce downtime and repeat issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records provided after every repair.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Television Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">TV Turns On But Screen Is Black</strong>
-                        <p>Backlight failures or display panel issues may cause a blank screen.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">No Sound Output</strong>
-                        <p>Speaker faults or audio board issues may affect sound performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Lines Appearing on Screen</strong>
-                        <p>Panel, ribbon cable, or T-Con board problems may affect display quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart TV Apps Not Working</strong>
-                        <p>Software corruption may affect streaming services and smart features.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">HDMI Ports Not Responding</strong>
-                        <p>Damaged ports may prevent external devices from connecting.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">TV Restarts Automatically</strong>
-                        <p>Power supply or motherboard issues may cause repeated restarts.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Wi-Fi Connectivity Problems</strong>
-                        <p>Network module failures may affect online functionality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Screen Flickering</strong>
-                        <p>Display instability may reduce viewing comfort and picture quality.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">TV Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ TV Not Turning On</li>
-                      <li>✓ Black Screen Problems</li>
-                      <li>✓ No Display Issues</li>
-                      <li>✓ LED Backlight Replacement</li>
-                      <li>✓ Smart TV Software Repair</li>
-                      <li>✓ Android TV Troubleshooting</li>
-                      <li>✓ Motherboard Repairs</li>
-                      <li>✓ Power Supply Board Repairs</li>
-                      <li>✓ T-Con Board Repairs</li>
-                      <li>✓ Vertical Line Problems</li>
-                      <li>✓ Horizontal Line Problems</li>
-                      <li>✓ No Sound Issues</li>
-                      <li>✓ HDMI Port Repairs</li>
-                      <li>✓ Wi-Fi Connectivity Problems</li>
-                      <li>✓ Remote Sensor Repairs</li>
-                      <li>✓ Screen Flickering Issues</li>
-                      <li>✓ TV Wall Mount Installation</li>
-                      <li>✓ TV Reinstallation Services</li>
-                      <li>✓ Google TV Repairs</li>
-                      <li>✓ 4K TV Troubleshooting</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi TV Repair Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your TV repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The television is thoroughly inspected to identify the root cause of the issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, software updates, component replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Picture quality, sound output, connectivity, and smart features are tested thoroughly.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Professional TV Maintenance</h3>
-                    <p>Routine maintenance helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Picture Quality</li>
-                       <li>Enhance Sound Performance</li>
-                       <li>Extend Television Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Smart TV Speed</li>
-                       <li>Detect Problems Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                       <li>Ensure Better Viewing Experience</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional inspection whenever display or sound quality begins to decline.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of TV repair in Varanasi?</strong>
-                        <p>TV repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">My TV has sound but no picture. Can it be repaired?</strong>
-                        <p>Yes. Backlight failures and display-related issues can often be repaired successfully.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair Smart TVs and Android TVs?</strong>
-                        <p>Absolutely. We repair Smart TVs, Android TVs, OLED TVs, QLED TVs, LED TVs, LCD TVs, and Google TVs.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you install TVs on walls?</strong>
-                        <p>Yes. We provide wall mounting, reinstallation, and TV relocation services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which TV brands do you repair?</strong>
-                        <p>We service Samsung, LG, Sony, Mi, OnePlus, TCL, Panasonic, Vu, Philips, Toshiba, Kodak, Thomson, Acer, Blaupunkt, Hisense, Haier, Realme, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Varanasi Today</h3>
-                      <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, wall mounting support, or preventive maintenance, Sofiyan delivers dependable television repair solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Restore your entertainment experience with Varanasi’s trusted TV repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-          
-          // Add location-specific SEO content for Television in Gorakhpur
-          if (categoryName === 'Television' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    TV Repair Service in Gorakhpur | Expert LED TV, Smart TV & Android TV Repair by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Television has become the center of modern entertainment, digital learning, gaming, video streaming, and smart home connectivity. Whether it's a Smart TV, Android TV, LED TV, OLED TV, or QLED television, uninterrupted performance is essential for a seamless viewing experience.</p>
-                    
-                    <p>In a rapidly growing city like Gorakhpur, households, hotels, hostels, coaching institutes, hospitals, and businesses rely heavily on televisions for information, entertainment, education, and customer engagement.</p>
-
-                    <p>If you're searching for trusted TV Repair Services in Gorakhpur, Sofiyan provides professional doorstep television repair, installation, maintenance, software troubleshooting, display restoration, and performance optimization services.</p>
-
-                    <p>Whether your TV has a black screen, display lines, no sound, software crashes, Wi-Fi connectivity issues, HDMI port failures, screen flickering, motherboard faults, or power supply problems, our experienced technicians provide reliable and long-lasting solutions.</p>
-
-                    <p>We offer same-day TV repair service in Gorakhpur for homes, apartments, hostels, hotels, guest houses, coaching institutes, hospitals, offices, gaming centers, retail stores, and commercial establishments.</p>
-
-                    <p>Our specialists repair LED TVs, Smart TVs, Android TVs, OLED TVs, QLED TVs, LCD TVs, Google TVs, 4K Ultra HD TVs, Curved TVs, Commercial Display Panels, and Home Entertainment Systems.</p>
-
-                    <p>We service all major brands including Samsung, LG, Sony, Mi, OnePlus, TCL, Panasonic, Vu, Philips, Toshiba, Kodak, Thomson, Acer, Blaupunkt, Hisense, Haier, Realme, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">TV Repair Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Inspection & Diagnosis</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>LED TV Repair</strong> – Starting from ₹299*</li>
-                      <li><strong>Smart TV Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>Android TV Repair</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Component Repairs</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>LED Backlight Repair</strong> – Custom Pricing</li>
-                      <li><strong>Motherboard Repair</strong> – Inspection Based</li>
-                      <li><strong>Power Supply Board Repair</strong> – Affordable Pricing</li>
-                      <li><strong>T-Con Board Repair</strong> – Affordable Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Wall Mount Installation</strong> – Starting from ₹499*</li>
-                      <li><strong>TV Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>TV Relocation Service</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>TV Performance Check-Up</strong> – Starting from ₹349*</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on television type, spare parts required, and repair complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan TV Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Assistance</strong>
-                        <p>Fast support for urgent television breakdowns.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart TV Technology Specialists</strong>
-                        <p>Technicians trained on Android TV, Google TV, WebOS, Tizen OS, and modern display technologies.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Services available for homes, hospitals, coaching institutes, hotels, offices, and commercial spaces.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement components improve reliability and viewing performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Diagnostics</strong>
-                        <p>Accurate troubleshooting reduces downtime and repeat faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records provided after service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after repair completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Television Needs Professional Repair</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">TV Turns On But No Display Appears</strong>
-                        <p>Backlight or display panel faults may cause a black screen.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">No Sound Output</strong>
-                        <p>Audio board or speaker problems may affect sound quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Vertical or Horizontal Lines on Screen</strong>
-                        <p>Display panels, ribbon cables, or T-Con boards may require repair.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Smart TV Apps Keep Crashing</strong>
-                        <p>Software corruption may affect smart functionality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">HDMI Ports Not Detecting Devices</strong>
-                        <p>Damaged ports may prevent external devices from connecting.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">TV Restarts Automatically</strong>
-                        <p>Power supply or motherboard issues may cause repeated rebooting.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Wi-Fi Connectivity Problems</strong>
-                        <p>Network module failures may affect online streaming services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Screen Flickering Issues</strong>
-                        <p>Display instability may reduce picture quality and viewing comfort.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">TV Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ TV Not Turning On</li>
-                      <li>✓ Black Screen Issues</li>
-                      <li>✓ No Display Problems</li>
-                      <li>✓ LED Backlight Replacement</li>
-                      <li>✓ Smart TV Software Repair</li>
-                      <li>✓ Android TV Troubleshooting</li>
-                      <li>✓ Motherboard Repair</li>
-                      <li>✓ Power Supply Board Repair</li>
-                      <li>✓ T-Con Board Repairs</li>
-                      <li>✓ Vertical Line Problems</li>
-                      <li>✓ Horizontal Line Problems</li>
-                      <li>✓ No Sound Issues</li>
-                      <li>✓ HDMI Port Repairs</li>
-                      <li>✓ Wi-Fi Connectivity Problems</li>
-                      <li>✓ Remote Sensor Repairs</li>
-                      <li>✓ Screen Flickering Issues</li>
-                      <li>✓ TV Wall Mount Installation</li>
-                      <li>✓ TV Reinstallation Services</li>
-                      <li>✓ Google TV Repairs</li>
-                      <li>✓ 4K TV Troubleshooting</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur TV Repair Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your TV repair service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Diagnosis:</strong> The television is thoroughly inspected to identify the exact issue.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Servicing:</strong> Repairs, software updates, component replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Picture quality, sound output, connectivity, and smart features are thoroughly tested.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular TV Maintenance</h3>
-                    <p>Routine maintenance helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Picture Quality</li>
-                       <li>Enhance Sound Performance</li>
-                       <li>Extend Television Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Improve Smart TV Speed</li>
-                       <li>Improve Streaming Performance</li>
-                       <li>Detect Problems Early</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional inspection whenever picture quality or sound performance begins to decline.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of TV repair in Gorakhpur?</strong>
-                        <p>TV repair services start from ₹299*. Final pricing depends on the issue and spare parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">My TV has sound but no picture. Can it be repaired?</strong>
-                        <p>Yes. Backlight failures and display-related faults can often be repaired successfully.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair Smart TVs and Android TVs?</strong>
-                        <p>Absolutely. We repair Smart TVs, Android TVs, OLED TVs, QLED TVs, LED TVs, LCD TVs, and Google TVs.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Can you install TVs on walls?</strong>
-                        <p>Yes. We provide wall mounting, reinstallation, and TV relocation services.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected repairs include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which TV brands do you repair?</strong>
-                        <p>We repair Samsung, LG, Sony, Mi, OnePlus, TCL, Panasonic, Vu, Philips, Toshiba, Kodak, Thomson, Acer, Blaupunkt, Hisense, Haier, Realme, and many more.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, wall mounting support, or preventive maintenance, Sofiyan delivers dependable television repair solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Restore your entertainment experience with Gorakhpur’s trusted TV repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Television' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -19383,480 +15748,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                     // Add location-specific SEO content for Chimney in Noida
-          
-          // Add location-specific SEO content for Chimney in Varanasi
-          if (categoryName === 'Chimney' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Chimney Cleaning & Repair Service in Varanasi | Expert Kitchen Chimney Deep Cleaning, Repair & Installation by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A kitchen chimney is one of the most important appliances for maintaining a clean, healthy, and smoke-free cooking environment. It helps remove smoke, grease particles, cooking odors, airborne pollutants, and excess heat generated during daily cooking activities.</p>
-                    
-                    <p>In Varanasi, where households, restaurants, sweet shops, cafés, guest houses, hotels, and commercial kitchens operate regularly, kitchen chimneys experience heavy usage throughout the year. Without periodic cleaning and maintenance, grease accumulation can reduce suction efficiency, increase energy consumption, and create potential safety hazards.</p>
-
-                    <p>If you're searching for trusted Chimney Cleaning & Repair Services in Varanasi, Sofiyan provides professional doorstep chimney repair, deep cleaning, maintenance, installation, and troubleshooting solutions for residential and commercial kitchens.</p>
-
-                    <p>Whether your chimney has low suction, excessive noise, oil leakage, auto-clean failure, electrical faults, motor issues, filter blockages, or ventilation problems, our experienced technicians provide reliable and long-lasting solutions.</p>
-
-                    <p>We offer same-day chimney service in Varanasi for homes, apartments, hotels, restaurants, cafés, bakeries, sweet shops, cloud kitchens, hostels, guest houses, and commercial food businesses.</p>
-
-                    <p>Our specialists service Auto-Clean Chimneys, Curved Glass Chimneys, Straight-Line Chimneys, Wall-Mounted Chimneys, Island Chimneys, Built-In Chimneys, Ducted Chimneys, Ductless Chimneys, and Commercial Kitchen Exhaust Systems.</p>
-
-                    <p>We service all major brands including Elica, Faber, Glen, Hindware, Kaff, Eurodomo, Prestige, Bosch, Inalsa, Crompton, Pigeon, Sunflame, Blowhot, Whirlpool, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Chimney Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Inspection & Troubleshooting</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Basic Chimney Cleaning</strong> – Starting from ₹399*</li>
-                      <li><strong>Deep Chimney Cleaning</strong> – Starting from ₹599*</li>
-                      <li><strong>Auto-Clean Chimney Maintenance</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Repair Service</strong> – Starting from ₹299*</li>
-                      <li><strong>Chimney Motor Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>PCB & Electrical Repair</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Installation</strong> – Starting from ₹799*</li>
-                      <li><strong>Chimney Uninstallation</strong> – Starting from ₹499*</li>
-                      <li><strong>Chimney Relocation Service</strong> – Starting from ₹999*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Commercial Kitchen Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Commercial Chimney Maintenance</strong> – Site Inspection Based</li>
-                      <li><strong>Exhaust System Cleaning</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on chimney type, grease accumulation level, spare parts required, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Chimney Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Fast response for urgent chimney cleaning and repair requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, restaurants, bakeries, cafés, hotels, and food businesses.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Deep Grease Removal Technology</strong>
-                        <p>Advanced cleaning methods help restore suction efficiency and airflow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Experienced Chimney Technicians</strong>
-                        <p>Professionals trained on modern chimney technologies and ventilation systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before service begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>Quality replacement components improve durability and performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>Invoices and service records delivered instantly through WhatsApp.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Chimney Needs Professional Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Smoke Remains Inside the Kitchen</strong>
-                        <p>Reduced suction power may indicate filter blockage or motor issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Oil Leakage</strong>
-                        <p>Heavy grease buildup can cause oil dripping from the chimney.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
-                        <p>Motor, blower, or internal component problems may generate abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Auto-Clean Function Not Working</strong>
-                        <p>Electrical or mechanical faults may affect self-cleaning systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Persistent Cooking Odors</strong>
-                        <p>Poor airflow may trap odors inside the kitchen.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Chimney Vibrates Excessively</strong>
-                        <p>Internal balancing issues may require professional inspection.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Weak Airflow Performance</strong>
-                        <p>Blocked ducts or filters may restrict ventilation efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Chimney Does Not Start</strong>
-                        <p>Electrical faults or PCB failures may affect operation.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Chimney Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Chimney Not Working</li>
-                      <li>✓ Chimney Deep Cleaning</li>
-                      <li>✓ Auto-Clean Chimney Repair</li>
-                      <li>✓ Chimney Motor Repair</li>
-                      <li>✓ Chimney PCB Repair</li>
-                      <li>✓ Low Suction Problems</li>
-                      <li>✓ Oil Leakage Repair</li>
-                      <li>✓ Filter Cleaning Services</li>
-                      <li>✓ Filter Replacement</li>
-                      <li>✓ Duct Cleaning Services</li>
-                      <li>✓ Chimney Noise Issues</li>
-                      <li>✓ Blower Motor Repairs</li>
-                      <li>✓ Chimney Electrical Repairs</li>
-                      <li>✓ Kitchen Exhaust Repairs</li>
-                      <li>✓ Ventilation System Troubleshooting</li>
-                      <li>✓ Chimney Installation</li>
-                      <li>✓ Chimney Reinstallation</li>
-                      <li>✓ Commercial Chimney Maintenance</li>
-                      <li>✓ Restaurant Chimney Cleaning</li>
-                      <li>✓ Preventive Chimney Servicing</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Chimney Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your chimney service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The chimney system is thoroughly inspected to identify performance issues.</li>
-                      <li><strong>Transparent Estimate:</strong> Cleaning or repair recommendations are explained clearly.</li>
-                      <li><strong>Service Execution:</strong> Deep cleaning, repairs, maintenance, replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Suction power, airflow efficiency, motor performance, and safety systems are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Chimney Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Smoke Extraction</li>
-                       <li>Remove Grease Deposits</li>
-                       <li>Improve Kitchen Hygiene</li>
-                       <li>Improve Indoor Air Quality</li>
-                       <li>Reduce Fire Hazards</li>
-                       <li>Increase Suction Performance</li>
-                       <li>Extend Chimney Lifespan</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional chimney cleaning every 3–6 months, depending on cooking frequency and kitchen usage.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of chimney service in Varanasi?</strong>
-                        <p>Chimney servicing starts from ₹299*, while deep cleaning starts from ₹599*. Final pricing depends on chimney type and service requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should a chimney be cleaned?</strong>
-                        <p>Most residential chimneys should be cleaned every 3–6 months depending on cooking habits.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair auto-clean chimneys?</strong>
-                        <p>Yes. We repair and service auto-clean, wall-mounted, island, ducted, and ductless chimney systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my chimney leaking oil?</strong>
-                        <p>Oil leakage is usually caused by excessive grease buildup and delayed maintenance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide chimney installation services?</strong>
-                        <p>Absolutely. We provide installation, relocation, and reinstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which chimney brands do you service?</strong>
-                        <p>We service Elica, Faber, Glen, Hindware, Kaff, Eurodomo, Prestige, Bosch, Inalsa, Crompton, Pigeon, Sunflame, Blowhot, Whirlpool, and many others.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Cleaning & Repair Service in Varanasi Today</h3>
-                      <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, grease removal, exhaust maintenance, or preventive servicing, Sofiyan delivers dependable chimney solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Maintain a cleaner, safer, and healthier kitchen environment with Varanasi’s trusted chimney cleaning and repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-          
-          // Add location-specific SEO content for Chimney in Gorakhpur
-          if (categoryName === 'Chimney' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Chimney Cleaning & Repair Service in Gorakhpur | Expert Kitchen Chimney Deep Cleaning, Repair & Installation by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A kitchen chimney plays a vital role in maintaining a smoke-free, odor-free, and hygienic cooking environment. It helps remove grease particles, cooking fumes, smoke, airborne contaminants, and excess heat generated during daily cooking activities.</p>
-                    
-                    <p>In Gorakhpur, where households, restaurants, sweet shops, hotels, cafés, and food businesses operate throughout the year, kitchen chimneys experience heavy grease accumulation and continuous usage. Without proper maintenance, chimney performance declines, suction power reduces, and kitchen hygiene may be affected.</p>
-
-                    <p>If you're searching for trusted Chimney Cleaning & Repair Services in Gorakhpur, Sofiyan provides professional doorstep chimney repair, deep cleaning, maintenance, installation, and troubleshooting solutions for residential and commercial kitchens.</p>
-
-                    <p>Whether your chimney has low suction, excessive noise, oil leakage, auto-clean failure, electrical faults, motor issues, filter blockages, or ventilation problems, our experienced technicians provide reliable and long-lasting solutions.</p>
-
-                    <p>We offer same-day chimney service in Gorakhpur for homes, apartments, restaurants, bakeries, cafés, hotels, cloud kitchens, hostels, guest houses, and commercial food businesses.</p>
-
-                    <p>Our specialists service Auto-Clean Chimneys, Curved Glass Chimneys, Straight-Line Chimneys, Wall-Mounted Chimneys, Island Chimneys, Built-In Chimneys, Ducted Chimneys, Ductless Chimneys, and Commercial Kitchen Exhaust Systems.</p>
-
-                    <p>We service all major brands including Elica, Faber, Glen, Hindware, Kaff, Eurodomo, Prestige, Bosch, Inalsa, Crompton, Pigeon, Sunflame, Blowhot, Whirlpool, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Chimney Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Inspection & Troubleshooting</strong> – Starting from ₹299*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Basic Chimney Cleaning</strong> – Starting from ₹399*</li>
-                      <li><strong>Deep Chimney Cleaning</strong> – Starting from ₹599*</li>
-                      <li><strong>Auto-Clean Chimney Maintenance</strong> – Starting from ₹699*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Repair Service</strong> – Starting from ₹299*</li>
-                      <li><strong>Chimney Motor Repair</strong> – Affordable Pricing Available</li>
-                      <li><strong>PCB & Electrical Repair</strong> – Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Chimney Installation</strong> – Starting from ₹799*</li>
-                      <li><strong>Chimney Uninstallation</strong> – Starting from ₹499*</li>
-                      <li><strong>Chimney Relocation Service</strong> – Starting from ₹999*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Commercial Kitchen Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Commercial Chimney Maintenance</strong> – Site Inspection Based</li>
-                      <li><strong>Exhaust Duct Cleaning</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on chimney type, grease accumulation level, spare parts required, and service complexity.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Chimney Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Support</strong>
-                        <p>Quick response for urgent chimney cleaning and repair requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, restaurants, hotels, bakeries, cafés, and cloud kitchens.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Advanced Deep Cleaning Methods</strong>
-                        <p>Professional grease removal improves airflow and chimney performance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Experienced Chimney Technicians</strong>
-                        <p>Experts trained on modern chimney systems and kitchen ventilation technologies.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Spare Parts</strong>
-                        <p>High-quality replacement components improve durability and efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Chimney Needs Professional Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Smoke Remains Inside the Kitchen</strong>
-                        <p>Low suction performance may indicate filter blockage or motor faults.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Oil Dripping from Chimney</strong>
-                        <p>Grease accumulation may cause oil leakage and hygiene issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Excessive Noise During Operation</strong>
-                        <p>Motor or blower issues may create unusual sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Auto-Clean Function Not Working</strong>
-                        <p>Electrical or mechanical faults may affect automatic cleaning systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Persistent Cooking Odors</strong>
-                        <p>Poor ventilation may trap cooking smells inside the kitchen.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Weak Airflow Performance</strong>
-                        <p>Blocked ducts or filters may reduce suction efficiency.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Chimney Vibrates Excessively</strong>
-                        <p>Internal balancing issues may require professional attention.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Chimney Does Not Start</strong>
-                        <p>Electrical faults, PCB issues, or motor failures may prevent operation.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Chimney Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Chimney Not Working</li>
-                      <li>✓ Chimney Deep Cleaning</li>
-                      <li>✓ Auto-Clean Chimney Repair</li>
-                      <li>✓ Chimney Motor Repair</li>
-                      <li>✓ Chimney PCB Repair</li>
-                      <li>✓ Low Suction Problems</li>
-                      <li>✓ Oil Leakage Repair</li>
-                      <li>✓ Filter Cleaning Services</li>
-                      <li>✓ Filter Replacement</li>
-                      <li>✓ Duct Cleaning Services</li>
-                      <li>✓ Chimney Noise Issues</li>
-                      <li>✓ Blower Motor Repairs</li>
-                      <li>✓ Chimney Electrical Repairs</li>
-                      <li>✓ Kitchen Exhaust Repairs</li>
-                      <li>✓ Ventilation System Troubleshooting</li>
-                      <li>✓ Chimney Installation</li>
-                      <li>✓ Chimney Reinstallation</li>
-                      <li>✓ Commercial Chimney Maintenance</li>
-                      <li>✓ Restaurant Chimney Cleaning</li>
-                      <li>✓ Preventive Chimney Servicing</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Chimney Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your chimney service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The chimney system is thoroughly inspected to identify performance issues.</li>
-                      <li><strong>Transparent Estimate:</strong> Cleaning or repair recommendations are explained clearly.</li>
-                      <li><strong>Service Execution:</strong> Deep cleaning, repairs, maintenance, replacements, or installations are completed professionally.</li>
-                      <li><strong>Performance Testing:</strong> Suction power, airflow efficiency, motor performance, and safety systems are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular Chimney Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Smoke Extraction</li>
-                       <li>Remove Grease Deposits</li>
-                       <li>Improve Kitchen Hygiene</li>
-                       <li>Improve Indoor Air Quality</li>
-                       <li>Reduce Fire Hazards</li>
-                       <li>Increase Suction Performance</li>
-                       <li>Extend Chimney Lifespan</li>
-                       <li>Reduce Long-Term Repair Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional chimney cleaning every 3–6 months, depending on cooking frequency and kitchen usage.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of chimney service in Gorakhpur?</strong>
-                        <p>Chimney servicing starts from ₹299*, while deep cleaning starts from ₹599*. Final pricing depends on chimney type and service requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should a chimney be cleaned?</strong>
-                        <p>Most residential chimneys should be cleaned every 3–6 months depending on cooking habits.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you repair auto-clean chimneys?</strong>
-                        <p>Yes. We repair and service auto-clean, wall-mounted, island, ducted, and ductless chimney systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my chimney leaking oil?</strong>
-                        <p>Oil leakage is usually caused by excessive grease buildup and delayed maintenance.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide chimney installation services?</strong>
-                        <p>Absolutely. We provide installation, relocation, and reinstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is service warranty available?</strong>
-                        <p>Selected services include a 5–15 day service warranty and revisit support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which chimney brands do you service?</strong>
-                        <p>We service Elica, Faber, Glen, Hindware, Kaff, Eurodomo, Prestige, Bosch, Inalsa, Crompton, Pigeon, Sunflame, Blowhot, Whirlpool, and many others.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Cleaning & Repair Service in Gorakhpur Today</h3>
-                      <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, grease removal, exhaust maintenance, or preventive servicing, Sofiyan delivers dependable chimney solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Maintain a cleaner, safer, and healthier kitchen environment with Gorakhpur’s trusted chimney cleaning and repair experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Chimney' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -21789,303 +17680,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
           // Add location-specific SEO content for Cleaning in Ahmedabad
-          
-          // Add location-specific SEO content for Cleaning in Varanasi
-          if (categoryName === 'Cleaning' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Home Cleaning Services in Varanasi | Deep Cleaning, Sofa Cleaning & Professional Sanitization by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A clean and hygienic environment is essential for healthy living, better productivity, and a comfortable lifestyle. Whether it's a home, apartment, hotel, office, clinic, hostel, or commercial property, professional cleaning helps maintain hygiene standards while improving the appearance and longevity of interiors.</p>
-                    
-                    <p>In Varanasi, dust accumulation, pollution, tourist movement, daily household activities, and environmental factors can make regular deep cleaning necessary for maintaining a healthy indoor environment.</p>
-
-                    <p>If you're searching for trusted Home Cleaning Services in Varanasi, Sofiyan provides professional deep cleaning, sanitization, sofa cleaning, mattress cleaning, bathroom cleaning, kitchen cleaning, office cleaning, and complete property hygiene solutions.</p>
-
-                    <p>Whether you need complete home deep cleaning, move-in cleaning, move-out cleaning, post-construction cleaning, sofa shampooing, bathroom sanitization, kitchen degreasing, office cleaning, or commercial property maintenance, our trained cleaning professionals deliver reliable and hygienic results.</p>
-
-                    <p>We offer same-day and scheduled cleaning services in Varanasi using professional equipment, advanced cleaning techniques, and high-quality cleaning products.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Home Cleaning Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Residential Deep Cleaning</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>1 BHK Deep Cleaning</strong> – Starting from ₹2,499*</li>
-                      <li><strong>2 BHK Deep Cleaning</strong> – Starting from ₹3,499*</li>
-                      <li><strong>3 BHK Deep Cleaning</strong> – Starting from ₹4,499*</li>
-                      <li><strong>Villa & Independent House Cleaning</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Specialized Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Sofa Cleaning</strong> – Starting from ₹499*</li>
-                      <li><strong>Mattress Cleaning</strong> – Starting from ₹399*</li>
-                      <li><strong>Carpet Cleaning</strong> – Starting from ₹299*</li>
-                      <li><strong>Bathroom Deep Cleaning</strong> – Starting from ₹499*</li>
-                      <li><strong>Kitchen Deep Cleaning</strong> – Starting from ₹999*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Commercial Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Office Cleaning</strong> – Custom Pricing</li>
-                      <li><strong>Hotel & Guest House Cleaning</strong> – Custom Pricing</li>
-                      <li><strong>Commercial Property Cleaning</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on property size, cleaning requirements, and service scope.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan Cleaning Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Cleaning Assistance</strong>
-                        <p>Fast response for urgent cleaning and sanitization requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, apartments, hotels, guest houses, offices, clinics, and commercial establishments.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Professional Cleaning Equipment</strong>
-                        <p>Advanced tools help achieve deeper and more effective cleaning results.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Experienced Cleaning Teams</strong>
-                        <p>Trained professionals follow systematic cleaning procedures.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before service begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Health-Focused Cleaning Solutions</strong>
-                        <p>Services designed to improve hygiene and indoor air quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Most Popular Cleaning Services</h3>
-                    
-                    <div class="space-y-6">
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Complete Home Deep Cleaning</h4>
-                        <p class="my-2">Comprehensive cleaning covering:</p>
-                        <ul class="grid grid-cols-2 md:grid-cols-3 gap-2 list-disc pl-5">
-                          <li>Living Rooms</li>
-                          <li>Bedrooms</li>
-                          <li>Kitchens</li>
-                          <li>Bathrooms</li>
-                          <li>Balconies</li>
-                          <li>Windows</li>
-                          <li>Doors</li>
-                          <li>Wardrobes</li>
-                          <li>Switchboards</li>
-                          <li>Ceiling Fans</li>
-                          <li>Furniture Surfaces</li>
-                          <li>Storage Areas</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Ideal for seasonal cleaning, festivals, family events, and routine maintenance.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Sofa Cleaning & Upholstery Care</h4>
-                        <p class="my-2">Professional sofa cleaning helps:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Remove Dust</li>
-                          <li>Eliminate Stains</li>
-                          <li>Reduce Allergens</li>
-                          <li>Remove Odors</li>
-                          <li>Improve Appearance</li>
-                          <li>Extend Furniture Life</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Suitable for fabric sofas, recliners, sectional sofas, and upholstered furniture.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Bathroom Deep Cleaning</h4>
-                        <p class="my-2">Our specialists remove:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Hard Water Deposits</li>
-                          <li>Tile Stains</li>
-                          <li>Soap Scum</li>
-                          <li>Mold Growth</li>
-                          <li>Toilet Stains</li>
-                          <li>Water Scaling</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Helping restore hygiene and freshness.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Kitchen Deep Cleaning</h4>
-                        <p class="my-2">Kitchen cleaning focuses on:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Countertops</li>
-                          <li>Cabinets</li>
-                          <li>Chimney Exteriors</li>
-                          <li>Cooking Areas</li>
-                          <li>Tiles</li>
-                          <li>Sink Areas</li>
-                          <li>Grease Deposits</li>
-                          <li>Food Preparation Surfaces</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Creating a cleaner and healthier cooking environment.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Mattress Cleaning & Sanitization</h4>
-                        <p class="my-2">Professional mattress cleaning helps remove:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Dust Mites</li>
-                          <li>Allergens</li>
-                          <li>Bacteria</li>
-                          <li>Sweat Stains</li>
-                          <li>Odors</li>
-                          <li>Hidden Dirt</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Providing a healthier sleeping environment.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Carpet & Rug Cleaning</h4>
-                        <p class="my-2">Our cleaning process removes:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Deep-Seated Dust</li>
-                          <li>Dirt Build-Up</li>
-                          <li>Food Stains</li>
-                          <li>Pet Hair</li>
-                          <li>Allergens</li>
-                          <li>Unpleasant Odors</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Restoring freshness and cleanliness.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 text-lg">Office & Commercial Cleaning</h4>
-                        <p class="my-2">Ideal for:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5">
-                          <li>Corporate Offices</li>
-                          <li>Clinics</li>
-                          <li>Educational Institutions</li>
-                          <li>Retail Stores</li>
-                          <li>Hotels</li>
-                          <li>Restaurants</li>
-                          <li>Guest Houses</li>
-                          <li>Commercial Buildings</li>
-                        </ul>
-                        <p class="mt-2 text-sm text-gray-600">Helping maintain a professional and hygienic environment.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Cleaning Problems We Frequently Solve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Heavy Dust Accumulation</li>
-                      <li>✓ Sofa Stain Removal</li>
-                      <li>✓ Carpet Deep Cleaning</li>
-                      <li>✓ Kitchen Grease Removal</li>
-                      <li>✓ Bathroom Stain Removal</li>
-                      <li>✓ Hard Water Deposits</li>
-                      <li>✓ Balcony Cleaning</li>
-                      <li>✓ Window Cleaning</li>
-                      <li>✓ Mattress Sanitization</li>
-                      <li>✓ Tile Cleaning</li>
-                      <li>✓ Move-In Cleaning</li>
-                      <li>✓ Move-Out Cleaning</li>
-                      <li>✓ Post-Construction Cleaning</li>
-                      <li>✓ Office Cleaning</li>
-                      <li>✓ Commercial Sanitization</li>
-                      <li>✓ Apartment Deep Cleaning</li>
-                      <li>✓ Villa Cleaning</li>
-                      <li>✓ Hotel Room Cleaning</li>
-                      <li>✓ Festival Cleaning</li>
-                      <li>✓ Complete Property Refresh Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi Cleaning Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your cleaning service online or by phone.</li>
-                      <li><strong>Property Assessment:</strong> Our team evaluates the property size and cleaning requirements.</li>
-                      <li><strong>Customized Cleaning Plan:</strong> A detailed cleaning checklist is prepared.</li>
-                      <li><strong>Transparent Pricing:</strong> Clear quotations are provided before work begins.</li>
-                      <li><strong>Professional Cleaning Execution:</strong> Cleaning is performed using professional equipment and systematic methods.</li>
-                      <li><strong>Quality Inspection:</strong> Every area is reviewed to ensure quality standards are met.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Professional Deep Cleaning</h3>
-                    <p>Regular professional cleaning helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Indoor Air Quality</li>
-                       <li>Reduce Allergens</li>
-                       <li>Remove Hidden Dirt</li>
-                       <li>Improve Hygiene Standards</li>
-                       <li>Enhance Property Appearance</li>
-                       <li>Create Healthier Living Spaces</li>
-                       <li>Save Time & Effort</li>
-                       <li>Reduce Long-Term Maintenance Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend deep cleaning every 4–6 months for optimal cleanliness and hygiene.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of home cleaning in Varanasi?</strong>
-                        <p>Home deep cleaning starts from ₹2,499*. Final pricing depends on property size and cleaning requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide sofa cleaning separately?</strong>
-                        <p>Yes. Sofa cleaning services can be booked individually.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is kitchen cleaning included in deep cleaning packages?</strong>
-                        <p>Yes. Most deep cleaning packages include kitchen cleaning.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide move-in and move-out cleaning?</strong>
-                        <p>Absolutely. We provide complete cleaning solutions for tenants, landlords, and property managers.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Are your cleaning professionals trained?</strong>
-                        <p>Yes. Our teams follow professional cleaning procedures and quality standards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should deep cleaning be performed?</strong>
-                        <p>Most homes benefit from professional deep cleaning every 4–6 months.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Home Cleaning Services in Varanasi Today</h3>
-                      <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, hotel cleaning, move-in cleaning, post-construction cleaning, or commercial property maintenance, Sofiyan delivers dependable cleaning solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy cleaner, healthier, and more hygienic living and working spaces with Varanasi’s trusted professional cleaning service experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Cleaning' && localStorage.getItem('preferredCity') === 'Ahmedabad') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -23760,302 +19354,6 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
           }
 
                               // Add location-specific SEO content for Cleaning in Noida
-          
-          // Add location-specific SEO content for Cleaning in Gorakhpur
-          if (categoryName === 'Cleaning' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Home Cleaning Services in Gorakhpur | Deep Cleaning, Sofa Cleaning & Sanitization Services by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>A clean environment is essential for a healthy lifestyle, improved productivity, and better living standards. Whether it is a home, apartment, office, clinic, hotel, hostel, coaching institute, or commercial property, professional cleaning helps maintain hygiene, improve appearance, and create a healthier indoor environment.</p>
-                    
-                    <p>In Gorakhpur, increasing urban development, dust accumulation, construction activities, traffic pollution, and changing weather conditions make regular deep cleaning an important part of property maintenance.</p>
-
-                    <p>If you're searching for trusted Home Cleaning Services in Gorakhpur, Sofiyan provides professional deep cleaning, sanitization, sofa shampooing, mattress cleaning, bathroom cleaning, kitchen cleaning, office cleaning, and complete property hygiene solutions.</p>
-
-                    <p>Whether you need full home deep cleaning, move-in cleaning, move-out cleaning, post-construction cleaning, sofa cleaning, kitchen degreasing, bathroom sanitization, office maintenance, or commercial property cleaning, our trained professionals deliver reliable and hygienic results.</p>
-
-                    <p>We offer same-day and scheduled cleaning services in Gorakhpur using advanced equipment, professional-grade cleaning materials, and industry-approved cleaning techniques.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Home Cleaning Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Residential Deep Cleaning</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>1 BHK Deep Cleaning</strong> – Starting from ₹2,499*</li>
-                      <li><strong>2 BHK Deep Cleaning</strong> – Starting from ₹3,499*</li>
-                      <li><strong>3 BHK Deep Cleaning</strong> – Starting from ₹4,499*</li>
-                      <li><strong>Villa Cleaning</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Specialized Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Sofa Cleaning</strong> – Starting from ₹499*</li>
-                      <li><strong>Mattress Cleaning</strong> – Starting from ₹399*</li>
-                      <li><strong>Carpet Cleaning</strong> – Starting from ₹299*</li>
-                      <li><strong>Bathroom Deep Cleaning</strong> – Starting from ₹499*</li>
-                      <li><strong>Kitchen Deep Cleaning</strong> – Starting from ₹999*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Commercial Cleaning Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Office Cleaning</strong> – Custom Pricing</li>
-                      <li><strong>Hotel Cleaning</strong> – Custom Pricing</li>
-                      <li><strong>Commercial Property Cleaning</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on property size, cleaning requirements, and service scope.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan Cleaning Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Cleaning Support</strong>
-                        <p>Quick response for urgent cleaning requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Expertise</strong>
-                        <p>Solutions available for homes, apartments, hospitals, coaching institutes, offices, hotels, and commercial properties.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Professional Equipment & Techniques</strong>
-                        <p>Advanced cleaning tools ensure deeper and more effective results.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Trained Cleaning Professionals</strong>
-                        <p>Experienced staff follow systematic and quality-focused cleaning procedures.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear estimates before service begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Health-Focused Cleaning Solutions</strong>
-                        <p>Designed to improve hygiene, cleanliness, and indoor air quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and service records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer support after project completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Most Popular Cleaning Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <h4 class="font-bold text-gray-900">Complete Home Deep Cleaning</h4>
-                        <p>Comprehensive cleaning of:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Living Rooms</li>
-                          <li>Bedrooms</li>
-                          <li>Kitchens</li>
-                          <li>Bathrooms</li>
-                          <li>Balconies</li>
-                          <li>Windows</li>
-                          <li>Doors</li>
-                          <li>Wardrobes</li>
-                          <li>Switchboards</li>
-                          <li>Ceiling Fans</li>
-                          <li>Furniture Surfaces</li>
-                          <li>Storage Areas</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Perfect for festivals, family events, seasonal maintenance, and property refreshes.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Sofa Cleaning & Upholstery Care</h4>
-                        <p>Professional sofa cleaning helps:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Remove Dust</li>
-                          <li>Eliminate Stains</li>
-                          <li>Remove Allergens</li>
-                          <li>Improve Fabric Hygiene</li>
-                          <li>Remove Odors</li>
-                          <li>Enhance Appearance</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Suitable for fabric sofas, recliners, sectional sofas, and upholstered furniture.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Bathroom Deep Cleaning</h4>
-                        <p>Our specialists remove:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Hard Water Deposits</li>
-                          <li>Soap Stains</li>
-                          <li>Tile Dirt</li>
-                          <li>Mold Growth</li>
-                          <li>Toilet Stains</li>
-                          <li>Water Scaling</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Helping restore cleanliness and hygiene.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Kitchen Deep Cleaning</h4>
-                        <p>Kitchen cleaning includes:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Cabinets</li>
-                          <li>Countertops</li>
-                          <li>Cooking Areas</li>
-                          <li>Chimney Exteriors</li>
-                          <li>Tiles</li>
-                          <li>Sink Areas</li>
-                          <li>Grease Deposits</li>
-                          <li>Food Preparation Surfaces</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Creating a cleaner and healthier cooking environment.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Mattress Cleaning & Sanitization</h4>
-                        <p>Professional mattress cleaning helps remove:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Dust Mites</li>
-                          <li>Allergens</li>
-                          <li>Sweat Stains</li>
-                          <li>Bacteria</li>
-                          <li>Hidden Dirt</li>
-                          <li>Unpleasant Odors</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Providing a healthier sleeping environment.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Carpet & Rug Cleaning</h4>
-                        <p>Our cleaning process removes:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Deep Dust</li>
-                          <li>Dirt Build-Up</li>
-                          <li>Food Stains</li>
-                          <li>Pet Hair</li>
-                          <li>Allergens</li>
-                          <li>Odors</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Restoring freshness and cleanliness.</p>
-                      </div>
-
-                      <div>
-                        <h4 class="font-bold text-gray-900 mt-6">Office & Commercial Cleaning</h4>
-                        <p>Ideal for:</p>
-                        <ul class="grid grid-cols-2 gap-2 list-disc pl-5 mt-2">
-                          <li>Corporate Offices</li>
-                          <li>Coaching Institutes</li>
-                          <li>Clinics</li>
-                          <li>Educational Centers</li>
-                          <li>Hotels</li>
-                          <li>Restaurants</li>
-                          <li>Retail Stores</li>
-                          <li>Commercial Buildings</li>
-                        </ul>
-                        <p class="mt-2 text-gray-600">Helping maintain a professional and hygienic environment.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Cleaning Problems We Frequently Solve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ Heavy Dust Accumulation</li>
-                      <li>✓ Sofa Stain Removal</li>
-                      <li>✓ Carpet Deep Cleaning</li>
-                      <li>✓ Kitchen Grease Removal</li>
-                      <li>✓ Bathroom Stain Removal</li>
-                      <li>✓ Hard Water Deposits</li>
-                      <li>✓ Balcony Cleaning</li>
-                      <li>✓ Window Cleaning</li>
-                      <li>✓ Mattress Sanitization</li>
-                      <li>✓ Tile Cleaning</li>
-                      <li>✓ Move-In Cleaning</li>
-                      <li>✓ Move-Out Cleaning</li>
-                      <li>✓ Post-Construction Cleaning</li>
-                      <li>✓ Office Cleaning</li>
-                      <li>✓ Commercial Sanitization</li>
-                      <li>✓ Apartment Deep Cleaning</li>
-                      <li>✓ Villa Cleaning</li>
-                      <li>✓ Hotel Room Cleaning</li>
-                      <li>✓ Festival Cleaning</li>
-                      <li>✓ Complete Property Refresh Services</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur Cleaning Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your cleaning service online or by phone.</li>
-                      <li><strong>Property Assessment:</strong> Our team evaluates the property size and cleaning requirements.</li>
-                      <li><strong>Customized Cleaning Plan:</strong> A detailed cleaning checklist is prepared.</li>
-                      <li><strong>Transparent Pricing:</strong> Clear quotations are provided before work begins.</li>
-                      <li><strong>Professional Cleaning Execution:</strong> Cleaning is performed using professional equipment and systematic methods.</li>
-                      <li><strong>Quality Inspection:</strong> Every area is reviewed to ensure quality standards are met.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Professional Deep Cleaning</h3>
-                    <p>Regular professional cleaning helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Improve Indoor Air Quality</li>
-                       <li>Reduce Allergens</li>
-                       <li>Remove Hidden Dirt</li>
-                       <li>Improve Hygiene Standards</li>
-                       <li>Enhance Property Appearance</li>
-                       <li>Create Healthier Living Spaces</li>
-                       <li>Save Time & Effort</li>
-                       <li>Reduce Long-Term Maintenance Costs</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend deep cleaning every 4–6 months for optimal cleanliness and hygiene.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of home cleaning in Gorakhpur?</strong>
-                        <p>Home deep cleaning starts from ₹2,499*. Final pricing depends on property size and cleaning requirements.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide sofa cleaning separately?</strong>
-                        <p>Yes. Sofa cleaning services can be booked individually.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is kitchen cleaning included in deep cleaning packages?</strong>
-                        <p>Yes. Most deep cleaning packages include kitchen cleaning.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide move-in and move-out cleaning?</strong>
-                        <p>Absolutely. We provide complete cleaning solutions for tenants, landlords, and property managers.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Are your cleaning professionals trained?</strong>
-                        <p>Yes. Our teams follow professional cleaning procedures and quality standards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should deep cleaning be performed?</strong>
-                        <p>Most homes benefit from professional deep cleaning every 4–6 months.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Home Cleaning Services in Gorakhpur Today</h3>
-                      <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, hotel cleaning, move-in cleaning, post-construction cleaning, or commercial property maintenance, Sofiyan delivers dependable cleaning solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy cleaner, healthier, and more hygienic living and working spaces with Gorakhpur’s trusted professional cleaning service experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
           if (categoryName === 'Cleaning' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -24531,481 +19829,7 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
               content.appendChild(seoDiv);
           }
 
-                    
-          // Add location-specific SEO content for Water Purifier in Varanasi
-          if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Varanasi') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Water Purifier Service in Varanasi | Expert RO Repair, Filter Replacement & Water Purification Solutions by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Safe drinking water is essential for maintaining good health and protecting families from waterborne contaminants. In Varanasi, where water quality may vary from one locality to another, properly functioning water purification systems are important for homes, businesses, educational institutions, and healthcare facilities.</p>
-                    
-                    <p>Regular maintenance helps ensure consistent water quality, improved purification efficiency, and longer equipment lifespan.</p>
-
-                    <p>If you're searching for trusted Water Purifier Services in Varanasi, Sofiyan provides professional doorstep RO repair, maintenance, filter replacement, installation, AMC support, troubleshooting, and complete purification system care for residential and commercial customers.</p>
-
-                    <p>Whether your RO system is leaking, producing bad-tasting water, showing low water flow, generating unusual noises, failing to purify properly, or requiring periodic maintenance, our experienced technicians provide reliable and long-lasting solutions.</p>
-
-                    <p>We offer same-day RO service in Varanasi for homes, apartments, hostels, hotels, hospitals, clinics, schools, colleges, offices, restaurants, guest houses, and commercial establishments.</p>
-
-                    <p>Our specialists service RO Water Purifiers, UV Water Purifiers, UF Systems, RO+UV+UF Systems, Copper RO Systems, Alkaline Water Purifiers, Smart Water Purifiers, Commercial RO Plants, and Industrial Water Treatment Systems.</p>
-
-                    <p>We service all major brands including Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and more.</p>
-
-                    <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">RO Service Charges in Varanasi</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Inspection & Diagnosis</strong> – Starting from ₹249*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Water Purifier Repair</strong> – Starting from ₹249*</li>
-                      <li><strong>RO Troubleshooting</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Filter Replacement Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Sediment Filter Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Carbon Filter Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>RO Membrane Replacement</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Installation</strong> – Starting from ₹449*</li>
-                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>RO Relocation Service</strong> – Starting from ₹599*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Cleaning & Sanitization</strong> – Starting from ₹349*</li>
-                      <li><strong>AMC Plans</strong> – Custom Pricing</li>
-                      <li><strong>Commercial RO Maintenance</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on purifier type, filter condition, spare parts required, and water quality requirements.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Varanasi Residents Choose Sofiyan RO Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Assistance</strong>
-                        <p>Fast response for urgent drinking water purification issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Quality Specialists</strong>
-                        <p>Technicians trained to handle high-TDS and hard water purification challenges.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Services available for homes, hotels, hospitals, educational institutions, and offices.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Filters & Spare Parts</strong>
-                        <p>High-quality replacement parts improve purification efficiency and reliability.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before repair work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Health-Focused Solutions</strong>
-                        <p>Services designed to maintain safe and hygienic drinking water standards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Water Purifier Needs Professional Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Low Water Output</strong>
-                        <p>Blocked filters or membrane issues may reduce water flow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Bad Taste or Odor in Water</strong>
-                        <p>Filter deterioration can affect purification quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around RO Unit</strong>
-                        <p>Loose fittings, damaged pipes, or tank issues may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">High TDS Levels</strong>
-                        <p>Purification efficiency may decline over time.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">RO System Not Starting</strong>
-                        <p>Electrical faults or pump failures may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
-                        <p>Booster pump or internal component problems may create abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Water Tank Filling</strong>
-                        <p>Membrane blockage or pump issues may affect water production speed.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Appears Cloudy</strong>
-                        <p>Purification systems may require maintenance or filter replacement.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">RO Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ RO Not Working</li>
-                      <li>✓ Low Water Flow Problems</li>
-                      <li>✓ Water Leakage Repairs</li>
-                      <li>✓ RO Filter Replacement</li>
-                      <li>✓ Carbon Filter Replacement</li>
-                      <li>✓ Sediment Filter Replacement</li>
-                      <li>✓ RO Membrane Replacement</li>
-                      <li>✓ UV Lamp Replacement</li>
-                      <li>✓ Booster Pump Repair</li>
-                      <li>✓ TDS Controller Issues</li>
-                      <li>✓ Water Taste Problems</li>
-                      <li>✓ Storage Tank Cleaning</li>
-                      <li>✓ RO Installation</li>
-                      <li>✓ RO Reinstallation</li>
-                      <li>✓ Commercial RO Repairs</li>
-                      <li>✓ AMC Maintenance Services</li>
-                      <li>✓ Electrical Fault Diagnosis</li>
-                      <li>✓ Copper RO System Repairs</li>
-                      <li>✓ Alkaline Water Purifier Repairs</li>
-                      <li>✓ Water Purifier Sanitization</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Varanasi RO Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your RO service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The purification system is thoroughly inspected.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Water Quality Testing:</strong> Purification performance, leakage checks, and water quality parameters are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly via WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular RO Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Maintain Safe Drinking Water</li>
-                       <li>Improve Purification Efficiency</li>
-                       <li>Extend Purifier Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Maintain Proper TDS Levels</li>
-                       <li>Improve Water Taste</li>
-                       <li>Reduce Future Repair Costs</li>
-                       <li>Detect Problems Early</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional RO servicing every 3–6 months, especially in areas with high TDS water.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of RO repair in Varanasi?</strong>
-                        <p>RO repair services start from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should RO filters be replaced?</strong>
-                        <p>Most filters should be checked every 6 months and replaced according to water quality and usage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my RO water flow slow?</strong>
-                        <p>Slow water flow is commonly caused by clogged filters, membrane blockage, or booster pump issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide RO installation services?</strong>
-                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is AMC available for water purifiers?</strong>
-                        <p>Yes. We offer annual maintenance plans for residential and commercial systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which purifier brands do you service?</strong>
-                        <p>We service Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and many more.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you service commercial RO plants?</strong>
-                        <p>Absolutely. We provide repair and maintenance support for commercial and industrial purification systems.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Varanasi Today</h3>
-                      <p>Whether you need emergency RO repair, membrane replacement, filter replacement, purifier cleaning, installation support, AMC maintenance, or complete water purification system servicing, Sofiyan delivers dependable RO solutions throughout Varanasi.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy safe, healthy, and purified drinking water every day with Varanasi’s trusted RO repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
-          // Add location-specific SEO content for Water Purifier in Noida
-          
-          // Add location-specific SEO content for Water Purifier in Gorakhpur
-          if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Gorakhpur') {
-              const seoDiv = document.createElement('article');
-              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
-              seoDiv.innerHTML = `
-                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-                    Water Purifier Service in Gorakhpur | Expert RO Repair, Filter Replacement & Water Purification Solutions by Sofiyan
-                  </h2>
-                  
-                  <div class="space-y-5 text-base leading-relaxed">
-                    <p>Clean and safe drinking water is one of the most important requirements for a healthy lifestyle. Whether it's a home, office, hospital, school, restaurant, hotel, or commercial establishment, a properly functioning water purifier helps protect families and customers from harmful contaminants and waterborne diseases.</p>
-                    
-                    <p>In Gorakhpur, where water quality can vary across different localities, regular RO maintenance and timely repairs help ensure consistent purification performance and healthier drinking water.</p>
-
-                    <p>If you're searching for trusted Water Purifier Services in Gorakhpur, Sofiyan provides professional doorstep RO repair, maintenance, filter replacement, installation, AMC support, troubleshooting, and complete water purification system care for residential and commercial customers.</p>
-
-                    <p>Whether your RO system is leaking, producing bad-tasting water, showing low water flow, creating unusual noises, failing to purify properly, or requiring periodic maintenance, our experienced technicians provide reliable and long-lasting solutions.</p>
-
-                    <p>We offer same-day RO service in Gorakhpur for homes, apartments, hospitals, clinics, schools, colleges, hostels, hotels, restaurants, offices, guest houses, and commercial establishments.</p>
-
-                    <p>Our specialists service RO Water Purifiers, UV Water Purifiers, UF Systems, RO+UV+UF Systems, Copper RO Systems, Alkaline Water Purifiers, Smart Water Purifiers, Commercial RO Plants, and Industrial Water Treatment Systems.</p>
-
-                    <p>We service all major brands including Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and more.</p>
-
-                    <p>Our services are available across Golghar, Civil Lines, Basharatpur, Betiahata, Medical Road, Taramandal, Mohaddipur, Rustampur, Gorakhnath, Chargawan, Kunraghat, Shahpur, Rapti Nagar, Railway Colony, and nearby Gorakhpur locations.</p>
-
-                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
-                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">RO Service Charges in Gorakhpur</h3>
-                    
-                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Inspection & Diagnosis</strong> – Starting from ₹249*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Repair Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Water Purifier Repair</strong> – Starting from ₹249*</li>
-                      <li><strong>RO Troubleshooting</strong> – Affordable Pricing Available</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Filter Replacement Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>Sediment Filter Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>Carbon Filter Replacement</strong> – Affordable Pricing</li>
-                      <li><strong>RO Membrane Replacement</strong> – Custom Pricing</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Installation Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Installation</strong> – Starting from ₹449*</li>
-                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
-                      <li><strong>RO Relocation Service</strong> – Starting from ₹599*</li>
-                    </ul>
-
-                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
-                    <ul class="list-disc pl-5 space-y-2 mb-4">
-                      <li><strong>RO Cleaning & Sanitization</strong> – Starting from ₹349*</li>
-                      <li><strong>AMC Plans</strong> – Custom Pricing</li>
-                      <li><strong>Commercial RO Maintenance</strong> – Site Inspection Based</li>
-                    </ul>
-
-                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on purifier type, filter condition, spare parts required, and water quality requirements.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Gorakhpur Residents Choose Sofiyan RO Services</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Same-Day Doorstep Assistance</strong>
-                        <p>Quick support for urgent drinking water purification issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Quality Experts</strong>
-                        <p>Specialists trained to handle high TDS and groundwater purification challenges.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Residential & Commercial Coverage</strong>
-                        <p>Services available for homes, hospitals, schools, offices, restaurants, and hotels.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Genuine Filters & Spare Parts</strong>
-                        <p>High-quality components ensure better purification efficiency and longer lifespan.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Transparent Pricing</strong>
-                        <p>Clear quotations before work begins.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Health-Focused Solutions</strong>
-                        <p>Services designed to maintain safe and hygienic drinking water standards.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Digital Service Reports</strong>
-                        <p>WhatsApp invoices and maintenance records after every service.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Reliable After-Service Support</strong>
-                        <p>Dedicated customer assistance after service completion.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Water Purifier Needs Professional Service</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">Low Water Output</strong>
-                        <p>Blocked filters or membrane issues may reduce water flow.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Bad Taste or Odor in Water</strong>
-                        <p>Filter deterioration can affect purification quality.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Water Leakage Around RO Unit</strong>
-                        <p>Loose fittings, damaged pipes, or tank issues may cause leakage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">High TDS Levels</strong>
-                        <p>Purification efficiency may decline over time.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">RO System Not Starting</strong>
-                        <p>Electrical faults or pump failures may prevent operation.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
-                        <p>Booster pump or internal component issues may create abnormal sounds.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Slow Water Tank Filling</strong>
-                        <p>Membrane blockage or pump issues may affect water production speed.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Cloudy or Impure Water</strong>
-                        <p>Purification systems may require maintenance or filter replacement.</p>
-                      </div>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">RO Problems We Frequently Resolve</h3>
-                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
-                      <li>✓ RO Not Working</li>
-                      <li>✓ Low Water Flow Problems</li>
-                      <li>✓ Water Leakage Repairs</li>
-                      <li>✓ RO Filter Replacement</li>
-                      <li>✓ Carbon Filter Replacement</li>
-                      <li>✓ Sediment Filter Replacement</li>
-                      <li>✓ RO Membrane Replacement</li>
-                      <li>✓ UV Lamp Replacement</li>
-                      <li>✓ Booster Pump Repair</li>
-                      <li>✓ TDS Controller Issues</li>
-                      <li>✓ Water Taste Problems</li>
-                      <li>✓ Storage Tank Cleaning</li>
-                      <li>✓ RO Installation</li>
-                      <li>✓ RO Reinstallation</li>
-                      <li>✓ Commercial RO Repairs</li>
-                      <li>✓ AMC Maintenance Services</li>
-                      <li>✓ Electrical Fault Diagnosis</li>
-                      <li>✓ Copper RO System Repairs</li>
-                      <li>✓ Alkaline Water Purifier Repairs</li>
-                      <li>✓ Water Purifier Sanitization</li>
-                    </ul>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Gorakhpur RO Service Process</h3>
-                    <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Service Booking:</strong> Book your RO service online or by phone.</li>
-                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your location.</li>
-                      <li><strong>Complete Inspection:</strong> The purification system is thoroughly inspected.</li>
-                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
-                      <li><strong>Repair & Maintenance:</strong> Repairs, cleaning, replacements, or installations are completed professionally.</li>
-                      <li><strong>Water Quality Testing:</strong> Purification performance, leakage checks, and water quality parameters are verified.</li>
-                      <li><strong>Digital Billing:</strong> Invoices and service reports are delivered instantly through WhatsApp.</li>
-                    </ol>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular RO Maintenance</h3>
-                    <p>Routine servicing helps:</p>
-                    <ul class="list-disc pl-5 space-y-2">
-                       <li>Maintain Safe Drinking Water</li>
-                       <li>Improve Purification Efficiency</li>
-                       <li>Extend Purifier Lifespan</li>
-                       <li>Prevent Unexpected Breakdowns</li>
-                       <li>Maintain Proper TDS Levels</li>
-                       <li>Improve Water Taste</li>
-                       <li>Reduce Future Repair Costs</li>
-                       <li>Detect Problems Early</li>
-                     </ul>
-                     <p class="mt-2">Experts recommend professional RO servicing every 3–6 months, especially in high TDS water areas.</p>
-
-                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
-                    <div class="space-y-4">
-                      <div>
-                        <strong class="block text-gray-900">What is the starting cost of RO repair in Gorakhpur?</strong>
-                        <p>RO repair services start from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">How often should RO filters be replaced?</strong>
-                        <p>Most filters should be inspected every 6 months and replaced based on water quality and usage.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Why is my RO water flow slow?</strong>
-                        <p>Slow water flow is commonly caused by clogged filters, membrane blockage, or booster pump issues.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you provide RO installation services?</strong>
-                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation support.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Is AMC available for water purifiers?</strong>
-                        <p>Yes. We offer annual maintenance plans for residential and commercial systems.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Which purifier brands do you service?</strong>
-                        <p>We service Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and many more.</p>
-                      </div>
-                      <div>
-                        <strong class="block text-gray-900">Do you service commercial RO plants?</strong>
-                        <p>Absolutely. We provide repair and maintenance support for commercial and industrial purification systems.</p>
-                      </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Gorakhpur Today</h3>
-                      <p>Whether you need emergency RO repair, membrane replacement, filter replacement, purifier cleaning, installation support, AMC maintenance, or complete water purification system servicing, Sofiyan delivers dependable RO solutions throughout Gorakhpur.</p>
-                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
-                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
-                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
-                      </div>
-                      <p class="mt-4 font-bold text-gray-900">Enjoy safe, healthy, and purified drinking water every day with Gorakhpur’s trusted RO repair and maintenance experts.</p>
-                    </div>
-                  </div>
-              `;
-              content.appendChild(seoDiv);
-          }
-
-
+                    // Add location-specific SEO content for Water Purifier in Noida
           if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Noida') {
               const seoDiv = document.createElement('article');
               seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
@@ -26293,4 +21117,854 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
                         <p>If your purifier is giving very slow water output, it may be due to clogged filters, membrane issues, or inlet pressure problems.</p>
                       </div>
                       <div>
+                        <strong class="block text-gray-900">Bad Taste or Smell</strong>
+                        <p>A change in taste or smell may indicate filter saturation, tank cleaning requirement, or membrane replacement.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Water Leakage</strong>
+                        <p>Leakage from the tank, pipe, connector, or filter housing should be checked immediately.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">TDS Problem</strong>
+                        <p>If TDS is too high or water quality is not proper, your RO membrane or purification system may need servicing.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Filter Life Ended</strong>
+                        <p>Filters have a limited life. Regular replacement helps maintain safe and clean drinking water.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Machine Not Working</strong>
+                        <p>If your purifier is not switching on, not purifying, or showing a fault indicator, it needs professional inspection.</p>
+                      </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Common Water Purifier Problems We Fix</h3>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
+                      <li>✓ RO Water Purifier Not Working</li>
+                      <li>✓ Low Water Flow Problem</li>
+                      <li>✓ Water Leakage Issue</li>
+                      <li>✓ Bad Taste and Bad Smell</li>
+                      <li>✓ TDS Problem</li>
+                      <li>✓ Filter Replacement</li>
+                      <li>✓ Membrane Replacement</li>
+                      <li>✓ UV Lamp Issue</li>
+                      <li>✓ Pump / Motor Fault</li>
+                      <li>✓ Tank Cleaning</li>
+                      <li>✓ Noise or Vibration Problem</li>
+                      <li>✓ Installation and Reinstallation Services</li>
+                      <li>✓ Leakage from Pipe or Connector</li>
+                      <li>✓ AMC Maintenance Support</li>
+                    </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
+                     <ol class="list-decimal pl-5 space-y-3">
+                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
+                        <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
+                        <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
+                        <li><strong>Service Completion:</strong> Repair, cleaning, filter replacement, installation, or AMC support is completed using proper tools and quality materials.</li>
+                        <li><strong>Final Testing:</strong> We test water flow, purification quality, leakage, and overall performance.</li>
+                        <li><strong>Digital Invoice:</strong> You receive the invoice and service details on WhatsApp.</li>
+                     </ol>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Mumbai Customers Trust Sofiyan</h3>
+                     <ul class="list-disc pl-5 space-y-2">
+                       <li>Local service expertise across Mumbai</li>
+                       <li>Fast and reliable response</li>
+                       <li>Experienced and background-verified technicians</li>
+                       <li>Affordable pricing with no surprises</li>
+                       <li>Customer-first service approach</li>
+                       <li>Convenient booking and after-service support</li>
+                       <li>Commitment to quality and satisfaction</li>
+                     </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
+                     <div class="space-y-4">
+                       <div>
+                         <strong class="block text-gray-900">What is the cost of water purifier repair in Mumbai?</strong>
+                         <p>Water purifier repair starts from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO filter replacement?</strong>
+                         <p>Yes, we provide filter check-up and complete filter replacement for water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you repair all types of water purifiers?</strong>
+                         <p>Yes, we service RO, UV, UF, and RO+UV water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO installation?</strong>
+                         <p>Yes, we provide wall-mounted RO installation and related setup services at your doorstep.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Is service warranty available?</strong>
+                         <p>Yes, selected services include a 5–15 day warranty with free revisit support as applicable.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Which brands do you service?</strong>
+                         <p>We work on Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Eureka Forbes, Havells, LG, and more.</p>
+                       </div>
+                     </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Mumbai Today</h3>
+                      <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
+                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
+                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                      </div>
+                      <p class="mt-4 font-bold text-gray-900">Book now and get fast, affordable, and trusted water purifier service in Mumbai.</p>
+                    </div>
+                  </div>
+              `;
+              content.appendChild(seoDiv);
+          }
+
+          // Add location-specific SEO content for Water Purifier in Delhi
+          if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Delhi') {
+              const seoDiv = document.createElement('article');
+              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
+              seoDiv.innerHTML = `
+                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    Water Purifier Service in Delhi | Trusted RO Repair, Filter Replacement & Installation by Sofiyan
+                  </h2>
+                  
+                  <div class="space-y-5 text-base leading-relaxed">
+                    <p>Looking for a reliable water purifier service in Delhi? Sofiyan provides professional RO repair, water purifier installation, uninstallation, filter replacement, tank cleaning, membrane replacement, UV/UF servicing, and AMC support at your doorstep.</p>
+                    
+                    <p>We offer same-day water purifier service in Delhi by verified and experienced technicians for all major types of purifiers, including RO water purifiers, UV purifiers, UF purifiers, and RO+UV systems. Service pages in the Delhi market commonly highlight the same core offer set: RO servicing, repairs, installation, and filter replacement.</p>
+                    
+                    <p>If your water purifier is not giving proper water flow, leaking water, showing low purification, giving bad taste or smell, or displaying filter error, our experts can inspect and fix the issue quickly.</p>
+                    
+                    <p>We service all major brands including Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Eureka Forbes, Havells, LG, and more.</p>
+
+                    <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
+
+                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
+                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Water Purifier Service Pricing in Delhi</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                      <li><strong>Water Purifier Inspection & Repair</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Check-up</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Replacement</strong> – Affordable Pricing Available</li>
+                      <li><strong>RO Installation</strong> – Starting from ₹449*</li>
+                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
+                      <li><strong>Tank Cleaning</strong> – Starting from ₹349*</li>
+                      <li><strong>AMC / Annual Maintenance</strong> – Custom Pricing Available</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 italic">Transparent pricing with no hidden charges.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Choose Sofiyan for Water Purifier Service in Delhi?</h3>
+                    <ul class="space-y-3">
+                      <li>★ <strong>Same-Day Doorstep Service</strong> across Delhi</li>
+                      <li>★ <strong>Verified & Experienced Technicians</strong></li>
+                      <li>★ <strong>Transparent Pricing Before Work Begins</strong></li>
+                      <li>★ <strong>Support for All Major RO, UV, UF, and RO+UV Models</strong></li>
+                      <li>★ <strong>Genuine Filters & Spare Parts</strong> for Better Performance</li>
+                      <li>★ <strong>Quick Diagnosis & Efficient Repairs</strong></li>
+                      <li>★ <strong>5–15 Days Service Warranty</strong> on applicable services</li>
+                      <li>★ <strong>WhatsApp Bills & Digital Service Records</strong></li>
+                      <li>★ <strong>Dedicated After-Service Support</strong></li>
+                      <li>★ <strong>One Call – Multiple Solutions</strong> under one trusted brand</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">When Does Your Water Purifier Need Service?</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">Low Water Flow</strong>
+                        <p>If your purifier is giving very slow water output, it may be due to clogged filters, membrane issues, or inlet pressure problems.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Bad Taste or Smell</strong>
+                        <p>A change in taste or smell may indicate filter saturation, tank cleaning requirement, or membrane replacement.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Water Leakage</strong>
+                        <p>Leakage from the tank, pipe, connector, or filter housing should be checked immediately.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">TDS Problem</strong>
+                        <p>If TDS is too high or water quality is not proper, your RO membrane or purification system may need servicing.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Filter Life Ended</strong>
+                        <p>Filters have a limited life. Regular replacement helps maintain safe and clean drinking water.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Machine Not Working</strong>
+                        <p>If your purifier is not switching on, not purifying, or showing a fault indicator, it needs professional inspection.</p>
+                      </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Common Water Purifier Problems We Fix</h3>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
+                      <li>✓ RO Water Purifier Not Working</li>
+                      <li>✓ Low Water Flow Problem</li>
+                      <li>✓ Water Leakage Issue</li>
+                      <li>✓ Bad Taste and Bad Smell</li>
+                      <li>✓ TDS Problem</li>
+                      <li>✓ Filter Replacement</li>
+                      <li>✓ Membrane Replacement</li>
+                      <li>✓ UV Lamp Issue</li>
+                      <li>✓ Pump / Motor Fault</li>
+                      <li>✓ Tank Cleaning</li>
+                      <li>✓ Noise or Vibration Problem</li>
+                      <li>✓ Installation and Reinstallation Services</li>
+                      <li>✓ Leakage from Pipe or Connector</li>
+                      <li>✓ AMC Maintenance Support</li>
+                    </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
+                     <ol class="list-decimal pl-5 space-y-3">
+                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
+                        <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
+                        <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
+                        <li><strong>Service Completion:</strong> Repair, cleaning, filter replacement, installation, or AMC support is completed using proper tools and quality materials.</li>
+                        <li><strong>Final Testing:</strong> We test water flow, purification quality, leakage, and overall performance.</li>
+                        <li><strong>Digital Invoice:</strong> You receive the invoice and service details on WhatsApp.</li>
+                     </ol>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Delhi Customers Trust Sofiyan</h3>
+                     <ul class="list-disc pl-5 space-y-2">
+                       <li>Local service expertise across Delhi</li>
+                       <li>Fast and reliable response</li>
+                       <li>Experienced and background-verified technicians</li>
+                       <li>Affordable pricing with no surprises</li>
+                       <li>Customer-first service approach</li>
+                       <li>Convenient booking and after-service support</li>
+                       <li>Commitment to quality and satisfaction</li>
+                     </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
+                     <div class="space-y-4">
+                       <div>
+                         <strong class="block text-gray-900">What is the cost of water purifier repair in Delhi?</strong>
+                         <p>Water purifier repair starts from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO filter replacement?</strong>
+                         <p>Yes, we provide filter check-up and complete filter replacement for water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you repair all types of water purifiers?</strong>
+                         <p>Yes, we service RO, UV, UF, and RO+UV water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO installation?</strong>
+                         <p>Yes, we provide wall-mounted RO installation and related setup services at your doorstep.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Is service warranty available?</strong>
+                         <p>Yes, selected services include a 5–15 day warranty with free revisit support as applicable.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Which brands do you service?</strong>
+                         <p>We work on Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Eureka Forbes, Havells, LG, and more.</p>
+                       </div>
+                     </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Delhi Today</h3>
+                      <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
+                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
+                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                      </div>
+                      <p class="mt-4 font-bold text-gray-900">Book now and get fast, affordable, and trusted water purifier service in Delhi.</p>
+                    </div>
+                  </div>
+              `;
+              content.appendChild(seoDiv);
+          }
+
+          // Add location-specific SEO content for Water Purifier in Chennai
+          if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Chennai') {
+              const seoDiv = document.createElement('article');
+              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
+              seoDiv.innerHTML = `
+                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    Water Purifier Service in Chennai | Expert RO Repair, Filter Replacement & Water Purification Solutions by Sofiyan
+                  </h2>
+                  
+                  <div class="space-y-5 text-base leading-relaxed">
+                    <p>Clean and safe drinking water is one of the most important requirements for every household and business. In a city like Chennai, where water sources and TDS levels can vary significantly, a properly maintained water purifier is essential for protecting your family's health.</p>
+                    
+                    <p>If you're searching for trusted water purifier services in Chennai, Sofiyan provides professional doorstep repair, maintenance, installation, and filter replacement solutions for all major RO and water purification systems.</p>
+                    
+                    <p>Whether your purifier is leaking, producing unusual tastes, showing low water flow, making noise, or requiring regular maintenance, our trained technicians provide fast and reliable solutions.</p>
+
+                    <p>We offer same-day RO service in Chennai for homes, apartments, villas, offices, schools, hospitals, restaurants, cafés, hostels, and commercial establishments.</p>
+
+                    <p>Our specialists service RO Water Purifiers, UV Purifiers, UF Systems, RO+UV Water Purifiers, Alkaline Water Purifiers, Copper RO Systems, Commercial RO Plants, and Advanced Water Treatment Systems.</p>
+
+                    <p>We service all major brands including Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, Urban Company RO Systems, and more.</p>
+
+                    <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
+
+                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
+                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Water Purifier Service Charges in Chennai</h3>
+                    
+                    <h4 class="font-bold text-gray-900">Inspection & Diagnosis</h4>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                      <li><strong>RO Inspection & Diagnosis</strong> – Starting from ₹249*</li>
+                    </ul>
+
+                    <h4 class="font-bold text-gray-900">Repair Services</h4>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                      <li><strong>Water Purifier Repair</strong> – Starting from ₹249*</li>
+                      <li><strong>RO System Troubleshooting</strong> – Affordable Pricing Available</li>
+                    </ul>
+
+                    <h4 class="font-bold text-gray-900">Filter Replacement Services</h4>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                      <li><strong>Sediment Filter Replacement</strong> – Affordable Pricing</li>
+                      <li><strong>Carbon Filter Replacement</strong> – Affordable Pricing</li>
+                      <li><strong>RO Membrane Replacement</strong> – Custom Pricing</li>
+                    </ul>
+
+                    <h4 class="font-bold text-gray-900">Installation Services</h4>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                      <li><strong>RO Installation</strong> – Starting from ₹449*</li>
+                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
+                      <li><strong>RO Relocation Service</strong> – Starting from ₹599*</li>
+                    </ul>
+
+                    <h4 class="font-bold text-gray-900">Maintenance Services</h4>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                      <li><strong>RO Cleaning & Sanitization</strong> – Starting from ₹349*</li>
+                      <li><strong>RO AMC Plans</strong> – Custom Pricing</li>
+                      <li><strong>Commercial RO Maintenance</strong> – Site Inspection Based</li>
+                    </ul>
+
+                    <p class="text-sm text-gray-500 italic mt-4">Final pricing depends on purifier type, spare parts required, filter replacements, and service complexity.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Chennai Families Choose Sofiyan RO Services</h3>
+                    <ul class="space-y-3">
+                      <li>★ <strong>Safe Drinking Water Focus</strong> – Our services help maintain healthy drinking water quality for your family.</li>
+                      <li>★ <strong>Same-Day Doorstep Assistance</strong> – Quick response for urgent purifier issues and breakdowns.</li>
+                      <li>★ <strong>Trained RO Specialists</strong> – Experienced technicians familiar with all major purification technologies.</li>
+                      <li>★ <strong>Genuine Filters & Spare Parts</strong> – High-quality components improve purification efficiency and system lifespan.</li>
+                      <li>★ <strong>Transparent Pricing</strong> – Clear quotations are provided before work begins.</li>
+                      <li>★ <strong>Flexible Appointment Scheduling</strong> – Choose a convenient time according to your schedule.</li>
+                      <li>★ <strong>Digital Service Reports</strong> – Invoices and maintenance reports are delivered through WhatsApp.</li>
+                      <li>★ <strong>Dedicated After-Service Support</strong> – Customer assistance remains available after service completion.</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Signs Your Water Purifier Needs Servicing</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">Water Flow Has Become Slow</strong>
+                        <p>Clogged filters or membrane issues may reduce output water flow.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Water Tastes Different</strong>
+                        <p>Changes in taste or smell often indicate exhausted filters or purification problems.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Purifier Is Leaking Water</strong>
+                        <p>Leakage from pipes, connectors, or storage tanks requires immediate repair.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">RO System Is Not Starting</strong>
+                        <p>Electrical faults or pump-related issues may prevent operation.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">High TDS Levels</strong>
+                        <p>Improper filtration can affect water purity and drinking quality.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Unusual Noise During Operation</strong>
+                        <p>Pump or internal component problems may cause abnormal sounds.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Filter Change Indicator Is Active</strong>
+                        <p>Many modern systems provide maintenance reminders when servicing is due.</p>
+                      </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Water Purifier Problems We Frequently Resolve</h3>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
+                      <li>✓ RO Not Working</li>
+                      <li>✓ Low Water Flow Issues</li>
+                      <li>✓ Water Leakage Repair</li>
+                      <li>✓ RO Filter Replacement</li>
+                      <li>✓ Carbon Filter Replacement</li>
+                      <li>✓ Sediment Filter Change</li>
+                      <li>✓ RO Membrane Replacement</li>
+                      <li>✓ UV Lamp Replacement</li>
+                      <li>✓ Booster Pump Repair</li>
+                      <li>✓ TDS Controller Problems</li>
+                      <li>✓ Water Taste Issues</li>
+                      <li>✓ Storage Tank Cleaning</li>
+                      <li>✓ RO Installation</li>
+                      <li>✓ RO Reinstallation</li>
+                      <li>✓ Commercial RO Repairs</li>
+                      <li>✓ Annual Maintenance Contracts</li>
+                      <li>✓ Electrical Fault Troubleshooting</li>
+                      <li>✓ Copper RO System Repairs</li>
+                      <li>✓ Alkaline Water Purifier Repairs</li>
+                      <li>✓ Water Purifier Sanitization</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Chennai Water Purifier Service Process</h3>
+                    <ol class="list-decimal pl-5 space-y-3">
+                      <li><strong>Service Booking:</strong> Call us or submit a service request online.</li>
+                      <li><strong>Technician Assignment:</strong> A nearby Sofiyan technician is assigned according to your Chennai location.</li>
+                      <li><strong>Complete Inspection:</strong> The purifier is thoroughly inspected to identify the exact issue.</li>
+                      <li><strong>Transparent Estimate:</strong> Repair recommendations and pricing are explained clearly.</li>
+                      <li><strong>Repair & Maintenance:</strong> Cleaning, repairs, filter replacement, installation, or servicing is completed professionally.</li>
+                      <li><strong>Water Quality Testing:</strong> Water flow, TDS levels, leakage checks, and purification efficiency are verified.</li>
+                      <li><strong>Digital Billing:</strong> Invoices and service reports are instantly delivered through WhatsApp.</li>
+                    </ol>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Benefits of Regular RO Maintenance</h3>
+                    <p>Routine servicing helps:</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                       <li>Maintain Healthy Drinking Water</li>
+                       <li>Improve Purification Performance</li>
+                       <li>Extend Purifier Lifespan</li>
+                       <li>Prevent Unexpected Breakdowns</li>
+                       <li>Maintain Proper TDS Levels</li>
+                       <li>Improve Water Taste & Quality</li>
+                       <li>Reduce Repair Expenses</li>
+                       <li>Detect Problems Before Major Failures</li>
+                     </ul>
+                     <p class="mt-2">Experts recommend professional RO servicing every 3–6 months, depending on water quality and daily usage.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">What is the starting cost of RO repair in Chennai?</strong>
+                        <p>RO repair services start from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">How often should RO filters be replaced?</strong>
+                        <p>Generally, filters should be inspected every 6 months and replaced according to water quality and usage.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Why is my RO water flow slow?</strong>
+                        <p>Slow water flow is usually caused by clogged filters, membrane blockage, or booster pump issues.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Do you provide RO installation services?</strong>
+                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation services.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Is AMC available for water purifiers?</strong>
+                        <p>Yes. We provide annual maintenance plans for residential and commercial systems.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Which brands do you service?</strong>
+                        <p>We service Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and many more.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Do you service commercial RO plants?</strong>
+                        <p>Absolutely. We provide repair and maintenance support for commercial water purification systems.</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Chennai Today</h3>
+                      <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Chennai.</p>
+                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
+                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                      </div>
+                      <p class="mt-4 font-bold text-gray-900">Experience fast, affordable, and professional water purifier services designed to keep your drinking water pure, safe, and healthy every day.</p>
+                    </div>
+                  </div>
+              `;
+              content.appendChild(seoDiv);
+          }
+
+          // Add location-specific SEO content for Water Purifier in Bangalore
+          if (categoryName === 'WaterPurifier' && localStorage.getItem('preferredCity') === 'Bangalore') {
+              const seoDiv = document.createElement('article');
+              seoDiv.className = 'mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans';
+              seoDiv.innerHTML = `
+                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    Water Purifier Service in Bangalore | Trusted RO Repair, Installation & Filter Replacement by Sofiyan
+                  </h2>
+                  
+                  <div class="space-y-5 text-base leading-relaxed">
+                    <p>Looking for reliable water purifier service in Bangalore? Sofiyan provides professional RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, UV/UF service, and AMC support at your doorstep.</p>
+                    
+                    <p>We offer same-day service by verified and experienced technicians for all major types of water purifiers, including RO water purifier, UV water purifier, UF purifier, and RO+UV systems.</p>
+                    
+                    <p>If your water purifier is not giving proper water flow, showing low purification, leaking water, making unusual noise, giving bad taste or smell, or displaying filter error, our experts can inspect and resolve the issue quickly.</p>
+
+                    <p>We service all major brands including Kent, Aquaguard, AO Smith, Blue Star, Eureka Forbes, Pureit, Livpure, HUL, Havells, LG, Kent RO, and more.</p>
+
+                    <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, Jayanagar, JP Nagar, Yelahanka, and all other areas of Bangalore.</p>
+
+                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
+                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Water Purifier Service Pricing in Bangalore</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                      <li><strong>Water Purifier Repair</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Check-up</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Replacement</strong> – Affordable Pricing Available</li>
+                      <li><strong>RO Water Purifier Installation</strong> – Starting from ₹449*</li>
+                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
+                      <li><strong>Water Purifier AMC</strong> – Custom Plans Available</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 italic">Transparent pricing with no hidden charges.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Choose Sofiyan for Water Purifier Service?</h3>
+                    <ul class="space-y-3">
+                      <li>★ <strong>Same-Day Doorstep Service</strong> for urgent RO problems</li>
+                      <li>★ <strong>Verified Technicians</strong> with installation and repair experience</li>
+                      <li>★ <strong>Transparent Pricing</strong> shared before work begins</li>
+                      <li>★ <strong>Support for All Types</strong> of water purifiers</li>
+                      <li>★ <strong>Genuine Filters & Spare Parts</strong> for better performance</li>
+                      <li>★ <strong>Service Warranty</strong> with free revisit support as applicable</li>
+                      <li>★ <strong>Quick Diagnosis</strong> of leakage, TDS, filter, and flow issues</li>
+                      <li>★ <strong>WhatsApp Bills & Digital Service Records</strong></li>
+                      <li>★ <strong>After-Service Support</strong> for customer convenience</li>
+                      <li>★ <strong>One Call – Multiple Solutions</strong> under a trusted brand</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">When Does Your Water Purifier Need Service?</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">Low Water Flow</strong>
+                        <p>If your purifier is giving very slow water output, it may be due to clogged filters, membrane issue, or inlet pressure problems.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Bad Taste or Smell</strong>
+                        <p>A change in taste or smell may indicate filter saturation, tank cleaning requirement, or membrane replacement.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Water Leakage</strong>
+                        <p>Leakage from the tank, pipe, connector, or filter housing should be checked immediately.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">TDS Problem</strong>
+                        <p>If TDS is too high or water quality is not proper, your RO membrane or purification system may need servicing.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Filter Life Ended</strong>
+                        <p>Filters have a limited life. Regular replacement helps maintain safe and clean drinking water.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Machine Not Working</strong>
+                        <p>If your purifier is not switching on, not purifying, or showing a fault indicator, it needs professional inspection.</p>
+                      </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Common Water Purifier Problems We Fix</h3>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 list-none pl-0">
+                      <li>✓ RO Water Purifier Not Working</li>
+                      <li>✓ Low Water Flow Problem</li>
+                      <li>✓ Water Leakage Issue</li>
+                      <li>✓ Bad Taste and Bad Smell</li>
+                      <li>✓ TDS Problem</li>
+                      <li>✓ Filter Replacement</li>
+                      <li>✓ Membrane Replacement</li>
+                      <li>✓ UV Lamp Issue</li>
+                      <li>✓ Pump / Motor Fault</li>
+                      <li>✓ Tank Cleaning</li>
+                      <li>✓ Noise or Vibration Problem</li>
+                      <li>✓ Installation and Reinstallation Services</li>
+                      <li>✓ Leakage from Pipe or Connector</li>
+                    </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
+                     <ol class="list-decimal pl-5 space-y-3">
+                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
+                        <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
+                        <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
+                        <li><strong>Service Completion:</strong> Repair, cleaning, filter replacement, installation, or AMC support is completed using proper tools and quality materials.</li>
+                        <li><strong>Final Testing:</strong> We test water flow, purification quality, leakage, and overall performance.</li>
+                        <li><strong>Digital Invoice:</strong> You receive the invoice and service details on WhatsApp.</li>
+                     </ol>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Bangalore Customers Trust Sofiyan</h3>
+                     <ul class="list-disc pl-5 space-y-2">
+                       <li>Local service expertise across Bangalore</li>
+                       <li>Fast and reliable response</li>
+                       <li>Experienced and background-verified technicians</li>
+                       <li>Affordable pricing with no surprises</li>
+                       <li>Customer-first service approach</li>
+                       <li>Convenient booking and after-service support</li>
+                       <li>Commitment to quality and satisfaction</li>
+                     </ul>
+
+                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
+                     <div class="space-y-4">
+                       <div>
+                         <strong class="block text-gray-900">What is the cost of water purifier repair in Bangalore?</strong>
+                         <p>Water purifier repair starts from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO filter replacement?</strong>
+                         <p>Yes, we provide filter check-up and complete filter replacement for water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you repair all types of water purifiers?</strong>
+                         <p>Yes, we service RO, UV, UF, and RO+UV water purifiers.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Do you provide RO installation?</strong>
+                         <p>Yes, we provide wall-mounted RO installation and related setup services at your doorstep.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Is service warranty available?</strong>
+                         <p>Yes, selected services include a 5–15 day warranty with free revisit support as applicable.</p>
+                       </div>
+                       <div>
+                         <strong class="block text-gray-900">Which brands do you service?</strong>
+                         <p>We work on Kent, Aquaguard, AO Smith, Blue Star, Eureka Forbes, Pureit, Livpure, HUL, Havells, LG, and more.</p>
+                       </div>
+                     </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Bangalore Today</h3>
+                      <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
+                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
+                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                      </div>
+                      <p class="mt-4 font-bold text-gray-900">Book now and get fast, affordable, and trusted water purifier service in Bangalore.</p>
+                    </div>
+                  </div>
+              `;
+              content.appendChild(seoDiv);
+          }
+
+          // Add scroll spy to update sidebar active state
+          content.onscroll = () => {
+              let current = '';
+              const sections = content.querySelectorAll('div[id^="section-"]');
+              sections.forEach(section => {
+                  const sectionTop = section.offsetTop - content.offsetTop;
+                  if (content.scrollTop >= sectionTop - 60) {
+                      current = section.getAttribute('id').replace('section-', '').replace(/-/g, ' ');
+                  }
+              });
               
+              if (current) {
+                 Array.from(sidebar.children).forEach(btn => {
+                     const isDesktop = window.innerWidth >= 768;
+                     if (btn.textContent.toLowerCase() === current.toLowerCase()) {
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4`;
+                         // Ensure active button is visible in horizontal scroll on mobile
+                         if (!isDesktop) {
+                             btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                         }
+                     } else {
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent`;
+                     }
+                 });
+              }
+          };
+
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+          document.body.style.overflow = 'hidden';
+          window.updateStickyCart();
+      };
+
+      window.closeCategoryView = function() {
+          const modal = document.getElementById('full-service-modal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.body.style.overflow = '';
+      };
+
+      window.updateStickyCart = function() {
+          let totalQty = 0;
+          let totalPrice = 0;
+          
+          if (window.getReactCart) {
+              const cartItems = window.getReactCart();
+              cartItems.forEach(item => {
+                  totalQty += item.quantity;
+                  totalPrice += item.price * item.quantity;
+              });
+          }
+
+          const bottomBar = document.getElementById('full-modal-bottom-bar');
+          const priceEl = document.getElementById('full-modal-total-price');
+          const countEl = document.getElementById('full-modal-cart-count');
+          const itemsEl = document.getElementById('full-modal-total-items');
+
+          if (totalQty > 0) {
+              bottomBar.classList.remove('hidden');
+              priceEl.textContent = '₹' + totalPrice;
+              if (itemsEl) itemsEl.textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+              countEl.textContent = totalQty;
+              countEl.classList.remove('hidden');
+          } else {
+              bottomBar.classList.add('hidden');
+              countEl.classList.add('hidden');
+          }
+      };
+
+      window.increaseQty = function(id, price, name, categoryName) {
+          if (window.addServiceToCart) {
+              window.addServiceToCart(id, name, price, categoryName);
+          } else if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, 1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.decreaseQty = function(id, price, name, categoryName) {
+          if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, -1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.proceedToCheckout = function() {
+          window.closeCategoryView();
+          
+          if (window.openReactCheckout) {
+              window.openReactCheckout();
+          } else {
+              window.dispatchEvent(new Event('openCheckout'));
+          }
+      };
+
+      // Expose sync function for React to call when cart changes externally
+      window.syncVanillaCartUI = function() {
+          if (!document.getElementById('full-service-modal').classList.contains('hidden')) {
+              window.updateStickyCart();
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }
+      };
+      
+      // Remove old unused functions to avoid errors
+      window.openCategoryModal = function(name) { window.openCategoryView(name); };
+      window.closeCategoryModal = function() { window.closeCategoryView(); };
+      window.openCartSidebar = function() { window.proceedToCheckout(); };
+      window.closeCartSidebar = function() {};
+      window.renderCartSidebar = function() {};
+
+      // --- Invoice Modal Logic ---
+      let currentInvoiceData = {
+        leadId: '',
+        partnerPhone: '',
+        partnerName: '',
+        customerName: '',
+        serviceName: '',
+        baseAmount: 0
+      };
+
+      window.openInvoiceModal = function(leadId, partnerPhone, partnerName, customerName, serviceName, baseAmount) {
+        currentInvoiceData = { leadId, partnerPhone, partnerName, customerName, serviceName, baseAmount };
+
+        document.getElementById('invoice-customer-name').innerText = customerName || 'N/A';
+        document.getElementById('invoice-service-name').innerText = serviceName || 'N/A';
+        
+        const amountInput = document.getElementById('invoice-final-amount');
+        amountInput.value = baseAmount || 0;
+
+        const phoneInput = document.getElementById('invoice-partner-phone');
+        if (phoneInput) phoneInput.value = partnerPhone || '';
+
+        const modal = document.getElementById('invoice-bill-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        window.calculateCommission();
+      };
+
+      window.closeInvoiceModal = function() {
+        const modal = document.getElementById('invoice-bill-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
+
+      window.calculateCommission = function() {
+        const amountInput = document.getElementById('invoice-final-amount');
+        const displayElement = document.getElementById('invoice-commission-display');
+        
+        const amount = parseFloat(amountInput.value) || 0;
+        const commission = amount * 0.25;
+        
+        displayElement.innerText = `₹${commission.toFixed(2)}`;
+      };
+
+      window.sendInvoiceWhatsApp = function() {
+        const amountInput = document.getElementById('invoice-final-amount');
+        const finalAmount = parseFloat(amountInput.value) || 0;
+        const commission = finalAmount * 0.25;
+        
+        const { partnerName, customerName, serviceName } = currentInvoiceData;
+
+        const phoneInput = document.getElementById('invoice-partner-phone').value.trim();
+        if (!phoneInput) {
+            alert("Please enter the partner's WhatsApp number.");
+            return;
+        }
+
+        const message = `🧾 *SOFIYAN HOME SERVICE - INVOICE* 🧾
+
+*Partner:* ${partnerName}
+*Customer:* ${customerName}
+*Service:* ${serviceName}
+
+💰 *Total Service Amount:* ₹${finalAmount.toFixed(2)}
+🔴 *COMMISSION DUE (25%):* ₹${commission.toFixed(2)}
+
+⚠️ *IMPORTANT NOTICE:* Jab tak aap pending service charge commission pay nahi karenge, tab tak aapko aage ki leads/kaam assign nahi kiya jayega.
+
+📲 *Pay via WhatsApp here:* https://wa.me/919219345455
+
+📸 *Payment karne ke baad yahan screenshot zaroor bhej dein.* Thank you!`;
+
+        const encodedMessage = encodeURIComponent(message);
+        // Send directly to Partner's WhatsApp
+        const whatsappUrl = `https://wa.me/91${phoneInput}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+        
+        window.closeInvoiceModal();
+      };
+    
