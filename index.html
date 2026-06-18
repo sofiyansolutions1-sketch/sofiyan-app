@@ -26293,4 +26293,532 @@ if (categoryName === 'Electrician' && localStorage.getItem('preferredCity') === 
                         <p>If your purifier is giving very slow water output, it may be due to clogged filters, membrane issues, or inlet pressure problems.</p>
                       </div>
                       <div>
+                                      <strong class="block text-gray-900">Bad Taste or Odor in Water</strong>
+                        <p>Exhausted carbon filters or membrane degradation can cause bad taste or smell in purified water.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Water Leakage from Purifier</strong>
+                        <p>Leaks may indicate damaged connectors, fittings, or storage tank faults that need immediate repair.</p>
+                      </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Book Water Purifier Service in Mumbai Today</h3>
+                    <p>Don't compromise on your family's drinking water quality. Whether you need RO repair, filter replacement, installation, or maintenance, Sofiyan delivers fast and dependable water purifier services throughout Mumbai.</p>
+                    <div class="mt-4 bg-indigo-50 p-4 rounded">
+                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                      <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                    </div>
+                    <p class="mt-4 font-bold text-gray-900">Experience same-day, affordable, and trusted water purifier services across Mumbai.</p>
+                  </div>
+              `;
+              content.appendChild(seoDiv);
+          }
+
+
+          // Add scroll spy to update sidebar active state
+          content.onscroll = () => {
+              let current = '';
+              const sections = content.querySelectorAll('div[id^="section-"]');
+              sections.forEach(section => {
+                  const sectionTop = section.offsetTop - content.offsetTop;
+                  if (content.scrollTop >= sectionTop - 60) {
+                      current = section.getAttribute('id').replace('section-', '').replace(/-/g, ' ');
+                  }
+              });
               
+              if (current) {
+                 Array.from(sidebar.children).forEach(btn => {
+                     const isDesktop = window.innerWidth >= 768;
+                     if (btn.textContent.toLowerCase() === current.toLowerCase()) {
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4`;
+                         // Ensure active button is visible in horizontal scroll on mobile
+                         if (!isDesktop) {
+                             btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                         }
+                     } else {
+                         btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent`;
+                     }
+                 });
+              }
+          };
+
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+          document.body.style.overflow = 'hidden';
+          window.updateStickyCart();
+      };
+
+      window.closeCategoryView = function() {
+          const modal = document.getElementById('full-service-modal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          document.body.style.overflow = '';
+      };
+
+      window.updateStickyCart = function() {
+          let totalQty = 0;
+          let totalPrice = 0;
+          
+          if (window.getReactCart) {
+              const cartItems = window.getReactCart();
+              cartItems.forEach(item => {
+                  totalQty += item.quantity;
+                  totalPrice += item.price * item.quantity;
+              });
+          }
+
+          const bottomBar = document.getElementById('full-modal-bottom-bar');
+          const priceEl = document.getElementById('full-modal-total-price');
+          const countEl = document.getElementById('full-modal-cart-count');
+          const itemsEl = document.getElementById('full-modal-total-items');
+
+          if (totalQty > 0) {
+              bottomBar.classList.remove('hidden');
+              priceEl.textContent = '₹' + totalPrice;
+              if (itemsEl) itemsEl.textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+              countEl.textContent = totalQty;
+              countEl.classList.remove('hidden');
+          } else {
+              bottomBar.classList.add('hidden');
+              countEl.classList.add('hidden');
+          }
+      };
+
+      window.increaseQty = function(id, price, name, categoryName) {
+          if (window.addServiceToCart) {
+              window.addServiceToCart(id, name, price, categoryName);
+          } else if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, 1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.decreaseQty = function(id, price, name, categoryName) {
+          if (window.updateReactCartQuantity) {
+              window.updateReactCartQuantity(id, -1);
+          }
+          
+          // Re-render to update buttons, preserving scroll
+          setTimeout(() => {
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }, 50);
+      };
+
+      window.proceedToCheckout = function() {
+          window.closeCategoryView();
+          
+          if (window.openReactCheckout) {
+              window.openReactCheckout();
+          } else {
+              window.dispatchEvent(new Event('openCheckout'));
+          }
+      };
+
+      // Expose sync function for React to call when cart changes externally
+      window.syncVanillaCartUI = function() {
+          if (!document.getElementById('full-service-modal').classList.contains('hidden')) {
+              window.updateStickyCart();
+              if (currentCategoryView) {
+                  const content = document.getElementById('full-modal-services-content');
+                  const scrollTop = content ? content.scrollTop : 0;
+                  window.openCategoryView(currentCategoryView);
+                  if (content) {
+                      document.getElementById('full-modal-services-content').scrollTop = scrollTop;
+                  }
+              }
+          }
+      };
+      
+      // Remove old unused functions to avoid errors
+      window.openCategoryModal = function(name) { window.openCategoryView(name); };
+      window.closeCategoryModal = function() { window.closeCategoryView(); };
+      window.openCartSidebar = function() { window.proceedToCheckout(); };
+      window.closeCartSidebar = function() {};
+      window.renderCartSidebar = function() {};
+
+      // --- Invoice Modal Logic ---
+      let currentInvoiceData = {
+        leadId: '',
+        partnerPhone: '',
+        partnerName: '',
+        customerName: '',
+        serviceName: '',
+        baseAmount: 0
+      };
+
+      window.openInvoiceModal = function(leadId, partnerPhone, partnerName, customerName, serviceName, baseAmount) {
+        currentInvoiceData = { leadId, partnerPhone, partnerName, customerName, serviceName, baseAmount };
+
+        document.getElementById('invoice-customer-name').innerText = customerName || 'N/A';
+        document.getElementById('invoice-service-name').innerText = serviceName || 'N/A';
+        
+        const amountInput = document.getElementById('invoice-final-amount');
+        amountInput.value = baseAmount || 0;
+
+        const phoneInput = document.getElementById('invoice-partner-phone');
+        if (phoneInput) phoneInput.value = partnerPhone || '';
+
+        const modal = document.getElementById('invoice-bill-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        window.calculateCommission();
+      };
+
+      window.closeInvoiceModal = function() {
+        const modal = document.getElementById('invoice-bill-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
+
+      window.calculateCommission = function() {
+        const amountInput = document.getElementById('invoice-final-amount');
+        const displayElement = document.getElementById('invoice-commission-display');
+        
+        const amount = parseFloat(amountInput.value) || 0;
+        const commission = amount * 0.25;
+        
+        displayElement.innerText = `₹${commission.toFixed(2)}`;
+      };
+
+      window.sendInvoiceWhatsApp = function() {
+        const amountInput = document.getElementById('invoice-final-amount');
+        const finalAmount = parseFloat(amountInput.value) || 0;
+        const commission = finalAmount * 0.25;
+        
+        const { partnerName, customerName, serviceName } = currentInvoiceData;
+
+        const phoneInput = document.getElementById('invoice-partner-phone').value.trim();
+        if (!phoneInput) {
+            alert("Please enter the partner's WhatsApp number.");
+            return;
+        }
+
+        const message = `🧾 *SOFIYAN HOME SERVICE - INVOICE* 🧾
+
+*Partner:* ${partnerName}
+*Customer:* ${customerName}
+*Service:* ${serviceName}
+
+💰 *Total Service Amount:* ₹${finalAmount.toFixed(2)}
+🔴 *COMMISSION DUE (25%):* ₹${commission.toFixed(2)}
+
+⚠️ *IMPORTANT NOTICE:* Jab tak aap pending service charge commission pay nahi karenge, tab tak aapko aage ki leads/kaam assign nahi kiya jayega.
+
+📲 *Pay via WhatsApp here:* https://wa.me/919219345455
+
+📸 *Payment karne ke baad yahan screenshot zaroor bhej dein.* Thank you!`;
+
+        const encodedMessage = encodeURIComponent(message);
+        // Send directly to Partner's WhatsApp
+        const whatsappUrl = `https://wa.me/91${phoneInput}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+        
+        window.closeInvoiceModal();
+      };
+    </script>
+
+    <!-- Smart Commission Invoice Modal -->
+    <div id="invoice-bill-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity p-4">
+      <div class="w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        
+        <!-- Header -->
+        <div class="flex-shrink-0 flex items-center justify-between border-b border-gray-100 bg-gray-50 px-6 py-4">
+          <h3 class="text-lg font-semibold text-gray-800">Generate Invoice & Commission Bill 🧾</h3>
+          <button onclick="closeInvoiceModal()" class="text-gray-400 transition-colors hover:text-gray-600">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Body -->
+        <div class="space-y-5 p-6 overflow-y-auto">
+          
+          <div class="mb-4">
+              <label class="block text-sm font-bold text-gray-700 mb-1">Partner WhatsApp Number <span class="text-red-500">*</span></label>
+              <div class="flex">
+                  <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md font-bold">+91</span>
+                  <input type="tel" id="invoice-partner-phone" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 block flex-1 min-w-0 w-full text-sm p-2.5" placeholder="Enter 10-digit mobile number">
+              </div>
+          </div>
+
+          <!-- Lead Summary -->
+          <div class="rounded-lg bg-gray-50 p-4 border border-gray-100">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-500">Customer:</span>
+              <span id="invoice-customer-name" class="font-medium text-gray-800">-</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-500">Service:</span>
+              <span id="invoice-service-name" class="font-medium text-gray-800">-</span>
+            </div>
+          </div>
+
+          <!-- Editable Amount Field -->
+          <div>
+            <label for="invoice-final-amount" class="mb-1 block text-sm font-medium text-gray-700">Total Service Charge (₹)</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 font-medium">₹</span>
+              <input type="number" id="invoice-final-amount" oninput="calculateCommission()" 
+                     class="w-full rounded-lg border border-gray-300 py-2.5 pl-8 pr-4 text-gray-900 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                     placeholder="0.00">
+            </div>
+          </div>
+          
+          <!-- Commission Display -->
+          <div class="rounded-lg border border-red-100 bg-red-50 p-4 text-center">
+            <p class="text-sm font-medium text-red-800">Commission Due (25%)</p>
+            <p id="invoice-commission-display" class="mt-1 text-3xl font-bold text-red-600">₹0.00</p>
+          </div>
+
+          <!-- Notice -->
+          <div class="flex flex-col items-center space-y-3">
+            <div class="w-full rounded-lg border border-orange-200 bg-orange-50 p-3">
+              <p class="text-xs font-semibold text-orange-800 flex items-start">
+                <span class="mr-1.5 text-base leading-none">⚠️</span>
+                Notice: Jab tak aap service charge commission pay nahi karenge, tab tak unhe aage kaam nahi milega.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6">
+              <button onclick="sendInvoiceWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md flex justify-center items-center gap-2 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                  </svg>
+                  Send via WhatsApp
+              </button>
+          </div>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <script type="module" src="/index.tsx"></script>
+    <script>
+      // --- Hyper-Local Programmatic SEO Manager ---
+      
+      // PART 1: The SEO Data Dictionary
+      const seoConfig = {
+          'ac-repair': {
+              title: "Top AC Repair Near Me | Bengaluru, Delhi | Sofiyan Solutions",
+              description: "Looking for affordable AC repair near me? Get 24/7 expert technicians in Bengaluru, Delhi, Lucknow, and Varanasi. Fast, reliable, and guaranteed service.",
+              keywords: "best AC mechanic near me, AC service in Lucknow, AC repair Delhi near me, AC installation Bengaluru, affordable AC service Varanasi",
+              h1: "Expert AC Repair & Service Near You"
+          },
+          'plumber': {
+              title: "Best Plumber Near Me | 24/7 Services | Sofiyan Solutions",
+              description: "Find a reliable plumber near me for fast, affordable fixes. Expert plumbing services available 24/7 in Bengaluru, Delhi, Lucknow, and Varanasi.",
+              keywords: "plumber near me, best plumber in Delhi, emergency plumber Lucknow, affordable plumbing Varanasi, water leak repair Bengaluru",
+              h1: "Professional Plumbing Services Near You"
+          },
+          'electrician': {
+              title: "Expert Electrician Near Me | Fast Fix | Sofiyan Solutions",
+              description: "Need an electrician near me? Our certified experts provide 24/7 affordable electrical repairs in Bengaluru, Delhi, Lucknow, and Varanasi. Book now!",
+              keywords: "electrician near me, electrical repair Delhi, best electrician Lucknow, wiring expert Varanasi, emergency electrician Bengaluru",
+              h1: "Certified Electricians Near You"
+          },
+          'cleaning': {
+              title: "Deep Cleaning Services Near Me | Sofiyan Solutions",
+              description: "Top-rated deep cleaning near me. Get affordable, spotless home & office cleaning in Bengaluru, Delhi, Lucknow, and Varanasi by verified professionals.",
+              keywords: "home cleaning near me, deep cleaning Delhi, office cleaning Lucknow, affordable cleaners Varanasi, best cleaning service Bengaluru",
+              h1: "Professional Deep Cleaning Services Near You"
+          },
+          'default': {
+              title: "Best Home Services Near Me | Sofiyan Solutions",
+              description: "Looking for top home services near me? Sofiyan Solutions offers expert AC repair, plumbing, and cleaning in Bengaluru, Delhi, Lucknow, and Varanasi.",
+              keywords: "home services near me, handyman Delhi, home maintenance Lucknow, affordable services Varanasi, expert technicians Bengaluru",
+              h1: "Top-Rated Home Services Near You"
+          }
+      };
+
+      // PART 2: The Injection Function
+      function applyLocalSEO(serviceSlug) {
+          const config = seoConfig[serviceSlug] || seoConfig['default'];
+          
+          // 1. Update Title
+          document.title = config.title;
+          
+          // 2. Update Meta Description
+          let metaDesc = document.querySelector('meta[name="description"]');
+          if (!metaDesc) {
+              metaDesc = document.createElement('meta');
+              metaDesc.setAttribute('name', 'description');
+              document.head.appendChild(metaDesc);
+          }
+          metaDesc.setAttribute('content', config.description);
+          
+          // 3. Update Meta Keywords
+          let metaKeywords = document.querySelector('meta[name="keywords"]');
+          if (!metaKeywords) {
+              metaKeywords = document.createElement('meta');
+              metaKeywords.setAttribute('name', 'keywords');
+              document.head.appendChild(metaKeywords);
+          }
+          metaKeywords.setAttribute('content', config.keywords);
+          
+          // 4. Update H1 (if it exists in the DOM)
+          const h1Tag = document.querySelector('h1');
+          if (h1Tag) {
+              h1Tag.textContent = config.h1;
+          }
+          
+          // 5. Update Canonical Tag
+          let canonical = document.querySelector('link[rel="canonical"]');
+          if (!canonical) {
+              canonical = document.createElement('link');
+              canonical.setAttribute('rel', 'canonical');
+              document.head.appendChild(canonical);
+          }
+          const cleanSlug = (serviceSlug && serviceSlug !== 'default') ? `services/${serviceSlug}` : '';
+          canonical.setAttribute('href', `https://www.sofiyansolutions.com/${cleanSlug}`);
+      }
+
+      // PART 3: Advanced "Near Me" JSON-LD Schema (LocalBusiness)
+      function injectLocalSchema(serviceSlug) {
+          const config = seoConfig[serviceSlug] || seoConfig['default'];
+          
+          // Remove existing schema if present
+          const existingSchema = document.querySelector('#local-seo-schema');
+          if (existingSchema) {
+              existingSchema.remove();
+          }
+          
+          const cleanSlug = (serviceSlug && serviceSlug !== 'default') ? `services/${serviceSlug}` : '';
+          
+          const schemaJSON = {
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "serviceType": config.h1,
+              "provider": {
+                  "@type": "LocalBusiness",
+                  "name": "Sofiyan Home Service Solutions",
+                  "image": "https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg",
+                  "telephone": "+919219345455",
+                  "priceRange": "$$"
+              },
+              "areaServed": [
+                  { "@type": "City", "name": "Bengaluru" },
+                  { "@type": "City", "name": "Delhi" },
+                  { "@type": "City", "name": "Lucknow" },
+                  { "@type": "City", "name": "Varanasi" }
+              ],
+              "description": config.description,
+              "url": `https://www.sofiyansolutions.com/${cleanSlug}`
+          };
+          
+          const scriptTag = document.createElement('script');
+          scriptTag.id = 'local-seo-schema';
+          scriptTag.type = 'application/ld+json';
+          scriptTag.text = JSON.stringify(schemaJSON);
+          document.head.appendChild(scriptTag);
+      }
+
+      // 1. The Routing Logic
+      window.MapsTo = function(path, isPopState = false) {
+          if (!isPopState) {
+              window.history.pushState({ path: path }, '', path);
+          }
+          
+          if (path.startsWith('/services/')) {
+              const categorySlug = path.replace('/services/', '');
+              
+              // Map slug back to exact category name from masterServicesData
+              const slugToKeyMap = {};
+              if (window.masterServicesData) {
+                  for (const key in window.masterServicesData) {
+                      const slug = key.replace(/\s+/g, '-').toLowerCase();
+                      slugToKeyMap[slug] = key;
+                  }
+              }
+              
+              const category = slugToKeyMap[categorySlug] || categorySlug.replace(/-/g, ' ');
+              
+              // Apply Local SEO and Schema
+              applyLocalSEO(categorySlug);
+              injectLocalSchema(categorySlug);
+              
+              if (window.openCategoryView) {
+                  window.openCategoryView(category, true); // true = skip pushState in openCategoryView
+              }
+          } else if (path === '/' || path === '') {
+              // Apply Default Local SEO and Schema
+              applyLocalSEO('default');
+              injectLocalSchema('default');
+              
+              if (window.closeCategoryView) {
+                  window.closeCategoryView(true); // true = skip pushState in closeCategoryView
+              }
+          }
+      };
+
+      // 3. Deep Linking Handler
+      window.addEventListener('popstate', (event) => {
+          window.MapsTo(window.location.pathname, true);
+      });
+
+      window.addEventListener('DOMContentLoaded', () => {
+          window.MapsTo(window.location.pathname, true);
+      });
+
+      // Intercept openCategoryView to use MapsTo
+      const originalOpenView = window.openCategoryView;
+      window.openCategoryView = function(categoryName, skipRouting = false) {
+          if (!skipRouting) {
+              const slug = categoryName.replace(/\s+/g, '-').toLowerCase();
+              window.MapsTo(`/services/${slug}`);
+              return; // MapsTo will call openCategoryView with skipRouting = true
+          }
+          
+          if (typeof originalOpenView === 'function') {
+              originalOpenView(categoryName);
+          }
+      };
+
+      // Intercept closeCategoryView to use MapsTo
+      const originalCloseView = window.closeCategoryView;
+      window.closeCategoryView = function(skipRouting = false) {
+          if (!skipRouting) {
+              if (window.location.pathname.startsWith('/services/')) {
+                  window.MapsTo('/');
+                  return; // MapsTo will call closeCategoryView with skipRouting = true
+              }
+          }
+          
+          if (typeof originalCloseView === 'function') {
+              originalCloseView();
+          }
+      };
+      
+      // 4. Link Structure Handler
+      window.handleLinkClick = function(event) {
+          event.preventDefault();
+          const href = event.currentTarget.getAttribute('href');
+          if (href) {
+              window.MapsTo(href);
+          }
+      };
+    </script>
+  </body>
+</html>
