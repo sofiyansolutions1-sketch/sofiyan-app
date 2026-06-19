@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CustomerPanel } from './pages/CustomerPanel';
 import { PartnerPanel } from './pages/PartnerPanel';
@@ -37,6 +37,8 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/:cityParam" element={<CustomerPanel />} />
+          <Route path="/:cityParam/:categoryParam" element={<CustomerPanel />} />
           <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>
