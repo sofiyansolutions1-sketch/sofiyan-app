@@ -1,332 +1,4 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta
-      name="google-site-verification"
-      content="UmTbZg7YFRoaCSRALoE9MHVsK97M9sYav1VVsdtDoMw"
-    />
 
-    <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      type="image/jpeg"
-      href="https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg"
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AC Repair Lucknow | Sofiyan Home Service</title>
-    <meta
-      name="description"
-      content="Expert AC, fridge, washing machine & RO repair in Lucknow. Call Sofiyan Home Service for fast, reliable doorstep service today!"
-    />
-    <link rel="canonical" href="https://www.sofiyansolutions.com/" />
-    <meta name="robots" content="index, follow" />
-    <meta
-      name="googlebot"
-      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
-    />
-    <meta
-      property="og:title"
-      content="AC Repair Lucknow | Sofiyan Home Service"
-    />
-    <meta
-      property="og:description"
-      content="Expert AC, fridge, washing machine & RO repair in Lucknow. Call Sofiyan Home Service for fast, reliable doorstep service today!"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.sofiyansolutions.com/" />
-
-    <!-- Local Business Schema Markup (JSON-LD) -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "HomeAndConstructionBusiness",
-        "name": "Sofiyan Home Service",
-        "telephone": "+919219345455",
-        "url": "https://www.sofiyansolutions.com/",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Lucknow",
-          "addressRegion": "Uttar Pradesh",
-          "addressCountry": "IN"
-        },
-        "areaServed": [
-          "Gomti Nagar",
-          "Hazratganj",
-          "Indira Nagar",
-          "Alambagh",
-          "Aashiyana"
-        ],
-        "makesOffer": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "AC Repair"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Refrigerator Repair"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Washing Machine Repair"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "RO Repair"
-            }
-          }
-        ]
-      }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons (Spinner, Check, etc.) -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: "Poppins", sans-serif;
-      }
-      /* Custom scrollbar for better aesthetics */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      /* Specific class for smaller areas like Time Slot container */
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-
-      /* Featured Services Auto-Scroll Animation */
-      @keyframes scroll {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(-50%);
-        } /* Scrolls half the width (original content) */
-      }
-      .animate-scroll {
-        animation: scroll 80s linear infinite;
-        width: max-content;
-      }
-      .animate-scroll:hover {
-        animation-play-state: paused; /* Pauses when user hovers to book */
-      }
-
-      /* Snap-fast animations for Modals */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      @keyframes scaleIn {
-        from {
-          opacity: 0;
-          transform: scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-      .animate-fadeIn {
-        animation: fadeIn 0.15s ease-out forwards;
-      }
-      .animate-scaleIn {
-        animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-
-    <!-- Smart Address Matcher Modal -->
-    <div
-      id="text-match-modal"
-      class="fixed inset-0 bg-black bg-opacity-60 hidden z-[60] flex items-center justify-center p-4 backdrop-blur-sm transition-all"
-    >
-      <div
-        class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col scale-100 transition-transform"
-      >
-        <div class="flex justify-between items-center border-b pb-3 mb-3">
-          <div>
-            <h3 class="text-xl font-bold text-gray-900">
-              🔍 Smart Address Matcher
-            </h3>
-            <p
-              id="match-customer-address"
-              class="text-xs text-indigo-600 font-semibold mt-1"
-            ></p>
-          </div>
-          <button
-            onclick="closeMatchModal()"
-            class="text-gray-400 hover:text-red-500 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <input type="hidden" id="match-lead-id" />
-        <input type="hidden" id="match-lead-data" />
-
-        <div
-          class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100 shadow-inner"
-        >
-          <label class="text-xs font-bold text-indigo-800 block mb-1"
-            >Live Filter (e.g., Area, City, or Pincode):</label
-          >
-          <div class="relative">
-            <i
-              class="fas fa-keyboard absolute left-3 top-2.5 text-indigo-400"
-            ></i>
-            <input
-              type="text"
-              id="live-keyword-search"
-              onkeyup="runKeywordMatch()"
-              placeholder="Type 'Mau' to instantly filter..."
-              class="w-full border border-indigo-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-indigo-500 font-medium"
-            />
-          </div>
-        </div>
-
-        <div
-          id="match-loading"
-          class="text-center text-indigo-600 font-bold py-10 hidden"
-        >
-          <i class="fas fa-sync fa-spin text-3xl mb-2 block"></i> Matching
-          address words...
-        </div>
-        <div
-          id="match-results"
-          class="overflow-y-auto space-y-3 flex-1 pr-1 custom-scrollbar"
-        ></div>
-      </div>
-    </div>
-
-    <!-- Full-Screen Service Modal -->
-    <div
-      id="full-service-modal"
-      class="hidden fixed inset-0 z-[100] w-full h-full bg-slate-50 flex-col"
-    >
-      <!-- Sticky Header -->
-      <div
-        class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm flex-shrink-0"
-      >
-        <button
-          onclick="closeCategoryView()"
-          class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-        >
-          <i class="fas fa-arrow-left text-xl"></i>
-        </button>
-        <h2 id="full-modal-title" class="text-lg font-bold text-slate-800">
-          Category Name
-        </h2>
-        <button
-          class="relative p-2 text-slate-600 hover:text-indigo-600 transition-colors"
-          onclick="
-            closeCategoryView();
-            if (window.openReactCheckout) window.openReactCheckout();
-          "
-        >
-          <i class="fas fa-shopping-cart text-xl"></i>
-          <span
-            id="full-modal-cart-count"
-            class="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden"
-            >0</span
-          >
-        </button>
-      </div>
-
-      <!-- Main Content Area -->
-      <div
-        class="flex flex-1 flex-col md:flex-row overflow-hidden relative pb-20"
-      >
-        <!-- Sidebar / Top Categories (Responsive) -->
-        <div
-          id="full-modal-sidebar"
-          class="flex flex-row md:flex-col w-full md:w-64 bg-white md:bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 overflow-x-auto md:overflow-y-auto custom-scrollbar flex-shrink-0 z-10"
-        >
-          <!-- Subcategory items injected here -->
-        </div>
-
-        <!-- Services List -->
-        <div
-          id="full-modal-services-content"
-          class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-6 custom-scrollbar scroll-smooth bg-slate-50/30"
-        >
-          <!-- Service sections injected here -->
-        </div>
-      </div>
-
-      <!-- Sticky Bottom Bar -->
-      <div
-        id="full-modal-bottom-bar"
-        class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 shadow-[0_-10px_40px_-5px_rgba(79,70,229,0.1)] hidden z-20"
-      >
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div
-              class="bg-indigo-50 p-2.5 rounded-xl border border-indigo-100 hidden sm:block"
-            >
-              <i class="fas fa-shopping-bag text-indigo-600"></i>
-            </div>
-            <div>
-              <p
-                class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mb-1"
-              >
-                <span id="full-modal-total-items">0 items</span> in cart
-              </p>
-              <p
-                id="full-modal-total-price"
-                class="text-2xl font-black text-indigo-950"
-              >
-                ₹0
-              </p>
-            </div>
-          </div>
-          <button
-            onclick="proceedToCheckout()"
-            class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-xl shadow-indigo-200 active:scale-95 text-sm uppercase tracking-wider"
-          >
-            Checkout <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <script>
       window.calculateWordMatchScore = function (searchQuery, partnerString) {
         if (!searchQuery || !partnerString) return 0;
 
@@ -27146,4 +26818,125 @@
                        <li>Improve Purification Efficiency</li>
                        <li>Extend Purifier Lifespan</li>
                        <li>Prevent Unexpected Breakdowns</li>
-               
+                       <li>Maintain Proper TDS Levels</li>
+                       <li>Improve Water Taste</li>
+                       <li>Reduce Repair Expenses</li>
+                       <li>Detect Problems Early</li>
+                     </ul>
+                     <p class="mt-2">Experts recommend professional RO servicing every 3–6 months depending on water quality and daily usage.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Frequently Asked Questions</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">What is the starting cost of RO repair in Kolkata?</strong>
+                        <p>RO repair services start from ₹249*. Final pricing depends on the issue and replacement parts required.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">How often should RO filters be replaced?</strong>
+                        <p>Filters should generally be inspected every 6 months and replaced according to usage and water quality.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Why is my RO water flow slow?</strong>
+                        <p>Slow flow is often caused by clogged filters, membrane blockage, or booster pump issues.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Do you provide RO installation services?</strong>
+                        <p>Yes. We provide installation, relocation, reinstallation, and uninstallation services.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Is AMC available for water purifiers?</strong>
+                        <p>Yes. We offer annual maintenance plans for residential and commercial systems.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Which purifier brands do you service?</strong>
+                        <p>We service Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Havells, Eureka Forbes, LG, V-Guard, Aqua Fresh, Aqua Grand, and many more.</p>
+                      </div>
+                      <div>
+                        <strong class="block text-gray-900">Do you service commercial RO plants?</strong>
+                        <p>Absolutely. We provide repair and maintenance support for commercial and industrial water purification systems.</p>
+                      </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                      <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Kolkata Today</h3>
+                      <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Kolkata.</p>
+                      <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
+                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
+                        <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
+                      </div>
+                      <p class="mt-4 font-bold text-gray-900">Experience fast, affordable, and professional water purifier services designed to keep your drinking water pure, healthy, and safe every day.</p>
+                    </div>
+                  </div>
+              `;
+          content.appendChild(seoDiv);
+        }
+
+        // Add location-specific SEO content for Water Purifier in Mumbai
+        if (
+          categoryName === "WaterPurifier" &&
+          localStorage.getItem("preferredCity") === "Mumbai"
+        ) {
+          const seoDiv = document.createElement("article");
+          seoDiv.className =
+            "mt-12 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 mx-4 md:mx-0 text-gray-800 font-sans";
+          seoDiv.innerHTML = `
+                  <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    Water Purifier Service in Mumbai | Trusted RO Repair, Filter Replacement & Installation by Sofiyan
+                  </h2>
+                  
+                  <div class="space-y-5 text-base leading-relaxed">
+                    <p>Looking for a reliable water purifier service in Mumbai? Sofiyan provides professional RO repair, water purifier installation, uninstallation, filter replacement, tank cleaning, membrane replacement, UV/UF servicing, and AMC support at your doorstep.</p>
+                    
+                    <p>We offer same-day water purifier service in Mumbai by verified and experienced technicians for all major types of purifiers, including RO water purifiers, UV purifiers, UF purifiers, and RO+UV systems.</p>
+                    
+                    <p>If your water purifier is not giving proper water flow, leaking water, showing low purification, giving bad taste or smell, or displaying filter error, our experts can inspect and fix the issue quickly.</p>
+                    
+                    <p>We service all major brands including Kent, Aquaguard, Livpure, Pureit, AO Smith, Blue Star, Eureka Forbes, Havells, LG, and more.</p>
+
+                    <p>Serving customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
+
+                    <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
+                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
+                    </div>
+
+                                        <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Water Purifier Service Pricing in Mumbai</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                      <li><strong>Water Purifier Inspection & Repair</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Check-up</strong> – Starting from ₹249*</li>
+                      <li><strong>Filter Replacement</strong> – Affordable Pricing Available</li>
+                      <li><strong>RO Installation</strong> – Starting from ₹449*</li>
+                      <li><strong>RO Uninstallation</strong> – Starting from ₹399*</li>
+                      <li><strong>Tank Cleaning</strong> – Starting from ₹349*</li>
+                      <li><strong>AMC / Annual Maintenance</strong> – Custom Pricing Available</li>
+                    </ul>
+                    <p class="text-sm text-gray-500 italic">Transparent pricing with no hidden charges.</p>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Why Choose Sofiyan for Water Purifier Service in Mumbai?</h3>
+                    <ul class="space-y-3">
+                      <li>★ <strong>Same-Day Doorstep Service</strong> across Mumbai</li>
+                      <li>★ <strong>Verified & Experienced Technicians</strong></li>
+                      <li>★ <strong>Transparent Pricing Before Work Begins</strong></li>
+                      <li>★ <strong>Support for All Major RO, UV, UF, and RO+UV Models</strong></li>
+                      <li>★ <strong>Genuine Filters & Spare Parts for Better Performance</strong></li>
+                      <li>★ <strong>Quick Diagnosis & Efficient Repairs</strong></li>
+                      <li>★ <strong>5–15 Days Service Warranty</strong> on applicable services</li>
+                      <li>★ <strong>WhatsApp Bills & Digital Service Records</strong></li>
+                      <li>★ <strong>Dedicated After-Service Support</strong></li>
+                      <li>★ <strong>One Call – Multiple Solutions</strong> under one trusted brand</li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">When Does Your Water Purifier Need Service?</h3>
+                    <div class="space-y-4">
+                      <div>
+                        <strong class="block text-gray-900">Low Water Flow</strong>
+                        <p>If your purifier is giving very slow water output</p>
+                      </div>
+                    </div>
+                  </div>
+              `;
+          content.appendChild(seoDiv);
+        }
+      };
+    
