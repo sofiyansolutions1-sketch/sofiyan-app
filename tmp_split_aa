@@ -1,0 +1,100 @@
+-- =============================================================
+-- ULTIMATE FULL SUPABASE SQL SCHEMA FOR SOFIYAN HOME SERVICE
+-- =============================================================
+
+-- SECTION 0: CLEAN SLATE RESET (SAFE DROPPING)
+DROP TABLE IF EXISTS influencer_referrals CASCADE;
+DROP TABLE IF EXISTS influencers CASCADE;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS customers CASCADE;
+DROP TABLE IF EXISTS primary_partners CASCADE;
+DROP TABLE IF EXISTS customer_followups CASCADE;
+DROP TABLE IF EXISTS blog_posts CASCADE;
+DROP TABLE IF EXISTS admins CASCADE;
+
+-- Enable UUID Extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- SECTION 1: CUSTOMER PANEL DATA
+CREATE TABLE customers (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    full_name TEXT NOT NULL,
+    phone_number TEXT UNIQUE NOT NULL,
+    email TEXT,
+    address TEXT,
+    city TEXT,
+    pincode TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone_number);
+
+-- SECTION 2: PRIMARY PARTNERS DATA
+CREATE TABLE primary_partners (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT UNIQUE NOT NULL,
+    password TEXT,
+    alt_phone TEXT,
+    gender TEXT,
+    age INTEGER,
+    city TEXT,
+    address TEXT,
+    pincode TEXT,
+    lat NUMERIC,
+    lng NUMERIC,
+    service_areas JSONB DEFAULT '[]',
+    service_pincodes JSONB DEFAULT '[]',
+    categories JSONB DEFAULT '[]',
+    sub_categories JSONB DEFAULT '[]',
+    experience TEXT,
+    aadhar_number TEXT,
+    id_proof_url TEXT,
+    status TEXT DEFAULT 'available' CHECK (status IN ('pending', 'available', 'busy', 'on_hold', 'blocked')),
+    rating NUMERIC DEFAULT 5.0 CHECK (rating >= 1.0 AND rating <= 5.0),
+    review_count INTEGER DEFAULT 0,
+    earnings NUMERIC DEFAULT 0,
+    completed_jobs INTEGER DEFAULT 0,
+    registration_fee_paid BOOLEAN DEFAULT false,
+    registration_fee_screenshot TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_primary_partners_phone ON primary_partners(phone);
+CREATE INDEX IF NOT EXISTS idx_primary_partners_status ON primary_partners(status);
+
+-- SECTION 3: BOOKINGS & LEAD TRANSITION DATA
+CREATE TABLE bookings (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
+    customer_name TEXT NOT NULL,
+    contact_number TEXT NOT NULL,
+    address TEXT NOT NULL,
+    area TEXT,
+    city TEXT,
+    pin_code TEXT,
+    location_link TEXT,
+    lat NUMERIC,
+    lng NUMERIC,
+    service_category TEXT,
+    sub_service_name TEXT,
+    cart_items JSONB DEFAULT '[]',
+    description TEXT,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
+    price NUMERIC NOT NULL DEFAULT 0,
+    total_price NUMERIC DEFAULT 0,
+    discount_amount NUMERIC DEFAULT 0,
+    commission_paid BOOLEAN DEFAULT FALSE,
+    commission_screenshot TEXT,
+    applied_referral_code TEXT,
+    coupon_used TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'completed', 'cancelled', 'Forwarded', 'on_hold', 'admin_review')),
+    assigned_partner_id UUID REFERENCES primary_partners(id) ON DELETE SET NULL,
+    assigned_partner_name TEXT,
+    assigned_partner_phone TEXT,
+    assigned_partner_area TEXT,
+    partner_rating INTEGER CHECK (partner_rating >= 1 AND partner_rating <= 5),

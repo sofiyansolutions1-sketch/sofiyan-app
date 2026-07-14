@@ -28,7 +28,7 @@ export const AdminPanel: React.FC = () => {
   const [isSearchingPartners, setIsSearchingPartners] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const [currentAdminTab, setCurrentAdminTab] = useState<'Pending' | 'Forwarded'>('Pending');
+  const [currentAdminTab, setCurrentAdminTab] = useState<'Pending' | 'Forwarded' | 'Accepted' | 'Review' | 'Completed'>('Pending');
   const [showPartnersDirectory, setShowPartnersDirectory] = useState(false);
   const [directorySearchQuery, setDirectorySearchQuery] = useState('');
   const [directoryStatusFilter, setDirectoryStatusFilter] = useState<'all' | 'available' | 'busy' | 'pending' | 'on_hold' | 'blocked'>('all');
@@ -184,11 +184,17 @@ export const AdminPanel: React.FC = () => {
   const completedBookings = bookings.filter(b => b.status === 'completed');
   const pendingJobs = bookings.filter(b => b.status === 'pending').length;
   const assignedJobs = bookings.filter(b => b.status === 'Forwarded' || b.status === 'accepted').length;
+  const forwardedJobs = bookings.filter(b => b.status === 'Forwarded').length;
+  const acceptedJobs = bookings.filter(b => b.status === 'accepted').length;
+  const reviewJobs = bookings.filter(b => b.status === 'admin_review').length;
   const completedJobs = completedBookings.length;
 
   const displayedBookings = bookings.filter(b => {
     if (currentAdminTab === 'Pending') return b.status === 'pending';
-    if (currentAdminTab === 'Forwarded') return b.status === 'Forwarded' || b.status === 'accepted' || b.status === 'completed';
+    if (currentAdminTab === 'Forwarded') return b.status === 'Forwarded';
+    if (currentAdminTab === 'Accepted') return b.status === 'accepted';
+    if (currentAdminTab === 'Review') return b.status === 'admin_review';
+    if (currentAdminTab === 'Completed') return b.status === 'completed';
     return false;
   });
 
@@ -302,7 +308,25 @@ export const AdminPanel: React.FC = () => {
                     onClick={() => setCurrentAdminTab('Forwarded')} 
                     className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentAdminTab === 'Forwarded' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
                 >
-                    Dispatched
+                    Dispatched ({forwardedJobs})
+                </button>
+                <button 
+                    onClick={() => setCurrentAdminTab('Accepted')} 
+                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentAdminTab === 'Accepted' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
+                >
+                    Accepted ({acceptedJobs})
+                </button>
+                <button 
+                    onClick={() => setCurrentAdminTab('Review')} 
+                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentAdminTab === 'Review' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
+                >
+                    Review ({reviewJobs})
+                </button>
+                <button 
+                    onClick={() => setCurrentAdminTab('Completed')} 
+                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentAdminTab === 'Completed' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
+                >
+                    Completed ({completedJobs})
                 </button>
               </div>
             </div>
@@ -452,7 +476,7 @@ export const AdminPanel: React.FC = () => {
                         <div className="p-3.5 bg-indigo-950 text-white rounded-2xl shadow-lg border border-indigo-900 flex flex-col gap-2.5">
                           {/* Mini Profile Header */}
                           <div className="flex justify-between items-start pb-2 border-b border-white/10">
-                            <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="flex items-center gap-2.5 min-w-0 relative">
                               <div className="w-8 h-8 rounded-lg bg-white/15 text-white flex items-center justify-center font-black text-xs shrink-0 select-none">
                                 {booking.assignedPartnerName ? booking.assignedPartnerName.charAt(0) : 'P'}
                               </div>
@@ -478,8 +502,8 @@ export const AdminPanel: React.FC = () => {
                           {/* Profile Quick Stats */}
                           <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] text-indigo-100">
                             <div>
-                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Completed Tasks</span>
-                              <span className="font-extrabold text-white">{pt?.completedJobs || 1}+ Jobs Done</span>
+                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Contact Number</span>
+                              <span className="font-extrabold text-white">{booking.assignedPartnerPhone}</span>
                             </div>
                             <div>
                               <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Expertise / Coverage</span>
@@ -542,7 +566,7 @@ export const AdminPanel: React.FC = () => {
                            <Send size={12} /> Assign Technician
                          </button>
                        )}
-                       {(booking.status === 'Forwarded' || booking.status === 'accepted') && (
+                       {(booking.status === 'Forwarded' || booking.status === 'accepted' || booking.status === 'admin_review') && (
                          <button 
                            onClick={() => {
                              setSelectedRating(5);
@@ -550,7 +574,7 @@ export const AdminPanel: React.FC = () => {
                            }} 
                            className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.15em] hover:from-emerald-700 hover:to-green-700 transition-all shadow-md flex items-center justify-center gap-2"
                          >
-                           <CheckCircle size={12} /> Complete & Rate
+                           <CheckCircle size={12} /> {booking.status === 'admin_review' ? 'Verify Payment & Rate' : 'Complete & Rate'}
                          </button>
                        )}
                        {booking.status === 'completed' && (
@@ -626,7 +650,12 @@ export const AdminPanel: React.FC = () => {
                           <div className="flex items-center gap-4">
                               <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-indigo-600 font-black text-lg group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                   {partner.name.charAt(0)}
-                              </div>
+                      </div>
+                      {index < 3 && directoryStatusFilter === 'all' && !directorySearchQuery && (
+                        <div className={`absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold text-white shadow-md ${index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-400' : 'bg-amber-600'}`}>
+                          #{index + 1}
+                        </div>
+                      )}
                               <div>
                                   <div className="flex items-center gap-2">
                                     <p className="font-black text-gray-900 tracking-tight">{partner.name}</p>
@@ -783,13 +812,24 @@ export const AdminPanel: React.FC = () => {
                 }
                 return true;
               })
-              .map(partner => (
+              .sort((a, b) => {
+                const ratingA = a.rating || 0;
+                const ratingB = b.rating || 0;
+                if (ratingB !== ratingA) return ratingB - ratingA;
+                const jobsA = a.completedJobs || 0;
+                const jobsB = b.completedJobs || 0;
+                if (jobsB !== jobsA) return jobsB - jobsA;
+                const earnA = a.earnings || 0;
+                const earnB = b.earnings || 0;
+                return earnB - earnA;
+              })
+              .map((partner, index) => (
                 <div 
                   key={partner.id} 
                   className="p-3 border border-gray-100 rounded-2xl bg-white hover:border-indigo-600/20 hover:shadow-md transition-all flex flex-col justify-between gap-3 group border-2"
                 >
                   <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0 relative">
                       {/* Status-colored visual circular avatar */}
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-sm border shadow-inner flex-shrink-0 ${
                         partner.status === 'available' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
@@ -800,6 +840,11 @@ export const AdminPanel: React.FC = () => {
                       }`}>
                         {partner.name.charAt(0)}
                       </div>
+                      {index < 3 && directoryStatusFilter === 'all' && !directorySearchQuery && (
+                        <div className={`absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold text-white shadow-md ${index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-400' : 'bg-amber-600'}`}>
+                          #{index + 1}
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <h4 className="font-black text-gray-900 tracking-tight leading-tight text-xs truncate max-w-[130px]" title={partner.name}>
                           {partner.name}

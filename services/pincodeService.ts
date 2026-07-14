@@ -65,7 +65,9 @@ export async function fetchPincodesByArea(areaNames: string[]): Promise<string[]
             }
             
             if (apiRes && apiRes.ok) {
-                const data = await apiRes.json();
+                const text = await apiRes.text();
+                let data;
+                try { data = JSON.parse(text); } catch { console.warn("Failed to parse", text); }
                 
                 // India Post API returns an array containing Status and PostOffice details
                 if (data && data[0] && data[0].Status === 'Success') {
@@ -125,7 +127,9 @@ export async function identifyPincode(addressText: string): Promise<string | nul
             const apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`);
             if (!apiRes.ok) continue;
 
-            const data = await apiRes.json();
+            const text = await apiRes.text();
+            let data;
+            try { data = JSON.parse(text); } catch { console.warn("Failed to parse", text); }
             if (data && data[0] && data[0].Status === 'Success') {
                 const postOffices = data[0].PostOffice;
                 if (postOffices.length > 0 && postOffices[0].Pincode) {
@@ -166,7 +170,9 @@ export async function fetchAreasByPincode(pincode: string): Promise<{ success: b
 
         if (!apiRes.ok) return { success: false, areas: [], isBangalore: false, error: 'API unreachable' };
 
-        const data = await apiRes.json();
+        const text = await apiRes.text();
+        let data;
+        try { data = JSON.parse(text); } catch { console.warn("Failed to parse", text); }
         if (data && data[0] && data[0].Status === 'Success') {
             const postOffices = data[0].PostOffice || [];
             

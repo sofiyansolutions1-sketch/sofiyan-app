@@ -19,15 +19,20 @@
     "express": "^5.2.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.344.0",
     "motion": "^12.38.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.22.3",
     "serverless-http": "^4.0.0",
-    "tsx": "^4.22.0"
+    "tsx": "^4.22.0",
+    "ws": "^8.21.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^25.9.3",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

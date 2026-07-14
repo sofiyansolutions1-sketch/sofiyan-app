@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, SubService, CartItem } from '../types';
+import { useStore } from '../hooks/useStore';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
@@ -102,7 +103,10 @@ const categoryList = [
 ];
 
 export const CustomerPanel: React.FC = () => {
+  const { partners } = useStore();
   const navigate = useNavigate();
+  const [techPincode, setTechPincode] = useState('');
+  const [searchedTechPincode, setSearchedTechPincode] = useState('');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
   // Advanced Cart State
@@ -172,16 +176,58 @@ export const CustomerPanel: React.FC = () => {
     }
     setIsTrackingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
         
+        let newPincode = formData.pincode;
+        let newArea = formData.area;
+        let newCity = formData.city;
+        
+        try {
+           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
+              headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' }
+           });
+           const data = await res.json();
+           if (data && data.address) {
+              if (data.address.postcode) {
+                  newPincode = data.address.postcode;
+                  const areaRes = await fetchAreasByPincode(newPincode);
+                  if (areaRes.success && areaRes.areas.length > 0) {
+                      newArea = areaRes.areas[0];
+                      if (areaRes.isBangalore) {
+                          newCity = 'Bangalore';
+                      } else if (newPincode.startsWith('110')) {
+                          newCity = 'Delhi';
+                      }
+                  }
+              } else {
+                  // Fallback: If no postcode is returned from OSM, use suburb/neighbourhood and India Post API
+                  const areaName = data.address.suburb || data.address.neighbourhood || data.address.residential || data.address.city_district;
+                  if (areaName) {
+                      newArea = areaName;
+                      const pins = await fetchPincodesByArea([areaName]);
+                      if (pins && pins.length > 0) {
+                          newPincode = pins[0];
+                          if (newPincode.startsWith('560')) newCity = 'Bangalore';
+                          else if (newPincode.startsWith('110')) newCity = 'Delhi';
+                      }
+                  }
+              }
+           }
+        } catch (e) {
+           console.warn("Reverse geocoding failed", e);
+        }
+
         setFormData(prev => ({
           ...prev,
           lat,
           lng,
-          locationLink: googleMapsLink
+          locationLink: googleMapsLink,
+          pincode: newPincode || prev.pincode,
+          area: newArea || prev.area,
+          city: newCity || prev.city
         }));
         setIsTrackingLocation(false);
       },
@@ -561,6 +607,34 @@ export const CustomerPanel: React.FC = () => {
     }
   }, [isBookingModalOpen]);
 
+  useEffect(() => {
+    const fetchAreaByPin = async () => {
+      if (formData.pincode && formData.pincode.length === 6 && !isNaN(Number(formData.pincode))) {
+        setIsFetchingAreaPincode(true);
+        try {
+          const areaRes = await fetchAreasByPincode(formData.pincode);
+          if (areaRes.success && areaRes.areas.length > 0) {
+             setFormData(prev => ({
+               ...prev,
+               area: areaRes.areas[0],
+               city: areaRes.isBangalore ? 'Bangalore' : (formData.pincode.startsWith('110') ? 'Delhi' : prev.city)
+             }));
+          }
+        } catch (e) {
+          console.warn("Could not fetch area from pin", e);
+        } finally {
+          setIsFetchingAreaPincode(false);
+        }
+      }
+    };
+    
+    // Only run if area is empty or user is currently typing the pincode and completes it
+    const timer = setTimeout(() => {
+        fetchAreaByPin();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [formData.pincode]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -798,16 +872,12 @@ export const CustomerPanel: React.FC = () => {
                            <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">2</span>
                            Service Address
                         </h3>
-                        <button type="button" onClick={handleTrackLocation} disabled={isTrackingLocation} className={`text-xs font-bold flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all shadow-sm ${formData.locationLink ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 active:scale-95'}`}>
-                           {isTrackingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : formData.locationLink ? <CheckCircle className="w-4 h-4" /> : <Navigation className="w-4 h-4" />}
-                           {isTrackingLocation ? 'Detecting...' : formData.locationLink ? 'Location Saved' : 'Auto-Detect Address'}
-                        </button>
                     </div>
 
                     <div className="space-y-5">
                        <div>
                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Address</label>
-                         <input name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => { if (!formData.pincode && formData.address) { setIsDetectingPincode(true); const foundPin = await identifyPincode(formData.address); if (foundPin) setFormData(p => ({ ...p, pincode: foundPin })); setIsDetectingPincode(false); } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
+                         <input name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => {      if (formData.address) {          setIsDetectingPincode(true);          const foundPin = await identifyPincode(formData.address);          if (foundPin) {             setFormData(p => ({ ...p, pincode: foundPin }));                          try {                 const areaRes = await fetchAreasByPincode(foundPin);                 if (areaRes.success && areaRes.areas.length > 0) {                     setFormData(p => ({                         ...p,                         area: areaRes.areas[0],                        city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)                     }));                 }             } catch { /* ignore */ }         }         setIsDetectingPincode(false);      }  }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
                        </div>
                        
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -822,13 +892,40 @@ export const CustomerPanel: React.FC = () => {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area / Locality</label>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area (Tap to Select)</label>
                             <div className="relative">
-                               <select name="area" value={formData.area} onChange={async (e) => { const newArea = e.target.value; setFormData(prev => ({ ...prev, area: newArea })); if (newArea) { setIsFetchingAreaPincode(true); try { const pins = await fetchPincodesByArea([newArea]); if (pins && pins.length > 0) setFormData(prev => ({ ...prev, pincode: pins[0] })); } finally { setIsFetchingAreaPincode(false); } } }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium" disabled={!formData.city}>
-                                  <option value="">Select Area</option>
-                                  {formData.city && PREDEFINED_AREAS[formData.city] ? PREDEFINED_AREAS[formData.city].map(area => <option key={area} value={area}>{area}</option>) : <option value="Other">Other</option>}
-                               </select>
-                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                              {formData.city ? (
+                                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-3 bg-gray-50/50 rounded-xl border border-gray-200">
+                                      {(PREDEFINED_AREAS[formData.city] || []).map(area => (
+                                          <button
+                                              key={area}
+                                              type="button"
+                                              onClick={async () => {
+                                                  setFormData(prev => ({ ...prev, area }));
+                                                  setIsFetchingAreaPincode(true);
+                                                  try {
+                                                      const pins = await fetchPincodesByArea([area]);
+                                                      if (pins && pins.length > 0) {
+                                                          setFormData(prev => ({ ...prev, pincode: pins[0] }));
+                                                      }
+                                                  } finally {
+                                                      setIsFetchingAreaPincode(false);
+                                                  }
+                                              }}
+                                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${formData.area === area ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-gray-700 border border-gray-200 hover:border-indigo-300'}`}
+                                          >
+                                              {area}
+                                          </button>
+                                      ))}
+                                      {!(PREDEFINED_AREAS[formData.city]?.length > 0) && (
+                                          <span className="text-xs text-gray-400 p-2 font-medium">No predefined areas. Enter pincode.</span>
+                                      )}
+                                  </div>
+                              ) : (
+                                  <div className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl font-medium text-sm text-gray-400">
+                                      Select City First
+                                  </div>
+                              )}
                             </div>
                           </div>
                        </div>
@@ -846,6 +943,29 @@ export const CustomerPanel: React.FC = () => {
                        <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
                        Current Location
                     </h3>
+                                        <div className="relative bg-indigo-950 rounded-2xl p-5 shadow-lg border border-indigo-500/30 overflow-hidden group mb-4">
+                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                       <div className="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
+                       <div className="relative flex flex-col sm:flex-row items-center justify-between gap-5">
+                          <div className="flex items-center gap-4">
+                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-indigo-300 ring-1 ring-white/20 shadow-inner">
+                                <Navigation size={22} className={isTrackingLocation ? "animate-spin text-white" : "group-hover:scale-110 transition-transform"} />
+                             </div>
+                             <div>
+                                <h5 className="font-bold text-white text-sm tracking-tight mb-1">Use Current Location</h5>
+                                <p className="text-[10px] text-indigo-300 font-medium leading-relaxed max-w-[200px]">One click to automatically fill your area & pincode.</p>
+                             </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={handleTrackLocation} 
+                            disabled={isTrackingLocation}
+                            className="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50"
+                          >
+                            {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'LOCKED' : 'AUTO-DETECT'}
+                          </button>
+                       </div>
+                    </div>
                     <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
                        <div className="flex items-center justify-between">
                           <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
@@ -1246,6 +1366,99 @@ export const CustomerPanel: React.FC = () => {
           </div>
         </div>
 
+        {/* Find a Technician Section */}
+        <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 relative">
+          <div className="absolute inset-0 bg-indigo-50/30 rounded-[3rem] -z-10 transform -skew-y-2 scale-105"></div>
+          
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <h2 className="text-sm font-black text-indigo-500 tracking-[0.2em] uppercase mb-2">Technician Directory</h2>
+            <h3 className="text-3xl sm:text-4xl font-black text-indigo-950 uppercase italic tracking-tight mb-4">Find Local Experts</h3>
+            <p className="text-sm text-gray-500 font-medium">Enter your 6-digit Pincode to see available service professionals in your immediate area.</p>
+          </div>
+
+          <div className="max-w-md mx-auto mb-10">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input 
+                  type="text" 
+                  placeholder="Enter Pincode (e.g. 110001)" 
+                  value={techPincode}
+                  onChange={(e) => setTechPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onKeyDown={(e) => e.key === 'Enter' && techPincode.length === 6 && setSearchedTechPincode(techPincode)}
+                  className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none text-lg font-bold tracking-widest text-center shadow-sm"
+                />
+              </div>
+              <button 
+                onClick={() => setSearchedTechPincode(techPincode)}
+                disabled={techPincode.length !== 6}
+                className="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase tracking-wider disabled:opacity-50 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
+          {searchedTechPincode && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <ShieldCheck className="text-green-500 w-5 h-5" /> 
+                Verified Professionals near {searchedTechPincode}
+              </h4>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {partners.filter(p => p.status === 'verified' && (p.service_pincodes || []).includes(searchedTechPincode)).length > 0 ? (
+                  partners.filter(p => p.status === 'verified' && (p.service_pincodes || []).includes(searchedTechPincode)).map(partner => (
+                    <div key={partner.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:border-indigo-200 transition-colors">
+                      <div className="absolute top-0 right-0 p-4">
+                        <div className="bg-amber-100 text-amber-700 text-xs font-black px-2 py-1 rounded-lg flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-current" /> 4.9
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 border border-indigo-100 shrink-0 group-hover:scale-105 transition-transform">
+                          <User className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <h4 className="font-black text-gray-900 text-lg">{partner.name}</h4>
+                          <p className="text-xs font-bold text-gray-500 flex items-center gap-1"><Briefcase className="w-3 h-3" /> {partner.experience || '3+ years'} Exp.</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Expertise</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(partner.categories || []).slice(0, 3).map((cat, i) => (
+                            <span key={i} className="text-[10px] font-bold px-2 py-1 bg-gray-50 text-gray-600 rounded-md border border-gray-100">{cat}</span>
+                          ))}
+                          {(partner.categories || []).length > 3 && (
+                            <span className="text-[10px] font-bold px-2 py-1 bg-gray-50 text-gray-600 rounded-md border border-gray-100">+{partner.categories.length - 3}</span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-gray-100 pt-4 mt-auto">
+                        <button 
+                          onClick={() => document.getElementById('hero-section')?.scrollIntoView({behavior: 'smooth'})}
+                          className="w-full bg-slate-900 hover:bg-black text-white text-xs font-black py-3 rounded-xl uppercase tracking-widest transition-colors"
+                        >
+                          Book Service Now
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300 text-center">
+                    <User className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">No professionals found</h4>
+                    <p className="text-gray-500">We couldn't find any available technicians serving pincode {searchedTechPincode} right now. Try a nearby pincode or book directly.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Sticky Cart Footer */}
         {cart.length > 0 && (
           <div className="fixed bottom-0 inset-x-0 z-40 bg-white/80 backdrop-blur-xl border-t border-indigo-100 shadow-[0_-20px_50px_rgba(79,70,229,0.12)] p-5 animate-slideUp">
@@ -1573,16 +1786,23 @@ export const CustomerPanel: React.FC = () => {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h3>
-              <p className="text-gray-600 mb-8">
-                Your booking has been confirmed. A partner will be assigned shortly.
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Booking Confirmed!</h3>
+              <p className="text-gray-600 mb-6">
+                Your booking is placed successfully. A partner will be assigned shortly.
               </p>
-              <button
-                onClick={resetFlow}
-                className="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg"
-              >
-                Back to Home
-              </button>
+              
+              <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl w-full mb-8 shadow-sm text-left">
+                <h4 className="font-bold text-indigo-900 mb-2 text-lg">Customer Dashboard</h4>
+                <p className="text-sm text-indigo-700 mb-4">Track your booking or contact our service center directly for any assistance.</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a href="tel:7625046788" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
+                    <Phone size={18} /> Call Helpline (7625046788)
+                  </a>
+                  <button onClick={resetFlow} className="flex-1 bg-white border-2 border-indigo-200 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
+                    View My Bookings
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1786,11 +2006,21 @@ export const CustomerPanel: React.FC = () => {
                             value={formData.address}
                             onChange={handleInputChange}
                             onBlur={async () => {
-                              if (!formData.pincode && formData.address) {
+                              if (formData.address) {
                                   setIsDetectingPincode(true);
                                   const foundPin = await identifyPincode(formData.address);
                                   if (foundPin) {
                                       setFormData(p => ({ ...p, pincode: foundPin }));
+                                      try {
+                                          const areaRes = await fetchAreasByPincode(foundPin);
+                                          if (areaRes.success && areaRes.areas.length > 0) {
+                                              setFormData(p => ({
+                                                  ...p,
+                                                  area: areaRes.areas[0],
+                                                  city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)
+                                              }));
+                                          }
+                                      } catch { /* ignore */ }
                                   }
                                   setIsDetectingPincode(false);
                               }
@@ -1825,38 +2055,41 @@ export const CustomerPanel: React.FC = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area</label>
-                          <div className="relative group/input">
-                              <MapIcon className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                              <select
-                                name="area"
-                                value={formData.area}
-                                onChange={async (e) => {
-                                   const newArea = e.target.value;
-                                   setFormData(prev => ({ ...prev, area: newArea }));
-                                   if (newArea) {
-                                      setIsFetchingAreaPincode(true);
-                                      try {
-                                         const pins = await fetchPincodesByArea([newArea]);
-                                         if (pins && pins.length > 0) {
-                                            setFormData(prev => ({ ...prev, pincode: pins[0] }));
-                                         }
-                                      } finally {
-                                         setIsFetchingAreaPincode(false);
-                                      }
-                                   }
-                                }}
-                                className="w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all appearance-none font-bold text-sm text-gray-900"
-                                disabled={!formData.city}
-                              >
-                                 <option value="">Choose your area.</option>
-                                 {formData.city && PREDEFINED_AREAS[formData.city] ? PREDEFINED_AREAS[formData.city].map(area => (
-                                    <option key={area} value={area}>{area}</option>
-                                 )) : (
-                                    <option value="Other">Other</option>
-                                 )}
-                              </select>
-                              <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area (Tap to Select)</label>
+                          <div className="relative">
+                              {formData.city ? (
+                                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-3 bg-gray-50/50 rounded-xl border-2 border-gray-100">
+                                      {(PREDEFINED_AREAS[formData.city] || []).map(area => (
+                                          <button
+                                              key={area}
+                                              type="button"
+                                              onClick={async () => {
+                                                  setFormData(prev => ({ ...prev, area }));
+                                                  setIsFetchingAreaPincode(true);
+                                                  try {
+                                                      const pins = await fetchPincodesByArea([area]);
+                                                      if (pins && pins.length > 0) {
+                                                          setFormData(prev => ({ ...prev, pincode: pins[0] }));
+                                                      }
+                                                  } finally {
+                                                      setIsFetchingAreaPincode(false);
+                                                  }
+                                              }}
+                                              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${formData.area === area ? 'bg-indigo-600 text-white shadow-md scale-[1.02]' : 'bg-white text-gray-700 border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
+                                          >
+                                              {area}
+                                          </button>
+                                      ))}
+                                      {!(PREDEFINED_AREAS[formData.city]?.length > 0) && (
+                                          <span className="text-xs text-gray-400 p-2 font-medium">No predefined areas. Enter your pincode below.</span>
+                                      )}
+                                  </div>
+                              ) : (
+                                  <div className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl font-bold text-sm text-gray-400 flex items-center gap-2">
+                                      <MapIcon className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
+                                      Select a city first
+                                  </div>
+                              )}
                           </div>
                         </div>
                       </div>

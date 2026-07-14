@@ -1,2302 +1,853 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../hooks/useStore';
-import { Partner, Booking } from '../types';
-import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
-import { Modal } from '../components/Modal';
-import { Briefcase, CheckCircle, MapPin, User, LogOut, Trash2, Upload, AlertCircle, Clock, Loader2, AlertTriangle, Star, Navigation, Plus, ShieldCheck, PartyPopper } from 'lucide-react';
-import { motion } from 'motion/react';
-import { supabase } from '../supabaseClient';
-import { Session } from '@supabase/supabase-js';
-import { fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
+import { Partner } from '../types';
 
-const calculateDistanceKM = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const toRadian = (angle: number) => (Math.PI / 180) * angle;
-  const earthRadius = 6371; // km
-  const dLat = toRadian(lat2 - lat1);
-  const dLon = toRadian(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadian(lat1)) * Math.cos(toRadian(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadius * c;
-};
+import { Briefcase, CheckCircle, MapPin, User, LogOut, Clock, User as UserIcon,  Loader2, ShieldCheck, Star } from 'lucide-react';
+import { MapRadiusSelector } from '../components/MapRadiusSelector';
 
 export const PartnerPanel: React.FC = () => {
-  const navigate = useNavigate();
-  const { bookings, updateBooking, updatePartner } = useStore();
-  
-  // Auth State
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
-  const submittingRef = useRef(false); 
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-  const [authData, setAuthData] = useState({ name: '', email: '', phone: '', password: '' });
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const { bookings, updateBooking, addPartner, updatePartner, partners } = useStore();
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  // App Logic State
   const [currentUser, setCurrentUser] = useState<Partner | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
-  const [leadToAccept, setLeadToAccept] = useState<Booking | null>(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [editData, setEditData] = useState({
+    name: '',
+    phone: '',
+    pincode: '',
+    city: '',
+    categories: [] as string[],
+    sub_categories: [] as string[],
+    service_pincodes: [] as string[]
+  });
+  const [authData, setAuthData] = useState({ phone: '', password: '', name: '', email: '' });
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Registration Modal State
   
-  // Billing Modal State
-  const [paymentModal, setPaymentModal] = useState<Booking | null>(null);
-  const [extraWorks, setExtraWorks] = useState<{name: string, price: number}[]>([]);
-  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [jobToComplete, setJobToComplete] = useState<any>(null);
+  const [verificationStep, setVerificationStep] = useState<'idle'|'uploading'|'verifying'|'success'>('idle');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verify' | 'verifying' | 'success'>('personal');
+  
+  const [regData, setRegData] = useState({
+    firstName: '', lastName: '', phone: '', altPhone: '', password: '', age: '', gender: 'Male',
+    experience: '',
+    categories: [] as string[], subCategories: [] as string[],
+    service_pincodes: [] as string[], aadharNumber: '', city: ''
+  });
 
-  // Partner Registration Modal State
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [regStep, setRegStep] = useState<'personal' | 'expertise' | 'location' | 'verification' | 'success'>('personal');
+  const openEditProfile = () => {
+    setEditData({
+      name: currentUser.name || '',
+      phone: currentUser.phone || '',
+      pincode: currentUser.pincode || '',
+      city: currentUser.city || '',
+      categories: currentUser.categories || [],
+      sub_categories: currentUser.sub_categories || [],
+      service_pincodes: currentUser.service_pincodes || []
+    });
+    setIsEditProfileOpen(true);
+  };
 
+  const handleEditProfileSubmit = async () => {
+    const updatedPartner = {
+      ...currentUser,
+      name: editData.name,
+      phone: editData.phone,
+      pincode: editData.pincode,
+      city: editData.city,
+      categories: editData.categories,
+      sub_categories: editData.sub_categories,
+      service_pincodes: editData.service_pincodes
+    };
+    await updatePartner(updatedPartner);
+    setCurrentUser(updatedPartner);
+    setIsEditProfileOpen(false);
+  };
 
-
-  const uploadFileToStorage = async (file: File, folder: string = 'screenshots'): Promise<string> => {
-    // Dynamic query to protect against stale closures or race conditions
-    const { data: { session: currentSession } } = await supabase.auth.getSession();
-    const activeUser = currentSession?.user || session?.user;
-    const userId = activeUser?.id || currentUser?.id || 'anonymous';
-    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-    
-    // Simplify folder structure to flatter isolated paths: userId + '/' + filename
-    // This perfectly complies with any standards like: (storage.foldername(name))[1] = auth.uid()::text
-    const filePath = `${userId}/${Date.now()}_${sanitizedFileName}`;
-    console.log(`📤 Uploading file of type '${folder}' to 'app-file' bucket: ${filePath}. User: ${userId}`);
-    
-    try {
-      const { error } = await supabase.storage
-        .from('app-file')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          contentType: file.type,
-          upsert: false
-        });
-        
-      if (error) {
-        console.warn('Supabase Storage Upload failed with RLS/policy warning, using robust Base64 fallback:', error);
-        return await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = (err) => reject(err);
-        });
+  
+  useEffect(() => {
+    const savedPhone = localStorage.getItem('partnerPhone');
+    if (savedPhone && partners.length > 0 && !currentUser) {
+      const user = partners.find(p => p.phone === savedPhone);
+      if (user) {
+        setTimeout(() => {
+          setCurrentUser(user);
+          setRegData(prev => ({
+             ...prev,
+             firstName: user.first_name || '',
+             lastName: user.last_name || '',
+             phone: user.phone || '',
+             password: user.password || '',
+             city: user.city || '',
+             altPhone: user.alt_phone || '',
+             gender: user.gender || '',
+             age: user.age ? user.age.toString() : '',
+             experience: user.experience || '',
+             categories: user.categories || [],
+             subCategories: user.sub_categories || [],
+             service_pincodes: user.service_pincodes || [],
+             aadharNumber: user.aadhar_number || ''
+          }));
+        }, 0);
       }
-      
-      const { data: publicUrlData } = supabase.storage
-        .from('app-file')
-        .getPublicUrl(filePath);
-      return publicUrlData?.publicUrl || '';
-    } catch (storageError) {
-      console.warn('Supabase Storage Upload threw error, using robust Base64 fallback:', storageError);
-      return await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => {
-          resolve(`file_${file.name}`);
-        };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [partners]);
+
+  const handleLogin = () => {
+    const user = partners.find(p => p.phone === authData.phone && p.password === authData.password);
+    if (user) {
+      setCurrentUser(user);
+      localStorage.setItem('partnerPhone', user.phone);
+      setAuthError(null);
+      setRegData({
+        ...regData,
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        phone: user.phone || '',
+        password: user.password || '',
+        city: user.city || '',
+        altPhone: user.alt_phone || '',
+        gender: user.gender || '',
+        age: user.age ? user.age.toString() : '',
+        experience: user.experience || '',
+        categories: user.categories || [],
+        subCategories: user.sub_categories || [],
+        service_pincodes: user.service_pincodes || [],
+        aadharNumber: user.aadhar_number || ''
+      });
+    } else {
+      setAuthError("Invalid credentials");
+    }
+  };
+
+  const handleSignup = async () => {
+    if (!authData.phone || !authData.password || !authData.name) {
+      setAuthError("Please fill all required fields");
+      return;
+    }
+    const newPartner = {
+      id: "P" + Date.now(),
+      name: authData.name,
+      first_name: authData.name.split(' ')[0],
+      last_name: authData.name.split(' ').slice(1).join(' '),
+      email: authData.email || authData.phone + "@example.com",
+      phone: authData.phone,
+      password: authData.password,
+      status: 'pending' as const,
+      earnings: 0,
+      completedJobs: 0
+    };
+    const createdPartner = await addPartner(newPartner);
+    setCurrentUser(createdPartner);
+    localStorage.setItem('partnerPhone', createdPartner.phone || '');
+    setAuthError(null);
+    setRegData({
+      ...regData,
+      firstName: createdPartner.first_name || '',
+      lastName: createdPartner.last_name || '',
+      phone: createdPartner.phone || '',
+      password: createdPartner.password || ''
+    });
+  };
+const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('partnerPhone');
+  };
+
+
+  const handleRegistrationSubmit = async () => {
+    const isUpdating = !!currentUser;
+    const partnerId = isUpdating ? currentUser.id : "P" + Date.now();
+    const newPartner = {
+      ...(isUpdating ? currentUser : {}),
+      id: partnerId,
+      name: regData.firstName + " " + regData.lastName,
+      first_name: regData.firstName,
+      last_name: regData.lastName,
+      email: currentUser?.email || regData.phone + "@example.com",
+      phone: regData.phone,
+      city: regData.city,
+      alt_phone: regData.altPhone,
+      password: regData.password,
+      gender: regData.gender,
+      age: parseInt(regData.age) || 0,
+      experience: regData.experience,
+      categories: regData.categories,
+      sub_categories: regData.subCategories,
+      service_pincodes: regData.service_pincodes,
+      aadhar_number: regData.aadharNumber,
+      status: 'pending' as const,
+      earnings: isUpdating ? currentUser.earnings : 0,
+      completedJobs: isUpdating ? currentUser.completedJobs : 0
+    };
+    if (isUpdating) {
+       await updatePartner(newPartner);
+       setCurrentUser(newPartner);
+    } else {
+       const createdPartner = await addPartner(newPartner);
+       setCurrentUser(createdPartner);
+    }
+    
+  };
+const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning & Pest Control", "Pooja", "Home Appliances"];
+  const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
+  const CITIES = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat"];
+
+  const renderAuth = () => (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl max-w-md w-full">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="text-white w-8 h-8" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{authMode === 'login' ? 'Partner Portal' : 'Join as Partner'}</h2>
+          <p className="text-gray-500">{authMode === 'login' ? 'Manage your bookings and earnings' : 'Create an account to start earning'}</p>
+        </div>
+        
+        {authError && <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">{authError}</div>}
+        
+        <div className="space-y-4">
+          {authMode === 'signup' && (
+            <>
+              <input type="text" placeholder="Full Name" value={authData.name} onChange={e => setAuthData({...authData, name: e.target.value})} className="w-full border p-3 rounded-lg" />
+              <input type="email" placeholder="Email Address (Optional)" value={authData.email} onChange={e => setAuthData({...authData, email: e.target.value})} className="w-full border p-3 rounded-lg" />
+            </>
+          )}
+          <input type="text" placeholder="Phone Number" value={authData.phone} onChange={e => setAuthData({...authData, phone: e.target.value})} className="w-full border p-3 rounded-lg" />
+          <input type="password" placeholder="Password" value={authData.password} onChange={e => setAuthData({...authData, password: e.target.value})} className="w-full border p-3 rounded-lg" />
+          
+          <button onClick={authMode === 'login' ? handleLogin : handleSignup} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700">
+            {authMode === 'login' ? 'Login' : 'Sign Up'}
+          </button>
+        </div>
+        <div className="mt-6 text-center border-t pt-6">
+          <p className="text-gray-600 mb-4">{authMode === 'login' ? 'Want to join as a professional?' : 'Already have an account?'}</p>
+          <button onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')} className="w-full bg-white border-2 border-indigo-600 text-indigo-600 py-3 rounded-lg font-bold hover:bg-indigo-50">
+            {authMode === 'login' ? 'Sign Up as Partner' : 'Login'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRegistrationModal = (isProfileIncomplete = false) => (
+    <div className={isProfileIncomplete ? 'min-h-screen bg-slate-50 flex items-center justify-center p-4' : 'fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4'}>
+      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-8 relative shadow-2xl">
+        {isProfileIncomplete ? (
+            <button onClick={() => { setCurrentUser(null); localStorage.removeItem('partnerPhone'); }} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-red-500 hover:text-red-700 font-bold">Logout</button>
+        ) : (
+            <button onClick={() => setIsRegistrationOpen(false)} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-800 font-bold">✕</button>
+        )}
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Partner Onboarding 👋</h2>
+        <p className="text-slate-500 mb-6 sm:mb-10 text-xs sm:text-sm">Join our network of expert professionals</p>
+        
+        <div className="flex justify-between items-center mb-6 sm:mb-10 relative px-2">
+          <div className="absolute top-6 left-8 right-8 h-0.5 bg-slate-100 -z-10"></div>
+          
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-sm ${['personal', 'expertise', 'location', 'verify', 'verifying', 'success'].includes(regStep) ? 'bg-indigo-600 text-white' : 'bg-white border-2 border-slate-200 text-slate-400'}`}>
+              <UserIcon className="w-5 h-5" />
+            </div>
+            <span className={`text-[9px] sm:text-[10px] mt-2 sm:mt-3 font-bold hidden sm:block tracking-wider ${['personal', 'expertise', 'location', 'verify', 'verifying', 'success'].includes(regStep) ? 'text-indigo-700' : 'text-slate-400'}`}>PERSONAL</span>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-sm ${['expertise', 'location', 'verify', 'verifying', 'success'].includes(regStep) ? 'bg-indigo-600 text-white' : 'bg-white border-2 border-slate-200 text-slate-400'}`}>
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <span className={`text-[9px] sm:text-[10px] mt-2 sm:mt-3 font-bold hidden sm:block tracking-wider ${['expertise', 'location', 'verify', 'verifying', 'success'].includes(regStep) ? 'text-indigo-700' : 'text-slate-400'}`}>EXPERTISE</span>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-sm ${['location', 'verify', 'verifying', 'success'].includes(regStep) ? 'bg-indigo-600 text-white' : 'bg-white border-2 border-slate-200 text-slate-400'}`}>
+              <MapPin className="w-5 h-5" />
+            </div>
+            <span className={`text-[9px] sm:text-[10px] mt-2 sm:mt-3 font-bold hidden sm:block tracking-wider ${['location', 'verify', 'verifying', 'success'].includes(regStep) ? 'text-indigo-700' : 'text-slate-400'}`}>SERVICE AREAS</span>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-sm ${['verify', 'verifying', 'success'].includes(regStep) ? 'bg-indigo-600 text-white' : 'bg-white border-2 border-slate-200 text-slate-400'}`}>
+              <CheckCircle className="w-5 h-5" />
+            </div>
+            <span className={`text-[9px] sm:text-[10px] mt-2 sm:mt-3 font-bold hidden sm:block tracking-wider ${['verify', 'verifying', 'success'].includes(regStep) ? 'text-indigo-700' : 'text-slate-400'}`}>VERIFY</span>
+          </div>
+        </div>
+        
+        {regStep === 'personal' && (
+          <div className="space-y-5 animate-in slide-in-from-right-4 duration-300 fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">FIRST NAME</label>
+                <input type="text" placeholder="First Name" value={regData.firstName} onChange={e => setRegData({...regData, firstName: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">LAST NAME</label>
+                <input type="text" placeholder="Last Name" value={regData.lastName} onChange={e => setRegData({...regData, lastName: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">AGE <span className="text-red-500">*</span></label>
+                <input type="text" placeholder="Age (Min 18)" value={regData.age} onChange={e => setRegData({...regData, age: e.target.value.replace(/\D/g, '').slice(0, 3)})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">GENDER</label>
+                <select value={regData.gender} onChange={e => setRegData({...regData, gender: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-white">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">PRIMARY PHONE</label>
+                <input type="text" placeholder="Mobile number" value={regData.phone} onChange={e => setRegData({...regData, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">ALTERNATIVE PHONE (OPTIONAL)</label>
+                <input type="text" placeholder="Secondary contact" value={regData.altPhone} onChange={e => setRegData({...regData, altPhone: e.target.value.replace(/\D/g, '').slice(0, 10)})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">PASSWORD <span className="text-red-500">*</span></label>
+              <input type="password" placeholder="Strong Password (Min 6 chars)" value={regData.password} onChange={e => setRegData({...regData, password: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+            </div>
+            
+            <button onClick={() => setRegStep('expertise')} disabled={!regData.firstName || !regData.lastName || regData.phone.length < 10 || !regData.password || regData.password.length < 6 || parseInt(regData.age) < 18} className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 mt-6 shadow-md hover:shadow-lg">Continue to Expertise</button>
+          </div>
+        )}
+        
+        {regStep === 'expertise' && (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 fade-in">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 mb-3 tracking-wide">CATEGORIES OF EXPERTISE</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {EXPERTISE_CATEGORIES.map(categoryName => (
+                  <label key={categoryName} className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${regData.categories.includes(categoryName) ? 'bg-indigo-50 border-indigo-200 text-indigo-800 shadow-sm' : 'hover:bg-slate-50 text-slate-700 border-slate-200'}`}>
+                    <input type="checkbox" checked={regData.categories.includes(categoryName)} onChange={e => {
+                      const newCats = e.target.checked ? [...regData.categories, categoryName] : regData.categories.filter(x => x !== categoryName);
+                      setRegData({...regData, categories: newCats});
+                    }} className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" />
+                    <span className="font-semibold text-sm">{categoryName}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            {regData.categories.includes('Home Appliances') && (
+              <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
+                <label className="flex items-center gap-2 text-[11px] font-bold text-indigo-800 mb-4 tracking-wide">
+                  <Briefcase className="w-4 h-4" /> APPLIANCES YOU REPAIR
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {APPLIANCE_LIST.map(app => (
+                    <label key={app} className="flex items-center gap-3 cursor-pointer text-slate-700 hover:text-indigo-700 transition-colors">
+                      <input type="checkbox" checked={regData.subCategories.includes(app)} onChange={e => {
+                        const newApps = e.target.checked ? [...regData.subCategories, app] : regData.subCategories.filter(x => x !== app);
+                        setRegData({...regData, subCategories: newApps});
+                      }} className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" />
+                      <span className="text-sm font-medium">{app}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 mb-1.5 tracking-wide">YEARS OF EXPERIENCE</label>
+              <input type="text" placeholder="e.g. 3" value={regData.experience} onChange={e => setRegData({...regData, experience: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" />
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button onClick={() => setRegStep('personal')} className="flex-1 bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+              <button onClick={() => setRegStep('location')} className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg disabled:opacity-50" disabled={regData.categories.length === 0}>Continue to Location</button>
+            </div>
+          </div>
+        )}
+
+        {regStep === 'location' && (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 fade-in">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 mb-3 tracking-wide">CHOOSE YOUR CITY <span className="text-red-500">*</span></label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+                {CITIES.map(city => (
+                  <button
+                    key={city}
+                    onClick={() => setRegData({...regData, city})}
+                    className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border ${regData.city === city ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+              {regData.city && (
+                <div className="animate-in fade-in duration-300">
+                  <label className="block text-[11px] font-bold text-slate-500 mb-2 mt-6 tracking-wide">SERVICE DELIVERY AREAS</label>
+                  <p className="text-sm text-slate-500 mb-4">Choose your area, select the radius, and we will find all pincodes within that range.</p>
+                  
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <MapRadiusSelector onPincodesFound={(pins) => setRegData({...regData, service_pincodes: Array.from(new Set([...regData.service_pincodes, ...pins]))})} />
+                  </div>
+                  
+                  {regData.service_pincodes.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-[11px] font-bold text-slate-500 mb-3 tracking-wide">SELECTED PINCODES ({regData.service_pincodes.length})</h4>
+                      <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-4 border border-slate-200 rounded-xl bg-white shadow-inner">
+                        {regData.service_pincodes.map(pin => (
+                          <span key={pin} className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2">
+                            {pin}
+                            <button onClick={() => setRegData({...regData, service_pincodes: regData.service_pincodes.filter(p => p !== pin)})} className="text-indigo-400 hover:text-red-500 transition-colors">✕</button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button onClick={() => setRegStep('expertise')} className="flex-1 bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+              <button onClick={() => setRegStep('verify')} disabled={!regData.city || regData.service_pincodes.length === 0} className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all disabled:opacity-50 shadow-md hover:shadow-lg">Continue to Verification</button>
+            </div>
+          </div>
+        )}
+        
+        {regStep === 'verify' && (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 fade-in">
+            <div className="bg-indigo-50/50 p-8 rounded-2xl border border-indigo-100 text-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-indigo-100">
+                <ShieldCheck className="w-8 h-8 text-indigo-600" />
+              </div>
+              <h3 className="font-bold text-indigo-900 mb-2 uppercase tracking-wide text-sm">Identity Verification</h3>
+              <p className="text-sm text-indigo-600/80">Please provide your 12-digit Aadhaar number below to verify your identity and activate your account.</p>
+            </div>
+            
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 mb-2 tracking-wide">AADHAAR CARD NUMBER <span className="text-red-500">*</span></label>
+              <input type="text" placeholder="Enter 12-digit Aadhaar Number" value={regData.aadharNumber || ''} onChange={e => setRegData({...regData, aadharNumber: e.target.value.replace(/\D/g, '').slice(0, 12)})} className="w-full border border-slate-200 p-4 rounded-xl text-lg tracking-widest font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300" maxLength={12} />
+              <p className="text-xs text-slate-500 mt-2">Your Aadhaar number is secure and only used for background validation.</p>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start gap-3">
+              <Star className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-600 leading-relaxed">
+                By submitting, you agree to our <a href="#" className="font-bold text-indigo-600 hover:underline">Partner Terms of Service</a> and consent to identity verification.
+              </p>
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button onClick={() => setRegStep('location')} className="flex-1 bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+              <button onClick={() => {
+                setRegStep('verifying');
+                setTimeout(() => {
+                  setRegStep('success');
+                  setTimeout(() => {
+                    handleRegistrationSubmit();
+                  }, 2000);
+                }, 2500);
+              }} disabled={!regData.aadharNumber || regData.aadharNumber.length !== 12} className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50">Submit Application</button>
+            </div>
+          </div>
+        )}
+        
+        {regStep === 'verifying' && (
+          <div className="space-y-6 text-center py-20 flex flex-col items-center justify-center animate-in fade-in duration-300">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-indigo-200 rounded-full animate-ping opacity-75"></div>
+              <div className="relative w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center shadow-inner">
+                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+              </div>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Verifying Identity</h3>
+            <p className="text-slate-500 max-w-sm mx-auto text-lg leading-relaxed">Please wait while we validate your Aadhaar details with our background verification systems...</p>
+          </div>
+        )}
+
+        {regStep === 'success' && (
+          <div className="space-y-6 text-center py-20 animate-in zoom-in duration-500 fade-in">
+            <div className="w-28 h-28 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-8 relative shadow-lg"> 
+               <div className="absolute inset-0 bg-emerald-200 rounded-full animate-ping opacity-50 delay-150"></div>
+               <CheckCircle className="w-16 h-16 text-emerald-600 relative z-10 animate-bounce" />
+            </div>
+            <h3 className="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Congratulations! 🎉</h3>
+            <p className="text-slate-500 max-w-md mx-auto text-lg leading-relaxed">Your identity has been verified successfully. Redirecting you to your brand new dashboard...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const isProfileIncomplete = currentUser && (!currentUser.aadhar_number || !currentUser.categories?.length || !currentUser.city);
+
+  if (!currentUser) {
+    return (
+      <>
+        {renderAuth()}
+      </>
+    );
+  }
+
+  if (isProfileIncomplete) {
+    return renderRegistrationModal();
+  }
+
+  const partnerBookings = bookings.filter(b => b.assignedPartnerId === currentUser.id);
+  
+  const newLeads = bookings.filter(b => {
+    if (b.status !== 'pending') return false;
+    
+    const partnerPins = currentUser.service_pincodes || [];
+    const bPin = String(b.pinCode || '').trim();
+    const pPin = String(currentUser.pincode || '').trim();
+    
+    const hasPincodeMatch = bPin === pPin || partnerPins.includes(bPin);
+    if (!hasPincodeMatch) return false;
+
+    return true; // As long as pincode matches, show the lead to the partner
+  });
+  
+
+  const activeJob = partnerBookings.find(b => b.status === 'accepted' || b.status === 'Forwarded');
+
+  const handleAcceptLead = async (lead: Booking) => {
+    if (activeJob) {
+      alert("You can only accept one lead at a time. Please complete your current job first.");
+      return;
+    }
+    await updateBooking({
+      ...lead,
+      status: 'accepted',
+      assignedPartnerId: currentUser.id,
+      assignedPartnerName: currentUser.name,
+      assignedPartnerPhone: currentUser.phone,
+      assignedPartnerArea: currentUser.city || currentUser.pincode
+    });
+  };
+
+  const handleCancelLead = async (b: Booking) => {
+    const penalty = b.price * 0.05;
+    if (confirm(`Are you sure you want to cancel this lead? A penalty of ₹${penalty.toFixed(2)} (5% of service charge) will be deducted from your earnings.`)) {
+      await updateBooking({
+        ...b,
+        status: 'pending',
+        assignedPartnerId: undefined,
+        assignedPartnerName: undefined,
+        assignedPartnerPhone: undefined,
+        assignedPartnerArea: undefined
+      });
+      await updatePartner({
+        ...currentUser,
+        earnings: (currentUser.earnings || 0) - penalty
+      });
+      setCurrentUser({
+        ...currentUser,
+        earnings: (currentUser.earnings || 0) - penalty
       });
     }
   };
-  const [selectedAreasList, setSelectedAreasList] = useState<string[]>([]);
-  const [editSelectedAreasList, setEditSelectedAreasList] = useState<string[]>([]);
-  const [discoveredPincodesList, setDiscoveredPincodesList] = useState<string[]>([]);
-  const [editDiscoveredPincodesList, setEditDiscoveredPincodesList] = useState<string[]>([]);
-  const [fetchingPincodes, setFetchingPincodes] = useState(false);
-  const [customAreaInput, setCustomAreaInput] = useState('');
-  const [editCustomAreaInput, setEditCustomAreaInput] = useState('');
-  const [pincodeError, setPincodeError] = useState<string | null>(null);
-  const [pincodeAreas, setPincodeAreas] = useState<string[]>([]);
-  const [editPincodeError, setEditPincodeError] = useState<string | null>(null);
-  const [editPincodeAreas, setEditPincodeAreas] = useState<string[]>([]);
+
+  const handleCompleteJob = async (b: any) => {
+    setJobToComplete(b);
+    setVerificationStep('idle');
+    setUploadedImage(null);
+  };
   
-  const [regData, setRegData] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    altPhone: '', // Added altPhone
-    email: '',
-    age: '', // Added age
-    gender: 'Male',
-    experience: '',
-    address: '',
-    city: '',
-    customCity: '',
-    pincode: '',
-    serviceAreas: '',
-    categories: [] as string[],
-    subCategories: [] as string[],
-    aadharNumber: '',
-    lat: null as number | null,
-    lng: null as number | null
-  });
-
-  // Edit Profile State
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editData, setEditData] = useState({
-    phone: '',
-    altPhone: '',
-    address: '',
-    city: '',
-    customCity: '',
-    pincode: '',
-    categories: [] as string[],
-    subCategories: [] as string[],
-    experience: '',
-    gender: 'Male',
-    age: '',
-    lat: null as number | null,
-    lng: null as number | null
-  });
-
-  const [isTrackingLocation, setIsTrackingLocation] = useState(false);
-
-  const handleTrackLocation = (isEdit = false) => {
-    if (!navigator.geolocation) {
-      alert("Location tracking is not supported by your browser.");
-      return;
-    }
-    setIsTrackingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (isEdit) {
-            setEditData(prev => ({ ...prev, lat: position.coords.latitude, lng: position.coords.longitude }));
-        } else {
-            setRegData(prev => ({ ...prev, lat: position.coords.latitude, lng: position.coords.longitude }));
-        }
-        setIsTrackingLocation(false);
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        setIsTrackingLocation(false);
-        alert("Unable to fetch location. Please ensure location permissions are granted.");
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  };
-
-  const CATEGORY_LIST = ["Electrician", "Plumber", "Carpenters", "Cleaning & Pest Control", "Pooja", "Home Appliances"];
-  const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
-
-  useEffect(() => {
-    // Check for mode in URL
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get('mode');
-    if (mode === 'signup' || mode === 'signin') {
-      setAuthMode(mode as 'signin' | 'signup');
-    }
-
-    // Check Supabase Connection
-    const checkConnection = async () => {
-        try {
-            const { error } = await supabase.from('primary_partners').select('count', { count: 'exact', head: true });
-            if (error) {
-                console.error("Supabase Connection Error:", error);
-                if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.code === '401') {
-                    setAuthError("Database Connection Failed: Invalid API Key. Please verify your Supabase credentials.");
-                }
-            }
-        } catch (err) {
-            console.error("Connection check failed:", err);
-        }
-    };
-    checkConnection();
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user?.email) {
-        syncUserWithStore(session.user.email);
-      }
-      setLoading(false);
+  const processCompletion = async () => {
+    if (!jobToComplete) return;
+    await updateBooking({ ...jobToComplete, status: 'admin_review' });
+    await updatePartner({
+      ...currentUser,
+      completedJobs: (currentUser?.completedJobs || 0) + 1,
+      earnings: (currentUser?.earnings || 0) + jobToComplete.price
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user?.email) {
-        syncUserWithStore(session.user.email);
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const handleForgotPassword = async () => {
-    if (!authData.email) {
-        setAuthError("Please enter your email address to reset password.");
-        return;
+    if (currentUser) {
+      setCurrentUser({
+        ...currentUser,
+        completedJobs: (currentUser.completedJobs || 0) + 1,
+        earnings: (currentUser.earnings || 0) + jobToComplete.price
+      });
     }
-    setIsSubmitting(true);
-    setAuthError(null);
-    setAuthMessage(null);
-    
-    try {
-        const { error } = await supabase.auth.resetPasswordForEmail(authData.email, {
-            redirectTo: window.location.origin + '/partner',
-        });
-        if (error) throw error;
-        setAuthMessage("Password reset link sent! Check your email.");
-    } catch (error: any) {
-        console.error("Reset Password Error:", error);
-        setAuthError(error.message || "Failed to send reset link.");
-    } finally {
-        setIsSubmitting(false);
-    }
+    setJobToComplete(null);
   };
 
-  const handleAddArea = (area: string) => {
-    if (area && !selectedAreasList.includes(area)) {
-       setSelectedAreasList([...selectedAreasList, area]);
-    }
+  const simulateVerification = () => {
+    setVerificationStep('verifying');
+    setTimeout(() => {
+      setVerificationStep('success');
+      setTimeout(() => {
+        processCompletion();
+      }, 1500);
+    }, 2500);
   };
 
-  const handleRemoveArea = (area: string) => {
-      setSelectedAreasList(selectedAreasList.filter(a => a !== area));
-  };
-
-  const handleAddCustomArea = () => {
-     if (customAreaInput.trim() && !selectedAreasList.includes(customAreaInput.trim())) {
-         setSelectedAreasList([...selectedAreasList, customAreaInput.trim()]);
-         setCustomAreaInput('');
-     }
-  };
-
-  const handleEditAddArea = (area: string) => {
-    if (area && !editSelectedAreasList.includes(area)) {
-       setEditSelectedAreasList([...editSelectedAreasList, area]);
-    }
-  };
-
-  const handleEditRemoveArea = (area: string) => {
-      setEditSelectedAreasList(editSelectedAreasList.filter(a => a !== area));
-  };
-
-  const handleEditAddCustomArea = () => {
-     if (editCustomAreaInput.trim() && !editSelectedAreasList.includes(editCustomAreaInput.trim())) {
-         setEditSelectedAreasList([...editSelectedAreasList, editCustomAreaInput.trim()]);
-         setEditCustomAreaInput('');
-     }
-  };
-
-  useEffect(() => {
-    const fetchPins = async () => {
-      const computedAreasArray = selectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
-      if (computedAreasArray.length > 0) {
-        setFetchingPincodes(true);
-        const pins = await fetchPincodesByArea(computedAreasArray);
-        setDiscoveredPincodesList(pins);
-        setFetchingPincodes(false);
-      } else {
-        setDiscoveredPincodesList([]);
-      }
-    };
-    fetchPins();
-  }, [selectedAreasList]);
-
-  useEffect(() => {
-    const fetchEditPins = async () => {
-      const computedAreasArray = editSelectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
-      if (computedAreasArray.length > 0) {
-        setFetchingPincodes(true);
-        const pins = await fetchPincodesByArea(computedAreasArray);
-        setEditDiscoveredPincodesList(pins);
-        setFetchingPincodes(false);
-      } else {
-        setEditDiscoveredPincodesList([]);
-      }
-    };
-    fetchEditPins();
-  }, [editSelectedAreasList]);
-
-  useEffect(() => {
-    const fetchReverse = async () => {
-      const pin = regData.pincode;
-      if (pin.length === 6) {
-        setFetchingPincodes(true);
-        const res = await fetchAreasByPincode(pin);
-        setFetchingPincodes(false);
-        if (res.success) {
-           if (regData.city === 'Bangalore' && !res.isBangalore) {
-               setPincodeError("It is a pin code outside of Bangalore city.");
-               setPincodeAreas([]);
-           } else {
-               setPincodeError(null);
-               setPincodeAreas(res.areas);
-           }
-        } else {
-           setPincodeError("Invalid or unfound PIN code.");
-           setPincodeAreas([]);
-        }
-      } else {
-        setPincodeError(null);
-        setPincodeAreas([]);
-      }
-    };
-    fetchReverse();
-  }, [regData.pincode, regData.city]);
-
-  useEffect(() => {
-    const fetchReverseEdit = async () => {
-      const pin = editData.pincode;
-      if (pin && pin.length === 6) {
-        setFetchingPincodes(true);
-        const res = await fetchAreasByPincode(pin);
-        setFetchingPincodes(false);
-        if (res.success) {
-           if (editData.city === 'Bangalore' && !res.isBangalore) {
-               setEditPincodeError("It is a pin code outside of Bangalore city.");
-               setEditPincodeAreas([]);
-           } else {
-               setEditPincodeError(null);
-               setEditPincodeAreas(res.areas);
-           }
-        } else {
-           setEditPincodeError("Invalid or unfound PIN code.");
-           setEditPincodeAreas([]);
-        }
-      } else {
-        setEditPincodeError(null);
-        setEditPincodeAreas([]);
-      }
-    };
-    fetchReverseEdit();
-  }, [editData.pincode, editData.city]);
-
-  const syncUserWithStore = async (email: string) => {
-    try {
-        const { data } = await supabase
-            .from('primary_partners')
-            .select('*')
-            .eq('email', email)
-            .single();
-        
-        if (data) {
-           const partner: Partner = {
-               id: data.id,
-               name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name,
-               first_name: data.first_name,
-               last_name: data.last_name,
-               email: data.email,
-               phone: data.phone,
-               gender: data.gender,
-               address: data.address,
-               pincode: data.pincode,
-               city: data.city,
-               lat: data.lat,
-               lng: data.lng,
-               categories: data.categories || [],
-               sub_categories: data.sub_categories || [],
-               experience: data.experience,
-               status: data.status,
-               age: data.age,
-               alt_phone: data.alt_phone,
-               aadhar_number: data.aadhar_number,
-               id_proof_url: data.id_proof_url,
-               earnings: data.earnings || 0,
-               completedJobs: data.completed_jobs || 0,
-               rating: data.rating || 0,
-               review_count: data.review_count || 0,
-               registration_fee_paid: data.registration_fee_paid || false,
-               registration_fee_screenshot: data.registration_fee_screenshot,
-               partner_type: 'Primary'
-           };
-           setCurrentUser(partner);
-        } else {
-           setIsRegistrationOpen(true);
-           setRegData(prev => ({ ...prev, email: email }));
-        }
-    } catch (err) {
-        console.error("Error syncing profile:", err);
-    }
-  };
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (submittingRef.current) return; 
-
-    submittingRef.current = true;
-    setIsSubmitting(true);
-    setAuthError(null);
-    setAuthMessage(null);
-
-    try {
-      if (authMode === 'signup') {
-        const cleanPhone = authData.phone?.trim();
-        if (cleanPhone) {
-          const { data: phoneCheck, error: phoneCheckError } = await supabase
-            .from('primary_partners')
-            .select('id')
-            .eq('phone', cleanPhone);
+  
+  const renderEditProfileModal = () => {
+    if (!isEditProfileOpen) return null;
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+          <button onClick={() => setIsEditProfileOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 font-bold">✕</button>
+          <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
           
-          if (phoneCheckError) {
-             console.error("Error checking phone availability:", phoneCheckError);
-          } else if (phoneCheck && phoneCheck.length > 0) {
-             setAuthError("This mobile number is already registered with another technician account. Please sign in or use a different number.");
-             setIsSubmitting(false);
-             submittingRef.current = false;
-             return;
-          }
-        }
-
-        const { data, error } = await supabase.auth.signUp({
-          email: authData.email,
-          password: authData.password,
-          options: {
-            data: {
-              phone: authData.phone,
-              full_name: authData.name
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        if (data.session) {
-          setRegData(prev => ({
-            ...prev,
-            email: authData.email,
-            firstName: authData.name.split(' ')[0] || '',
-            lastName: authData.name.split(' ').slice(1).join(' ') || '',
-            phone: authData.phone
-          }));
-        } else {
-          setAuthMessage("Account created. If you are not redirected, please check your email for confirmation.");
-        }
-
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: authData.email,
-          password: authData.password,
-        });
-
-        if (error) throw error;
-      }
-    } catch (error: any) {
-      const errorMessage = error?.message || (typeof error === 'string' ? error : 'Unknown error');
-      const msg = errorMessage.toLowerCase();
-
-      // Handle "User already registered" specifically without logging as error
-      if (msg.includes("already registered") || msg.includes("user already exists")) {
-        setAuthMode('signin');
-        setAuthMessage("Account already exists. Please sign in with your password.");
-        setAuthError(null);
-        return;
-      }
-
-      console.error("Auth Error:", error);
-      
-      if (msg.includes("rate limit") || msg.includes("too many requests")) {
-        setAuthError("System busy. Please wait a minute before trying again.");
-      } else if (msg.includes("invalid login credentials") || msg.includes("invalid_grant")) {
-        setAuthError("Incorrect email or password. If you just signed up, please confirm your email.");
-      } else {
-        setAuthError(errorMessage || "Authentication failed. Please try again.");
-      }
-    } finally {
-      setIsSubmitting(false);
-      submittingRef.current = false;
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setCurrentUser(null);
-    navigate('/partner');
-  };
-
-  const handleCategoryChange = (category: string) => {
-    setRegData(prev => {
-      const isSelected = prev.categories.includes(category);
-      let newCategories;
-      if (isSelected) {
-        newCategories = prev.categories.filter(c => c !== category);
-        if (category === "Home Appliances") {
-             return { ...prev, categories: newCategories, subCategories: [] };
-        }
-      } else {
-        newCategories = [...prev.categories, category];
-      }
-      return { ...prev, categories: newCategories };
-    });
-  };
-
-  const handleSubCategoryChange = (sub: string) => {
-    setRegData(prev => {
-        const isSelected = prev.subCategories.includes(sub);
-        if (isSelected) {
-            return { ...prev, subCategories: prev.subCategories.filter(s => s !== sub) };
-        } else {
-            return { ...prev, subCategories: [...prev.subCategories, sub] };
-        }
-    });
-  };
-
-  useEffect(() => {
-    // No longer need silent GPS capture
-  }, [isRegistrationOpen]);
-
-  const submitPartnerRegistration = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!session?.user?.email) return;
-
-      let finalCityValue = regData.city;
-      
-      // If 'Others' is selected, override it with the typed text
-      if (finalCityValue === 'Others') {
-          finalCityValue = regData.customCity.trim();
-          // Basic validation to ensure they didn't leave the "Others" box blank
-          if (!finalCityValue) {
-              alert("Please type your city name in the box provided.");
-              return; // Stop form submission
-          }
-      }
-
-      setIsSubmitting(true);
-
-      try {
-        const pLat = regData.lat;
-        const pLng = regData.lng;
-
-        // Auto-Discover Pincodes based on multiselect comma separated arrays
-        const computedAreasArray = selectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
-        let discoveredPincodes: string[] = [];
-        if (computedAreasArray.length > 0) {
-            discoveredPincodes = await fetchPincodesByArea(computedAreasArray);
-        }
-
-        // Merge reverse resolved areas and pincodes
-        const finalServiceAreas = Array.from(new Set([...computedAreasArray, ...pincodeAreas]));
-        const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
-        if (regData.pincode && regData.pincode.length === 6 && !pincodeError) {
-             finalServicePincodes.push(regData.pincode);
-        }
-
-        // Validate that phone number does not belong to another ID in database
-        const cleanRegPhone = regData.phone?.trim();
-        if (cleanRegPhone) {
-            const { data: phoneCheck, error: phoneCheckError } = await supabase
-                .from('primary_partners')
-                .select('id')
-                .eq('phone', cleanRegPhone)
-                .neq('id', session.user.id);
-            
-            if (phoneCheckError) {
-                console.error("Error precheck registration phone:", phoneCheckError);
-            } else if (phoneCheck && phoneCheck.length > 0) {
-                alert("Registration failed: The phone number " + cleanRegPhone + " is already registered with another technician account. Please use a different phone number.");
-                setIsSubmitting(false);
-                return;
-            }
-        }
-
-        console.log("🚀 SENDING PARTNER GPS TO SUPABASE:", pLat, pLng, "(Type:", typeof pLat, ")");
-
-        const basePayload: any = { 
-            id: session.user.id,
-            name: `${regData.firstName} ${regData.lastName}`.trim(),
-            first_name: regData.firstName, 
-            last_name: regData.lastName,
-            phone: regData.phone,
-            alt_phone: regData.altPhone,
-            email: session.user.email,
-            gender: regData.gender,
-            age: parseInt(regData.age) || null,
-            categories: regData.categories, 
-            sub_categories: regData.subCategories, 
-            experience: regData.experience,
-            address: regData.address,
-            city: finalCityValue,
-            pincode: regData.pincode,
-            service_areas: finalServiceAreas,
-            service_pincodes: finalServicePincodes,
-            lat: pLat,
-            lng: pLng,
-            aadhar_number: regData.aadharNumber,
-            status: 'available', // Changed from 'pending' to 'available' for prompt verification
-            earnings: 0,
-            completed_jobs: 0,
-            registration_fee_paid: true,
-            registration_fee_screenshot: null
-        };
-
-        const currentPayload = { ...basePayload };
-        let success = false;
-        let activeError: any = null;
-
-        for (let attempt = 0; attempt < 10; attempt++) {
-            try {
-                console.log(`Attempting upsert of primary_partners (attempt ${attempt + 1})...`);
-                const { error: upsertError } = await supabase
-                    .from('primary_partners')
-                    .upsert([currentPayload]);
-
-                if (!upsertError) {
-                    success = true;
-                    break;
-                }
-
-                activeError = upsertError;
-                const errMsg = upsertError.message || String(upsertError);
-                console.warn(`Upsert attempt ${attempt + 1} failed:`, errMsg);
-
-                // Match both schema cache issues and standard postgresql error messages for missing columns
-                const matchCache = errMsg.match(/Could not find the '([^']+)' column/i);
-                const matchPostgres = errMsg.match(/column "([^"]+)"/i);
-                const missingColumn = (matchCache && matchCache[1]) || (matchPostgres && matchPostgres[1]);
-
-                if (missingColumn && currentPayload[missingColumn] !== undefined) {
-                    console.log(`Pruning field '${missingColumn}' because it design-mismatches database metadata.`);
-                    delete currentPayload[missingColumn];
-                } else {
-                    // Try to guess and remove registration_fee_paid or other problematic columns if it's a generic column error
-                    if (errMsg.includes('registration_fee_paid') && currentPayload.registration_fee_paid !== undefined) {
-                        delete currentPayload.registration_fee_paid;
-                        delete currentPayload.registration_fee_screenshot;
-                    } else {
-                        break;
-                    }
-                }
-            } catch (err: any) {
-                console.error("Exception during robust partner upsert:", err);
-                activeError = err;
-                break;
-            }
-        }
-
-        if (!success && activeError) {
-            throw activeError;
-        }
-
-        // Force sync after insertion
-        await syncUserWithStore(session.user.email);
-        
-        setRegStep('success');
-      } catch (error: any) {
-        console.error("Error saving partner:", error);
-        const errMsg = error.message || "";
-        if (errMsg.includes("primary_partners_phone_key") || errMsg.includes("duplicate key")) {
-          alert("Registration failed: This phone number is already registered with another account.\n\nPlease log in or use a different phone number in the personal details tab.");
-        } else {
-          alert("Registration failed: " + errMsg);
-        }
-      } finally {
-        setIsSubmitting(false);
-      }
-  };
-
-
-
-  const handleEditProfile = async () => {
-    if (!currentUser?.email) return;
-    setIsSubmitting(true);
-    try {
-        const { data, error } = await supabase
-            .from('primary_partners')
-            .select('*')
-            .eq('email', currentUser.email)
-            .single();
-            
-        if (error) throw error;
-        
-        setEditData({
-            phone: data.phone || '',
-            altPhone: data.alternate_phone || '',
-            address: data.address || '',
-            city: data.city || '',
-            customCity: '',
-            pincode: data.pincode || '',
-            categories: data.categories || [],
-            subCategories: data.sub_categories || [],
-            experience: data.experience || '',
-            gender: data.gender || 'Male',
-            age: data.age || '',
-            lat: data.lat || null,
-            lng: data.lng || null
-        });
-        setEditSelectedAreasList(Array.isArray(data.service_areas) ? data.service_areas : []);
-        setIsEditingProfile(true);
-    } catch (err: any) {
-        console.error("Error fetching profile for edit:", err);
-        alert("Failed to load profile details.");
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-
-  const handleEditCategoryChange = (category: string) => {
-    setEditData(prev => {
-      const isSelected = prev.categories.includes(category);
-      let newCategories;
-      if (isSelected) {
-        newCategories = prev.categories.filter(c => c !== category);
-        if (category === "Home Appliances") {
-             return { ...prev, categories: newCategories, subCategories: [] };
-        }
-      } else {
-        newCategories = [...prev.categories, category];
-      }
-      return { ...prev, categories: newCategories };
-    });
-  };
-
-  const handleEditSubCategoryChange = (sub: string) => {
-    setEditData(prev => {
-        const isSelected = prev.subCategories.includes(sub);
-        if (isSelected) {
-            return { ...prev, subCategories: prev.subCategories.filter(s => s !== sub) };
-        } else {
-            return { ...prev, subCategories: [...prev.subCategories, sub] };
-        }
-    });
-  };
-
-  const submitProfileEdit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!currentUser?.id) return;
-
-      let finalCityValue = editData.city;
-      if (finalCityValue === 'Others') {
-          finalCityValue = editData.customCity.trim();
-          if (!finalCityValue) {
-              alert("Please type your city name in the box provided.");
-              return;
-          }
-      }
-
-      setIsSubmitting(true);
-
-      try {
-        const pLat = editData.lat;
-        const pLng = editData.lng;
-
-        const computedAreasArray = editSelectedAreasList.map(a => a.trim()).filter(a => a.length > 0);
-        let discoveredPincodes: string[] = [];
-        if (computedAreasArray.length > 0) {
-            discoveredPincodes = await fetchPincodesByArea(computedAreasArray);
-        }
-
-        // Merge reverse resolved areas and pincodes
-        const finalServiceAreas = Array.from(new Set([...computedAreasArray, ...editPincodeAreas]));
-        const finalServicePincodes = Array.from(new Set([...discoveredPincodes]));
-        if (editData.pincode && editData.pincode.length === 6 && !editPincodeError) {
-             finalServicePincodes.push(editData.pincode);
-        }
-
-        // Validate that phone number does not belong to another ID in database
-        const cleanEditPhone = editData.phone?.trim();
-        if (cleanEditPhone) {
-            const { data: phoneCheck, error: phoneCheckError } = await supabase
-                .from('primary_partners')
-                .select('id')
-                .eq('phone', cleanEditPhone)
-                .neq('id', currentUser.id);
-            
-            if (phoneCheckError) {
-                console.error("Error precheck edit phone:", phoneCheckError);
-            } else if (phoneCheck && phoneCheck.length > 0) {
-                alert("Update failed: The phone number " + cleanEditPhone + " is already registered with another technician account. Please use a different phone number.");
-                setIsSubmitting(false);
-                return;
-            }
-        }
-
-        const { error } = await supabase
-           .from('primary_partners')
-           .update({ 
-               phone: editData.phone,
-               categories: editData.categories, 
-               sub_categories: editData.subCategories, 
-               experience: editData.experience,
-               gender: editData.gender,
-               address: editData.address,
-               city: finalCityValue,
-               pincode: editData.pincode,
-               service_areas: finalServiceAreas,
-               service_pincodes: finalServicePincodes,
-               lat: pLat,
-               lng: pLng
-           })
-           .eq('id', currentUser.id);
-
-        if (error) throw error;
-
-        await syncUserWithStore(currentUser.email);
-        
-        setIsEditingProfile(false);
-        setNotification("Profile Updated Successfully!");
-
-      } catch (error: any) {
-        console.error("Error updating profile:", error);
-        alert("Update failed: " + (error.message || "Unknown error"));
-      } finally {
-        setIsSubmitting(false);
-      }
-  };
-
-  const handleAcceptLead = (booking: Booking) => {
-    if (!currentUser) return;
-    
-    if (currentUser.status === 'blocked') {
-      alert("🚫 Your account has been blocked. Please contact admin for support.");
-      return;
-    }
-    
-    if (currentUser.status === 'on_hold') {
-      alert("⚠️ Your account is currently on hold. You cannot accept new jobs at this time.");
-      return;
-    }
-
-    const hasActiveJob = bookings.some(b => b.assignedPartnerId === currentUser.id && b.status === 'accepted');
-    if (currentUser.status === 'busy' || hasActiveJob) {
-      alert("🚫 You have an ongoing job! Please complete your current task before accepting a new one.");
-      return;
-    }
-    setLeadToAccept(booking);
-  };
-
-  const confirmLeadAcceptance = async () => {
-    if (!leadToAccept || !currentUser) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-        const { error } = await supabase
-             .from('bookings')
-             .update({ 
-                 status: 'accepted', 
-                 assigned_partner_id: currentUser.id 
-             })
-             .eq('id', leadToAccept.id);
-
-         if (error) throw error;
-
-         // Optimistic UI updates
-         const updatedBooking: Booking = { ...leadToAccept, status: 'accepted', assignedPartnerId: currentUser.id };
-         const updatedPartner: Partner = { ...currentUser, status: 'busy' };
-         
-         setCurrentUser(updatedPartner);
-         updateBooking(updatedBooking);
-         updatePartner(updatedPartner);
-         
-         setNotification(`Lead accepted! Contact the customer now.`);
-         setLeadToAccept(null);
-
-         // Forwarding Logic: Inform Admin about the acceptance
-         let servicesText = "Services";
-         if (updatedBooking.cartItems && Array.isArray(updatedBooking.cartItems) && updatedBooking.cartItems.length > 0) {
-           servicesText = updatedBooking.cartItems.map(item => `${item.name} (x${item.quantity || 1})`).join(', ');
-         } else {
-             servicesText = updatedBooking.subServiceName;
-         }
-
-         let waText = `✅ *LEAD ACCEPTED BY PARTNER* ✅\n\n`;
-         waText += `*👤 PARTNER DETAILS*\n`;
-         waText += `🛠️ *Name:* ${updatedPartner.name}\n`;
-         waText += `📞 *Phone:* ${updatedPartner.phone}\n`;
-         waText += `📍 *Base City:* ${updatedPartner.city}\n\n`;
-
-         waText += `*📋 LEAD DETAILS*\n`;
-         waText += `🎟️ *Order ID:* #${updatedBooking.id.substring(0,6).toUpperCase()}\n`;
-         waText += `👤 *Customer:* ${updatedBooking.customerName}\n`;
-         waText += `📞 *Customer Phone:* ${updatedBooking.contactNumber}\n`;
-         waText += `📍 *Service Address:* ${updatedBooking.address}, ${updatedBooking.pinCode}\n`;
-         waText += `🛠️ *Services:* ${servicesText}\n`;
-         waText += `📅 *Schedule:* ${updatedBooking.date} | ${updatedBooking.time}\n`;
-         waText += `💵 *Price:* ₹${updatedBooking.price}\n\n`;
-         waText += `🔗 *Map:* ${updatedBooking.location_link || 'Not provided'}`;
-
-         const encodedWaText = encodeURIComponent(waText);
-         const adminWaLink = `https://wa.me/919219345455?text=${encodedWaText}`;
-         
-         // Trigger redirect after a short delay so the user sees the notification
-         setTimeout(() => {
-            window.open(adminWaLink, '_blank');
-         }, 1500);
-
-    } catch (error) {
-         console.error('Error accepting lead:', error);
-         alert('Failed to accept lead. Someone else might have taken it.');
-    } finally {
-         setIsSubmitting(false);
-    }
-  };
-
-  const handleCompleteService = (booking: Booking) => {
-    setExtraWorks([]);
-    setScreenshot(null);
-    setPaymentModal(booking);
-  };
-
-  const processPayment = async () => {
-    if (!paymentModal || !currentUser) return;
-    if (!screenshot) {
-      alert("Please upload the payment screenshot to proceed.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const uploadedScreenshotUrl = await uploadFileToStorage(screenshot, 'commission_payments');
-      const extraTotal = extraWorks.reduce((acc, curr) => acc + curr.price, 0);
-      const finalTotalPrice = paymentModal.price + extraTotal;
-      const commission = finalTotalPrice * 0.25;
-      
-      const completedBooking: Booking = { 
-        ...paymentModal, 
-        price: finalTotalPrice,
-        status: 'completed', 
-        commissionPaid: true,
-        commission_screenshot: uploadedScreenshotUrl
-      };
-
-      const updatedPartner: Partner = { 
-        ...currentUser, 
-        status: 'available',
-        earnings: currentUser.earnings + (finalTotalPrice - commission),
-        completedJobs: currentUser.completedJobs + 1
-      };
-
-      setCurrentUser(updatedPartner);
-      await updateBooking(completedBooking);
-      await updatePartner(updatedPartner);
-      setPaymentModal(null);
-      setNotification("Job Completed! Commission Submitted.");
-    } catch (error: any) {
-      console.error("Error submitting job commission payment:", error);
-      alert("Submission failed: " + (error.message || "Unknown error"));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 relative">
-        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 animate-fadeIn">
-          <div className="text-center mb-8">
-            <div className="bg-indigo-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <Briefcase className="text-indigo-600 w-8 h-8" />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Name</label>
+              <input type="text" value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})} className="w-full border p-2 rounded-lg" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">Technician Portal</h2>
-            <p className="text-gray-500">Join our network of professionals</p>
-          </div>
-          
-          <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
-            <button 
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${authMode === 'signin' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}
-              onClick={() => { setAuthMode('signin'); setAuthError(null); setAuthMessage(null); }}
-              disabled={isSubmitting}
-            >
-              Sign In
-            </button>
-            <button 
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${authMode === 'signup' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}
-              onClick={() => { setAuthMode('signup'); setAuthError(null); setAuthMessage(null); }}
-              disabled={isSubmitting}
-            >
-              Sign Up
-            </button>
-          </div>
-
-          <form onSubmit={handleAuth} className="space-y-4">
-            {authMode === 'signup' && (
-              <>
-                <input
-                  placeholder="Full Name"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  value={authData.name}
-                  onChange={e => setAuthData({...authData, name: e.target.value})}
-                  required
-                  disabled={isSubmitting}
-                />
-                <input
-                  placeholder="Mobile Number"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  value={authData.phone}
-                  onChange={e => setAuthData({...authData, phone: e.target.value})}
-                  required
-                  pattern="[0-9]{10}"
-                  title="10 digit mobile number"
-                  disabled={isSubmitting}
-                />
-              </>
-            )}
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-              value={authData.email}
-              onChange={e => setAuthData({...authData, email: e.target.value})}
-              required
-              disabled={isSubmitting}
-            />
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none"
-                value={authData.password}
-                onChange={e => setAuthData({...authData, password: e.target.value})}
-                required
-                disabled={isSubmitting}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Phone</label>
+              <input type="text" value={editData.phone} onChange={e => setEditData({...editData, phone: e.target.value})} className="w-full border p-2 rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">City</label>
+              <input type="text" value={editData.city} onChange={e => setEditData({...editData, city: e.target.value})} className="w-full border p-2 rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Primary Pincode</label>
+              <input type="text" value={editData.pincode} onChange={e => setEditData({...editData, pincode: e.target.value})} className="w-full border p-2 rounded-lg" />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Service Pincodes (Comma separated)</label>
+              <input 
+                type="text" 
+                value={(editData.service_pincodes || []).join(', ')} 
+                onChange={e => setEditData({...editData, service_pincodes: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})} 
+                className="w-full border p-2 rounded-lg" 
               />
-              <button
-                type="button"
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                )}
-              </button>
             </div>
             
-            <div className="flex justify-between items-center text-sm">
-              <button 
-                type="button"
-                onClick={handleForgotPassword}
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
-                disabled={isSubmitting}
-              >
-                Forgot Password?
-              </button>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Categories (Comma separated)</label>
+              <input 
+                type="text" 
+                value={(editData.categories || []).join(', ')} 
+                onChange={e => setEditData({...editData, categories: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})} 
+                className="w-full border p-2 rounded-lg" 
+              />
             </div>
 
-            {authError && (
-              <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-100 text-center animate-fadeIn">
-                {authError}
-              </div>
-            )}
-            {authMessage && (
-              <div className="text-green-700 text-sm bg-green-50 p-3 rounded-lg border border-green-200 text-center font-medium animate-fadeIn">
-                {authMessage}
-              </div>
-            )}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">Sub Categories (Comma separated)</label>
+              <input 
+                type="text" 
+                value={(editData.sub_categories || []).join(', ')} 
+                onChange={e => setEditData({...editData, sub_categories: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})} 
+                className="w-full border p-2 rounded-lg" 
+              />
+            </div>
 
-            <button 
-              disabled={isSubmitting}
-              className={`w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" /> Processing...
-                </span>
-              ) : (
-                authMode === 'signin' ? 'Access Dashboard' : 'Register Now'
-              )}
-            </button>
-          </form>
+            <button onClick={handleEditProfileSubmit} className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">Save Changes</button>
+          </div>
         </div>
       </div>
     );
-  }
+  };
 
-  if (!currentUser && !isRegistrationOpen) {
+  const renderPaymentModal = () => {
+    if (!jobToComplete) return null;
+    const commission = (jobToComplete.price * 0.25).toFixed(2);
+    
     return (
-      <div className="min-h-screen flex items-center justify-center">
-         <div className="text-center">
-             <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mx-auto mb-4" />
-             <p className="text-gray-500">Syncing profile...</p>
-         </div>
-      </div>
-    );
-  }
-
-  const myActiveJob = currentUser ? bookings.find(b => b.status === 'accepted' && b.assignedPartnerId === currentUser.id) : null;
-  
-  // Filter leads by city as requested
-  const availableLeads = bookings.filter(b => {
-      if (!currentUser) return false;
-      if (b.status !== 'pending' && b.status !== 'Forwarded') return false;
-
-      // If a lead is Forwarded, it must be assigned to this partner explicitly
-      if (b.status === 'Forwarded') {
-        return b.assignedPartnerId === currentUser.id;
-      }
-
-      // 1. Category Matching
-      // We check if any of the partner's categories match the lead's service category
-      const partnerCategories = currentUser.categories || [];
-      const categoryMatch = partnerCategories.some(cat => 
-        b.serviceCategory?.toLowerCase().includes(cat.toLowerCase()) || 
-        cat.toLowerCase().includes(b.serviceCategory?.toLowerCase())
-      );
-      
-      if (!categoryMatch) return false;
-
-      // 2. Location Matching: Pincode, Area, or City
-      const partnerPincodes = currentUser.service_pincodes || [];
-      const partnerAreas = currentUser.service_areas || [];
-      const partnerCity = currentUser.city || '';
-      
-      const pincodeMatch = b.pinCode && partnerPincodes.includes(b.pinCode);
-      const areaMatch = b.area && partnerAreas.some(a => a.toLowerCase() === b.area!.toLowerCase());
-      const cityMatch = b.city && partnerCity && b.city.toLowerCase() === partnerCity.toLowerCase();
-
-      return pincodeMatch || areaMatch || cityMatch;
-  });
-
-  const groupedLeads = availableLeads.reduce((acc, lead) => {
-    const areaName = lead.area || lead.city || 'Other Areas';
-    if (!acc[areaName]) {
-      acc[areaName] = [];
-    }
-    acc[areaName].push(lead);
-    return acc;
-  }, {} as Record<string, Booking[]>);
-
-  const { total: modalTotal, commission: modalCommission } = paymentModal ? { total: paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0), commission: (paymentModal.price + extraWorks.reduce((a,c)=>a+c.price,0)) * 0.25 } : { total: 0, commission: 0 };
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-8 relative">
-
-      <div className="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Welcome, {currentUser?.name}</h1>
-          <div className="flex items-center gap-3 mt-2">
-            <p className="text-sm text-gray-500 flex items-center gap-2">
-              Status: 
-              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                currentUser?.status === 'available' ? 'bg-green-100 text-green-700' : 
-                currentUser?.status === 'busy' ? 'bg-blue-100 text-blue-700' :
-                currentUser?.status === 'on_hold' ? 'bg-orange-100 text-orange-700' :
-                currentUser?.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                'bg-red-100 text-red-700'
-              }`}>
-                {currentUser?.status.replace('_', ' ').toUpperCase()}
-              </span>
-            </p>
-            {currentUser?.rating !== undefined && (
-              <div className="flex items-center bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-100">
-                <Star className="w-3 h-3 text-yellow-500 fill-current mr-1" />
-                <span className="text-xs font-bold text-yellow-700">{currentUser.rating.toFixed(1)}</span>
-                <span className="text-xs text-yellow-600 ml-1">({currentUser.review_count || 0})</span>
-              </div>
-            )}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
+          <button onClick={() => setJobToComplete(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
+          
+          <div className="bg-indigo-600 p-6 text-white text-center">
+            <h3 className="text-xl font-bold">Complete Job</h3>
+            <p className="text-indigo-200 text-sm mt-1">Commission Payment Verification</p>
           </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={handleEditProfile}
-            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition-colors font-medium text-sm"
-          >
-            <User size={18} /> Edit Profile
-          </button>
-          <button 
-            onClick={handleSignOut}
-            className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors text-sm"
-          >
-            <LogOut size={18} /> Sign Out
-          </button>
-        </div>
-      </div>
-
-      {currentUser?.status === 'pending' ? (
-        <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm mb-10 overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-600"></div>
-          <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-             <Clock size={32} className="text-indigo-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification in Progress ⏳</h2>
-          <p className="text-gray-500 max-w-md mx-auto">
-            Your profile is currently under review. We verify all partners to keep our platform safe. 
-            Usually this takes 24-48 hours.
-          </p>
-          <div className="mt-8 flex justify-center gap-4">
-             <div className="flex items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg border border-green-100">
-                <CheckCircle size={14} /> Profile Submitted
-             </div>
-             <div className="flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-4 py-2 rounded-lg border border-amber-100">
-                <Loader2 size={14} className="animate-spin" /> Review Pending
-             </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {notification && (
-        <Modal isOpen={!!notification} onClose={() => setNotification(null)} title="Notice">
-          <div className="text-center py-6">
-             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-             </div>
-             <p className="text-lg font-semibold text-gray-800 mb-2">{notification}</p>
-             <button onClick={() => setNotification(null)} className="mt-6 px-8 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">OK</button>
-          </div>
-        </Modal>
-      )}
-
-      {myActiveJob ? (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 mb-8 shadow-inner">
-          <h2 className="text-xl font-bold text-indigo-900 mb-6 flex items-center gap-2">
-            <Briefcase /> Current Active Job
-          </h2>
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-bold text-gray-800">{myActiveJob.serviceCategory}</h3>
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2 mb-4">
-                   <p className="text-indigo-700 font-bold mb-1 text-sm uppercase tracking-wide">Work Order:</p>
-                   {myActiveJob.cartItems && Array.isArray(myActiveJob.cartItems) ? (
-                      <ul className="space-y-1">
-                        {myActiveJob.cartItems.map((item, idx) => (
-                           <li key={idx} className="flex justify-between text-sm text-gray-700">
-                             <span>{item.name} <span className="text-gray-400">x{item.quantity}</span></span>
-                           </li>
-                        ))}
-                      </ul>
-                   ) : (
-                      <p className="text-indigo-600 font-medium">{myActiveJob.subServiceName}</p>
-                   )}
-                </div>
-                <div className="space-y-2 text-gray-600">
-                   <p className="flex items-center gap-2"><User size={16}/> {myActiveJob.customerName}</p>
-                   <p className="flex items-center gap-2"><MapPin size={16}/> {myActiveJob.address}, {myActiveJob.pinCode}</p>
-                   <p className="flex items-center gap-2"><Clock size={16}/> {myActiveJob.date} at {myActiveJob.time}</p>
-                </div>
-              </div>
-              <div className="flex flex-col justify-between items-end w-full md:w-auto">
-                <div className="text-right w-full md:w-auto">
-                   <p className="text-sm text-gray-500">Potential Earnings</p>
-                   <p className="text-2xl font-bold text-green-600">₹{(myActiveJob.price * 0.75).toFixed(2)}</p>
-                   <p className="text-xs text-gray-400">after commission</p>
+          
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-600">Service Charge</span>
+              <span className="font-bold">₹{jobToComplete.price}</span>
+            </div>
+            <div className="flex justify-between items-center mb-6 pb-6 border-b border-gray-100">
+              <span className="text-gray-600 font-bold">Company Commission (25%)</span>
+              <span className="font-bold text-indigo-600 text-lg">₹{commission}</span>
+            </div>
+            
+            {verificationStep === 'idle' && (
+              <div className="text-center space-y-4">
+                <p className="text-sm text-gray-500">Ask the customer to scan this QR code and pay the commission amount.</p>
+                <div className="inline-block p-2 border-4 border-indigo-50 rounded-2xl bg-white shadow-sm">
+                  <img src="https://iili.io/CEJ9e9I.png" onError={(e) => { e.currentTarget.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CompanyUPI'; }} alt="Payment QR" className="w-48 h-48 object-contain" />
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full md:w-auto">
-                  <a 
-                    href={`tel:${myActiveJob.contactNumber}`} 
-                    className="flex-1 bg-blue-100 text-blue-600 font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2 hover:bg-blue-200 transition border border-blue-200"
-                  >
-                    <i className="fas fa-phone-alt"></i> Call Customer
-                  </a>
-                  {(myActiveJob.location_link || (myActiveJob.lat && myActiveJob.lng)) && (
-                    <a 
-                      href={myActiveJob.location_link || `https://www.google.com/maps?q=${myActiveJob.lat},${myActiveJob.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 bg-rose-100 text-rose-600 font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2 hover:bg-rose-200 transition border border-rose-200"
-                    >
-                      <Navigation size={18} /> Track Location
-                    </a>
-                  )}
-                  <button
-                    onClick={() => handleCompleteService(myActiveJob)}
-                    className="flex-1 bg-gray-950 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-black transition-all flex justify-center items-center gap-2"
-                  >
-                    <CheckCircle size={20} /> Complete Task
-                  </button>
+                <div className="mt-6 text-left">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Upload Payment Screenshot</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setUploadedImage(URL.createObjectURL(e.target.files[0]));
+                    }
+                  }} className="w-full border rounded-xl p-2 text-sm" />
+                </div>
+                
+                <button 
+                  onClick={() => setVerificationStep('uploading')}
+                  disabled={!uploadedImage}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 transition-colors mt-2"
+                >
+                  Verify Payment
+                </button>
+              </div>
+            )}
+            
+            {verificationStep === 'uploading' && (
+              <div className="text-center py-8">
+                <div className="w-full bg-gray-100 h-2 rounded-full mb-4 overflow-hidden">
+                  <div className="bg-indigo-600 h-full w-full animate-[pulse_1s_ease-in-out_infinite]"></div>
+                </div>
+                <p className="font-bold text-indigo-600">Uploading screenshot...</p>
+                {setTimeout(() => simulateVerification(), 1000) && null}
+              </div>
+            )}
+            
+            {verificationStep === 'verifying' && (
+              <div className="text-center py-8 space-y-4">
+                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto" />
+                <div>
+                  <p className="font-bold text-gray-900">AI Verification in progress</p>
+                  <p className="text-sm text-gray-500 mt-1">Checking amount and timestamp...</p>
                 </div>
               </div>
-            </div>
+            )}
+            
+            {verificationStep === 'success' && (
+              <div className="text-center py-8 space-y-4 animate-in zoom-in duration-300">
+                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 text-lg">Payment Verified!</p>
+                  <div className="bg-gray-50 p-3 rounded-lg mt-4 text-left border border-gray-100">
+                    <p className="text-xs text-gray-600 mb-1"><strong>Identified Amount:</strong> ₹{jobToComplete?.price}</p>
+                    <p className="text-xs text-gray-600 mb-1"><strong>Service Commission:</strong> ₹{(jobToComplete?.price * 0.25).toFixed(2)}</p>
+                    <p className="text-xs text-gray-600"><strong>Date & Time:</strong> {new Date().toLocaleString()}</p>
+                  </div>
+                  <p className="text-sm text-green-600 mt-4 font-bold">Sent to Admin for Review & Rating</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      ) : (
-        <div>
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Available Leads by Area</h2>
-          {Object.keys(groupedLeads).length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-              <p className="text-gray-500">No new leads available at the moment.</p>
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 mt-2 md:mt-6 pb-20">
+      {renderPaymentModal()}
+      {renderEditProfileModal()}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex items-center gap-3 sm:gap-4 w-full md:w-auto">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0">
+            <User className="w-6 h-6 sm:w-7 sm:h-7" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">Welcome, {currentUser.name}</h1>
+            <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">★ {currentUser.rating || "New"} • {currentUser.service_pincodes?.length || 0} Pincodes covered</p>
+            <p className="text-xs text-green-600 font-bold mt-0.5">Earnings: ₹{(currentUser.earnings || 0).toFixed(2)}</p>
+          </div>
+        </div>
+        
+        <div className="flex flex-row w-full md:w-auto gap-2 mt-2 md:mt-0">
+          <button onClick={openEditProfile} className="flex-1 md:flex-none flex items-center justify-center gap-2 text-indigo-600 hover:text-indigo-700 px-3 py-2 sm:px-4 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors font-bold shadow-sm text-sm sm:text-base">
+            <UserIcon size={16} /> Edit Profile
+          </button>
+          <button onClick={handleLogout} className="flex-1 md:flex-none flex items-center justify-center gap-2 text-gray-500 hover:text-red-600 px-3 py-2 sm:px-4 bg-gray-50 rounded-xl hover:bg-red-50 transition-colors font-bold shadow-sm text-sm sm:text-base">
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 md:col-span-2 flex flex-col">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><Briefcase className="text-indigo-600 w-5 h-5" /> Process Lead</h2>
+          {partnerBookings.length === 0 ? (
+            <div className="text-center py-10 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+              <p className="text-gray-500 text-sm font-medium">No jobs assigned yet.</p>
+              <p className="text-xs text-gray-400 mt-2">Accept a lead from the Available Leads panel to get started.</p>
             </div>
           ) : (
-            <div className="space-y-8">
-              {Object.entries(groupedLeads).map(([area, leads]) => (
-                <div key={area} className="space-y-4">
-                  <h3 className="text-lg font-bold text-gray-700 border-b pb-2 flex items-center gap-2">
-                    <MapPin size={20} className="text-indigo-500" /> {area}
-                    <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full ml-2">{leads.length}</span>
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {leads.map(lead => (
-                      <div key={lead.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden">
-                        <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
-                          New Lead
-                        </div>
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-full">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded uppercase">
-                                  {lead.city || 'City N/A'}
-                                </span>
-                                <span className="text-2xl font-bold text-gray-900">₹{lead.price}</span>
-                            </div>
-                            
-                            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                              <Briefcase size={16} className="text-gray-400" />
-                              {lead.cartItems && Array.isArray(lead.cartItems) ? lead.cartItems.map(i => i.name).join(', ') : lead.subServiceName}
-                            </h3>
-                            <p className="text-xs text-gray-500 mb-2">{lead.serviceCategory}</p>
-                          </div>
-                        </div>
+            <div className="space-y-4">
+              {partnerBookings.map(b => (
+                <div key={b.id} className="border border-gray-200 p-4 sm:p-5 rounded-xl hover:border-indigo-300 transition-colors shadow-sm bg-white relative">
+                  <div className="flex justify-between items-start mb-3 gap-2">
+                    <p className="font-bold text-gray-900 text-base sm:text-lg leading-tight">{b.subServiceName}</p>
+                    <span className={`shrink-0 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-md uppercase tracking-wider ${b.status === 'completed' ? 'bg-green-50 text-green-700' : 'bg-indigo-50 text-indigo-700'}`}>{b.status}</span>
+                  </div>
+                  
+                  {(b.status === 'accepted' || b.status === 'Forwarded') && (
+                    <div className="mb-4 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100 text-sm">
+                      <p className="font-bold text-indigo-900 mb-2 border-b border-indigo-100 pb-1">Customer Details</p>
+                      <div className="space-y-1">
+                        <p className="text-indigo-800 break-words"><strong className="text-indigo-900">Name:</strong> {b.customerName}</p>
+                        <p className="text-indigo-800 break-words"><strong className="text-indigo-900">Phone:</strong> {b.contactNumber}</p>
+                        <p className="text-indigo-800 break-words"><strong className="text-indigo-900">Address:</strong> {b.address}, {b.area}</p>
+                      </div>
+                    </div>
+                  )}
 
-                        <div className="space-y-2 text-sm text-gray-600 mb-6 border-t border-gray-50 pt-3">
-                          <p className="flex items-center gap-2 font-medium">
-                              <MapPin size={16} className="text-red-400" /> 
-                              {lead.address} {lead.area ? `- ${lead.area}` : ''} - {lead.pinCode}
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1">
-                            {lead.lat && lead.lng && currentUser?.lat && currentUser?.lng && (
-                              <p className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200">
-                                <Navigation size={12} className="animate-pulse" />
-                                {calculateDistanceKM(currentUser.lat, currentUser.lng, lead.lat, lead.lng).toFixed(1)} KM AWAY
-                              </p>
-                            )}
-                            {(lead.location_link || (lead.lat && lead.lng)) && (
-                              <a 
-                                href={lead.location_link || `https://www.google.com/maps?q=${lead.lat},${lead.lng}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 font-black text-[10px] uppercase tracking-wider text-blue-700 bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 hover:bg-blue-200 transition-colors"
-                              >
-                                <Navigation size={12} />
-                                Track Lead Location
-                              </a>
-                            )}
-                          </div>
-                          <p className="flex items-center gap-2"><Clock size={14} className="text-gray-400" /> {lead.date} | {lead.time}</p>
-                        </div>
-                        <button
-                          onClick={() => handleAcceptLead(lead)}
-                          className="w-full py-2.5 bg-gray-950 text-white rounded-lg font-bold hover:bg-black transition-colors shadow-sm"
-                        >
-                          Accept Lead
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
+                    <p className="text-sm text-gray-600 flex items-center gap-2"><MapPin size={16} className="text-gray-400 shrink-0" /> <span className="truncate">{b.pinCode}</span></p>
+                    <p className="text-sm text-gray-600 flex items-center gap-2"><Clock size={16} className="text-gray-400 shrink-0" /> {b.date} at {b.time}</p>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center pt-4 border-t border-gray-100 gap-3 sm:gap-0">
+                    <p className="font-bold text-green-600 text-lg">₹{b.price}</p>
+                    {(b.status === 'accepted' || b.status === 'Forwarded') && (
+                      <div className="flex gap-2 w-full sm:w-auto">
+                        <button onClick={() => handleCancelLead(b)} className="flex-1 sm:flex-none text-xs sm:text-sm font-bold bg-red-50 text-red-700 border border-red-100 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:bg-red-100 transition-colors">
+                          Cancel
+                        </button>
+                        <button onClick={() => handleCompleteJob(b)} className="flex-[2] sm:flex-none text-xs sm:text-sm font-bold bg-green-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:bg-green-600 transition-colors shadow-sm">
+                          Mark Completed
                         </button>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-      )}
-
-      {isRegistrationOpen && (
-          <div id="partner-reg-modal" className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex justify-center items-center px-4 animate-fadeIn backdrop-blur-sm">
-            <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
-              <div className="p-8">
-                {/* Stepper Header */}
-                <div className="mb-8">
-                  <div className="flex justify-between items-center mb-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Partner Onboarding 👋</h2>
-                      <p className="text-gray-500 text-sm">Join our network of expert professionals</p>
-                    </div>
-                    <button onClick={() => { setIsRegistrationOpen(false); handleSignOut(); }} className="text-gray-400 hover:bg-gray-100 p-2 rounded-full transition">
-                      <span className="sr-only">Close</span>
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+        
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col max-h-[800px]">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2 shrink-0"><Star className="text-amber-500 w-5 h-5" /> Available Leads</h2>
+          {newLeads.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+              <p className="text-gray-500 text-sm font-medium">No new leads.</p>
+              <p className="text-xs text-gray-400 mt-2">We will notify you when a job matches your profile.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 overflow-y-auto pr-2 pb-4">
+              {newLeads.map(b => (
+                <div key={b.id} className="border p-4 rounded-xl bg-amber-50/30 border-amber-100 hover:border-amber-300 transition-all shadow-sm">
+                  <div className="flex justify-between items-start mb-2 gap-2">
+                    <p className="font-bold text-gray-900 text-sm sm:text-base leading-tight">{b.subServiceName}</p>
+                    <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-700 rounded uppercase tracking-wider">NEW</span>
+                  </div>
+                  <p className="text-xs text-gray-600 flex items-center gap-1.5 mb-1"><MapPin size={12} className="text-gray-400 shrink-0" /> <span className="truncate">{b.pinCode}</span></p>
+                  <p className="text-xs text-gray-600 flex items-center gap-1.5 mb-3"><Clock size={12} className="text-gray-400 shrink-0" /> {b.date} • {b.time}</p>
+                  
+                  <div className="flex justify-between items-center pt-3 border-t border-amber-100/50">
+                    <p className="font-bold text-green-600 text-sm sm:text-base">₹{b.price}</p>
+                    <button 
+                      onClick={() => handleAcceptLead(b)} 
+                      disabled={!!activeJob}
+                      className="text-xs sm:text-sm font-bold bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                      title={activeJob ? "Complete current job first" : "Accept Lead"}
+                    >
+                      Accept
                     </button>
                   </div>
-
-                  <div className="flex items-center gap-2">
-                    {[
-                      { id: 'personal', label: 'Personal', icon: <User size={14} /> },
-                      { id: 'expertise', label: 'Expertise', icon: <Briefcase size={14} /> },
-                      { id: 'location', label: 'Service Areas', icon: <MapPin size={14} /> },
-                      { id: 'verification', label: 'Verify', icon: <CheckCircle size={14} /> }
-                    ].map((step, idx) => (
-                      <React.Fragment key={step.id}>
-                        <div className={`flex flex-col items-center gap-1.5 flex-1`}>
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                            regStep === step.id ? 'bg-indigo-600 text-white shadow-lg ring-4 ring-indigo-100' : 
-                            ['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
-                          }`}>
-                            {['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? <CheckCircle size={16} /> : step.icon}
-                          </div>
-                          <span className={`text-[10px] font-bold uppercase tracking-wider ${regStep === step.id ? 'text-indigo-600' : 'text-gray-400'}`}>{step.label}</span>
-                        </div>
-                        {idx < 3 && <div className={`h-px flex-1 mb-5 transition-colors duration-500 ${['personal', 'expertise', 'location', 'verification'].indexOf(regStep) > idx ? 'bg-green-500' : 'bg-gray-100'}`} />}
-                      </React.Fragment>
-                    ))}
-                  </div>
                 </div>
-
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  if (regStep === 'personal') setRegStep('expertise');
-                  else if (regStep === 'expertise') {
-                    if (regData.categories.length === 0) {
-                      alert("Please select at least one category of expertise.");
-                      return;
-                    }
-                    setRegStep('location');
-                  }
-                  else if (regStep === 'location') {
-                    if (!regData.city) {
-                      alert("Please select a city.");
-                      return;
-                    }
-                    setRegStep('verification');
-                  }
-                  else if (regStep === 'verification') {
-                    if (!regData.aadharNumber || regData.aadharNumber.length !== 12) {
-                      alert("Please enter a valid 12-digit Aadhaar Card Number.");
-                      return;
-                    }
-                    submitPartnerRegistration(e);
-                  }
-                }} className="space-y-6">
-                  
-                  {/* STEP 1: PERSONAL DETAILS */}
-                  {regStep === 'personal' && (
-                    <div className="space-y-4 animate-fadeIn">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">First Name</label>
-                          <input 
-                            type="text" 
-                            required 
-                            placeholder="e.g., Salman"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                            value={regData.firstName}
-                            onChange={(e) => setRegData({...regData, firstName: e.target.value})}
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Last Name</label>
-                          <input 
-                            type="text" 
-                            required 
-                            placeholder="e.g., Khan"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                            value={regData.lastName}
-                            onChange={(e) => setRegData({...regData, lastName: e.target.value})}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Age</label>
-                          <input 
-                            type="number" 
-                            required 
-                            min="18"
-                            max="70"
-                            placeholder="Years"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                            value={regData.age}
-                            onChange={(e) => setRegData({...regData, age: e.target.value})}
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Gender</label>
-                          <select 
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white transition-all appearance-none"
-                            value={regData.gender}
-                            onChange={(e) => setRegData({...regData, gender: e.target.value})}
-                          >
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-400 uppercase ml-1">Alternative Phone (Optional)</label>
-                        <input 
-                          type="tel" 
-                          placeholder="Secondary contact number"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                          value={regData.altPhone}
-                          onChange={(e) => setRegData({...regData, altPhone: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* STEP 2: EXPERTISE */}
-                  {regStep === 'expertise' && (
-                    <div className="space-y-6 animate-fadeIn">
-                      <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Categories of Expertise</label>
-                        <div className="grid grid-cols-2 gap-3">
-                          {CATEGORY_LIST.map((cat) => (
-                            <label key={cat} className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${
-                              regData.categories.includes(cat) ? 'border-indigo-600 bg-indigo-50 shadow-sm ring-1 ring-indigo-600' : 'border-gray-100 hover:border-gray-300'
-                            }`}>
-                              <input 
-                                type="checkbox" 
-                                className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                                checked={regData.categories.includes(cat)}
-                                onChange={() => handleCategoryChange(cat)}
-                              />
-                              <span className={`text-sm font-bold ${regData.categories.includes(cat) ? 'text-indigo-700' : 'text-gray-700'}`}>{cat}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      {regData.categories.includes("Home Appliances") && (
-                        <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                          <h4 className="text-xs font-bold text-blue-800 uppercase mb-3 flex items-center gap-2">
-                             <Briefcase size={14} /> Appliances you repair
-                          </h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            {APPLIANCE_LIST.map((sub) => (
-                              <label key={sub} className="flex items-center gap-2 p-1.5 cursor-pointer group">
-                                <input 
-                                  type="checkbox" 
-                                  className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
-                                  checked={regData.subCategories.includes(sub)}
-                                  onChange={() => handleSubCategoryChange(sub)}
-                                />
-                                <span className="text-xs text-blue-700 group-hover:text-blue-900 transition-colors">{sub}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-400 uppercase ml-1">Years of Experience</label>
-                        <input 
-                          type="number" 
-                          required 
-                          placeholder="e.g., 5"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                          value={regData.experience}
-                          onChange={(e) => setRegData({...regData, experience: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* STEP 3: LOCATION */}
-                  {regStep === 'location' && (
-                    <div className="space-y-6 animate-fadeIn">
-                      <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Primary Work City</label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {CITY_DATA.map(city => (
-                            <button
-                              key={city.name}
-                              type="button"
-                              onClick={() => setRegData({...regData, city: city.name})}
-                              className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all ${
-                                regData.city === city.name ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-white'
-                              }`}
-                            >
-                              {city.name}
-                            </button>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => setRegData({...regData, city: 'Others', customCity: ''})}
-                            className={`py-2.5 px-2 rounded-xl text-xs font-bold border transition-all ${
-                              regData.city === 'Others' ? 'bg-indigo-600 text-white border-indigo-700 shadow-md' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-white'
-                            }`}
-                          >
-                            Other
-                          </button>
-                        </div>
-                      </div>
-
-                      {regData.city === 'Others' && (
-                        <div className="space-y-1 animate-fadeIn">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Type City Name</label>
-                          <input 
-                            type="text" 
-                            placeholder="Your city"
-                            required
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                            value={regData.customCity}
-                            onChange={(e) => setRegData({...regData, customCity: e.target.value})}
-                          />
-                        </div>
-                      )}
-
-                      <div>
-                        <label className="text-xs font-bold text-gray-400 uppercase ml-1 mb-2 block">Service Delivery Areas</label>
-                        <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">
-                          <div className="flex flex-wrap gap-2 mb-4 max-h-24 overflow-y-auto">
-                            {(PREDEFINED_AREAS[regData.city] || []).filter(a => !selectedAreasList.includes(a)).map(area => (
-                               <button 
-                                  key={area}
-                                  type="button"
-                                  onClick={() => handleAddArea(area)}
-                                  className="bg-white border border-gray-200 text-gray-700 text-[10px] px-2.5 py-1 rounded-full hover:border-indigo-500 transition-colors shadow-sm flex items-center gap-1 font-bold"
-                               >
-                                  <Plus size={10} /> {area}
-                               </button>
-                            ))}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                             <input 
-                                type="text"
-                                placeholder="Add custom area..."
-                                className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                value={customAreaInput}
-                                onChange={(e) => setCustomAreaInput(e.target.value)}
-                             />
-                             <button
-                                type="button"
-                                onClick={handleAddCustomArea}
-                                className="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-lg"
-                             >
-                                Add
-                             </button>
-                          </div>
-                        </div>
-
-                        {selectedAreasList.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-1.5">
-                            {selectedAreasList.map(area => (
-                              <span key={area} className="bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-full font-bold flex items-center gap-1.5 group shadow-sm">
-                                {area}
-                                <button type="button" onClick={() => handleRemoveArea(area)} className="hover:bg-white/20 rounded-full p-0.5">
-                                  <LogOut size={10} className="rotate-180" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Auto Discovered Pincodes Display */}
-                        {selectedAreasList.length > 0 && (
-                          <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
-                             <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
-                                Auto-Fetched Pincodes
-                                {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
-                             </label>
-                             <div className="text-sm text-green-700">
-                                {fetchingPincodes ? (
-                                    <span className="opacity-70">Fetching from India Post...</span>
-                                ) : discoveredPincodesList.length > 0 ? (
-                                    <div className="flex flex-wrap gap-1 mt-1">
-                                       {discoveredPincodesList.map(pin => (
-                                          <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
-                                            {pin}
-                                          </span>
-                                       ))}
-                                    </div>
-                                ) : (
-                                    <span className="opacity-70">No pincodes found for selected areas.</span>
-                                )}
-                             </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-bold text-gray-400 uppercase ml-1">Home Address</label>
-                          <button 
-                            type="button" 
-                            onClick={() => handleTrackLocation(false)} 
-                            disabled={isTrackingLocation || !!(regData.lat && regData.lng)}
-                            className={`text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all ${
-                              regData.lat && regData.lng ? 'bg-green-100 text-green-700 border-green-200' : 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100'
-                            }`}
-                          >
-                            {regData.lat && regData.lng ? <><CheckCircle size={12} /> Location Saved</> : isTrackingLocation ? <><Loader2 className="animate-spin" size={12} /> Locating...</> : <><Navigation size={12} /> GPS Detect</>}
-                          </button>
-                        </div>
-                        <textarea 
-                          placeholder="Complete residence address" 
-                          required
-                          rows={2}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
-                          value={regData.address}
-                          onChange={(e) => setRegData({...regData, address: e.target.value})}
-                        ></textarea>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* STEP 4: VERIFICATION */}
-                  {regStep === 'verification' && (
-                    <div className="space-y-6 animate-fadeIn">
-                      <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col items-center text-center gap-4">
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                           <ShieldCheck className="text-indigo-600" size={32} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-indigo-900 uppercase tracking-wide">Identity Verification</p>
-                          <p className="text-xs text-indigo-700 leading-relaxed mt-1">Please provide your 12-digit Aadhaar number below to verify your identity and activate your account.</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-750 block">Aadhaar Card Number <span className="text-rose-500 font-bold">*</span></label>
-                        <input 
-                          type="text" 
-                          placeholder="Enter 12-digit Aadhaar Number" 
-                          required
-                          maxLength={12}
-                          minLength={12}
-                          pattern="[0-9]{12}"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono tracking-widest text-center text-lg font-bold text-indigo-950"
-                          value={regData.aadharNumber}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, '');
-                            if (value.length <= 12) {
-                              setRegData({ ...regData, aadharNumber: value });
-                            }
-                          }}
-                        />
-                        <p className="text-[10px] text-gray-400">Your Aadhaar number is secure and only used for background validation.</p>
-                      </div>
-
-                      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex gap-3 text-gray-600 text-[10px] leading-relaxed">
-                         <Star size={14} className="flex-shrink-0 text-indigo-600 mt-0.5" />
-                         <p>By submitting, you agree to our <span className="font-bold underline cursor-pointer">Partner Terms of Service</span> and consent to identity verification.</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {regStep === 'success' && (
-                    <motion.div 
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="text-center py-8 animate-fadeIn"
-                    >
-                       <motion.div 
-                         initial={{ y: 20, opacity: 0 }}
-                         animate={{ y: 0, opacity: 1 }}
-                         transition={{ delay: 0.2 }}
-                         className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 relative"
-                       >
-                          <CheckCircle size={48} className="text-green-600 relative z-10" />
-                          <motion.div 
-                            animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
-                            transition={{ repeat: Infinity, duration: 2 }}
-                            className="absolute inset-0 bg-green-400 rounded-full"
-                          />
-                       </motion.div>
-                       
-                       <motion.div
-                         initial={{ y: 20, opacity: 0 }}
-                         animate={{ y: 0, opacity: 1 }}
-                         transition={{ delay: 0.4 }}
-                       >
-                         <h2 className="text-3xl font-bold text-gray-800 mb-2">Congratulations! 🎉</h2>
-                         <div className="flex justify-center gap-1 mb-4">
-                            <PartyPopper className="text-yellow-500" size={24} />
-                            <p className="text-indigo-600 font-bold">You are now a Verified Partner!</p>
-                            <PartyPopper className="text-yellow-500" size={24} />
-                         </div>
-                         <p className="text-gray-600 mb-8 px-4 text-sm leading-relaxed max-w-sm mx-auto">
-                            Your account is active and you can now start receiving leads. Welcome to the professional network of Sofiyan Home Service!
-                         </p>
-                       </motion.div>
-
-                       <motion.button 
-                         initial={{ y: 20, opacity: 0 }}
-                         animate={{ y: 0, opacity: 1 }}
-                         transition={{ delay: 0.6 }}
-                         type="button"
-                         onClick={() => {
-                            setIsRegistrationOpen(false);
-                         }}
-                         className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95"
-                       >
-                         Go to Dashboard
-                       </motion.button>
-                    </motion.div>
-                  )}
-
-                  {/* Navigation Buttons */}
-                  {regStep !== 'success' && (
-                    <div className="flex gap-3 pt-4">
-                      {regStep !== 'personal' && (
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            if (regStep === 'expertise') setRegStep('personal');
-                            else if (regStep === 'location') setRegStep('expertise');
-                            else if (regStep === 'verification') setRegStep('location');
-                          }}
-                          className="flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-all text-sm"
-                        >
-                          Back
-                        </button>
-                      )}
-                      <button 
-                        type="submit" 
-                        disabled={isSubmitting}
-                        className={`flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95 text-sm ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                      >
-                        {isSubmitting ? (
-                            <span className="flex items-center justify-center gap-2">
-                              <Loader2 className="w-5 h-5 animate-spin" /> Processing...
-                            </span>
-                        ) : regStep === 'verification' ? 'Submit' : 'Continue'}
-                      </button>
-                    </div>
-                  )}
-                </form>
-              </div>
+              ))}
             </div>
-          </div>
-        )}
-
-      {isEditingProfile && (
-          <div id="partner-edit-modal" className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex justify-center items-center px-4 animate-fadeIn backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scaleIn">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-                   <h2 className="text-2xl font-bold text-gray-800">Edit Your Profile ✏️</h2>
-                   <button onClick={() => setIsEditingProfile(false)} className="text-gray-400 hover:text-gray-600">
-                     <span className="sr-only">Close</span>
-                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                   </button>
-                </div>
-
-                <form onSubmit={submitProfileEdit} className="space-y-6">
-                  {/* Personal Info */}
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Contact Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input 
-                        type="tel" 
-                        placeholder="Phone Number" 
-                        required 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        value={editData.phone}
-                        onChange={(e) => setEditData({...editData, phone: e.target.value})}
-                      />
-                      <select 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        value={editData.gender}
-                        onChange={(e) => setEditData({...editData, gender: e.target.value})}
-                      >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
-                      <input 
-                        type="number" 
-                        placeholder="Work Experience (Years)" 
-                        required 
-                        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                        value={editData.experience}
-                        onChange={(e) => setEditData({...editData, experience: e.target.value})}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Work Categories */}
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Select Your Expertise</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                       {CATEGORY_LIST.map((cat) => (
-                         <label key={cat} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                           <input 
-                             type="checkbox" 
-                             className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                             checked={editData.categories.includes(cat)}
-                             onChange={() => handleEditCategoryChange(cat)}
-                           />
-                           <span className="text-sm font-medium text-gray-700">{cat}</span>
-                         </label>
-                       ))}
-                    </div>
-
-                    {/* Conditional Sub-Categories */}
-                    {editData.categories.includes("Home Appliances") && (
-                      <div className="bg-blue-50 p-4 rounded-xl mt-4 border border-blue-100 animate-fadeIn">
-                         <h4 className="text-sm font-bold text-blue-800 mb-3">Select Appliances you can repair:</h4>
-                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                           {APPLIANCE_LIST.map((sub) => (
-                             <label key={sub} className="flex items-center gap-2">
-                               <input 
-                                 type="checkbox" 
-                                 className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
-                                 checked={editData.subCategories.includes(sub)}
-                                 onChange={() => handleEditSubCategoryChange(sub)}
-                               />
-                               <span className="text-sm text-blue-700">{sub}</span>
-                             </label>
-                           ))}
-                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Location */}
-                  <div>
-                     <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Service Areas ({editData.city === 'Others' ? editData.customCity : editData.city})</h3>
-                       
-                       {editData.city === 'Others' && (
-                           <input 
-                               type="text" 
-                               id="edit-other-city-input" 
-                               placeholder="Type your city name" 
-                               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 outline-none animate-fadeIn"
-                               value={editData.customCity}
-                               onChange={(e) => setEditData({...editData, customCity: e.target.value})}
-                               required
-                           />
-                       )}
-
-                       <div className="space-y-4">
-                          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Available Areas in {editData.city}</label>
-                             <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                                {(PREDEFINED_AREAS[editData.city] || []).filter(a => !editSelectedAreasList.includes(a)).map(area => (
-                                   <div 
-                                      key={area}
-                                      onClick={() => handleEditAddArea(area)}
-                                      className="bg-white border border-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-full cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:text-indigo-700 transition flex items-center gap-1 shadow-sm"
-                                   >
-                                      <Plus size={14} /> {area}
-                                   </div>
-                                ))}
-                                {(PREDEFINED_AREAS[editData.city] || []).filter(a => !editSelectedAreasList.includes(a)).length === 0 && (
-                                   <span className="text-sm text-gray-400 italic py-1">No predefined areas left to select.</span>
-                                )}
-                             </div>
-                             
-                             <div className="mt-4 flex gap-2">
-                                <input 
-                                   type="text"
-                                   placeholder="Add a custom area..."
-                                   className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                   value={editCustomAreaInput}
-                                   onChange={(e) => setEditCustomAreaInput(e.target.value)}
-                                   onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                         e.preventDefault();
-                                         handleEditAddCustomArea();
-                                      }
-                                   }}
-                                />
-                                <button
-                                   type="button"
-                                   onClick={handleEditAddCustomArea}
-                                   className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700"
-                                >
-                                   Add
-                                </button>
-                             </div>
-                          </div>
-
-                          <div className="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100 min-h-[100px]">
-                             <label className="block text-xs font-bold text-indigo-800 uppercase mb-2 flex items-center justify-between">
-                                Selected Service Areas
-                                <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full">{editSelectedAreasList.length}</span>
-                             </label>
-                             {editSelectedAreasList.length === 0 ? (
-                                <div className="text-center py-6 border-2 border-dashed border-indigo-200 rounded-lg text-indigo-400 text-sm">
-                                   Click '+' to add areas or type below.
-                                </div>
-                             ) : (
-                                <div className="flex flex-wrap gap-2">
-                                   {editSelectedAreasList.map(area => (
-                                      <div 
-                                         key={area}
-                                         className="bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 group"
-                                      >
-                                         {area}
-                                         <button 
-                                            type="button" 
-                                            onClick={() => handleEditRemoveArea(area)}
-                                            className="w-4 h-4 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center transition"
-                                         >
-                                            <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                            </svg>
-                                         </button>
-                                      </div>
-                                   ))}
-                                </div>
-                             )}
-                          </div>
-                          
-                          <input 
-                            type="number" 
-                            placeholder="Other service area pin code" 
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none mt-2 ${editPincodeError ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}`}
-                            value={editData.pincode}
-                            onChange={(e) => setEditData({...editData, pincode: e.target.value})}
-                          />
-                          {editPincodeError && <p className="text-red-500 text-xs mt-1 font-medium">{editPincodeError}</p>}
-                          {editPincodeAreas.length > 0 && !editPincodeError && (
-                             <p className="text-emerald-600 text-xs mt-1 font-medium bg-emerald-50 p-1.5 rounded inline-block">
-                                📍 Areas found: {editPincodeAreas.join(', ')}
-                             </p>
-                          )}
-                          
-                          {/* Auto Discovered Pincodes Display */}
-                          {editSelectedAreasList.length > 0 && (
-                            <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
-                               <label className="block text-xs font-bold text-green-800 uppercase mb-1 flex items-center justify-between">
-                                  Auto-Fetched Pincodes
-                                  {fetchingPincodes && <Loader2 className="w-3 h-3 animate-spin" />}
-                               </label>
-                               <div className="text-sm text-green-700">
-                                  {fetchingPincodes ? (
-                                      <span className="opacity-70">Fetching from India Post...</span>
-                                  ) : editDiscoveredPincodesList.length > 0 ? (
-                                      <div className="flex flex-wrap gap-1 mt-1">
-                                         {editDiscoveredPincodesList.map(pin => (
-                                            <span key={pin} className="bg-green-200/50 text-green-800 px-2 py-0.5 rounded text-xs font-medium border border-green-300">
-                                              {pin}
-                                            </span>
-                                         ))}
-                                      </div>
-                                  ) : (
-                                      <span className="opacity-70">No pincodes found for selected areas.</span>
-                                  )}
-                               </div>
-                            </div>
-                          )}
-
-                          <div className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Manual Address</label>
-                            <button 
-                              type="button" 
-                              onClick={() => handleTrackLocation(true)} 
-                              disabled={isTrackingLocation || !!(editData.lat && editData.lng)}
-                              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:text-green-600 flex items-center gap-1"
-                            >
-                              {editData.lat && editData.lng ? '✓ Location Saved' : isTrackingLocation ? 'Locating...' : '📍 Auto-Detect Location'}
-                            </button>
-                          </div>
-                          <textarea 
-                             placeholder="Full Address" 
-                             required
-                             rows={2}
-                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                             value={editData.address}
-                             onChange={(e) => setEditData({...editData, address: e.target.value})}
-                          ></textarea>
-                        </div>
-                     </div>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className={`w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all active:scale-95 text-lg ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  >
-                    {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <Loader2 className="w-6 h-6 animate-spin" /> Saving Profile...
-                        </span>
-                    ) : 'Save Changes'}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-      <Modal 
-        isOpen={!!paymentModal} 
-        onClose={() => setPaymentModal(null)} 
-        title="Generate Final Bill"
-      >
-        {paymentModal && (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="font-bold text-gray-700 mb-2 border-b border-gray-200 pb-2">Job Summary</h3>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-600">Customer</span>
-                <span className="font-medium">{paymentModal.customerName}</span>
-              </div>
-              
-              <div className="bg-white p-3 rounded border border-gray-200 my-2">
-                 {paymentModal.cartItems && Array.isArray(paymentModal.cartItems) ? (
-                    <ul className="space-y-1">
-                      {paymentModal.cartItems.map((item, idx) => (
-                        <li key={idx} className="flex justify-between text-xs">
-                          <span>{item.name} <span className="text-gray-400">x{item.quantity}</span></span>
-                          <span className="font-medium">₹{item.price * item.quantity}</span>
-                        </li>
-                      ))}
-                    </ul>
-                 ) : (
-                    <div className="flex justify-between text-sm">
-                       <span>{paymentModal.subServiceName}</span>
-                       <span>₹{paymentModal.price}</span>
-                    </div>
-                 )}
-              </div>
-
-              <div className="flex justify-between text-sm font-semibold text-indigo-900 border-t border-gray-200 pt-2 mt-2">
-                <span>Base Total</span>
-                <span>₹{paymentModal.price}</span>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                <Briefcase size={16}/> Add Extra Works?
-              </h3>
-              <div className="flex gap-2 mb-3">
-                <select 
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                  onChange={(e) => {
-                     const selectedServiceName = e.target.value;
-                     let service = null;
-                     for (const category of SERVICES) {
-                         const found = category.subServices.find((s: any) => s.name === selectedServiceName);
-                         if (found) {
-                             service = found;
-                             break;
-                         }
-                     }
-                     
-                     if (service) {
-                       setExtraWorks([...extraWorks, { name: service.name, price: service.price }]);
-                       e.target.value = "";
-                     }
-                  }}
-                  defaultValue=""
-                >
-                  <option value="" disabled>Select extra service...</option>
-                  {SERVICES.map((category) => (
-                    <optgroup key={category.name} label={category.name}>
-                      {category.subServices.map((s: any) => (
-                         <option key={`${category.name}-${s.name}`} value={s.name}>{s.name} - ₹{s.price}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </div>
-              
-              {extraWorks.length > 0 && (
-                <div className="space-y-2 mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  {extraWorks.map((work, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-sm animate-fadeIn">
-                      <span className="text-gray-700">{work.name}</span>
-                      <div className="flex items-center gap-3">
-                         <span className="font-medium text-gray-900">₹{work.price}</span>
-                         <button 
-                           onClick={() => setExtraWorks(extraWorks.filter((_, i) => i !== idx))}
-                           className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded"
-                         >
-                           <Trash2 size={14}/>
-                         </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-               <div className="flex justify-between text-sm">
-                 <span className="text-gray-600">Total Service Charge</span>
-                 <span className="font-bold text-gray-900">₹{modalTotal}</span>
-               </div>
-               <div className="flex justify-between items-center text-lg font-bold text-indigo-700 border-t border-blue-200 pt-3">
-                 <span>Platform Commission (25%)</span>
-                 <span>₹{modalCommission.toFixed(2)}</span>
-               </div>
-            </div>
-
-            <div className="text-center space-y-4 pt-2">
-               <div className="bg-white p-4 inline-block rounded-lg shadow-sm border border-gray-200 w-full">
-                 <p className="font-medium text-gray-900 mb-3">Pay Commission via WhatsApp</p>
-                 <a 
-                   href="https://wa.me/919219345455" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="inline-flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-                 >
-                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-                   </svg>
-                   Contact Admin
-                 </a>
-               </div>
-               
-               <div className="relative">
-                 <input 
-                   type="file" 
-                   id="payment-screenshot"
-                   accept="image/*"
-                   onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
-                   className="hidden"
-                 />
-                 <label 
-                   htmlFor="payment-screenshot"
-                   className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${screenshot ? 'border-green-500 bg-green-50 text-green-700 font-medium' : 'border-gray-300 hover:border-indigo-500 text-gray-500 hover:bg-gray-50'}`}
-                 >
-                   <Upload size={18} />
-                   {screenshot ? screenshot.name : 'Upload Payment Screenshot'}
-                 </label>
-               </div>
-            </div>
-
-            <div className="bg-red-50 p-4 rounded-lg border border-red-100 flex gap-3 items-start">
-               <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={18} />
-               <p className="text-xs text-red-700 leading-relaxed font-medium">
-                 <strong>IMPORTANT NOTE:</strong> Dear Partner, is lead ko complete mark karne ke liye kripya commission amount turant pay karein. Jab tak yeh payment clear nahi hoti, nayi leads milna temporary hold par rahega. Thank you for your cooperation.
-               </p>
-            </div>
-
-            <button
-              onClick={processPayment}
-              className="w-full py-3.5 bg-green-600 text-white rounded-xl font-bold shadow-lg hover:bg-green-700 hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-              <CheckCircle size={20} />
-              Complete Service & Submit
-            </button>
-          </div>
-        )}
-      </Modal>
-
-      {leadToAccept && (
-            <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex justify-center items-center px-4 animate-fadeIn">
-                <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all animate-scaleIn">
-                    <div className="bg-indigo-600 p-4 text-center">
-                        <h3 className="text-white text-lg font-bold flex items-center justify-center gap-2">
-                            <AlertTriangle className="text-yellow-300" /> Confirm Lead Acceptance
-                        </h3>
-                    </div>
-                    <div className="p-6">
-                        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-4 text-sm text-gray-700 space-y-2">
-                            <p><strong>📍 City:</strong> {leadToAccept.city || 'N/A'}</p>
-                            <p><strong>🛠️ Category:</strong> {leadToAccept.serviceCategory}</p>
-                            <p><strong>🏠 Address:</strong> {leadToAccept.address}</p>
-                        </div>
-                        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-                            <p className="text-red-700 font-semibold text-sm leading-relaxed">
-                                "यह लीड कम्पलीट करने के बाद ही आप नेक्स्ट लीड एक्सेप्ट कर सकते हैं。<br/>ध्यान दें: हम सर्विस चार्ज का 25% कमीशन चार्ज करते हैं。"
-                            </p>
-                        </div>
-                        <div className="flex space-x-3">
-                            <button 
-                                onClick={() => setLeadToAccept(null)} 
-                                className="flex-1 bg-gray-200 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-300 transition"
-                                disabled={isSubmitting}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                onClick={confirmLeadAcceptance} 
-                                disabled={isSubmitting}
-                                className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-700 transition flex justify-center items-center gap-2"
-                            >
-                                {isSubmitting ? <Loader2 className="animate-spin" /> : <><CheckCircle size={18} /> Confirmed</>}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )}
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 };

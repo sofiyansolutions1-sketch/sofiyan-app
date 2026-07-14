@@ -213,13 +213,13 @@ export const FollowUpManager: React.FC = () => {
 
     try {
       recognition.start();
-    } catch (e) {
-      console.error(e);
+    } catch {
+      console.error( );
       setIsListening(false);
     }
   };
 
-  const processSpeechToFormWithAI = async (text: string) => {
+  const processSpeechToFormWithAI = async () => {
     setIsProcessingAI(true);
     try {
       const response = await fetch('/api/extract-lead', {
@@ -229,7 +229,9 @@ export const FollowUpManager: React.FC = () => {
       });
       
       if (!response.ok) throw new Error('Server error during extraction');
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error("Invalid response from server"); }
       
       setFormData(prev => ({
         ...prev,
@@ -355,7 +357,9 @@ export const FollowUpManager: React.FC = () => {
         body: JSON.stringify(payload)
       });
       
-      const resData = await response.json();
+      const text = await response.text();
+      let resData;
+      try { resData = JSON.parse(text); } catch { throw new Error("Invalid response from server"); }
       if (response.ok) {
         alert(`WhatsApp Utility Notification sent to ${recipientType}!`);
       } else {
@@ -868,7 +872,7 @@ const LeadCard = ({ lead, onReschedule, onDelete, isUrgent, highlightAsNext = fa
             <Phone size={16} />
           </a>
           <a 
-            onClick={(e) => {
+            onClick={( ) => {
                e.preventDefault();
                const cleanNum = lead.contact_number.replace(/\D/g, '');
                const waNum = cleanNum.length === 10 ? '91' + cleanNum : cleanNum;

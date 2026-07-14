@@ -1,113 +1,126 @@
-import { useState, useEffect, useCallback } from 'react';
+import { create } from 'zustand';
 import { Booking, Partner } from '../types';
 import { supabase } from '../supabaseClient';
 
-export const useStore = () => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [loading, setLoading] = useState(true);
+interface StoreState {
+  bookings: Booking[];
+  partners: Partner[];
+  loading: boolean;
+  initialized: boolean;
+  
+  fetchBookings: () => Promise<void>;
+  fetchPartners: () => Promise<void>;
+  init: () => Promise<void>;
+  
+  addBooking: () => Promise<void>;
+  updateBooking: (updatedBooking: Booking) => Promise<void>;
+  addPartner: (newPartner: Partner) => Promise<Partner>;
+  updatePartner: (updatedPartner: Partner) => Promise<void>;
+  getPartner: (email: string) => Partner | undefined;
+}
 
-  // Mappers to convert DB snake_case to App camelCase
-  const mapBookingFromDB = (data: any): Booking => ({
-    id: data.id,
-    customerName: data.customer_name,
-    contactNumber: data.customer_phone || data.contact_number,
-    address: data.customer_address || data.address,
-    area: data.area || '', 
-    city: data.city,
-    location_link: data.location_link,
-    pinCode: data.pincode || data.pin_code,
-    description: '', // Not in schema
-    date: data.service_date || data.date,
-    time: data.service_time || data.time,
-    serviceCategory: data.service_category,
-    subServiceName: data.sub_service_name,
-    cartItems: data.cart_items,
-    price: data.total_price || data.price,
-    status: data.status,
-    assignedPartnerId: data.assigned_partner_id,
-    assignedPartnerName: data.assigned_partner_name,
-    assignedPartnerPhone: data.assigned_partner_phone,
-    assignedPartnerArea: data.assigned_partner_area || '', 
-    commissionPaid: data.commission_paid || false,
-    commission_screenshot: data.commission_screenshot || '',
-    createdAt: data.created_at,
-    couponUsed: data.coupon_used || '',
-    discountAmount: data.discount_amount,
-    appliedReferralCode: data.applied_referral_code
-  });
+const mapBookingFromDB = (data: any): Booking => ({
+  id: data.id,
+  customerName: data.customer_name,
+  contactNumber: data.customer_phone || data.contact_number,
+  address: data.customer_address || data.address,
+  area: data.area || '', 
+  city: data.city,
+  location_link: data.location_link,
+  pinCode: data.pincode || data.pin_code,
+  description: '', // Not in schema
+  date: data.service_date || data.date,
+  time: data.service_time || data.time,
+  serviceCategory: data.service_category,
+  subServiceName: data.sub_service_name,
+  cartItems: data.cart_items,
+  price: data.total_price || data.price,
+  status: data.status,
+  assignedPartnerId: data.assigned_partner_id,
+  assignedPartnerName: data.assigned_partner_name,
+  assignedPartnerPhone: data.assigned_partner_phone,
+  assignedPartnerArea: data.assigned_partner_area || '', 
+  commissionPaid: data.commission_paid || false,
+  commission_screenshot: data.commission_screenshot || '',
+  createdAt: data.created_at,
+  couponUsed: data.coupon_used || '',
+  discountAmount: data.discount_amount,
+  appliedReferralCode: data.applied_referral_code
+});
 
-  const mapPrimaryPartnerFromDB = (data: any): Partner => ({
-    id: data.id,
-    name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name,
-    first_name: data.first_name,
-    last_name: data.last_name,
-    email: data.email,
-    phone: data.phone,
-    city: data.city,
-    pincode: data.pincode,
-    categories: data.categories,
-    sub_categories: data.sub_categories,
-    service_areas: data.service_areas,
-    service_pincodes: data.service_pincodes,
-    status: data.status,
-    rating: data.rating || 0,
-    review_count: data.review_count || 0,
-    earnings: data.earnings || 0,
-    completedJobs: data.completed_jobs || 0,
-    aadhar_number: data.aadhar_number,
-    id_proof_url: data.id_proof_url,
-    partner_type: 'Primary'
-  });
+const mapPrimaryPartnerFromDB = (data: any): Partner => ({
+  id: data.id,
+  name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name,
+  first_name: data.first_name,
+  last_name: data.last_name,
+  email: data.email,
+  phone: data.phone,
+  password: data.password,
+  city: data.city,
+  pincode: data.pincode,
+  categories: data.categories,
+  sub_categories: data.sub_categories,
+  service_areas: data.service_areas,
+  service_pincodes: data.service_pincodes,
+  status: data.status,
+  rating: data.rating || 0,
+  review_count: data.review_count || 0,
+  earnings: data.earnings || 0,
+  completedJobs: data.completed_jobs || 0,
+  aadhar_number: data.aadhar_number,
+  id_proof_url: data.id_proof_url,
+  partner_type: 'Primary'
+});
 
-  const fetchBookings = useCallback(async () => {
+export const useStore = create<StoreState>((set, get) => ({
+  bookings: [],
+  partners: [],
+  loading: true,
+  initialized: false,
+
+  fetchBookings: async () => {
     const { data } = await supabase
       .from('bookings')
       .select('*')
       .neq('status', 'cancelled')
       .order('created_at', { ascending: false });
-    if (data) setBookings(data.map(mapBookingFromDB));
-  }, []);
+    if (data) {
+      set({ bookings: data.map(mapBookingFromDB) });
+    }
+  },
 
-  const fetchPartners = useCallback(async () => {
+  fetchPartners: async () => {
     const { data, error } = await supabase.from('primary_partners').select('*');
     if (error) {
       console.error("Error fetching partners:", error);
     }
     const primary = data ? data.map(mapPrimaryPartnerFromDB) : [];
-    setPartners(primary);
-  }, []);
+    set({ partners: primary });
+  },
 
-  useEffect(() => {
-    const init = async () => {
-      setLoading(true);
-      await Promise.all([fetchBookings(), fetchPartners()]);
-      setLoading(false);
-    };
-    init();
+  init: async () => {
+    if (get().initialized) return;
+    set({ loading: true, initialized: true });
+    await Promise.all([get().fetchBookings(), get().fetchPartners()]);
+    set({ loading: false });
 
-    const bookingsSub = supabase.channel('bookings-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => fetchBookings())
+    supabase.channel('bookings-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => get().fetchBookings())
       .subscribe();
       
-    const primaryPartnersSub = supabase.channel('primary-partners-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'primary_partners' }, () => fetchPartners())
+    supabase.channel('primary-partners-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'primary_partners' }, () => get().fetchPartners())
       .subscribe();
+  },
 
-    return () => {
-      supabase.removeChannel(bookingsSub);
-      supabase.removeChannel(primaryPartnersSub);
-    };
-  }, [fetchBookings, fetchPartners]);
+  addBooking: async () => {
+      await get().fetchBookings(); 
+  },
 
-  const addBooking = async () => {
-      // Logic handled by components via direct insert mostly, but refetching ensures sync
-      await fetchBookings(); 
-  };
-
-  const updateBooking = async (updatedBooking: Booking) => {
-    // Optimistic UI update
-    setBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
+  updateBooking: async (updatedBooking: Booking) => {
+    set(state => ({
+      bookings: state.bookings.map(b => b.id === updatedBooking.id ? updatedBooking : b)
+    }));
 
     const { error } = await supabase.from('bookings').update({
         status: updatedBooking.status,
@@ -115,8 +128,6 @@ export const useStore = () => {
         assigned_partner_name: updatedBooking.assignedPartnerName || null,
         assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
         assigned_partner_area: updatedBooking.assignedPartnerArea || null,
-        service_date: updatedBooking.date,
-        service_time: updatedBooking.time,
         date: updatedBooking.date,
         time: updatedBooking.time,
         commission_paid: updatedBooking.commissionPaid,
@@ -125,41 +136,94 @@ export const useStore = () => {
     
     if (error) {
         console.error("Error updating booking:", error);
-        fetchBookings(); // Revert on error
+        get().fetchBookings(); 
     }
-  };
+  },
 
-  const addPartner = async () => {
-     await fetchPartners();
-  };
+  
+  addPartner: async (newPartner: Partner) => {
+    const dbPartner = {
+      name: newPartner.name,
+      first_name: newPartner.first_name,
+      last_name: newPartner.last_name,
+      email: newPartner.email || `${newPartner.phone || Date.now()}@example.com`,
+      phone: newPartner.phone,
+      password: newPartner.password,
+      alt_phone: newPartner.alt_phone,
+      gender: newPartner.gender,
+      age: newPartner.age,
+      city: newPartner.city,
+      pincode: newPartner.pincode,
+      categories: newPartner.categories,
+      sub_categories: newPartner.sub_categories,
+      service_pincodes: newPartner.service_pincodes,
+      experience: newPartner.experience,
+      aadhar_number: newPartner.aadhar_number,
+      status: newPartner.status,
+      earnings: newPartner.earnings,
+      completed_jobs: newPartner.completedJobs,
+      registration_fee_paid: false
+    };
 
-  const updatePartner = async (updatedPartner: Partner) => {
-     setPartners(prev => prev.map(p => p.id === updatedPartner.id ? updatedPartner : p));
+    const { data, error } = await supabase.from('primary_partners').insert(dbPartner).select().single();
+    if (error) {
+       console.error("Error adding partner:", error);
+       return newPartner;
+    }
+    
+    const createdPartner: Partner = {
+      ...newPartner,
+      id: data.id
+    };
+    
+    set(state => ({
+      partners: [...state.partners.filter(p => p.id !== newPartner.id), createdPartner]
+    }));
+    
+    return createdPartner;
+  },
 
+
+  updatePartner: async (updatedPartner: Partner) => {
+     set(state => ({
+       partners: state.partners.map(p => p.id === updatedPartner.id ? updatedPartner : p)
+     }));
      const { error } = await supabase.from('primary_partners').update({
          status: updatedPartner.status,
          earnings: updatedPartner.earnings,
          completed_jobs: updatedPartner.completedJobs,
          rating: updatedPartner.rating,
-         review_count: updatedPartner.review_count
+         review_count: updatedPartner.review_count,
+         name: updatedPartner.name,
+         first_name: updatedPartner.first_name,
+         last_name: updatedPartner.last_name,
+         email: updatedPartner.email,
+         phone: updatedPartner.phone,
+         password: updatedPartner.password,
+         alt_phone: updatedPartner.alt_phone,
+         gender: updatedPartner.gender,
+         age: updatedPartner.age,
+         experience: updatedPartner.experience,
+         aadhar_number: updatedPartner.aadhar_number,
+         address: updatedPartner.address,
+         pincode: updatedPartner.pincode,
+         city: updatedPartner.city,
+         categories: updatedPartner.categories,
+         sub_categories: updatedPartner.sub_categories,
+         service_pincodes: updatedPartner.service_pincodes,
+         id_proof_url: updatedPartner.id_proof_url,
+         registration_fee_paid: updatedPartner.registration_fee_paid,
+         registration_fee_screenshot: updatedPartner.registration_fee_screenshot
      }).eq('id', updatedPartner.id);
-
+     
      if (error) {
         console.error("Error updating partner:", error);
-        fetchPartners();
+        get().fetchPartners();
      }
-  };
+  },
 
-  const getPartner = (email: string) => partners.find(p => p.email === email);
+  getPartner: (email: string) => get().partners.find(p => p.email === email)
+}));
 
-  return {
-    bookings,
-    partners,
-    addBooking,
-    updateBooking,
-    addPartner,
-    updatePartner,
-    getPartner,
-    loading
-  };
-};
+// Initialize the store immediately
+useStore.getState().init();
