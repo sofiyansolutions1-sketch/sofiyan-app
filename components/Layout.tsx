@@ -282,7 +282,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <ul className="space-y-3 text-sm text-gray-600">
                 <li className="flex items-start gap-3 text-gray-900 font-medium">
                   <Phone size={16} className="text-gray-900 mt-0.5 flex-shrink-0" />
-                  <span>+91 9219345455</span>
+                  <span>+91 7625046788</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />

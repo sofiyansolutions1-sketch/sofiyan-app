@@ -28,7 +28,7 @@ const htmlContent = `
                     <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Shivpur, Sarnath, Ashapur, Orderly Bazar, Chaukaghat, Ramnagar, DLW, BHU Area, and nearby Varanasi locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -225,7 +225,7 @@ const htmlContent = `
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Varanasi Today</h3>
                       <p>Whether you need emergency RO repair, membrane replacement, filter replacement, purifier cleaning, installation support, AMC maintenance, or complete water purification system servicing, Sofiyan delivers dependable RO solutions throughout Varanasi.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>

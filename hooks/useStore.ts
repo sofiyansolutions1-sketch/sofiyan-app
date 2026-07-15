@@ -168,7 +168,7 @@ export const useStore = create<StoreState>((set, get) => ({
     const { data, error } = await supabase.from('primary_partners').insert(dbPartner).select().single();
     if (error) {
        console.error("Error adding partner:", error);
-       return newPartner;
+       throw error;
     }
     
     const createdPartner: Partner = {
@@ -219,6 +219,7 @@ export const useStore = create<StoreState>((set, get) => ({
      if (error) {
         console.error("Error updating partner:", error);
         get().fetchPartners();
+        throw error;
      }
   },
 

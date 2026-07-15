@@ -25,6 +25,7 @@ export const PartnerPanel: React.FC = () => {
 
   // Registration Modal State
   
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [jobToComplete, setJobToComplete] = useState<any>(null);
   const [verificationStep, setVerificationStep] = useState<'idle'|'uploading'|'verifying'|'success'>('idle');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -140,17 +141,21 @@ export const PartnerPanel: React.FC = () => {
       earnings: 0,
       completedJobs: 0
     };
-    const createdPartner = await addPartner(newPartner);
-    setCurrentUser(createdPartner);
-    localStorage.setItem('partnerPhone', createdPartner.phone || '');
-    setAuthError(null);
-    setRegData({
-      ...regData,
-      firstName: createdPartner.first_name || '',
-      lastName: createdPartner.last_name || '',
-      phone: createdPartner.phone || '',
-      password: createdPartner.password || ''
-    });
+    try {
+      const createdPartner = await addPartner(newPartner);
+      setCurrentUser(createdPartner);
+      localStorage.setItem('partnerPhone', createdPartner.phone || '');
+      setAuthError(null);
+      setRegData({
+        ...regData,
+        firstName: createdPartner.first_name || '',
+        lastName: createdPartner.last_name || '',
+        phone: createdPartner.phone || '',
+        password: createdPartner.password || ''
+      });
+    } catch (err: any) {
+      setAuthError(err.message || "Failed to sign up");
+    }
   };
 const handleLogout = () => {
     setCurrentUser(null);
@@ -183,12 +188,16 @@ const handleLogout = () => {
       earnings: isUpdating ? currentUser.earnings : 0,
       completedJobs: isUpdating ? currentUser.completedJobs : 0
     };
-    if (isUpdating) {
-       await updatePartner(newPartner);
-       setCurrentUser(newPartner);
-    } else {
-       const createdPartner = await addPartner(newPartner);
-       setCurrentUser(createdPartner);
+    try {
+      if (isUpdating) {
+         await updatePartner(newPartner);
+         setCurrentUser(newPartner);
+      } else {
+         const createdPartner = await addPartner(newPartner);
+         setCurrentUser(createdPartner);
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to update profile");
     }
     
   };
@@ -486,8 +495,8 @@ const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning 
     );
   }
 
-  if (isProfileIncomplete) {
-    return renderRegistrationModal();
+  if (isProfileIncomplete || isRegistrationOpen) {
+    return renderRegistrationModal(isProfileIncomplete);
   }
 
   const partnerBookings = bookings.filter(b => b.assignedPartnerId === currentUser.id);

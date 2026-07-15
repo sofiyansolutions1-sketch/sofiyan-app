@@ -103,7 +103,7 @@ const categoryList = [
 ];
 
 export const CustomerPanel: React.FC = () => {
-  const { partners } = useStore();
+  const { partners, bookings } = useStore();
   const navigate = useNavigate();
   const [techPincode, setTechPincode] = useState('');
   const [searchedTechPincode, setSearchedTechPincode] = useState('');
@@ -114,6 +114,29 @@ export const CustomerPanel: React.FC = () => {
   
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'success'>('form');
+
+  const [customerPhone, setCustomerPhone] = useState(localStorage.getItem('customerPhone') || '');
+  const [showHelplineBanner, setShowHelplineBanner] = useState(false);
+
+  useEffect(() => {
+    let hasActive = false;
+    let hasAny = false;
+    if (customerPhone) {
+        hasAny = bookings.some(b => b.contactNumber === customerPhone);
+        hasActive = bookings.some(b => b.contactNumber === customerPhone && b.status !== 'completed' && b.status !== 'cancelled');
+    }
+    
+    if (sessionStorage.getItem('justBooked') === 'true') {
+       if (hasAny && !hasActive) {
+           sessionStorage.removeItem('justBooked');
+           setShowHelplineBanner(false);
+       } else {
+           setShowHelplineBanner(true);
+       }
+    } else {
+       setShowHelplineBanner(hasActive);
+    }
+  }, [bookings, customerPhone]);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -764,7 +787,7 @@ export const CustomerPanel: React.FC = () => {
           `Sent via Sofiyan Home Service App`;
 
         // 1. Automatic send to admin via Server API
-        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '919219345455').replace(/\+/g, '');
+        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '7625046788').replace(/\+/g, '');
         
         fetch('/api/send-whatsapp', {
           method: 'POST',
@@ -784,6 +807,9 @@ export const CustomerPanel: React.FC = () => {
 
       // Success UI
       setBookingStep('success');
+      sessionStorage.setItem('justBooked', 'true');
+      localStorage.setItem('customerPhone', formData.contact);
+      setCustomerPhone(formData.contact);
       setCart([]); 
       
       // NOTE: Removed local addBooking() call to strictly enforce usage of Supabase DB as the source of truth.
@@ -2277,6 +2303,22 @@ export const CustomerPanel: React.FC = () => {
           onClose={() => setIsRateCardModalOpen(false)}
           category={activeRateCardCategory}
         />
+
+        {/* Floating Helpline Pill */}
+        {showHelplineBanner && (
+          <a 
+            href="tel:7625046788" 
+            className="fixed bottom-24 right-4 sm:right-8 z-50 flex items-center bg-white rounded-full shadow-2xl border border-gray-200 cursor-pointer animate-pulse hover:animate-none hover:scale-105 transition-all overflow-hidden"
+          >
+            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shrink-0 m-1 shadow-sm">
+               <Phone className="w-4 h-4 text-white" />
+            </div>
+            <div className="pr-4 pl-1 py-1">
+              <span className="block text-[8px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-0.5">Helpline</span>
+              <span className="block text-xs font-black text-indigo-600 tracking-tight leading-none">7625046788</span>
+            </div>
+          </a>
+        )}
       </div>
     </>
   );

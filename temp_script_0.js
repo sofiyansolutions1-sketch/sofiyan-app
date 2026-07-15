@@ -337,7 +337,7 @@
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -498,7 +498,7 @@
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Noida Today</h3>
                       <p>Whether you need emergency repairs, gas refilling, deep cleaning, installation support, inverter AC troubleshooting, or preventive maintenance, Sofiyan delivers dependable AC repair solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -534,7 +534,7 @@
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Navrangpura, Vastrapur, Chandkheda, Gota, Nikol, Maninagar, Thaltej, South Bopal, Motera, Sabarmati, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -699,7 +699,7 @@
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Ahmedabad Today</h3>
                       <p>Don't let Ahmedabad's extreme heat affect your comfort. Whether you need emergency repairs, deep cleaning, gas refilling, installation support, or preventive maintenance, Sofiyan delivers dependable AC solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -729,7 +729,7 @@
                     <p>Serving customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -806,7 +806,7 @@
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our AC Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the required solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -858,7 +858,7 @@
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your AC Repair Service in Mumbai Today</h3>
                       <p>Don't let Mumbai's heat and humidity affect your comfort. Whether you need AC repair, AC servicing, deep cleaning, installation, or gas refilling, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -886,7 +886,7 @@
                     <p>We serve customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Yelahanka, Jayanagar, and other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -952,7 +952,7 @@
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Split AC Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Issue Diagnosis:</strong> We check the AC carefully and identify the problem.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost before the work begins.</li>
@@ -1004,7 +1004,7 @@
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Split AC Service in Bangalore Today</h3>
                       <p>Don’t let AC problems disturb your comfort. Whether you need Split AC repair, cleaning, installation, uninstallation, or gas refilling, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -1042,7 +1042,7 @@
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -1203,7 +1203,7 @@
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Gurgaon Today</h3>
                       <p>Whether you need emergency AC repair, gas refilling, deep cleaning, installation support, inverter AC troubleshooting, or preventive maintenance, Sofiyan provides reliable AC repair and service solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -1239,7 +1239,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -1404,7 +1404,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Kolkata Today</h3>
                       <p>Don't let Kolkata's heat and humidity affect your comfort. Whether you need emergency repairs, deep cleaning, gas refilling, installation support, or preventive maintenance, Sofiyan delivers dependable AC solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -1438,7 +1438,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                     <p>Our services are available across T. Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and all nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -1603,7 +1603,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Chennai Today</h3>
                       <p>Don't let Chennai's heat and humidity affect your comfort. Whether you need emergency repairs, deep cleaning, gas refilling, installation support, or preventive maintenance, Sofiyan delivers dependable AC solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -1637,7 +1637,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                     <p>हम Hyderabad के Madhapur, Gachibowli, Kondapur, Kukatpally, Miyapur, Hitech City, Begumpet, Secunderabad, Ameerpet, Banjara Hills, Jubilee Hills, LB Nagar, Uppal, Dilsukhnagar और पूरे Hyderabad में service उपलब्ध कराते हैं।</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -1792,7 +1792,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Hyderabad Today</h3>
                       <p>Don't let Hyderabad's scorching heat affect your comfort. Whether you need emergency AC repair, routine servicing, gas refilling, deep cleaning, or installation support, Sofiyan is ready to assist.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -1826,7 +1826,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                     <p>Our services are available across Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and all nearby areas of Pune.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -1990,7 +1990,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Pune Today</h3>
                       <p>Don't let AC problems affect your comfort, productivity, or sleep. Whether you need emergency repairs, deep cleaning, gas refilling, installation, or preventive maintenance, Sofiyan delivers dependable AC solutions throughout Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -2029,7 +2029,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                     <p>Our services are available across Lanka, Sigra, Bhelupur, Mahmoorganj, Cantt, Pandeypur, Ashapur, Sarnath, Shivpur, BHU Area, Orderly Bazar, Chaukaghat, Ramnagar, DLW, and nearby Varanasi locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -2190,7 +2190,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Kolkata'
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book AC Repair Service in Varanasi Today</h3>
                       <p>Whether you need emergency AC repair, gas refilling, deep cleaning, installation support, inverter AC troubleshooting, or preventive maintenance, Sofiyan provides reliable AC repair and service solutions throughout Varanasi.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -2219,7 +2219,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Paschim Vihar, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -2296,7 +2296,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our AC Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the required solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -2348,7 +2348,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your AC Repair Service in Delhi Today</h3>
                       <p>Don't let Delhi's heat affect your comfort. Whether you need AC repair, AC servicing, deep cleaning, installation, or gas refilling, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -2386,7 +2386,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -2555,7 +2555,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Noida Today</h3>
                       <p>Whether you need emergency repairs, drum cleaning, installation support, motor troubleshooting, PCB repairs, drainage solutions, or complete maintenance, Sofiyan delivers dependable washing machine repair services throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -2593,7 +2593,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -2762,7 +2762,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Gurgaon Today</h3>
                       <p>Whether you need emergency repairs, drum cleaning, installation support, motor troubleshooting, PCB repairs, or complete maintenance, Sofiyan delivers dependable washing machine repair services throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -2798,7 +2798,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -2967,7 +2967,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Ahmedabad Today</h3>
                       <p>Whether you need emergency repairs, drum cleaning, installation support, motor troubleshooting, PCB repairs, or complete maintenance, Sofiyan delivers dependable washing machine repair services throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3003,7 +3003,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -3172,7 +3172,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Kolkata Today</h3>
                       <p>Whether you need emergency repairs, drum cleaning, installation support, motor troubleshooting, PCB repairs, or complete maintenance, Sofiyan delivers dependable washing machine repair services throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3204,7 +3204,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -3282,7 +3282,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Washing Machine Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book online through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book online through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician reaches your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue in your washing machine and explain the solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost in advance before work starts.</li>
@@ -3334,7 +3334,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Washing Machine Service in Mumbai Today</h3>
                       <p>Don’t let washing machine problems interrupt your daily routine. Whether you need washing machine repair, cleaning, installation, uninstallation, spin repair, drainage fix, or water leakage service, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3366,7 +3366,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -3444,7 +3444,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Washing Machine Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book online through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book online through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician reaches your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue in your washing machine and explain the solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost in advance before work starts.</li>
@@ -3496,7 +3496,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Washing Machine Service in Delhi Today</h3>
                       <p>Don’t let washing machine problems interrupt your daily routine. Whether you need washing machine repair, cleaning, installation, uninstallation, spin repair, drainage fix, or water leakage service, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3530,7 +3530,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We proudly serve customers across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, Begumpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -3691,7 +3691,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Hyderabad Today</h3>
                       <p>Don't let washing machine problems disrupt your household routine. Whether you need emergency repairs, deep cleaning, installation support, or complete troubleshooting, Sofiyan delivers dependable doorstep solutions across Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3725,7 +3725,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -3894,7 +3894,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Pune Today</h3>
                       <p>Don't let washing machine problems disrupt your daily schedule. Whether you need emergency repairs, drum cleaning, installation support, or complete troubleshooting, Sofiyan delivers dependable doorstep solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -3930,7 +3930,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4099,7 +4099,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Washing Machine Repair Service in Chennai Today</h3>
                       <p>Don't let washing machine problems affect your daily routine. Whether you need emergency repairs, drum cleaning, installation support, motor troubleshooting, or complete maintenance, Sofiyan delivers dependable doorstep washing machine solutions across Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -4131,7 +4131,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, Jayanagar, JP Nagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4207,7 +4207,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Washing Machine Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book online through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book online through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician reaches your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue in your washing machine and explain the solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost in advance before work starts.</li>
@@ -4259,7 +4259,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Washing Machine Service in Bangalore Today</h3>
                       <p>Don’t let washing machine problems interrupt your daily routine. Whether you need washing machine repair, cleaning, installation, uninstallation, spin repair, drainage fix, or water leakage service, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -4293,7 +4293,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Knowledge Park, Alpha, Beta, Gamma, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4460,7 +4460,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Noida Today</h3>
                       <p>Whether you need emergency electrical repairs, house wiring, switchboard replacement, lighting installation, MCB troubleshooting, inverter wiring, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -4492,7 +4492,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4601,7 +4601,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                     <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Ahmedabad Electrician Service Process</h3>
                     <ol class="list-decimal pl-5 space-y-3">
-                      <li><strong>Book Your Service:</strong> Call 9219345455 or submit your request through sofiyan.com.</li>
+                      <li><strong>Book Your Service:</strong> Call 7625046788 or submit your request through sofiyan.com.</li>
                       <li><strong>Technician Assignment:</strong> A nearby Sofiyan electrician is assigned based on your Ahmedabad location.</li>
                       <li><strong>On-Site Inspection:</strong> We inspect the issue carefully to identify the root cause.</li>
                       <li><strong>Transparent Quotation:</strong> You receive a clear estimate before any repair or installation begins.</li>
@@ -4660,7 +4660,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Ahmedabad Today</h3>
                       <p>Whether you need emergency electrical repairs, switchboard replacement, fan installation, wiring work, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -4692,7 +4692,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our team serves all major Pune areas including Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby localities.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4857,7 +4857,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Pune Today</h3>
                       <p>Whether you need emergency repairs, fan installation, switch replacement, wiring support, or complete electrical maintenance, Sofiyan delivers dependable service at your doorstep across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -4887,7 +4887,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -4966,7 +4966,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Electrician Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your service through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your service through sofiyan.com.</li>
                         <li><strong>Electrician Visit:</strong> A verified Sofiyan electrician arrives at your location.</li>
                         <li><strong>Inspection & Diagnosis:</strong> The issue is carefully inspected and the required work is explained.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work starts.</li>
@@ -5018,7 +5018,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Electrician Service in Mumbai Today</h3>
                       <p>Don't let electrical problems disrupt your daily routine. Whether you need electrical repairs, fan installation, switchboard repair, MCB replacement, house wiring, or appliance connections, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5050,7 +5050,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -5216,7 +5216,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Kolkata Today</h3>
                       <p>Whether you need emergency electrical repairs, house wiring, fan installation, switchboard replacement, lighting upgrades, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5248,7 +5248,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -5414,7 +5414,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Chennai Today</h3>
                       <p>Whether you need emergency electrical repairs, wiring upgrades, fan installations, switchboard repairs, or complete electrical maintenance, Sofiyan delivers reliable and professional electrician services throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5444,7 +5444,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -5521,7 +5521,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Electrician Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan electrician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the electrical issue and explain the solution clearly.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost before the work begins.</li>
@@ -5573,7 +5573,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Electrician Service in Bangalore Today</h3>
                       <p>Don’t let electrical problems disturb your routine. Whether you need electrical repair, wiring work, switchboard repair, fan installation, light fitting, or MCB repair, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5605,7 +5605,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Banjara Hills, Jubilee Hills, Ameerpet, Secunderabad, LB Nagar, Uppal, Dilsukhnagar, Kondapur, Begumpet, and all areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -5767,7 +5767,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Hyderabad Today</h3>
                       <p>Whether you need emergency repairs, fan installation, switchboard replacement, rewiring, or complete electrical upgrades, Sofiyan delivers dependable solutions right at your doorstep.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5797,7 +5797,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -5876,7 +5876,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Electrician Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your service through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your service through sofiyan.com.</li>
                         <li><strong>Electrician Visit:</strong> A verified Sofiyan electrician arrives at your location.</li>
                         <li><strong>Inspection & Diagnosis:</strong> The issue is carefully inspected and the required work is explained.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work starts.</li>
@@ -5928,7 +5928,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Electrician Service in Delhi Today</h3>
                       <p>Don't let electrical problems disrupt your daily routine. Whether you need electrical repairs, fan installation, switchboard repair, MCB replacement, house wiring, or appliance connections, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -5960,7 +5960,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -6128,7 +6128,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Electrician Service in Gurgaon Today</h3>
                       <p>Whether you need emergency electrical repairs, wiring work, switchboard replacement, lighting installation, MCB troubleshooting, or complete electrical maintenance, Sofiyan delivers dependable electrician services throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -6162,7 +6162,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -6334,7 +6334,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Noida Today</h3>
                       <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, concealed leak detection, toilet repairs, water tank connections, or complete plumbing maintenance, Sofiyan delivers dependable plumbing solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -6366,7 +6366,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -6538,7 +6538,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Gurgaon Today</h3>
                       <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, toilet repairs, water tank connections, or complete plumbing maintenance, Sofiyan delivers dependable plumbing services throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -6572,7 +6572,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -6743,7 +6743,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Ahmedabad Today</h3>
                       <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, toilet repairs, water tank connections, or complete plumbing maintenance, Sofiyan delivers dependable plumbing services throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -6775,7 +6775,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -6946,7 +6946,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Kolkata Today</h3>
                       <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, toilet repairs, water tank installation, or complete plumbing solutions, Sofiyan delivers dependable plumbing services throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -6976,7 +6976,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -7055,7 +7055,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Plumbing Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Plumber Visit:</strong> A verified Sofiyan plumber visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the plumbing issue and explain the required solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost before the work begins.</li>
@@ -7107,7 +7107,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Plumbing Service in Mumbai Today</h3>
                       <p>Don’t let plumbing problems disturb your daily routine. Whether you need leak repair, drain cleaning, tap fixing, pipe fitting, toilet repair, bathroom plumbing, or repiping, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -7137,7 +7137,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -7216,7 +7216,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Plumbing Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Plumber Visit:</strong> A verified Sofiyan plumber visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the plumbing issue and explain the required solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost before the work begins.</li>
@@ -7268,7 +7268,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Plumbing Service in Delhi Today</h3>
                       <p>Don’t let plumbing problems disturb your daily routine. Whether you need leak repair, drain cleaning, tap fixing, pipe fitting, toilet repair, bathroom plumbing, or repiping, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -7300,7 +7300,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -7470,7 +7470,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Chennai Today</h3>
                       <p>Whether you need emergency leak repairs, bathroom plumbing work, drain cleaning, toilet repairs, water tank connections, or complete plumbing solutions, Sofiyan delivers dependable and professional plumbing services throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -7498,7 +7498,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, Jayanagar, JP Nagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -7575,7 +7575,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Plumbing Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Plumber Visit:</strong> A verified Sofiyan plumber visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the plumbing issue and explain the required solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the service cost before the work begins.</li>
@@ -7627,7 +7627,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Plumbing Service in Bangalore Today</h3>
                       <p>Don’t let plumbing problems disturb your daily routine. Whether you need leak repair, drain cleaning, tap fixing, pipe fitting, toilet repair, or bathroom plumbing, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -7659,7 +7659,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -7829,7 +7829,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Pune Today</h3>
                       <p>Don't let plumbing issues damage your property or disrupt your routine. Whether you need emergency leak repair, bathroom plumbing, drain cleaning, toilet repairs, or complete plumbing solutions, Sofiyan delivers fast and dependable service across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -7863,7 +7863,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We proudly serve customers across Gachibowli, Madhapur, Kukatpally, Miyapur, Hitech City, Kondapur, Banjara Hills, Jubilee Hills, Ameerpet, Begumpet, Secunderabad, Uppal, LB Nagar, Dilsukhnagar, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -8036,7 +8036,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Plumbing Service in Hyderabad Today</h3>
                       <p>Don't let plumbing problems disrupt your daily routine or damage your property. Whether you need emergency leak repair, drain cleaning, toilet repairs, or complete plumbing solutions, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -8074,7 +8074,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Knowledge Park, Alpha, Beta, Gamma, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -8242,7 +8242,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Noida Today</h3>
                       <p>Whether you need emergency repairs, gas refilling, compressor troubleshooting, cooling restoration, installation support, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -8280,7 +8280,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -8448,7 +8448,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Gurgaon Today</h3>
                       <p>Whether you need emergency repairs, gas refilling, compressor troubleshooting, cooling restoration, installation support, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -8486,7 +8486,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -8654,7 +8654,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Ahmedabad Today</h3>
                       <p>Don't let refrigerator problems affect your food storage and daily routine. Whether you need emergency repairs, gas refilling, compressor troubleshooting, cooling restoration, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -8690,7 +8690,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -8858,7 +8858,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Pune Today</h3>
                       <p>Don't let cooling problems affect your daily routine or put your groceries at risk. Whether you need emergency repairs, gas refilling, compressor troubleshooting, or complete refrigerator maintenance, Sofiyan delivers dependable doorstep solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -8892,7 +8892,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We proudly serve customers across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9058,7 +9058,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Hyderabad Today</h3>
                       <p>Don't let refrigerator breakdowns disrupt your routine or put your food supplies at risk. Whether you need emergency cooling repairs, gas refilling, compressor replacement, or complete troubleshooting, Sofiyan delivers fast and professional refrigeration solutions across Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9094,7 +9094,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9262,7 +9262,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Kolkata Today</h3>
                       <p>Don't let refrigerator problems affect your food storage and daily routine. Whether you need emergency repairs, gas refilling, compressor troubleshooting, cooling restoration, or preventive maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9294,7 +9294,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9372,7 +9372,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Refrigerator Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan refrigerator technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the required repair work.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before any work begins.</li>
@@ -9424,7 +9424,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Refrigerator Repair Service in Mumbai Today</h3>
                       <p>Don't let refrigerator problems spoil your food and disrupt your daily routine. Whether you need fridge repair, gas refilling, compressor repair, cooling issue fixing, thermostat replacement, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9456,7 +9456,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9534,7 +9534,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Refrigerator Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan refrigerator technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the required repair work.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before any work begins.</li>
@@ -9586,7 +9586,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Refrigerator Repair Service in Delhi Today</h3>
                       <p>Don't let refrigerator problems spoil your food and disrupt your daily routine. Whether you need fridge repair, gas refilling, compressor repair, cooling issue fixing, thermostat replacement, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9622,7 +9622,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9790,7 +9790,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Refrigerator Repair Service in Chennai Today</h3>
                       <p>Don't let refrigerator problems affect your food storage and daily routine. Whether you need emergency repairs, gas refilling, compressor troubleshooting, cooling restoration, or complete maintenance, Sofiyan delivers dependable refrigerator repair solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9820,7 +9820,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -9896,7 +9896,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Refrigerator Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your service through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your service through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan refrigerator technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the required repair.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -9948,7 +9948,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Refrigerator Repair Service in Bangalore Today</h3>
                       <p>Don't let refrigerator problems spoil your food and disrupt your routine. Whether you need fridge repair, gas refilling, compressor repair, cooling issue fixing, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -9986,7 +9986,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -10154,7 +10154,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Noida Today</h3>
                       <p>Whether you need emergency geyser repairs, thermostat replacement, heating element replacement, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -10192,7 +10192,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -10360,7 +10360,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Gurgaon Today</h3>
                       <p>Whether you need emergency geyser repairs, thermostat replacement, heating element replacement, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -10396,7 +10396,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -10564,7 +10564,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Ahmedabad Today</h3>
                       <p>Whether you need emergency geyser repairs, heating element replacement, thermostat servicing, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -10600,7 +10600,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -10768,7 +10768,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Pune Today</h3>
                       <p>Don't let geyser problems interrupt your comfort. Whether you need emergency repairs, heating element replacement, installation support, or preventive maintenance, Sofiyan delivers dependable doorstep geyser solutions throughout Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -10802,7 +10802,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -10968,7 +10968,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Hyderabad Today</h3>
                       <p>Don't let geyser problems interrupt your comfort and daily routine. Whether you need emergency repairs, heating element replacement, installation support, or preventive maintenance, Sofiyan delivers dependable doorstep solutions throughout Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11004,7 +11004,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -11172,7 +11172,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Kolkata Today</h3>
                       <p>Whether you need emergency geyser repairs, heating element replacement, thermostat servicing, installation support, leakage repairs, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11204,7 +11204,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Andheri, Bandra, Borivali, Goregaon, Kandivali, Malad, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Navi Mumbai, Thane, Colaba, and all nearby locations in Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -11336,7 +11336,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Service in Mumbai Today</h3>
                       <p>Don't compromise on comfort during your daily routine. Whether you need emergency repairs, installation, maintenance, or component replacement, Sofiyan is ready to assist you with fast and professional service.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11368,7 +11368,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -11444,7 +11444,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Geyser Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work begins.</li>
@@ -11496,7 +11496,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Geyser Repair Service in Delhi Today</h3>
                       <p>Don't let geyser problems affect your comfort. Whether you need water heater repair, geyser installation, heating element replacement, thermostat repair, leakage fixing, or maintenance services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11532,7 +11532,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -11700,7 +11700,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Geyser Repair Service in Chennai Today</h3>
                       <p>Whether you need emergency geyser repairs, heating element replacement, thermostat servicing, installation support, or preventive maintenance, Sofiyan delivers dependable water heater solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11730,7 +11730,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -11806,7 +11806,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Geyser Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work begins.</li>
@@ -11858,7 +11858,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Geyser Repair Service in Bangalore Today</h3>
                       <p>Don't let geyser problems affect your comfort. Whether you need water heater repair, geyser installation, heating element replacement, thermostat repair, leakage fixing, or maintenance services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -11896,7 +11896,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Knowledge Park, Alpha, Beta, Gamma, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -12064,7 +12064,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Noida Today</h3>
                       <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, touch panel troubleshooting, installation support, or complete maintenance, Sofiyan delivers dependable microwave repair solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -12102,7 +12102,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -12270,7 +12270,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Gurgaon Today</h3>
                       <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, touch panel troubleshooting, installation support, or complete maintenance, Sofiyan delivers dependable microwave repair solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -12306,7 +12306,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -12474,7 +12474,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Ahmedabad Today</h3>
                       <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, touch panel troubleshooting, installation support, or complete maintenance, Sofiyan delivers dependable microwave repair solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -12510,7 +12510,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -12678,7 +12678,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Pune Today</h3>
                       <p>Don't let microwave problems interrupt your cooking routine. Whether you need emergency repairs, OTG servicing, magnetron replacement, control panel troubleshooting, or installation support, Sofiyan delivers dependable doorstep solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -12712,7 +12712,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -12877,7 +12877,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Hyderabad Today</h3>
                       <p>Don't let microwave problems interrupt your cooking routine. Whether you need emergency microwave repairs, OTG servicing, magnetron replacement, control panel troubleshooting, or installation support, Sofiyan delivers dependable doorstep solutions throughout Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -12913,7 +12913,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13081,7 +13081,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Kolkata Today</h3>
                       <p>Whether you need emergency repairs, OTG servicing, magnetron replacement, control panel troubleshooting, installation support, or complete maintenance, Sofiyan delivers dependable microwave repair solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -13115,7 +13115,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We proudly serve customers throughout Andheri, Bandra, Borivali, Goregaon, Kandivali, Malad, Powai, Ghatkopar, Dadar, Chembur, Lower Parel, Colaba, Navi Mumbai, Thane, and nearby Mumbai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13255,7 +13255,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Mumbai Today</h3>
                       <p>Don't let microwave problems interrupt your cooking schedule. Whether you need emergency repairs, OTG servicing, magnetron replacement, convection microwave troubleshooting, or installation support, Sofiyan is ready to assist.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -13287,7 +13287,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13363,7 +13363,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Microwave Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan microwave technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -13419,7 +13419,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Microwave Oven Repair Service in Delhi Today</h3>
                       <p>Don't let microwave problems interrupt your daily cooking routine. Whether you need microwave repair, magnetron replacement, OTG servicing, convection microwave repair, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -13455,7 +13455,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13623,7 +13623,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Microwave Repair Service in Chennai Today</h3>
                       <p>Don't let microwave problems affect your kitchen routine. Whether you need emergency repairs, OTG servicing, magnetron replacement, control panel troubleshooting, or installation support, Sofiyan delivers dependable microwave repair solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -13653,7 +13653,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13729,7 +13729,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Microwave Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan microwave technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -13785,7 +13785,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Microwave Oven Repair Service in Bangalore Today</h3>
                       <p>Don't let microwave problems interrupt your daily cooking routine. Whether you need microwave repair, magnetron replacement, OTG servicing, convection microwave repair, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -13823,7 +13823,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Knowledge Park, Alpha, Beta, Gamma, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -13996,7 +13996,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Noida Today</h3>
                       <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, wall mounting support, or preventive maintenance, Sofiyan delivers dependable television repair solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -14034,7 +14034,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -14207,7 +14207,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Gurgaon Today</h3>
                       <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, wall mounting support, or preventive maintenance, Sofiyan delivers dependable television repair solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -14245,7 +14245,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -14417,7 +14417,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Ahmedabad Today</h3>
                       <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, wall mounting support, or preventive maintenance, Sofiyan delivers dependable television repair solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -14453,7 +14453,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -14625,7 +14625,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Pune Today</h3>
                       <p>Don't let television problems interrupt your entertainment experience. Whether you need Smart TV troubleshooting, backlight replacement, motherboard repairs, software updates, or wall mounting support, Sofiyan delivers dependable doorstep TV repair solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -14659,7 +14659,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -14830,7 +14830,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Hyderabad Today</h3>
                       <p>Don't let television problems interrupt your family's entertainment experience. Whether you need Smart TV troubleshooting, LED backlight replacement, software repairs, motherboard diagnostics, or wall mounting support, Sofiyan delivers dependable doorstep solutions throughout Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -14866,7 +14866,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15038,7 +15038,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Kolkata Today</h3>
                       <p>Whether you need Smart TV troubleshooting, display repairs, motherboard servicing, backlight replacement, software updates, or wall mounting support, Sofiyan delivers dependable television repair solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15072,7 +15072,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers throughout Andheri, Bandra, Borivali, Goregaon, Kandivali, Malad, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and nearby Mumbai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15210,7 +15210,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Mumbai Today</h3>
                       <p>Don't let television problems interrupt your favourite moments. Whether you need Smart TV troubleshooting, LED TV repairs, backlight replacement, software support, or professional wall mounting services, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15242,7 +15242,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15318,7 +15318,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Television Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan TV technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work begins.</li>
@@ -15370,7 +15370,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Television Repair Service in Delhi Today</h3>
                       <p>Don't let TV problems interrupt your entertainment. Whether you need LED TV repair, Smart TV troubleshooting, backlight replacement, wall mounting, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15406,7 +15406,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15578,7 +15578,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book TV Repair Service in Chennai Today</h3>
                       <p>Whether you need Smart TV troubleshooting, backlight replacement, motherboard repairs, software updates, display issue resolution, or wall mounting support, Sofiyan delivers dependable TV repair solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15608,7 +15608,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15684,7 +15684,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Television Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan TV technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the work begins.</li>
@@ -15736,7 +15736,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Television Repair Service in Bangalore Today</h3>
                       <p>Don't let TV problems interrupt your entertainment. Whether you need LED TV repair, Smart TV troubleshooting, backlight replacement, wall mounting, or installation services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15774,7 +15774,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -15942,7 +15942,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Noida Today</h3>
                       <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, grease removal, or preventive maintenance, Sofiyan delivers dependable chimney services throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -15980,7 +15980,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -16148,7 +16148,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Gurgaon Today</h3>
                       <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, grease removal, or preventive maintenance, Sofiyan delivers dependable chimney services throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -16184,7 +16184,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -16352,7 +16352,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Ahmedabad Today</h3>
                       <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, or preventive maintenance, Sofiyan delivers dependable chimney services throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -16388,7 +16388,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -16556,7 +16556,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Pune Today</h3>
                       <p>Keep your kitchen fresh, smoke-free, and hygienic with Sofiyan's professional chimney solutions. Whether you need deep cleaning, motor repairs, auto-clean troubleshooting, installation support, or preventive maintenance, we deliver dependable doorstep chimney services across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -16592,7 +16592,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -16759,7 +16759,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Hyderabad Today</h3>
                       <p>Don't let smoke, grease, and poor ventilation affect your cooking experience. Whether you need deep cleaning, motor repairs, auto-clean troubleshooting, or chimney installation support, Sofiyan delivers fast and dependable doorstep solutions across Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -16795,7 +16795,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -16963,7 +16963,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Kolkata Today</h3>
                       <p>Whether you need deep chimney cleaning, motor repairs, auto-clean troubleshooting, installation support, or preventive maintenance, Sofiyan delivers dependable chimney services throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -16997,7 +16997,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We proudly serve customers across Andheri, Bandra, Borivali, Goregaon, Kandivali, Malad, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and nearby Mumbai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -17136,7 +17136,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Mumbai Today</h3>
                       <p>Don't let grease buildup and poor ventilation affect your kitchen experience. Whether you need chimney cleaning, motor repair, installation, or complete maintenance, Sofiyan is ready to deliver fast and professional assistance at your doorstep.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -17168,7 +17168,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -17246,7 +17246,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Chimney Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan chimney technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -17302,7 +17302,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Chimney Service in Delhi Today</h3>
                       <p>Don't let grease buildup and chimney problems affect your cooking experience. Whether you need chimney deep cleaning, chimney repair, installation, motor repair, or maintenance services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -17338,7 +17338,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -17506,7 +17506,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Chimney Service in Chennai Today</h3>
                       <p>Keep your kitchen fresh, smoke-free, and hygienic with Sofiyan's professional chimney solutions. Whether you need deep cleaning, motor repairs, auto-clean troubleshooting, installation support, or preventive maintenance, we provide dependable chimney services throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -17536,7 +17536,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -17612,7 +17612,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Chimney Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan chimney technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We identify the exact issue and explain the recommended solution.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before work begins.</li>
@@ -17668,7 +17668,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Chimney Service in Bangalore Today</h3>
                       <p>Don't let grease buildup and chimney problems affect your kitchen experience. Whether you need chimney deep cleaning, repair, installation, motor repair, or maintenance services, Sofiyan is just a call away.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -17700,7 +17700,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -17872,7 +17872,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Ahmedabad Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, post-construction cleaning, move-in cleaning, or commercial cleaning services, Sofiyan delivers dependable cleaning solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -17904,7 +17904,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -18076,7 +18076,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Pune Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, post-renovation cleaning, or move-in/move-out cleaning, Sofiyan delivers dependable and professional cleaning solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -18108,7 +18108,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -18294,7 +18294,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Hyderabad Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, or post-renovation cleaning, Sofiyan delivers reliable and professional cleaning solutions across Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -18326,7 +18326,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -18516,7 +18516,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Kolkata Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, post-renovation cleaning, move-in cleaning, or move-out cleaning, Sofiyan delivers dependable cleaning solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -18550,7 +18550,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>We serve customers across Andheri, Bandra, Borivali, Goregaon, Kandivali, Malad, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and nearby Mumbai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -18742,7 +18742,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Cleaning Services in Mumbai Today</h3>
                       <p>Whether you need a complete home makeover, bathroom sanitization, sofa shampooing, office cleaning, or move-in cleaning support, Sofiyan delivers dependable solutions tailored to your needs.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -18772,7 +18772,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -18887,7 +18887,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Cleaning Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Cleaning Team Visit:</strong> Our trained professionals arrive at your location with all the required equipment and supplies.</li>
                         <li><strong>Site Assessment:</strong> We understand your cleaning requirements and explain the cleaning scope.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the service begins.</li>
@@ -18943,7 +18943,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Cleaning Service in Delhi Today</h3>
                       <p>Transform your home or workplace with Sofiyan's professional cleaning solutions. Whether you need full home deep cleaning, bathroom cleaning, kitchen cleaning, sofa shampooing, carpet cleaning, mattress cleaning, office cleaning, or sanitization services, our experts are ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -18975,7 +18975,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -19147,7 +19147,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Chennai Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, post-renovation cleaning, or move-in/move-out cleaning, Sofiyan delivers dependable cleaning solutions across Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -19177,7 +19177,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, JP Nagar, Jayanagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -19290,7 +19290,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Cleaning Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or schedule your appointment through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or schedule your appointment through sofiyan.com.</li>
                         <li><strong>Cleaning Team Visit:</strong> Our trained professionals arrive at your location with the required equipment.</li>
                         <li><strong>Site Assessment:</strong> We understand your cleaning requirements and explain the process.</li>
                         <li><strong>Transparent Estimate:</strong> You receive a clear quotation before the service begins.</li>
@@ -19342,7 +19342,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Cleaning Service in Bangalore Today</h3>
                       <p>Transform your home or workplace with Sofiyan's professional cleaning solutions. Whether you need deep cleaning, bathroom cleaning, kitchen cleaning, sofa cleaning, carpet cleaning, or complete home sanitization, our experts are ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -19376,7 +19376,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Knowledge Park, Alpha, Beta, Gamma, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -19612,7 +19612,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Home Cleaning Services in Noida Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, move-in cleaning, post-construction cleaning, or commercial cleaning services, Sofiyan delivers dependable cleaning solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -19646,7 +19646,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -19818,7 +19818,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Professional Cleaning Services in Gurgaon Today</h3>
                       <p>Whether you need complete home deep cleaning, sofa shampooing, bathroom sanitization, office cleaning, move-in cleaning, post-construction cleaning, or commercial cleaning services, Sofiyan delivers dependable cleaning solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -19856,7 +19856,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Sector 18, Sector 62, Sector 63, Sector 76, Sector 78, Sector 93, Sector 104, Sector 137, Sector 143, Sector 150, Noida Extension, Greater Noida, Pari Chowk, Alpha, Beta, Gamma, Knowledge Park, and nearby Noida locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -20025,7 +20025,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Noida Today</h3>
                       <p>Whether you need emergency RO repair, membrane replacement, filter replacement, purifier cleaning, installation support, AMC maintenance, or complete water purification system servicing, Sofiyan delivers dependable RO solutions throughout Noida.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -20063,7 +20063,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across DLF Phase 1, DLF Phase 2, DLF Phase 3, DLF Phase 4, DLF Phase 5, Golf Course Road, Golf Course Extension Road, Sohna Road, Sector 56, Sector 57, Sector 67, Sushant Lok, Palam Vihar, South City, MG Road, Cyber City, and nearby Gurgaon locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -20232,7 +20232,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Gurgaon Today</h3>
                       <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, membrane replacement, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Gurgaon.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -20268,7 +20268,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Satellite, Bopal, SG Highway, Prahlad Nagar, Vastrapur, Chandkheda, Gota, Nikol, Motera, Sabarmati, Maninagar, Navrangpura, Thaltej, South Bopal, and nearby Ahmedabad locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -20437,7 +20437,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Ahmedabad Today</h3>
                       <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Ahmedabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -20473,7 +20473,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available throughout Hinjewadi, Wakad, Baner, Balewadi, Kharadi, Hadapsar, Viman Nagar, Kothrud, Aundh, Pimpri-Chinchwad, Magarpatta, Kondhwa, Pashan, Shivajinagar, and nearby Pune locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -20642,7 +20642,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Pune Today</h3>
                       <p>Don't compromise on the quality of your drinking water. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or AMC maintenance, Sofiyan delivers dependable doorstep solutions across Pune.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -20676,7 +20676,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Gachibowli, Madhapur, Hitech City, Kukatpally, Miyapur, Kondapur, Banjara Hills, Jubilee Hills, Secunderabad, Begumpet, Uppal, LB Nagar, Dilsukhnagar, Ameerpet, and all nearby areas of Hyderabad.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -20843,7 +20843,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Hyderabad Today</h3>
                       <p>Don't compromise on your family's health because of purifier problems. Whether you need emergency RO repair, filter replacement, tank cleaning, installation, or AMC support, Sofiyan delivers dependable doorstep solutions across Hyderabad.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -20879,7 +20879,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across Salt Lake, New Town, Rajarhat, Ballygunge, Behala, Dum Dum, Howrah, Park Street, Garia, Tollygunge, Jadavpur, Lake Town, Barasat, Kasba, and nearby Kolkata locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -21048,7 +21048,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Kolkata Today</h3>
                       <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Kolkata.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -21080,7 +21080,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Andheri, Bandra, Borivali, Malad, Goregaon, Kandivali, Kurla, Powai, Ghatkopar, Chembur, Dadar, Lower Parel, Colaba, Navi Mumbai, Thane, and all other areas of Mumbai.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -21158,7 +21158,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
@@ -21210,7 +21210,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Mumbai Today</h3>
                       <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -21242,7 +21242,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Dwarka, Rohini, Janakpuri, Uttam Nagar, Laxmi Nagar, Preet Vihar, Pitampura, Rajouri Garden, Karol Bagh, South Delhi, East Delhi, West Delhi, North Delhi, and all other areas of Delhi.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -21320,7 +21320,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
@@ -21372,7 +21372,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Delhi Today</h3>
                       <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -21408,7 +21408,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Our services are available across T Nagar, Velachery, Anna Nagar, Adyar, OMR, Sholinganallur, Porur, Tambaram, Medavakkam, Perungudi, Ambattur, Mogappair, Pallikaranai, Chromepet, and nearby Chennai locations.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -21577,7 +21577,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Water Purifier Service in Chennai Today</h3>
                       <p>Don't compromise on your family's drinking water quality. Whether you need emergency RO repair, filter replacement, purifier cleaning, installation support, or annual maintenance, Sofiyan delivers dependable water purifier solutions throughout Chennai.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -21609,7 +21609,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                     <p>Serving customers across Indiranagar, Koramangala, HSR Layout, Whitefield, Electronic City, Marathahalli, Jayanagar, JP Nagar, Yelahanka, and all other areas of Bangalore.</p>
 
                     <div class="bg-gray-50 border-l-4 border-indigo-600 p-4 rounded mt-4">
-                      <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-600 hover:underline">9219345455</a></p>
+                      <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-600 hover:underline">7625046788</a></p>
                       <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-600 hover:underline">sofiyan.com</a></p>
                     </div>
 
@@ -21685,7 +21685,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
                      <h3 class="text-xl font-bold text-gray-900 mt-8 mb-4 border-b pb-2">Our Water Purifier Service Process</h3>
                      <ol class="list-decimal pl-5 space-y-3">
-                        <li><strong>Book Your Service:</strong> Call 9219345455 or book through sofiyan.com.</li>
+                        <li><strong>Book Your Service:</strong> Call 7625046788 or book through sofiyan.com.</li>
                         <li><strong>Technician Visit:</strong> A verified Sofiyan technician visits your location for inspection.</li>
                         <li><strong>Problem Diagnosis:</strong> We check the purifier carefully and identify the issue.</li>
                         <li><strong>Transparent Estimate:</strong> You receive the cost and required solution before work begins.</li>
@@ -21737,7 +21737,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
                       <h3 class="text-xl font-bold text-gray-900 mb-3">Book Your Water Purifier Service in Bangalore Today</h3>
                       <p>Don’t let purifier issues affect your family’s drinking water. Whether you need RO repair, water purifier cleaning, filter replacement, installation, uninstallation, TDS issue fixing, or AMC support, Sofiyan is ready to help.</p>
                       <div class="mt-4 bg-indigo-50 p-4 rounded line-height-loose">
-                        <p><strong>Call:</strong> <a href="tel:9219345455" class="text-indigo-700 hover:underline font-bold">9219345455</a></p>
+                        <p><strong>Call:</strong> <a href="tel:7625046788" class="text-indigo-700 hover:underline font-bold">7625046788</a></p>
                         <p><strong>Website:</strong> <a href="https://sofiyan.com" class="text-indigo-700 hover:underline">sofiyan.com</a></p>
                         <p><strong>Email:</strong> <a href="mailto:sofiyansolutions1@gmail.com" class="text-indigo-700 hover:underline">sofiyansolutions1@gmail.com</a></p>
                       </div>
@@ -21956,7 +21956,7 @@ if (categoryName === 'AC' && localStorage.getItem('preferredCity') === 'Delhi') 
 
 ⚠️ *IMPORTANT NOTICE:* Jab tak aap pending service charge commission pay nahi karenge, tab tak aapko aage ki leads/kaam assign nahi kiya jayega.
 
-📲 *Pay via WhatsApp here:* https://wa.me/919219345455
+📲 *Pay via WhatsApp here:* https://wa.me/917625046788
 
 📸 *Payment karne ke baad yahan screenshot zaroor bhej dein.* Thank you!`;
 

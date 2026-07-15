@@ -331,7 +331,7 @@ export const FollowUpManager: React.FC = () => {
     // This logic assumes you have a template named 'followup_reminder' approved in Meta.
     // For this example, we'll try to send a template-based message.
     
-    const number = recipientType === 'customer' ? lead.contact_number : process.env.VITE_ADMIN_PHONE || '919219345455';
+    const number = recipientType === 'customer' ? lead.contact_number : process.env.VITE_ADMIN_PHONE || '7625046788';
     
     const payload = {
       number: number,
@@ -411,14 +411,14 @@ export const FollowUpManager: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tighter uppercase">Follow-up Manager</h2>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Reminders & Customer Follow-up System</p>
+          <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tighter uppercase leading-tight">Follow-up Manager</h2>
+          <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Reminders & Customer Follow-up System</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-200"
+          className="w-full md:w-auto justify-center bg-indigo-600 text-white px-4 sm:px-6 py-3 rounded-xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition flex items-center gap-2 shadow-lg shadow-indigo-200"
         >
           <Plus size={16} /> New Follow-up
         </button>
@@ -785,7 +785,7 @@ const LeadCard = ({ lead, onReschedule, onDelete, isUrgent, highlightAsNext = fa
                            `───────────────────\n` +
                            `Sent via Sofiyan Home Service App`;
                 
-                window.open(`https://wa.me/919219345455?text=${encodeURIComponent(msg)}`, '_blank');
+                window.open(`https://wa.me/7625046788?text=${encodeURIComponent(msg)}`, '_blank');
               }}
               className={`p-2.5 rounded-xl border flex items-center justify-center transition-all shadow-sm ${highlightAsNext ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' : 'bg-indigo-50 border-indigo-100 text-indigo-600 hover:bg-indigo-100'}`}
               title="Forward to Admin (WhatsApp)"
