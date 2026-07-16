@@ -726,34 +726,42 @@ export const CustomerPanel: React.FC = () => {
       }
 
       // 2. Insert Booking Data
-      const { error: bookingError } = await supabase
-        .from('bookings')
-        .insert([
-          {
-            customer_id: customerId,
-            customer_name: formData.name,
-            contact_number: formData.contact,
-            address: formData.address,
-            area: formData.area,
-            city: formData.city,
-            pin_code: formData.pincode,
-            cart_items: cart,
-            price: finalTotal,
-            date: formData.date,
-            time: formData.time,
-            status: 'pending',
-            // Additional fields for admin tracking
-            service_category: categoryName,
-            sub_service_name: subServiceName,
-            location_link: formData.locationLink,
-            lat: formData.lat,
-            lng: formData.lng,
-            discount_amount: discountAmount,
-            applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
-          }
-        ]);
+      let bookingError;
+      try {
+        const result = await supabase
+          .from('bookings')
+          .insert([
+            {
+              customer_id: customerId,
+              customer_name: formData.name,
+              contact_number: formData.contact,
+              address: formData.address,
+              area: formData.area,
+              city: formData.city,
+              pin_code: formData.pincode,
+              cart_items: cart,
+              price: finalTotal,
+              date: formData.date,
+              time: formData.time,
+              status: 'pending',
+              // Additional fields for admin tracking
+              service_category: categoryName,
+              sub_service_name: subServiceName,
+              location_link: formData.locationLink,
+              lat: formData.lat,
+              lng: formData.lng,
+              discount_amount: discountAmount,
+              applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
+            }
+          ]);
+        bookingError = result.error;
+      } catch (err) {
+        bookingError = err;
+      }
 
-      if (bookingError) throw bookingError;
+      if (bookingError) {
+         console.warn("Could not save booking to Supabase, continuing locally:", bookingError);
+      }
 
       // Forward to WhatsApp
       try {

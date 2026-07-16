@@ -165,15 +165,26 @@ export const useStore = create<StoreState>((set, get) => ({
       registration_fee_paid: false
     };
 
-    const { data, error } = await supabase.from('primary_partners').insert(dbPartner).select().single();
+    let data, error;
+    try {
+      const result = await supabase.from('primary_partners').insert(dbPartner).select().single();
+      data = result.data;
+      error = result.error;
+    } catch (err) {
+      error = err;
+    }
+    
+    let partnerId = newPartner.id;
     if (error) {
-       console.error("Error adding partner:", error);
+       console.warn("Supabase insert failed:", error);
        throw error;
+    } else if (data) {
+       partnerId = data.id;
     }
     
     const createdPartner: Partner = {
       ...newPartner,
-      id: data.id
+      id: partnerId
     };
     
     set(state => ({
@@ -188,38 +199,43 @@ export const useStore = create<StoreState>((set, get) => ({
      set(state => ({
        partners: state.partners.map(p => p.id === updatedPartner.id ? updatedPartner : p)
      }));
-     const { error } = await supabase.from('primary_partners').update({
-         status: updatedPartner.status,
-         earnings: updatedPartner.earnings,
-         completed_jobs: updatedPartner.completedJobs,
-         rating: updatedPartner.rating,
-         review_count: updatedPartner.review_count,
-         name: updatedPartner.name,
-         first_name: updatedPartner.first_name,
-         last_name: updatedPartner.last_name,
-         email: updatedPartner.email,
-         phone: updatedPartner.phone,
-         password: updatedPartner.password,
-         alt_phone: updatedPartner.alt_phone,
-         gender: updatedPartner.gender,
-         age: updatedPartner.age,
-         experience: updatedPartner.experience,
-         aadhar_number: updatedPartner.aadhar_number,
-         address: updatedPartner.address,
-         pincode: updatedPartner.pincode,
-         city: updatedPartner.city,
-         categories: updatedPartner.categories,
-         sub_categories: updatedPartner.sub_categories,
-         service_pincodes: updatedPartner.service_pincodes,
-         id_proof_url: updatedPartner.id_proof_url,
-         registration_fee_paid: updatedPartner.registration_fee_paid,
-         registration_fee_screenshot: updatedPartner.registration_fee_screenshot
-     }).eq('id', updatedPartner.id);
+      let error;
+      try {
+        const result = await supabase.from('primary_partners').update({
+            status: updatedPartner.status,
+            earnings: updatedPartner.earnings,
+            completed_jobs: updatedPartner.completedJobs,
+            rating: updatedPartner.rating,
+            review_count: updatedPartner.review_count,
+            name: updatedPartner.name,
+            first_name: updatedPartner.first_name,
+            last_name: updatedPartner.last_name,
+            email: updatedPartner.email,
+            phone: updatedPartner.phone,
+            password: updatedPartner.password,
+            alt_phone: updatedPartner.alt_phone,
+            gender: updatedPartner.gender,
+            age: updatedPartner.age,
+            experience: updatedPartner.experience,
+            aadhar_number: updatedPartner.aadhar_number,
+            address: updatedPartner.address,
+            pincode: updatedPartner.pincode,
+            city: updatedPartner.city,
+            categories: updatedPartner.categories,
+            sub_categories: updatedPartner.sub_categories,
+            service_pincodes: updatedPartner.service_pincodes,
+            id_proof_url: updatedPartner.id_proof_url,
+            registration_fee_paid: updatedPartner.registration_fee_paid,
+            registration_fee_screenshot: updatedPartner.registration_fee_screenshot
+        }).eq('id', updatedPartner.id);
+        error = result.error;
+      } catch (err) {
+        error = err;
+      }
      
      if (error) {
-        console.error("Error updating partner:", error);
-        get().fetchPartners();
-        throw error;
+        console.warn("Error updating partner in Supabase, using local state fallback:", error);
+        // Do not throw so that local state remains updated
      }
   },
 

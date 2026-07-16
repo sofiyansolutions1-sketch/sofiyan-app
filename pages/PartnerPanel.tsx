@@ -160,6 +160,7 @@ export const PartnerPanel: React.FC = () => {
 const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('partnerPhone');
+    setAuthData({ phone: '', password: '', name: '', email: '' });
   };
 
 
