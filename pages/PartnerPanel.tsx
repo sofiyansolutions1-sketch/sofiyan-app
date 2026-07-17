@@ -512,7 +512,14 @@ const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning 
     const hasPincodeMatch = bPin === pPin || partnerPins.includes(bPin);
     if (!hasPincodeMatch) return false;
 
-    return true; // As long as pincode matches, show the lead to the partner
+    const partnerCategories = currentUser.categories || [];
+    const hasCategoryMatch = partnerCategories.length === 0 || 
+      partnerCategories.includes(b.serviceCategory) || 
+      (b.cartItems && b.cartItems.some(item => partnerCategories.includes(item.categoryName)));
+      
+    if (!hasCategoryMatch) return false;
+
+    return true; // As long as pincode and category matches, show the lead to the partner
   });
   
 
