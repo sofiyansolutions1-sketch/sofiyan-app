@@ -142,7 +142,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
   
   addPartner: async (newPartner: Partner) => {
-    const dbPartner = {
+    const dbPartner: any = {
       name: newPartner.name,
       first_name: newPartner.first_name,
       last_name: newPartner.last_name,
@@ -164,6 +164,11 @@ export const useStore = create<StoreState>((set, get) => ({
       completed_jobs: newPartner.completedJobs,
       registration_fee_paid: false
     };
+    
+    // Only pass ID if it's a valid UUID (not our fallback "P12345...")
+    if (newPartner.id && !newPartner.id.startsWith('P')) {
+       dbPartner.id = newPartner.id;
+    }
 
     let data, error;
     try {

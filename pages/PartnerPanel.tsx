@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../hooks/useStore';
 import { Partner } from '../types';
+import { supabase } from '../supabaseClient';
 
 import { Briefcase, CheckCircle, MapPin, User, LogOut, Clock, User as UserIcon,  Loader2, ShieldCheck, Star } from 'lucide-react';
 import { MapRadiusSelector } from '../components/MapRadiusSelector';
@@ -129,19 +130,37 @@ export const PartnerPanel: React.FC = () => {
       setAuthError("Please fill all required fields");
       return;
     }
-    const newPartner = {
-      id: "P" + Date.now(),
-      name: authData.name,
-      first_name: authData.name.split(' ')[0],
-      last_name: authData.name.split(' ').slice(1).join(' '),
-      email: authData.email || authData.phone + "@example.com",
-      phone: authData.phone,
-      password: authData.password,
-      status: 'pending' as const,
-      earnings: 0,
-      completedJobs: 0
-    };
+
+    const email = authData.email || authData.phone + "@example.com";
+
     try {
+      const { data: authDataRes, error: authErrorRes } = await supabase.auth.signUp({
+        email: email,
+        password: authData.password,
+        options: {
+          data: {
+            name: authData.name,
+            phone: authData.phone,
+            role: 'partner'
+          }
+        }
+      });
+
+      if (authErrorRes) throw authErrorRes;
+
+      const newPartner = {
+        id: authDataRes.user?.id || "P" + Date.now(),
+        name: authData.name,
+        first_name: authData.name.split(' ')[0],
+        last_name: authData.name.split(' ').slice(1).join(' '),
+        email: email,
+        phone: authData.phone,
+        password: authData.password,
+        status: 'pending' as const,
+        earnings: 0,
+        completedJobs: 0
+      };
+
       const createdPartner = await addPartner(newPartner);
       setCurrentUser(createdPartner);
       localStorage.setItem('partnerPhone', createdPartner.phone || '');
