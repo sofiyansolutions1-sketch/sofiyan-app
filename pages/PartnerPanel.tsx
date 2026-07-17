@@ -27,6 +27,7 @@ export const PartnerPanel: React.FC = () => {
   // Registration Modal State
   
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const [isPendingSignup, setIsPendingSignup] = useState(false);
   const [jobToComplete, setJobToComplete] = useState<any>(null);
   const [verificationStep, setVerificationStep] = useState<'idle'|'uploading'|'verifying'|'success'>('idle');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -130,51 +131,17 @@ export const PartnerPanel: React.FC = () => {
       setAuthError("Please fill all required fields");
       return;
     }
-
-    const email = authData.email || authData.phone + "@example.com";
-
-    try {
-      const { data: authDataRes, error: authErrorRes } = await supabase.auth.signUp({
-        email: email,
-        password: authData.password,
-        options: {
-          data: {
-            name: authData.name,
-            phone: authData.phone,
-            role: 'partner'
-          }
-        }
-      });
-
-      if (authErrorRes) throw authErrorRes;
-
-      const newPartner = {
-        id: authDataRes.user?.id || "P" + Date.now(),
-        name: authData.name,
-        first_name: authData.name.split(' ')[0],
-        last_name: authData.name.split(' ').slice(1).join(' '),
-        email: email,
+    
+    setRegData(prev => ({
+        ...prev,
+        firstName: authData.name.split(' ')[0] || '',
+        lastName: authData.name.split(' ').slice(1).join(' ') || '',
         phone: authData.phone,
-        password: authData.password,
-        status: 'pending' as const,
-        earnings: 0,
-        completedJobs: 0
-      };
+        password: authData.password
+    }));
 
-      const createdPartner = await addPartner(newPartner);
-      setCurrentUser(createdPartner);
-      localStorage.setItem('partnerPhone', createdPartner.phone || '');
-      setAuthError(null);
-      setRegData({
-        ...regData,
-        firstName: createdPartner.first_name || '',
-        lastName: createdPartner.last_name || '',
-        phone: createdPartner.phone || '',
-        password: createdPartner.password || ''
-      });
-    } catch (err: any) {
-      setAuthError(err.message || "Failed to sign up");
-    }
+    setIsPendingSignup(true);
+    setAuthError(null);
   };
 const handleLogout = () => {
     setCurrentUser(null);
@@ -185,41 +152,74 @@ const handleLogout = () => {
 
   const handleRegistrationSubmit = async () => {
     const isUpdating = !!currentUser;
-    const partnerId = isUpdating ? currentUser.id : "P" + Date.now();
-    const newPartner = {
-      ...(isUpdating ? currentUser : {}),
-      id: partnerId,
-      name: regData.firstName + " " + regData.lastName,
-      first_name: regData.firstName,
-      last_name: regData.lastName,
-      email: currentUser?.email || regData.phone + "@example.com",
-      phone: regData.phone,
-      city: regData.city,
-      alt_phone: regData.altPhone,
-      password: regData.password,
-      gender: regData.gender,
-      age: parseInt(regData.age) || 0,
-      experience: regData.experience,
-      categories: regData.categories,
-      sub_categories: regData.subCategories,
-      service_pincodes: regData.service_pincodes,
-      aadhar_number: regData.aadharNumber,
-      status: 'pending' as const,
-      earnings: isUpdating ? currentUser.earnings : 0,
-      completedJobs: isUpdating ? currentUser.completedJobs : 0
-    };
+    
     try {
       if (isUpdating) {
-         await updatePartner(newPartner);
-         setCurrentUser(newPartner);
-      } else {
-         const createdPartner = await addPartner(newPartner);
-         setCurrentUser(createdPartner);
+        const newPartner = {
+          ...currentUser,
+          name: regData.firstName + " " + regData.lastName,
+          first_name: regData.firstName,
+          last_name: regData.lastName,
+          phone: regData.phone,
+          city: regData.city,
+          alt_phone: regData.altPhone,
+          password: regData.password,
+          gender: regData.gender,
+          age: parseInt(regData.age) || 0,
+          experience: regData.experience,
+          categories: regData.categories,
+          sub_categories: regData.subCategories,
+          service_pincodes: regData.service_pincodes,
+          aadhar_number: regData.aadharNumber,
+        };
+        await updatePartner(newPartner);
+        setCurrentUser(newPartner);
+      } else if (isPendingSignup) {
+        const email = authData.email || regData.phone + "@example.com";
+        const { data: authDataRes, error: authErrorRes } = await supabase.auth.signUp({
+            email: email,
+            password: regData.password,
+            options: {
+              data: {
+                name: regData.firstName + " " + regData.lastName,
+                phone: regData.phone,
+                role: 'partner'
+              }
+            }
+        });
+
+        if (authErrorRes) throw authErrorRes;
+
+        const newPartner = {
+          id: authDataRes.user?.id || "P" + Date.now(),
+          name: regData.firstName + " " + regData.lastName,
+          first_name: regData.firstName,
+          last_name: regData.lastName,
+          email: email,
+          phone: regData.phone,
+          password: regData.password,
+          city: regData.city,
+          alt_phone: regData.altPhone,
+          gender: regData.gender,
+          age: parseInt(regData.age) || 0,
+          experience: regData.experience,
+          categories: regData.categories,
+          sub_categories: regData.subCategories,
+          service_pincodes: regData.service_pincodes,
+          aadhar_number: regData.aadharNumber,
+          status: 'pending' as const,
+          earnings: 0,
+          completedJobs: 0
+        };
+        
+        const createdPartner = await addPartner(newPartner);
+        setCurrentUser(createdPartner);
+        localStorage.setItem('partnerPhone', createdPartner.phone || '');
+        setIsPendingSignup(false);
       }
     } catch (err: any) {
       alert(err.message || "Failed to update profile");
     }
-    
   };
 const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning & Pest Control", "Pooja", "Home Appliances"];
   const APPLIANCE_LIST = ["A.C. Service & Repair", "Air Cooler Repair", "Air Purifier", "Water Purifier (RO)", "Television", "Chimney Repair", "Geyser", "Washing Machine", "Refrigerator", "Mixer Grinder", "CCTV"];
@@ -266,7 +266,7 @@ const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning 
     <div className={isProfileIncomplete ? 'min-h-screen bg-slate-50 flex items-center justify-center p-4' : 'fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4'}>
       <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-8 relative shadow-2xl">
         {isProfileIncomplete ? (
-            <button onClick={() => { setCurrentUser(null); localStorage.removeItem('partnerPhone'); }} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-red-500 hover:text-red-700 font-bold">Logout</button>
+            <button onClick={() => { setCurrentUser(null); setIsPendingSignup(false); localStorage.removeItem('partnerPhone'); }} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-sm text-red-500 hover:text-red-700 font-bold">Cancel</button>
         ) : (
             <button onClick={() => setIsRegistrationOpen(false)} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-gray-800 font-bold">✕</button>
         )}
@@ -507,7 +507,7 @@ const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning 
 
   const isProfileIncomplete = currentUser && (!currentUser.aadhar_number || !currentUser.categories?.length || !currentUser.city);
 
-  if (!currentUser) {
+  if (!currentUser && !isPendingSignup) {
     return (
       <>
         {renderAuth()}
@@ -515,8 +515,8 @@ const EXPERTISE_CATEGORIES = ["Electrician", "Plumber", "Carpenters", "Cleaning 
     );
   }
 
-  if (isProfileIncomplete || isRegistrationOpen) {
-    return renderRegistrationModal(isProfileIncomplete);
+  if (isProfileIncomplete || isRegistrationOpen || isPendingSignup) {
+    return renderRegistrationModal(!!isProfileIncomplete || isPendingSignup);
   }
 
   const partnerBookings = bookings.filter(b => b.assignedPartnerId === currentUser.id);
