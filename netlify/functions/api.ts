@@ -4,10 +4,10 @@ import { app } from "../../server";
 
 const netlifyApp = express();
 
-// A request to /api/foo gets rewritten by Netlify to /.netlify/functions/api/foo 
-// by the [[redirects]] rule: from = "/api/*", to = "/.netlify/functions/api/:splat"
-// That means the path received by the function is /.netlify/functions/api/foo.
-// Since server.ts expects the path "/api/foo", we mount it at "/.netlify/functions"
+// Handle all path variations when called via Netlify Functions or custom redirects
+netlifyApp.use('/.netlify/functions/api', app);
 netlifyApp.use('/.netlify/functions', app);
+netlifyApp.use('/api', app);
+netlifyApp.use('/', app);
 
 export const handler = serverless(netlifyApp);

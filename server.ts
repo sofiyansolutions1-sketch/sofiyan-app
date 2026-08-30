@@ -15,7 +15,7 @@ app.use(express.json({ limit: '15mb' }));
 
 const paymentVerificationCodes = new Map<string, string>();
 
-app.post("/api/generate-payment-code", (req, res) => {
+app.post(["/api/generate-payment-code", "/generate-payment-code"], (req, res) => {
   const { bookingId } = req.body;
   if (!bookingId) return res.status(400).json({ error: "bookingId is required" });
   const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -23,7 +23,7 @@ app.post("/api/generate-payment-code", (req, res) => {
   res.json({ code });
 });
 
-app.post("/api/verify-payment", async (req, res) => {
+app.post(["/api/verify-payment", "/verify-payment"], async (req, res) => {
   try {
     const { imageBase64, bookingId, expectedAmount, expectedCode: inputCode, paymentType } = req.body;
     

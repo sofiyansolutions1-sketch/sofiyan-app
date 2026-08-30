@@ -100,22 +100,86 @@ export const useStore = create<StoreState>((set, get) => ({
   initialized: false,
 
   fetchBookings: async () => {
-    const { data } = await supabase
-      .from('bookings')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (data) {
-      set({ bookings: data.map(mapBookingFromDB) });
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.warn("fetchBookings supabase error:", error.message || error);
+      }
+      if (data && data.length > 0) {
+        const mapped = data.map(mapBookingFromDB);
+        set({ bookings: mapped });
+        try {
+          localStorage.setItem('cached_bookings', JSON.stringify(mapped));
+        } catch {
+          // Ignore localStorage write failures in sandboxed contexts
+        }
+      }
+    } catch (e: any) {
+      console.warn("fetchBookings network notice:", e?.message || e);
+      try {
+        const cached = localStorage.getItem('cached_bookings');
+        if (cached) {
+          set({ bookings: JSON.parse(cached) });
+        }
+      } catch {
+        // Ignore cache parsing failures
+      }
     }
   },
 
   fetchPartners: async () => {
-    const { data, error } = await supabase.from('primary_partners').select('*');
-    if (error) {
-      console.error("Error fetching partners:", error);
+    try {
+      let data: any[] | null = null;
+      let error: any = null;
+
+      // 1. Try primary_partners table
+      try {
+        const res = await supabase.from('primary_partners').select('*');
+        data = res.data;
+        error = res.error;
+      } catch (err) {
+        error = err;
+      }
+
+      // 2. Fallback to partners table if primary_partners is empty or errored
+      if ((!data || data.length === 0) && !error) {
+        try {
+          const fallbackRes = await supabase.from('partners').select('*');
+          if (fallbackRes.data && fallbackRes.data.length > 0) {
+            data = fallbackRes.data;
+          }
+        } catch {
+          // Table fallback ignored if unavailable
+        }
+      }
+
+      if (error) {
+        console.warn("fetchPartners notice:", error.message || error);
+      }
+
+      if (data && data.length > 0) {
+        const primary = data.map(mapPrimaryPartnerFromDB);
+        set({ partners: primary });
+        try {
+          localStorage.setItem('cached_partners', JSON.stringify(primary));
+        } catch {
+          // Ignore localStorage write errors
+        }
+      }
+    } catch (e: any) {
+      console.warn("fetchPartners network notice:", e?.message || e);
+      try {
+        const cached = localStorage.getItem('cached_partners');
+        if (cached) {
+          set({ partners: JSON.parse(cached) });
+        }
+      } catch {
+        // Ignore cache parse errors
+      }
     }
-    const primary = data ? data.map(mapPrimaryPartnerFromDB) : [];
-    set({ partners: primary });
   },
 
   init: async () => {

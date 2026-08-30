@@ -1,3 +1,5 @@
+/api/* /.netlify/functions/api/:splat 200
+/.netlify/functions/* /.netlify/functions/:splat 200
 /influencer-portal /influencer-portal.html 200
 /ac-repair-lucknow /ac-repair-lucknow.html 200
 /fridge-repair-lucknow /fridge-repair-lucknow.html 200

@@ -183,14 +183,14 @@ export const AdminPanel: React.FC = () => {
 
   useEffect(() => {
     // Fresh fetch on Admin mount
-    fetchBookings().catch(err => console.error("Error fetching bookings:", err));
-    fetchPartners().catch(err => console.error("Error fetching partners:", err));
+    fetchBookings().catch(err => console.warn("Notice fetching bookings:", err?.message || err));
+    fetchPartners().catch(err => console.warn("Notice fetching partners:", err?.message || err));
 
     // Live update backup interval
     const interval = setInterval(() => {
-      fetchBookings().catch(err => console.error("Error fetching bookings:", err));
-      fetchPartners().catch(err => console.error("Error fetching partners:", err));
-    }, 10000); // Poll every 10 seconds
+      fetchBookings().catch(err => console.warn("Notice fetching bookings:", err?.message || err));
+      fetchPartners().catch(err => console.warn("Notice fetching partners:", err?.message || err));
+    }, 12000); // Poll every 12 seconds
 
     return () => clearInterval(interval);
   }, [fetchBookings, fetchPartners]);

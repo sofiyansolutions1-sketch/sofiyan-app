@@ -39,6 +39,7 @@ import {
 import { MapRadiusSelector } from "../components/MapRadiusSelector";
 import { fetchAreasByPincode } from "../services/pincodeService";
 import { uploadAppFile, getSignedAppFileUrl } from "../services/storageService";
+import { verifyPaymentWithAi } from "../services/paymentVerificationService";
 
 // Haversine distance calculator
 const calculateDistance = (lat1?: number, lon1?: number, lat2?: number, lon2?: number): string => {
@@ -1000,15 +1001,6 @@ export const PartnerPanel: React.FC = () => {
     }
   };
 
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
   const handleVerifyAndSubmitRegistration = async () => {
     if (!regPaymentFile) {
       setRegPaymentError("Please upload the payment screenshot of ₹499 registration fee.");
@@ -1019,27 +1011,17 @@ export const PartnerPanel: React.FC = () => {
     setRegAiScanProgress("🤖 Initializing Gemini Vision AI OCR Scanner...");
 
     try {
-      // Step 1: Read image as base64
-      setRegAiScanProgress("📷 Reading & preparing payment screenshot...");
-      const base64Data = await fileToBase64(regPaymentFile);
-
-      // Step 2: Call Gemini Vision OCR API
-      setRegAiScanProgress("🔍 Gemini Vision AI analyzing ₹499 payment, UTR & status...");
-      const response = await fetch("/api/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64Data,
-          expectedAmount: 499,
-          expectedCode: regPaymentCode,
-          paymentType: "partner_onboarding"
-        })
+      const aiResult = await verifyPaymentWithAi({
+        file: regPaymentFile,
+        expectedAmount: 499,
+        expectedCode: regPaymentCode,
+        paymentType: "partner_onboarding",
+        onProgress: (msg) => setRegAiScanProgress(msg)
       });
 
-      const aiResult = await response.json();
       console.log("[Gemini Vision AI Registration Response]:", aiResult);
 
-      if (!response.ok || !aiResult.verified) {
+      if (!aiResult.verified) {
         const errorMsg = aiResult.message || aiResult.error || "Payment verification failed. Please ensure you transferred ₹499 to 8115983887@ptsbi and uploaded a clear success receipt.";
         setRegPaymentError(errorMsg);
         setRegPaymentStatus("idle");
@@ -2698,28 +2680,18 @@ export const PartnerPanel: React.FC = () => {
     setCommissionAiScanProgress("🤖 Initializing Gemini Vision AI scanner...");
 
     try {
-      // Step 1: Convert uploaded payment screenshot to Base64
-      setCommissionAiScanProgress("📷 Reading commission payment receipt...");
-      const base64Data = await fileToBase64(uploadedFile);
-
-      // Step 2: Call Gemini Vision OCR API
-      setCommissionAiScanProgress(`🔍 Gemini Vision AI verifying ₹${commission} commission payment & UTR...`);
-      const response = await fetch("/api/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64Data,
-          expectedAmount: commission,
-          expectedCode: paymentVerificationCode,
-          paymentType: "commission",
-          bookingId: jobToComplete.id
-        })
+      const aiResult = await verifyPaymentWithAi({
+        file: uploadedFile,
+        expectedAmount: commission,
+        expectedCode: paymentVerificationCode,
+        paymentType: "commission",
+        bookingId: jobToComplete.id,
+        onProgress: (msg) => setCommissionAiScanProgress(msg)
       });
 
-      const aiResult = await response.json();
       console.log("[Gemini Vision AI Commission Result]:", aiResult);
 
-      if (!response.ok || !aiResult.verified) {
+      if (!aiResult.verified) {
         const errorMsg = aiResult.message || aiResult.error || `Payment verification failed. Detected amount did not match required commission of ₹${commission}.`;
         setVerificationError(errorMsg);
         setVerificationStep("idle");
