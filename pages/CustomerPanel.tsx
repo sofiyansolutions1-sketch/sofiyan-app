@@ -433,7 +433,7 @@ export const CustomerPanel: React.FC = () => {
     };
 
     // Primary admin support phone resolvers
-    const adminRawPhone = import.meta.env.VITE_ADMIN_PHONE || '9196029763';
+    const adminRawPhone = import.meta.env.VITE_ADMIN_PHONE || '8115983887';
     const formattedAdminPhone = adminRawPhone.length === 10 
       ? `+91 ${adminRawPhone.slice(0, 5)} ${adminRawPhone.slice(5)}`
       : adminRawPhone.startsWith('91') && adminRawPhone.length === 12
@@ -2005,7 +2005,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           `Sent via Sofiyan Home Service App`;
 
         // 1. Automatic send to admin via Server API
-        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '9196029763').replace(/\+/g, '');
+        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
         
         fetch('/api/send-whatsapp', {
           method: 'POST',
@@ -2967,8 +2967,8 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a href="tel:9196029763" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
-                    <Phone size={18} /> Call Helpline (9196029763)
+                  <a href="tel:8115983887" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
+                    <Phone size={18} /> Call Helpline (8115983887)
                   </a>
                   <button onClick={() => { setIsBookingModalOpen(false); navigate('/track', { state: { bookingId: completedBookingId } }) }} className="flex-1 bg-white border-2 border-indigo-200 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
                     Track Booking
@@ -3875,7 +3875,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         {/* Floating Helpline Pill */}
         {showHelplineBanner && (
           <a 
-            href="tel:9196029763" 
+            href="tel:8115983887" 
             className="helpline-container fixed bottom-24 right-4 sm:right-8 z-50 flex items-center bg-white rounded-full shadow-lg border border-indigo-100 cursor-pointer hover:scale-105 transition-all overflow-hidden p-1 pr-2.5"
             title="Call Helpline"
           >

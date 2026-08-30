@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 
 export const BUSINESS_NAME = "Sofiyan Home Service";
-export const HELPLINE = "9196029763";
+export const HELPLINE = "8115983887";
 export const EMAIL = "sofiyansolutions1@gmail.com";
 export const ADMIN_PASSWORD = "ta7867@#";
 

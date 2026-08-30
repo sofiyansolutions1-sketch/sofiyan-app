@@ -331,7 +331,7 @@ export const FollowUpManager: React.FC = () => {
     // This logic assumes you have a template named 'followup_reminder' approved in Meta.
     // For this example, we'll try to send a template-based message.
     
-    const number = recipientType === 'customer' ? lead.contact_number : process.env.VITE_ADMIN_PHONE || '9196029763';
+    const number = recipientType === 'customer' ? lead.contact_number : process.env.VITE_ADMIN_PHONE || '8115983887';
     
     const payload = {
       number: number,
@@ -785,7 +785,7 @@ const LeadCard = ({ lead, onReschedule, onDelete, isUrgent, highlightAsNext = fa
                            `───────────────────\n` +
                            `Sent via Sofiyan Home Service App`;
                 
-                window.open(`https://wa.me/9196029763?text=${encodeURIComponent(msg)}`, '_blank');
+                window.open(`https://wa.me/918115983887?text=${encodeURIComponent(msg)}`, '_blank');
               }}
               className={`p-2.5 rounded-xl border flex items-center justify-center transition-all shadow-sm ${highlightAsNext ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' : 'bg-indigo-50 border-indigo-100 text-indigo-600 hover:bg-indigo-100'}`}
               title="Forward to Admin (WhatsApp)"

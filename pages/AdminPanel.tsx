@@ -436,7 +436,7 @@ export const AdminPanel: React.FC = () => {
                                                    `Time: ${booking.time}\n\n` +
                                                    `───────────────────\n` +
                                                    `Sent via Sofiyan Home Service App`;
-                                        window.open(`https://wa.me/9196029763?text=${encodeURIComponent(msg)}`, '_blank');
+                                        window.open(`https://wa.me/918115983887?text=${encodeURIComponent(msg)}`, '_blank');
                                     }} className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-all shadow-sm" title="Forward to Admin WhatsApp">
                                         <Share2 size={14} />
                                     </button>
