@@ -1,8 +1,9 @@
-import React, { useState, useEffect, } from 'react';
-import { Loader2, Navigation, AlertCircle, MapPin, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader2, Navigation, MapPin } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { fetchAreasByPincode } from '../services/pincodeService';
 
 // Fix default Leaflet marker icon
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
@@ -16,196 +17,213 @@ L.Icon.Default.mergeOptions({
   shadowUrl,
 });
 
+// Helper to reliably extract area / locality, city, pincode, and address from reverse geocoding
+async function parseGeocodedAddress(geoData: any): Promise<{ address: string; city: string; area: string; pincode: string }> {
+  if (!geoData) {
+    return { address: '', city: '', area: '', pincode: '' };
+  }
+
+  const addr = geoData.address || {};
+  const detectedAddress = geoData.display_name || '';
+
+  // Extract 6-digit pincode
+  let detectedPincode = addr.postcode || '';
+  const pinMatch = (detectedPincode || detectedAddress).match(/\b\d{6}\b/);
+  if (pinMatch) {
+    detectedPincode = pinMatch[0];
+  }
+
+  // Extract City
+  const detectedCity =
+    addr.city ||
+    addr.town ||
+    addr.village ||
+    addr.municipality ||
+    addr.county ||
+    addr.state_district ||
+    '';
+
+  // Extract Area / Locality from all possible OSM address hierarchy levels
+  let detectedArea =
+    addr.suburb ||
+    addr.neighbourhood ||
+    addr.residential ||
+    addr.subdivision ||
+    addr.subdistrict ||
+    addr.city_district ||
+    addr.quarter ||
+    addr.district ||
+    addr.hamlet ||
+    addr.village ||
+    addr.town ||
+    addr.locality ||
+    addr.road ||
+    addr.municipality ||
+    '';
+
+  // If detectedArea is missing or generic, try India Post Postal API via fetchAreasByPincode
+  if ((!detectedArea || detectedArea.trim() === '') && detectedPincode && detectedPincode.length === 6) {
+    try {
+      const areaRes = await fetchAreasByPincode(detectedPincode);
+      if (areaRes && areaRes.success && areaRes.areas && areaRes.areas.length > 0) {
+        detectedArea = areaRes.areas[0];
+      }
+    } catch (e) {
+      console.warn("India Post fallback error:", e);
+    }
+  }
+
+  // If still empty, parse leading components from display_name (e.g. "Ghosi, Mau, Uttar Pradesh, 275301, India")
+  if (!detectedArea || detectedArea.trim() === '') {
+    if (detectedAddress) {
+      const segments = detectedAddress
+        .split(',')
+        .map((s: string) => s.trim())
+        .filter(Boolean);
+
+      const filtered = segments.filter(
+        (s: string) =>
+          !s.toLowerCase().includes('india') &&
+          !s.toLowerCase().includes('uttar pradesh') &&
+          !s.toLowerCase().includes('maharashtra') &&
+          !s.toLowerCase().includes('karnataka') &&
+          !s.toLowerCase().includes('delhi') &&
+          !s.toLowerCase().includes('tamil nadu') &&
+          !s.toLowerCase().includes('west bengal') &&
+          !s.toLowerCase().includes('rajasthan') &&
+          !s.toLowerCase().includes('gujarat') &&
+          !s.toLowerCase().includes('telangana') &&
+          !s.toLowerCase().includes('bihar') &&
+          !s.toLowerCase().includes('madhya pradesh') &&
+          !/^\d{6}$/.test(s)
+      );
+
+      if (filtered.length > 0) {
+        detectedArea = filtered[0];
+      } else if (segments.length > 0) {
+        detectedArea = segments[0];
+      }
+    }
+  }
+
+  return {
+    address: detectedAddress,
+    city: detectedCity,
+    area: detectedArea,
+    pincode: detectedPincode
+  };
+}
+
 // Component to dynamically fit bounds to the circle radius
 const MapBoundsFitter = ({ center, radius }: { center: [number, number]; radius: number }) => {
   const map = useMap();
   useEffect(() => {
     if (center && radius) {
-      const latLng = L.latLng(center[0], center[1]);
-      const bounds = latLng.toBounds(radius * 1000); // radius is in km, toBounds needs meters
-      map.fitBounds(bounds, { animate: false });
+      // Add a slight delay to let the modal animation complete and container size to compute
+      const timer = setTimeout(() => {
+        map.invalidateSize(); // Fixes Leaflet rendering in a newly opened modal
+        const latLng = L.latLng(center[0], center[1]);
+        const bounds = latLng.toBounds(radius * 1000); // radius is in km, toBounds needs meters
+        map.fitBounds(bounds, { animate: true, maxZoom: 15 });
+      }, 250);
+      return () => clearTimeout(timer);
     }
   }, [center, radius, map]);
   return null;
 };
 
-interface PostOffice {
-  Name: string;
-  District: string;
-  State: string;
-  Pincode: string;
-}
-
 interface MapRadiusSelectorProps {
-  onPincodesFound: (pincodes: string[]) => void;
+  onPincodesFound: (pincodes: string[], lat?: number, lng?: number, radius?: number, addressDetails?: { address: string; city: string; area: string; pincode: string }) => void;
+  onLocationDetected?: (lat: number, lng: number, addressDetails?: { address: string; city: string; area: string; pincode: string }) => void;
 }
 
-export const MapRadiusSelector: React.FC<MapRadiusSelectorProps> = ({ onPincodesFound }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<PostOffice[]>([]);
-  const [searchError, setSearchError] = useState('');
-
-  const [selectedPO, setSelectedPO] = useState<PostOffice | null>(null);
+export const MapRadiusSelector: React.FC<MapRadiusSelectorProps> = ({ onPincodesFound, onLocationDetected }) => {
   const [showMapModal, setShowMapModal] = useState(false);
-  
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [radius, setRadius] = useState<number>(5); // default 5km
-  const [isGeocoding, setIsGeocoding] = useState(false);
   const [isFetchingOverpass, setIsFetchingOverpass] = useState(false);
-  const [geocodeError, setGeocodeError] = useState('');
+  
+  const [isAutoDetecting, setIsAutoDetecting] = useState(false);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    setIsSearching(true);
-    setSearchError('');
-    setSearchResults([]);
+  const handleAutoDetect = () => {
+    if (!navigator.geolocation) {
+      alert("Location tracking is not supported by your browser.");
+      return;
+    }
     
-    try {
-      const isNumeric = /^\d+$/.test(searchQuery.trim());
-      const endpoint = isNumeric 
-        ? `https://api.postalpincode.in/pincode/${searchQuery.trim()}`
-        : `https://api.postalpincode.in/postoffice/${searchQuery.trim()}`;
+    setIsAutoDetecting(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setMapCenter([lat, lng]);
+        setRadius(5); // default to 5
+        setShowMapModal(true);
+        setIsAutoDetecting(false);
         
-      const res = await fetch(endpoint);
-      const textRes = await res.text();
-      let data;
-      try {
-        data = JSON.parse(textRes);
-      } catch {
-        console.warn("Failed to parse response as JSON.");
-        throw new Error("Invalid response from Overpass API");
-      }
-      
-      if (data && data[0] && data[0].Status === 'Success') {
-        setSearchResults(data[0].PostOffice || []);
-      } else {
-        setSearchError('No results found. Try a different name or valid 6-digit pincode.');
-      }
-    } catch (err) {
-      console.warn(err);
-      setSearchError('Failed to search. Please try again later.');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const geocodeAddress = async (po: PostOffice) => {
-    setIsGeocoding(true);
-    setGeocodeError('');
-    
-    const cleanName = po.Name.replace(/\s*\(.*?\)\s*/g, '').replace(/B\.O|S\.O|H\.O|Branch Office|Sub Office|Head Office/g, '').trim();
-    const query1 = `${cleanName}, ${po.District}, ${po.State}, India`;
-    const query2 = `${po.District}, ${po.State}, India`;
-    
-    try {
-      // Primary Geocoding
-      let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query1)}`);
-      let textRes = await res.text();
-      let data;
-      try {
-        data = JSON.parse(textRes);
-      } catch {
-        console.warn("Nominatim primary failed:", textRes);
-        data = [];
-      }
-      
-      if (!data || data.length === 0) {
-        // Fallback Geocoding
-        console.warn(`Could not geocode specific name: ${query1}, falling back to: ${query2}`);
-        res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query2)}`);
-        textRes = await res.text();
-        try {
-          data = JSON.parse(textRes);
-        } catch {
-          console.warn("Nominatim fallback failed:", textRes);
-          data = [];
+        if (onLocationDetected) {
+          try {
+            const geoRes = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+              { headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' } }
+            );
+            const geoData = await geoRes.json();
+            const addressDetails = await parseGeocodedAddress(geoData);
+            onLocationDetected(lat, lng, addressDetails);
+          } catch (err) {
+            console.warn("Reverse geocoding failed during auto-detect", err);
+            onLocationDetected(lat, lng);
+          }
         }
-      }
-      
-      if (data && data.length > 0) {
-        setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-      } else {
-        setGeocodeError('Could not find location coordinates on the map. Please try a different post office.');
-      }
-    } catch (err) {
-      console.warn(err);
-      setGeocodeError('Geocoding failed due to network error.');
-    } finally {
-      setIsGeocoding(false);
-    }
-  };
-
-  const handleSelectPO = (po: PostOffice) => {
-    setSelectedPO(po);
-    setShowMapModal(true);
-    setMapCenter(null);
-    geocodeAddress(po);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Unable to fetch exact location. Please ensure location permissions are granted and GPS is turned on.");
+        setIsAutoDetecting(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
   };
 
   const handleFindPincodes = async () => {
     if (!mapCenter) return;
     setIsFetchingOverpass(true);
     
+    const [lat, lng] = mapCenter;
+    // Bounding box for overpass query based on radius
+    // 1 deg lat is approx 111 km. 1 deg lng is approx 111 * cos(lat) km.
+    const latDelta = radius / 111;
+    const lngDelta = radius / (111 * Math.cos(lat * Math.PI / 180));
+    
+    const s = lat - latDelta;
+    const n = lat + latDelta;
+    const w = lng - lngDelta;
+    const e = lng + lngDelta;
+
+    const query = `
+      [out:json][timeout:25];
+      (
+        node["postal_code"](${s},${w},${n},${e});
+        way["postal_code"](${s},${w},${n},${e});
+        relation["postal_code"](${s},${w},${n},${e});
+        
+        node["addr:postcode"](${s},${w},${n},${e});
+        way["addr:postcode"](${s},${w},${n},${e});
+        relation["addr:postcode"](${s},${w},${n},${e});
+      );
+      out tags;
+    `;
+
     try {
-      const radiusInMeters = radius * 1000;
-      const overpassQuery = `
-        [out:json][timeout:25];
-        (
-          node["amenity"="post_office"](around:${radiusInMeters},${mapCenter[0]},${mapCenter[1]});
-          node["postal_code"](around:${radiusInMeters},${mapCenter[0]},${mapCenter[1]});
-        );
-        out body;
-      `;
+      const res = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query
+      });
       
-      const endpoints = [
-        'https://overpass-api.de/api/interpreter',
-        'https://overpass.kumi.systems/api/interpreter',
-        'https://overpass.openstreetmap.ru/api/interpreter'
-      ];
-      
-      let textRes2 = '';
-      let fetchSuccess = false;
-      
-      for (const endpoint of endpoints) {
-        try {
-          const res = await fetch(endpoint, {
-            method: 'POST',
-            body: 'data=' + encodeURIComponent(overpassQuery.trim()),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-          });
-          if (res.ok) {
-            textRes2 = await res.text();
-            
-            // Basic validation to see if it's an HTML error page from overpass
-            if (!textRes2.includes('OSM3S Response') && !textRes2.includes('runtime error') && !textRes2.includes('<html')) {
-              fetchSuccess = true;
-              break;
-            }
-          }
-        } catch {
-          console.warn("Overpass endpoint failed:", endpoint, e);
-        }
-      }
-      
-      if (!fetchSuccess) {
-        throw new Error("All Overpass endpoints failed or returned errors.");
-      }
-      let data;
+      const data = await res.json();
       const pincodes = new Set<string>();
-      if (selectedPO) {
-          pincodes.add(selectedPO.Pincode);
-      }
-      try {
-        data = JSON.parse(textRes2);
-      } catch {
-        console.warn("Failed to parse response as JSON.");
-        console.warn("Overpass API failed. Falling back to selected Pincode only.");
-        onPincodesFound(Array.from(pincodes));
-        setShowMapModal(false);
-        setIsFetchingOverpass(false);
-        return;
-      }
+      
       
       if (data && data.elements) {
         data.elements.forEach((el: any) => {
@@ -219,18 +237,30 @@ export const MapRadiusSelector: React.FC<MapRadiusSelectorProps> = ({ onPincodes
         });
       }
       
-      onPincodesFound(Array.from(pincodes));
+      let addressDetails = undefined;
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+          { headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' } }
+        );
+        const geoData = await geoRes.json();
+        addressDetails = await parseGeocodedAddress(geoData);
+        if (addressDetails.pincode) {
+          pincodes.add(addressDetails.pincode);
+        }
+      } catch (err) {
+        console.warn("Reverse geocoding failed", err);
+      }
+      
+      onPincodesFound(Array.from(pincodes), mapCenter[0], mapCenter[1], radius, addressDetails);
+
       setShowMapModal(false);
       
     } catch (err) {
       console.warn(err);
-      // Fallback
-      if (selectedPO) {
-        onPincodesFound([selectedPO.Pincode]);
-        setShowMapModal(false);
-      } else {
-        alert('Failed to fetch nearby pincodes. Please try again later.');
-      }
+      // Fallback if overpass fails
+      onPincodesFound([], mapCenter[0], mapCenter[1], radius);
+      setShowMapModal(false);
     } finally {
       setIsFetchingOverpass(false);
     }
@@ -238,131 +268,111 @@ export const MapRadiusSelector: React.FC<MapRadiusSelectorProps> = ({ onPincodes
 
   return (
     <div className="w-full">
-      <div className="flex gap-2 mb-4">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Search Post Office name or 6-digit Pincode..."
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          />
-          <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-        </div>
-        <button
-          onClick={handleSearch}
-          disabled={isSearching || !searchQuery.trim()}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-md flex items-center justify-center min-w-[100px]"
-        >
-          {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Search'}
-        </button>
-      </div>
-      
-      {searchError && (
-        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-100 text-sm mb-4">
-          <AlertCircle className="w-4 h-4" />
-          <p>{searchError}</p>
-        </div>
-      )}
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2">
-        {searchResults.map((po, idx) => (
-          <div key={`${po.Name}-${idx}`} className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm hover:border-indigo-300 transition-colors flex flex-col justify-between">
-            <div>
-              <h4 className="font-bold text-gray-800 text-sm mb-1">{po.Name}</h4>
-              <div className="flex items-center text-xs text-gray-500 gap-1 mb-1">
-                <MapPin className="w-3 h-3" />
-                <span>{po.District}, {po.State}</span>
-              </div>
-              <div className="inline-block bg-gray-100 text-gray-700 text-xs font-mono px-2 py-0.5 rounded mt-1 mb-3">
-                {po.Pincode}
-              </div>
-            </div>
-            <button
-              onClick={() => handleSelectPO(po)}
-              className="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-bold hover:bg-slate-900 transition-colors flex items-center justify-center gap-1.5"
-            >
-              <Navigation className="w-3 h-3" /> Select Radius
-            </button>
-          </div>
-        ))}
-      </div>
+      <button
+        type="button"
+        onClick={handleAutoDetect}
+        disabled={isAutoDetecting}
+        className="w-full bg-slate-900 text-white px-6 py-4 rounded-xl font-bold hover:bg-slate-800 disabled:opacity-50 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+      >
+        {isAutoDetecting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Navigation className="w-5 h-5" />}
+        {isAutoDetecting ? 'Detecting Location...' : 'Use Current Location'}
+      </button>
 
       {showMapModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-end sm:items-center justify-center sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-3xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fadeIn">
-            <div className="p-5 sm:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/80 backdrop-blur">
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="p-5 sm:p-6 border-b border-gray-100 flex justify-between items-center bg-white z-10 relative">
               <div>
-                <h3 className="font-black text-gray-900 text-lg sm:text-xl uppercase tracking-tighter">Select Service Radius</h3>
-                <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">From {selectedPO?.Name} ({selectedPO?.Pincode})</p>
+                <h3 className="font-black text-slate-900 text-xl sm:text-2xl tracking-tight flex items-center gap-2">
+                  <MapPin className="text-indigo-600" />
+                  Service Area Map
+                </h3>
+                <p className="text-sm font-medium text-slate-500 mt-1">Adjust your operational radius around your location</p>
               </div>
               <button 
-                onClick={() => setShowMapModal(false)}
-                className="text-gray-400 hover:text-gray-700 bg-white shadow-sm border border-gray-200 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-bold transition-colors"
+                 type="button"
+                 onClick={() => setShowMapModal(false)}
+                className="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center font-bold transition-colors"
               >
                 ✕
               </button>
             </div>
             
-            <div className="p-4 sm:p-6 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
-              {isGeocoding ? (
-                <div className="flex-1 min-h-[300px] bg-slate-50 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-gray-500">
-                  <Loader2 className="w-8 h-8 animate-spin mb-2 text-indigo-500" />
-                  <p className="text-xs font-bold uppercase tracking-widest">Locating on map...</p>
-                </div>
-              ) : geocodeError ? (
-                <div className="flex-1 min-h-[300px] bg-red-50 rounded-2xl border border-red-100 flex flex-col items-center justify-center text-red-600 p-6 text-center">
-                  <AlertCircle className="w-10 h-10 mb-2 opacity-50" />
-                  <p className="text-sm font-bold">{geocodeError}</p>
-                </div>
-              ) : mapCenter ? (
-                <div className="flex flex-col gap-5 h-full">
-                  <div className="h-[250px] sm:h-[400px] shrink-0 w-full rounded-2xl overflow-hidden border border-gray-200 z-0 shadow-inner relative">
-                    <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
-                      <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <Marker position={mapCenter} />
-                      <Circle 
-                        center={mapCenter} 
-                        radius={radius * 1000} 
-                        pathOptions={{ color: '#4f46e5', fillColor: '#4f46e5', fillOpacity: 0.15, weight: 2 }} 
-                      />
-                      <MapBoundsFitter center={mapCenter} radius={radius} />
-                    </MapContainer>
-                  </div>
-                  
-                  <div className="bg-gray-50/80 p-5 rounded-2xl border border-gray-100 flex flex-col gap-4">
-                    <label className="flex justify-between items-center">
-                      <span className="text-xs font-black text-gray-600 uppercase tracking-widest">Search Radius</span>
-                      <span className="text-indigo-600 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-widest">{radius} km</span>
-                    </label>
-                    <input 
-                      type="range" 
-                      min="1" 
-                      max="50" 
-                      step="1"
-                      value={radius} 
-                      onChange={(e) => setRadius(parseInt(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+            <div className="flex-1 flex flex-col md:flex-row h-full min-h-[400px] md:min-h-[500px]">
+              {/* Map Area */}
+              <div className="flex-1 relative h-[300px] md:h-auto bg-slate-100">
+                {mapCenter && (
+                  <MapContainer center={mapCenter} zoom={13} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+                    {/* Esri World Imagery (Satellite) for a 3D-like rich view */}
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     />
-                  </div>
-                  
-                  <button
-                    onClick={handleFindPincodes}
-                    disabled={isFetchingOverpass}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] sm:text-xs hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"
-                  >
-                    {isFetchingOverpass ? (
-                      <><Loader2 className="w-5 h-5 animate-spin" /> Scanning Area for Pincodes...</>
-                    ) : (
-                      <><Navigation className="w-4 h-4 sm:w-5 sm:h-5" /> Find Pincodes in {radius}km Radius</>
-                    )}
-                  </button>
+                    {/* Overlay labels for satellite */}
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                    />
+                    
+                    <Marker position={mapCenter} />
+                    <Circle 
+                       center={mapCenter} 
+                       radius={radius * 1000} 
+                       pathOptions={{ color: '#4f46e5', fillColor: '#4f46e5', fillOpacity: 0.25, weight: 3 }} 
+                     />
+                    <MapBoundsFitter center={mapCenter} radius={radius} />
+                  </MapContainer>
+                )}
+                
+                {/* Floating overlay for radius display */}
+                <div className="absolute top-4 left-4 z-[400] bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg border border-white/20">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-0.5">Current Radius</p>
+                  <p className="text-2xl font-black text-indigo-600">{radius} <span className="text-sm text-indigo-400">km</span></p>
                 </div>
-              ) : null}
+              </div>
+              
+              {/* Controls Area */}
+              <div className="w-full md:w-80 bg-white p-6 flex flex-col justify-between border-t md:border-t-0 md:border-l border-gray-100 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.05)] z-10">
+                <div className="space-y-6">
+                    <div>
+                        <label className="flex justify-between items-center mb-3">
+                          <span className="text-sm font-black text-slate-800 uppercase tracking-widest">Adjust Range</span>
+                        </label>
+                        <input 
+                           type="range" 
+                           min="5" 
+                           max="10" 
+                           step="1"
+                           value={radius} 
+                           onChange={(e) => setRadius(parseInt(e.target.value))}
+                           className="w-full h-3 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        />
+                        <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
+                            <span>5 km</span>
+                            <span>10 km</span>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                        <p className="text-sm text-indigo-800 font-medium leading-relaxed">
+                            We will automatically match you with customer bookings within a <strong>{radius}km</strong> radius of your current location.
+                        </p>
+                    </div>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={handleFindPincodes}
+                  disabled={isFetchingOverpass}
+                  className="w-full mt-6 bg-indigo-600 text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200/50 flex items-center justify-center gap-2 transform hover:-translate-y-1"
+                >
+                  {isFetchingOverpass ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Navigation className="w-4 h-4" /> Confirm & Save</>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

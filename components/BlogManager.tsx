@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, Upload, X } from 'lucide-react';
 import { SERVICES } from '../constants';
+import { uploadAppFile, getSignedAppFileUrl, deleteAppFile } from '../services/storageService';
 
 export const BlogManager: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -12,6 +13,8 @@ export const BlogManager: React.FC = () => {
     const [metaDescription, setMetaDescription] = useState('');
     const [relatedService, setRelatedService] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [content, setContent] = useState('');
     const [isPublishing, setIsPublishing] = useState(false);
     const [blogs, setBlogs] = useState<any[]>([]);
@@ -26,7 +29,17 @@ export const BlogManager: React.FC = () => {
         if (error) {
             console.error('Error fetching blogs:', error);
         } else if (data) {
-            setBlogs(data);
+            // Resolve signed URLs for private storage files
+            const blogsWithSignedUrls = await Promise.all(
+                data.map(async (blog) => {
+                    if (blog.image_url) {
+                        const signed = await getSignedAppFileUrl(blog.image_url);
+                        return { ...blog, displayImageUrl: signed || blog.image_url };
+                    }
+                    return { ...blog, displayImageUrl: null };
+                })
+            );
+            setBlogs(blogsWithSignedUrls);
         }
     };
 
@@ -51,6 +64,27 @@ export const BlogManager: React.FC = () => {
         e.preventDefault();
         setIsPublishing(true);
 
+        let finalImagePath = imageUrl;
+
+        // If a file was selected, upload it to 'app-files'
+        if (imageFile) {
+            try {
+                const uploadResult = await uploadAppFile({
+                    userId: 'admin',
+                    featureName: 'blog_featured',
+                    itemId: slug || 'new_blog',
+                    file: imageFile,
+                    customFileName: imageFile.name || 'featured.jpg'
+                });
+                finalImagePath = uploadResult.filePath;
+            } catch (upErr: any) {
+                console.error("Failed to upload blog featured image:", upErr);
+                alert("Failed to upload image: " + (upErr.message || "Unknown error"));
+                setIsPublishing(false);
+                return;
+            }
+        }
+
         const blogData = {
             title,
             slug,
@@ -59,7 +93,7 @@ export const BlogManager: React.FC = () => {
             target_locations: targetLocations,
             meta_description: metaDescription,
             related_service: relatedService,
-            image_url: imageUrl,
+            image_url: finalImagePath,
             content,
             author: 'Admin',
             status: 'published'
@@ -92,7 +126,7 @@ export const BlogManager: React.FC = () => {
         }
     };
 
-    const editBlog = (blog: any) => {
+    const editBlog = async (blog: any) => {
         setEditingId(blog.id);
         setTitle(blog.title || '');
         setSlug(blog.slug || '');
@@ -102,14 +136,26 @@ export const BlogManager: React.FC = () => {
         setMetaDescription(blog.meta_description || '');
         setRelatedService(blog.related_service || '');
         setImageUrl(blog.image_url || '');
+        setImageFile(null);
+        if (blog.image_url) {
+            const signed = await getSignedAppFileUrl(blog.image_url);
+            setImagePreview(signed || blog.image_url);
+        } else {
+            setImagePreview(null);
+        }
         setContent(blog.content || '');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const deleteBlog = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this article?')) return;
+    const deleteBlog = async (blog: any) => {
+        if (!confirm(`Are you sure you want to delete "${blog.title}"?`)) return;
         
-        const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+        // Remove file from storage if present
+        if (blog.image_url) {
+            await deleteAppFile(blog.image_url);
+        }
+
+        const { error } = await supabase.from('blog_posts').delete().eq('id', blog.id);
         if (error) {
             alert('Error deleting article: ' + error.message);
         } else {
@@ -127,6 +173,8 @@ export const BlogManager: React.FC = () => {
         setMetaDescription('');
         setRelatedService('');
         setImageUrl('');
+        setImageFile(null);
+        setImagePreview(null);
         setContent('');
     };
 
@@ -179,9 +227,75 @@ export const BlogManager: React.FC = () => {
                             <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" rows={2} placeholder="Write a compelling description for Google search results..."></textarea>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Featured Image URL</label>
-                            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="https://example.com/image.jpg" />
+                        <div className="md:col-span-2 space-y-3">
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">Featured Article Image</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5">
+                                        Upload from Device (Supabase Storage)
+                                    </label>
+                                    <label className="border-2 border-dashed border-gray-300 hover:border-indigo-500 bg-gray-50 hover:bg-indigo-50/40 transition-all rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer min-h-[100px]">
+                                        <Upload size={22} className="text-indigo-600 mb-1" />
+                                        <span className="text-xs font-bold text-gray-700">
+                                            {imageFile ? imageFile.name : "Click to select image"}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WebP up to 10MB</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                if (e.target.files && e.target.files[0]) {
+                                                    const file = e.target.files[0];
+                                                    setImageFile(file);
+                                                    setImagePreview(URL.createObjectURL(file));
+                                                }
+                                            }}
+                                        />
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1.5">
+                                        Or External Image URL / Storage Path
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        value={imageUrl} 
+                                        onChange={(e) => {
+                                            setImageUrl(e.target.value);
+                                            if (!imageFile) setImagePreview(e.target.value);
+                                        }} 
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm" 
+                                        placeholder="https://example.com/image.jpg or app-files path" 
+                                    />
+                                </div>
+                            </div>
+
+                            {imagePreview && (
+                                <div className="relative inline-flex items-center gap-3 bg-gray-50 p-2.5 rounded-xl border border-gray-200 mt-2">
+                                    <img 
+                                        src={imagePreview} 
+                                        alt="Preview" 
+                                        className="w-20 h-14 object-cover rounded-lg border border-gray-200" 
+                                    />
+                                    <div className="text-xs text-gray-700 font-semibold truncate max-w-[250px]">
+                                        {imageFile ? imageFile.name : imageUrl}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setImageFile(null);
+                                            setImageUrl('');
+                                            setImagePreview(null);
+                                        }}
+                                        className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 ml-auto"
+                                        title="Remove Image"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         <div className="md:col-span-2">
@@ -235,7 +349,7 @@ export const BlogManager: React.FC = () => {
                                     <button onClick={() => editBlog(blog)} className="flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-800 transition">
                                         <Edit2 size={14} className="mr-1" /> Edit
                                     </button>
-                                    <button onClick={() => deleteBlog(blog.id)} className="flex items-center text-xs font-bold text-red-600 hover:text-red-800 transition">
+                                    <button onClick={() => deleteBlog(blog)} className="flex items-center text-xs font-bold text-red-600 hover:text-red-800 transition">
                                         <Trash2 size={14} className="mr-1" /> Delete
                                     </button>
                                 </div>

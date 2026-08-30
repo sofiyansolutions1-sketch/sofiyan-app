@@ -6,45 +6,48 @@ import { Service, SubService, CartItem } from '../types';
 import { useStore } from '../hooks/useStore';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
-import { identifyPincode, fetchPincodesByArea } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock } from 'lucide-react';
+import { identifyPincode, fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { getSignedAppFileUrl } from '../services/storageService';
+
+import { MapPicker } from '../components/MapPicker';
 
 // Specific Customer Reviews Data
 const customerReviews = [
   {
     name: "Rahul Sharma",
-    img: "https://randomuser.me/api/portraits/men/32.jpg", 
+    img: "https://randomuser.me/api/portraits/men/43.jpg",
     rating: 5,
     text: "Mene pehli baar Sofiyan Home Service se electrician book kiya. Kaam bahut safai se kiya aur time par aaye. Highly recommended!"
   },
   {
     name: "Priya Venkatesh",
-    img: "https://randomuser.me/api/portraits/women/44.jpg",
+    img: "https://randomuser.me/api/portraits/women/43.jpg",
     rating: 5,
     text: "Very happy with the AC cleaning service. The team from Sofiyan Home Service was polite, professional, and wore uniforms."
   },
   {
     name: "Amit Malhotra",
-    img: "https://randomuser.me/api/portraits/men/41.jpg",
+    img: "https://randomuser.me/api/portraits/men/33.jpg",
     rating: 4,
     text: "Sofiyan Home Service is trustworthy. Pricing was clear, and the plumber fixed the leakage quickly without any hidden charges."
   },
   {
     name: "Sneha Gupta",
-    img: "https://randomuser.me/api/portraits/women/68.jpg",
+    img: "https://randomuser.me/api/portraits/women/61.jpg",
     rating: 5,
     text: "Kitchen deep cleaning was excellent! Sofiyan Home Service staff really worked hard. My kitchen looks brand new now."
   },
   {
     name: "Vikram Singh",
-    img: "https://randomuser.me/api/portraits/men/22.jpg",
+    img: "https://randomuser.me/api/portraits/men/29.jpg",
     rating: 5,
     text: "Best app for home repairs in my area. I use Sofiyan Home Service for all my electrical and plumbing needs. Very reliable."
   },
   {
     name: "Anjali Mehta",
-    img: "https://randomuser.me/api/portraits/women/54.jpg",
+    img: "https://randomuser.me/api/portraits/women/40.jpg",
     rating: 5,
     text: "Safe and secure for women customers. The professionals sent by Sofiyan Home Service were verified and very decent."
   }
@@ -102,21 +105,135 @@ const categoryList = [
     { name: "Cleaning", image: "https://i.postimg.cc/0Np241Gb/Chat-GPT-Image-Mar-25-2026-06-16-45-PM.png" }
 ];
 
+const getRateCardCategory = (name: string): string | null => {
+  if (!name) return null;
+  const clean = name.toLowerCase().replace(/[^a-z]/g, '');
+  if (clean.includes('ac') || clean.includes('aircon') || clean.includes('aircond')) return 'AC Service';
+  if (clean.includes('washing') || clean.includes('washer')) return 'Washing Machine';
+  if (clean.includes('refrigerator') || clean.includes('fridge')) return 'Refrigerator';
+  if (clean.includes('purifier') || clean.includes('waterpurifier') || clean.includes('ro')) return 'Water Purifier';
+  return null;
+};
+
 export const CustomerPanel: React.FC = () => {
-  const { partners, bookings } = useStore();
+  const { bookings, fetchBookings, updateBooking, partners } = useStore();
   const navigate = useNavigate();
-  const [techPincode, setTechPincode] = useState('');
-  const [searchedTechPincode, setSearchedTechPincode] = useState('');
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [activeProfileTab, setActiveProfileTab] = useState<'bookings' | 'profile' | 'referral' | 'support'>('bookings');
+  const [bookingSubTab, setBookingSubTab] = useState<'active' | 'delivered' | 'cancelled' | 'warranty'>('active');
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [copiedReferral, setCopiedReferral] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   
-  // Advanced Cart State
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Advanced Cart State with localStorage persistence
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('sofiyan_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [useReferralBalance, setUseReferralBalance] = useState(false);
   const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'success'>('form');
+  const [bookingOtp, setBookingOtp] = useState("");
+  const [completedBookingId, setCompletedBookingId] = useState<string>('');
+
+  // Post-Service Review and Rating states
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
+  const [ratingInput, setRatingInput] = useState<number>(5);
+  const [commentInput, setCommentInput] = useState<string>('');
+  const [selectedTechnicianForProfile, setSelectedTechnicianForProfile] = useState<Partner | null>(null);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [dismissedReviewBookingIds, setDismissedReviewBookingIds] = useState<string[]>(() => {
+    try {
+      const stored = sessionStorage.getItem('dismissed_review_ids');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const [customerPhone, setCustomerPhone] = useState(localStorage.getItem('customerPhone') || '');
   const [showHelplineBanner, setShowHelplineBanner] = useState(false);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Tonnage State
+  const [tonnagePrompt, setTonnagePrompt] = useState<{ sub: SubService, category: string } | null>(null);
+  
+  // Rate Card Modal State
+  const [isRateCardModalOpen, setIsRateCardModalOpen] = useState(false);
+  const [activeRateCardCategory, setActiveRateCardCategory] = useState<string | null>(null);
+
+  // Blogs State
+  const [latestBlogs, setLatestBlogs] = useState<any[]>([]);
+  const blogScrollRef = useRef<HTMLDivElement>(null);
+
+  const [formData, setFormData] = useState(() => {
+    const saved = localStorage.getItem('customer_profile');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          locationLink: '',
+          date: '',
+          time: '',
+          lat: null as number | null,
+          lng: null as number | null
+        };
+      } catch {
+        /* ignore */
+      }
+    }
+    return {
+      name: '',
+      contact: localStorage.getItem('customerPhone') || '',
+      address: '',
+      area: '',
+      locationLink: '',
+      city: localStorage.getItem('preferredCity') || 'Bangalore',
+      pincode: '',
+      description: '',
+      date: '',
+      time: '',
+      referralCode: '',
+      lat: null as number | null,
+      lng: null as number | null
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sofiyan_cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event('sofiyan_cart_changed'));
+  }, [cart]);
+
+  useEffect(() => {
+    const handleOpenProfile = () => {
+      setIsProfileOpen(true);
+    };
+    const handleOpenCart = () => {
+      if (cart.length > 0) {
+        setBookingStep('details' as any);
+        setIsBookingModalOpen(true); // Open the booking/cart summary modal
+      } else {
+        alert("Your cart is empty. Please select a service first!");
+      }
+    };
+
+    window.addEventListener('sofiyan_open_profile', handleOpenProfile);
+    window.addEventListener('sofiyan_open_cart', handleOpenCart);
+
+    return () => {
+      window.removeEventListener('sofiyan_open_profile', handleOpenProfile);
+      window.removeEventListener('sofiyan_open_cart', handleOpenCart);
+    };
+  }, [cart]);
 
   useEffect(() => {
     let hasActive = false;
@@ -138,129 +255,1115 @@ export const CustomerPanel: React.FC = () => {
     }
   }, [bookings, customerPhone]);
 
-  // Search State
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Tonnage State
-  const [tonnagePrompt, setTonnagePrompt] = useState<{ sub: SubService, category: string } | null>(null);
-  
-  // Rate Card Modal State
-  const [isRateCardModalOpen, setIsRateCardModalOpen] = useState(false);
-  const [activeRateCardCategory, setActiveRateCardCategory] = useState<string | null>(null);
+  // Automatic Real-time Review Popup Trigger:
+  // As soon as technician collects payment and marks service as completed,
+  // this automatically triggers the Rating & Feedback modal on the customer's page.
+  useEffect(() => {
+    const currentCustomerPhone = normalizePhone(formData.contact || localStorage.getItem('customerPhone') || customerPhone || '');
+    if (!currentCustomerPhone) return;
 
-  // Helper to map service name to rate card database key
-  const getRateCardCategory = (serviceName: string) => {
-    const name = serviceName.toLowerCase();
-    if (name === 'ac' || name === 'ac repair' || name.includes('ac ')) return 'AC Service';
-    if (name === 'washingmachine' || name.includes('washing')) return 'Washing Machine';
-    if (name === 'refrigerator' || name.includes('refrigerat') || name.includes('fridge')) return 'Refrigerator';
-    if (name === 'waterpurifier' || name.includes('water purifier') || name.includes('ro service')) return 'Water Purifier';
-    return null;
+    // Find any completed booking belonging to this user that doesn't have a rating yet
+    const unratedBooking = bookings.find(b => {
+      const bPhone = normalizePhone(b.contactNumber || '');
+      return bPhone === currentCustomerPhone &&
+             b.status === 'completed' &&
+             !b.partner_rating &&
+             !dismissedReviewBookingIds.includes(b.id);
+    });
+
+    if (unratedBooking && !selectedBookingForReview) {
+      setSelectedBookingForReview(unratedBooking);
+      setRatingInput(5);
+      setCommentInput('');
+    }
+  }, [bookings, customerPhone, formData.contact, dismissedReviewBookingIds, selectedBookingForReview]);
+
+  useEffect(() => {
+    const { name, contact, address, area, pincode, city, referralCode } = formData;
+    localStorage.setItem('customer_profile', JSON.stringify({ name, contact, address, area, pincode, city, referralCode }));
+    if (contact) {
+        localStorage.setItem('customerPhone', contact);
+        setCustomerPhone(contact);
+    }
+  }, [formData]);
+
+  const handleCancelBooking = async (b: any) => {
+    if (b.status === 'in_progress' || b.otpVerified || b.status === 'completed') {
+      alert('This service is already in progress and the OTP has been verified. Cancellation is locked.');
+      return;
+    }
+    if (confirm('Are you sure you want to cancel this booking? Cancellation charges may apply as per terms.')) {
+        await updateBooking({ ...b, status: 'cancelled' } as any);
+    }
   };
 
-  // Blogs State
-  const [latestBlogs, setLatestBlogs] = useState<any[]>([]);
-  const blogScrollRef = useRef<HTMLDivElement>(null);
+  const handleSubmitReview = async () => {
+    if (!selectedBookingForReview) return;
+    setIsSubmittingReview(true);
+    try {
+      const bookingToUpdate: Booking = {
+        ...selectedBookingForReview,
+        partner_rating: ratingInput,
+        partner_comment: commentInput.trim()
+      };
+      
+      // 1. Save to Supabase Bookings table
+      await updateBooking(bookingToUpdate);
+      
+      // 2. Compute and persist updated technician rating & review_count to Supabase primary_partners
+      if (selectedBookingForReview.assignedPartnerId) {
+        const technicianId = selectedBookingForReview.assignedPartnerId;
+        const technician = partners.find(p => p.id === technicianId);
+        if (technician) {
+          // Aggregate all bookings for this technician including this newly submitted rating
+          const siblingBookings = bookings
+            .map(b => b.id === bookingToUpdate.id ? bookingToUpdate : b)
+            .filter(b => b.assignedPartnerId === technicianId && b.partner_rating);
+          
+          const totalRating = siblingBookings.reduce((sum, b) => sum + (b.partner_rating || 0), 0);
+          const reviewCount = siblingBookings.length;
+          const avgRating = reviewCount > 0 ? parseFloat((totalRating / reviewCount).toFixed(2)) : ratingInput;
 
-  const [formData, setFormData] = useState({
-    name: '',
-    contact: '',
-    address: '',
-    area: '',
-    locationLink: '',
-    city: localStorage.getItem('preferredCity') || '',
-    pincode: '',
-    description: '',
-    date: '',
-    time: '',
-    referralCode: '',
-    lat: null as number | null,
-    lng: null as number | null
-  });
+          await useStore.getState().updatePartner({
+            ...technician,
+            rating: avgRating,
+            review_count: reviewCount
+          });
+        }
+      }
+      
+      // Record as completed & dismissed
+      const updatedDismissed = [...dismissedReviewBookingIds, selectedBookingForReview.id];
+      setDismissedReviewBookingIds(updatedDismissed);
+      sessionStorage.setItem('dismissed_review_ids', JSON.stringify(updatedDismissed));
+
+      // Reset states and close review modal
+      setSelectedBookingForReview(null);
+      setRatingInput(5);
+      setCommentInput('');
+      alert('🎉 Thank you for your review! Your feedback and rating have been recorded in our verified technician directory.');
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      alert('Failed to submit review. Please try again.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleDismissReview = () => {
+    if (selectedBookingForReview) {
+      const updatedDismissed = [...dismissedReviewBookingIds, selectedBookingForReview.id];
+      setDismissedReviewBookingIds(updatedDismissed);
+      sessionStorage.setItem('dismissed_review_ids', JSON.stringify(updatedDismissed));
+      setSelectedBookingForReview(null);
+    }
+  };
+
+  const renderProfileModal = () => {
+    if (!isProfileOpen) return null;
+
+    const normalizedCustomerPhone = normalizePhone(formData.contact || localStorage.getItem('customerPhone') || '');
+    
+    // Core user specific history tracking
+    const myBookings = bookings.filter(b => {
+      const normalizedBookingPhone = normalizePhone(b.contactNumber || '');
+      return normalizedBookingPhone && normalizedCustomerPhone && normalizedBookingPhone === normalizedCustomerPhone;
+    });
+
+    const isBookingInWarranty = (b: any) => {
+      if (b.status !== 'completed') return false;
+      if (!b.date) return false;
+      try {
+        const serviceDate = new Date(b.date);
+        if (isNaN(serviceDate.getTime())) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const serviceDateZero = new Date(serviceDate);
+        serviceDateZero.setHours(0, 0, 0, 0);
+        const diffTime = today.getTime() - serviceDateZero.getTime();
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        return diffDays >= 0 && diffDays <= 30;
+      } catch {
+        return false;
+      }
+    };
+
+    const getWarrantyDetails = (b: any) => {
+      if (!b.date) return { active: false, daysLeft: 0, endDateStr: '' };
+      try {
+        const serviceDate = new Date(b.date);
+        if (isNaN(serviceDate.getTime())) return { active: false, daysLeft: 0, endDateStr: '' };
+        
+        const endDate = new Date(serviceDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const serviceDateZero = new Date(serviceDate);
+        serviceDateZero.setHours(0, 0, 0, 0);
+        
+        const diffTime = today.getTime() - serviceDateZero.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const daysLeft = 30 - diffDays;
+        
+        return {
+          active: daysLeft >= 0 && daysLeft <= 30,
+          daysLeft: Math.max(0, daysLeft),
+          endDateStr: endDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        };
+      } catch {
+        return { active: false, daysLeft: 0, endDateStr: '' };
+      }
+    };
+
+    const activeBookingsList = myBookings.filter(b => b.status !== 'completed' && b.status !== 'cancelled');
+    const deliveredBookingsList = myBookings.filter(b => b.status === 'completed');
+    const cancelledBookingsList = myBookings.filter(b => b.status === 'cancelled');
+    const warrantyBookingsList = myBookings.filter(b => isBookingInWarranty(b));
+
+    const displayedBookings = 
+      bookingSubTab === 'active' ? activeBookingsList :
+      bookingSubTab === 'delivered' ? deliveredBookingsList :
+      bookingSubTab === 'cancelled' ? cancelledBookingsList :
+      warrantyBookingsList;
+
+    const copyToClipboard = () => {
+      const code = `REF-${formData.contact ? formData.contact.slice(-4) : 'NEW'}`.toUpperCase();
+      navigator.clipboard.writeText(code);
+      setCopiedReferral(true);
+      setTimeout(() => setCopiedReferral(false), 2000);
+    };
+
+    // Primary admin support phone resolvers
+    const adminRawPhone = import.meta.env.VITE_ADMIN_PHONE || '9196029763';
+    const formattedAdminPhone = adminRawPhone.length === 10 
+      ? `+91 ${adminRawPhone.slice(0, 5)} ${adminRawPhone.slice(5)}`
+      : adminRawPhone.startsWith('91') && adminRawPhone.length === 12
+        ? `+91 ${adminRawPhone.slice(2, 7)} ${adminRawPhone.slice(7)}`
+        : adminRawPhone;
+
+    // Smart referral sharing template messages
+    const referralCode = formData.contact ? `REF-${formData.contact.slice(-4)}`.toUpperCase() : 'NEW';
+    const websiteLink = `${window.location.origin}?ref=${referralCode}`;
+    const whatsappShareMessage = `Hey! I am using *Sofiyan Home Service* for booking verified & expert technicians at home (AC Repair, Electrical, Plumbing, and Cleaning). 
+
+Use my referral code to get a flat *₹100 DISCOUNT* on your first booking!
+
+🎁 *Your Discount Code:* ${referralCode}
+🔗 *Book Service Here:* ${websiteLink}
+
+Directly book trusted services at your doorstep. Safe & reliable!`;
+
+    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappShareMessage)}`;
+    const whatsappAdminChatUrl = `https://api.whatsapp.com/send?phone=${adminRawPhone.replace(/\+/g, '')}&text=${encodeURIComponent('Hi Support, I need help with my booking on Sofiyan Home Service.')}`;
+
+    // Static FAQ data
+    const faqs = [
+      {
+        q: "What is the booking cancellation policy?",
+        a: "We offer completely free cancellation up to 2 hours before your scheduled time slot. You can cancel your lead directly from the 'My Bookings' tab, or contact our customer support."
+      },
+      {
+        q: "How are technicians verified on your platform?",
+        a: "Every professional technician undergoes extensive background checks, Aadhaar identity validation, and practical skill test vetting to ensure secure, damage-free, and high-quality services."
+      },
+      {
+        q: "Are there any hidden costs or travel charges?",
+        a: "Absolutely not! The pricing displayed on the app is inclusive of taxes and convenience charges. Standard rates are fully transparently specified on the platform."
+      },
+      {
+        q: "Is there any warranty on repair jobs?",
+        a: "Yes, Sofiyan Home Service offers an assured 30-day warranty on all electrical, plumbing, and AC repair jobs. If any issue reoccurs, we will fix it completely free of charge!"
+      }
+    ];
+
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-4 bg-indigo-950/60 backdrop-blur-sm animate-fadeIn">
+        <div className="bg-slate-50 w-full max-w-5xl h-full sm:h-[90vh] sm:max-h-[820px] rounded-none sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row transform transition-all animate-scaleIn border border-indigo-100">
+          
+          {/* LEFT SIDEBAR / TOP BAR - Profile Header & Tab Navigation */}
+          <div className="w-full md:w-80 bg-white md:bg-indigo-50/40 text-indigo-950 flex flex-col shrink-0 p-4 sm:p-5 md:p-6 border-b md:border-b-0 md:border-r border-indigo-100">
+            {/* Brand Title (Desktop) */}
+            <div className="items-center gap-2 mb-5 hidden md:flex">
+              <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600">Customer Account Center</p>
+            </div>
+
+            {/* Profile Header Card */}
+            <div className="bg-white border border-indigo-100/90 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3.5 mb-3 md:mb-5 shadow-xs">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-tr from-indigo-600 to-indigo-800 rounded-xl flex items-center justify-center font-black text-white text-base sm:text-lg tracking-wider shadow-sm shrink-0">
+                {formData.name ? formData.name.slice(0, 2).toUpperCase() : 'CU'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-extrabold text-indigo-950 text-sm sm:text-base truncate leading-tight">
+                  {formData.name || 'Dear Client'}
+                </h3>
+                <p className="text-[11px] text-indigo-600 mt-0.5 font-bold truncate">
+                  {formData.contact || 'No Contact Linked'}
+                </p>
+                <div className="inline-flex items-center gap-1 mt-1.5 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                  <ShieldCheck size={11} className="text-emerald-600" />
+                  <span className="text-[8px] font-black text-indigo-700 uppercase tracking-wider">Verified Client</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats Grid - Desktop Only */}
+            <div className="grid grid-cols-2 gap-2.5 mb-5 hidden md:grid">
+              <div className="bg-white border border-indigo-100/80 rounded-xl p-3 text-center shadow-xs">
+                <span className="block text-xl font-black text-indigo-600 leading-none">{myBookings.length}</span>
+                <span className="text-[8px] text-indigo-950/60 font-black uppercase tracking-wider block mt-1">Bookings</span>
+              </div>
+              <div className="bg-white border border-indigo-100/80 rounded-xl p-3 text-center shadow-xs">
+                <span className="block text-xl font-black text-emerald-600 leading-none">₹{referralBalance}</span>
+                <span className="text-[8px] text-indigo-950/60 font-black uppercase tracking-wider block mt-1">Discounts</span>
+              </div>
+            </div>
+
+            {/* TAB SELECTION - RESPONSIVE (Horizontal scroll on mobile, Vertical stack on desktop) */}
+            <div className="flex md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible pb-1 md:pb-0 custom-scrollbar shrink-0 select-none">
+              <button
+                onClick={() => setActiveProfileTab('bookings')}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 sm:py-3 rounded-xl font-extrabold transition-all whitespace-nowrap text-xs shrink-0 ${
+                  activeProfileTab === 'bookings'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'bg-white md:bg-transparent text-indigo-950/80 hover:bg-indigo-100/60 border border-indigo-100 md:border-transparent'
+                }`}
+              >
+                <ShoppingBag size={15} className={activeProfileTab === 'bookings' ? 'text-white' : 'text-indigo-600'} />
+                <span>My Bookings ({myBookings.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveProfileTab('profile')}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 sm:py-3 rounded-xl font-extrabold transition-all whitespace-nowrap text-xs shrink-0 ${
+                  activeProfileTab === 'profile'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'bg-white md:bg-transparent text-indigo-950/80 hover:bg-indigo-100/60 border border-indigo-100 md:border-transparent'
+                }`}
+              >
+                <UserIcon size={15} className={activeProfileTab === 'profile' ? 'text-white' : 'text-indigo-600'} />
+                <span>Edit Profile</span>
+              </button>
+
+              <button
+                onClick={() => setActiveProfileTab('referral')}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 sm:py-3 rounded-xl font-extrabold transition-all whitespace-nowrap text-xs shrink-0 ${
+                  activeProfileTab === 'referral'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'bg-white md:bg-transparent text-indigo-950/80 hover:bg-indigo-100/60 border border-indigo-100 md:border-transparent'
+                }`}
+              >
+                <Gift size={15} className={activeProfileTab === 'referral' ? 'text-white' : 'text-indigo-600'} />
+                <span className="flex items-center gap-1.5">
+                  Referral Program
+                  {referralBalance > 0 && (
+                    <span className="bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full">
+                      ₹{referralBalance}
+                    </span>
+                  )}
+                </span>
+              </button>
+
+              <button
+                onClick={() => setActiveProfileTab('support')}
+                className={`flex items-center gap-2.5 px-3.5 py-2.5 sm:py-3 rounded-xl font-extrabold transition-all whitespace-nowrap text-xs shrink-0 ${
+                  activeProfileTab === 'support'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'bg-white md:bg-transparent text-indigo-950/80 hover:bg-indigo-100/60 border border-indigo-100 md:border-transparent'
+                }`}
+              >
+                <HelpCircle size={15} className={activeProfileTab === 'support' ? 'text-white' : 'text-indigo-600'} />
+                <span>Help & Support</span>
+              </button>
+            </div>
+
+            {/* Desktop-Only Footer Close Button */}
+            <div className="mt-auto pt-4 border-t border-indigo-100 hidden md:block">
+              <button
+                onClick={() => setIsProfileOpen(false)}
+                className="w-full bg-white hover:bg-indigo-50 text-indigo-950 font-bold text-xs py-3 rounded-xl uppercase tracking-wider transition-all border border-indigo-200/80 active:scale-95 shadow-2xs"
+              >
+                Close Dashboard
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT VIEW PANEL - Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-white">
+            {/* View Panel Title Header */}
+            <div className="border-b border-indigo-50 px-4 sm:px-6 py-3.5 sm:py-4 flex justify-between items-center bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-indigo-600 rounded-full"></div>
+                <h2 className="text-xs sm:text-sm font-black text-indigo-950 uppercase tracking-wider">
+                  {activeProfileTab === 'bookings' && "Track Orders & Booking History"}
+                  {activeProfileTab === 'profile' && "Manage Personal Details"}
+                  {activeProfileTab === 'referral' && "Referral Program & Wallet"}
+                  {activeProfileTab === 'support' && "Regional Help Center & Support"}
+                </h2>
+              </div>
+              <button
+                onClick={() => setIsProfileOpen(false)}
+                className="p-1.5 sm:p-2 flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-900 rounded-xl transition-all border border-indigo-100 active:scale-95"
+                title="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Dynamic Content Frame */}
+            <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 bg-slate-50/60 custom-scrollbar">
+              {activeProfileTab === 'bookings' && (
+                <div className="space-y-4 animate-fadeIn">
+                  {/* Segmented Sub-tabs for Bookings */}
+                  <div className="flex gap-1 bg-white p-1 rounded-2xl overflow-x-auto shrink-0 select-none no-scrollbar border border-indigo-100/80 shadow-xs">
+                    <button
+                      onClick={() => setBookingSubTab('active')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                        bookingSubTab === 'active'
+                          ? 'bg-indigo-600 text-white shadow-xs font-black'
+                          : 'text-indigo-950/60 hover:text-indigo-950'
+                      }`}
+                    >
+                      <span>Active ({activeBookingsList.length})</span>
+                    </button>
+                    <button
+                      onClick={() => setBookingSubTab('delivered')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                        bookingSubTab === 'delivered'
+                          ? 'bg-indigo-600 text-white shadow-xs font-black'
+                          : 'text-indigo-950/60 hover:text-indigo-950'
+                      }`}
+                    >
+                      <span>Delivered ({deliveredBookingsList.length})</span>
+                    </button>
+                    <button
+                      onClick={() => setBookingSubTab('warranty')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                        bookingSubTab === 'warranty'
+                          ? 'bg-indigo-600 text-white shadow-xs font-black'
+                          : 'text-indigo-950/60 hover:text-indigo-950'
+                      }`}
+                    >
+                      <span className="flex items-center gap-1">
+                        Warranty ({warrantyBookingsList.length})
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setBookingSubTab('cancelled')}
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+                        bookingSubTab === 'cancelled'
+                          ? 'bg-indigo-600 text-white shadow-xs font-black'
+                          : 'text-indigo-950/60 hover:text-indigo-950'
+                      }`}
+                    >
+                      <span>Cancelled ({cancelledBookingsList.length})</span>
+                    </button>
+                  </div>
+
+                  {displayedBookings.length === 0 ? (
+                    <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-indigo-100/80 shadow-xs p-6 animate-scaleIn">
+                      <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-3.5">
+                        <ShoppingBag className="h-7 w-7 text-indigo-600" />
+                      </div>
+                      <h4 className="text-sm sm:text-base font-black text-indigo-950">
+                        {bookingSubTab === 'active' && "No active bookings yet"}
+                        {bookingSubTab === 'delivered' && "No delivered leads yet"}
+                        {bookingSubTab === 'warranty' && "No active warranties"}
+                        {bookingSubTab === 'cancelled' && "No cancelled leads"}
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto leading-relaxed font-semibold">
+                        {bookingSubTab === 'active' && "Securely log and manage your ongoing AC repair, plumbing, or electrical bookings right here."}
+                        {bookingSubTab === 'delivered' && "Once your assigned service partner marks the job completed, it will appear here instantly."}
+                        {bookingSubTab === 'warranty' && "All completed services are covered under a 30-day premium regional warranty protocol."}
+                        {bookingSubTab === 'cancelled' && "Records of leads you or the support desk cancelled will be maintained here safely."}
+                      </p>
+                      {bookingSubTab === 'active' && (
+                        <button
+                          onClick={() => setIsProfileOpen(false)}
+                          className="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs px-5 py-3 rounded-xl uppercase tracking-wider transition-all shadow-sm active:scale-95"
+                        >
+                          Book a Service Now
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-3.5">
+                      {displayedBookings.map(b => {
+                        const assignedPartner = b.assignedPartnerId ? partners.find(p => p.id === b.assignedPartnerId) : null;
+                        const hasPartner = !!b.assignedPartnerId;
+                        const wDetails = getWarrantyDetails(b);
+
+                        return (
+                          <div
+                            key={b.id}
+                            className="bg-white rounded-2xl border border-indigo-100/90 shadow-xs relative overflow-hidden transition-all hover:shadow-sm animate-scaleIn p-4 sm:p-5"
+                          >
+                            {/* Booking Header */}
+                            <div className="flex justify-between items-start gap-3 flex-wrap sm:flex-nowrap">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-[9px] font-black text-indigo-950 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                    ID: {b.id.split('-')[0].toUpperCase()}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500 font-bold">
+                                    {b.createdAt ? new Date(b.createdAt).toLocaleDateString() : 'Today'}
+                                  </span>
+                                </div>
+                                <h4 className="font-black text-indigo-950 mt-1.5 text-sm sm:text-base">{b.serviceCategory}</h4>
+                                <p className="text-xs text-slate-500 mt-0.5 font-semibold leading-relaxed">{b.subServiceName}</p>
+                              </div>
+
+                              <span
+                                className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shrink-0 ${
+                                  b.status === 'pending' || b.status === 'accepted' || b.status === 'Forwarded'
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                    : b.status === 'in_progress'
+                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 animate-pulse'
+                                    : b.status === 'completed'
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                }`}
+                              >
+                                {b.status === 'pending' ? 'FINDING TECHNICIAN' : b.status === 'accepted' ? 'TECHNICIAN ASSIGNED' : b.status === 'in_progress' ? 'WORK IN PROGRESS' : b.status.toUpperCase()}
+                              </span>
+                            </div>
+
+                            {/* Date, Time Slot & Total Billing */}
+                            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 bg-indigo-50/40 border border-indigo-100/50 p-3 rounded-xl mt-3.5 text-xs font-semibold">
+                              <div className="flex items-center gap-2 text-indigo-950">
+                                <Calendar size={14} className="text-indigo-600 shrink-0" />
+                                <span>{b.date} • {b.time}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-slate-500 font-medium">Amount:</span>
+                                <span className="text-indigo-950 font-black text-sm">₹{b.price}</span>
+                              </div>
+                            </div>
+
+                            {/* Warranty Details Block (for Completed & Warranty Tabs) */}
+                            {b.status === 'completed' && (
+                              <div className={`mt-3.5 rounded-xl p-3.5 border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
+                                wDetails.active 
+                                  ? 'bg-emerald-50/60 border-emerald-200 text-emerald-950' 
+                                  : 'bg-slate-50 border-slate-200 text-slate-600'
+                              }`}>
+                                <div>
+                                  <div className="flex items-center gap-1.5">
+                                    <ShieldCheck size={16} className={wDetails.active ? "text-emerald-600" : "text-slate-400"} />
+                                    <span className="font-extrabold text-xs text-indigo-950">
+                                      {wDetails.active ? '30-Day Active Warranty' : 'Warranty Expired'}
+                                    </span>
+                                  </div>
+                                  <p className="text-[10px] text-slate-500 font-bold mt-0.5 leading-none">
+                                    {wDetails.active 
+                                      ? `Coverage active until ${wDetails.endDateStr} (${wDetails.daysLeft} days left)` 
+                                      : 'Standard 30-day protection window has closed'
+                                    }
+                                  </p>
+                                </div>
+                                {wDetails.active && (
+                                  <a
+                                    href={`https://api.whatsapp.com/send?phone=${adminRawPhone.replace(/\+/g, '')}&text=${encodeURIComponent(`Hi support! I want to raise a warranty service claim for Booking ID: ${b.id.split('-')[0].toUpperCase()} of ${b.serviceCategory}.`)}`}
+                                    target="_blank"
+                                    referrerPolicy="no-referrer"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] px-3.5 py-2 rounded-lg transition-all uppercase tracking-wider flex items-center gap-1.5 active:scale-95"
+                                  >
+                                    <span>Raise Claim</span>
+                                  </a>
+                                )}
+                              </div>
+                            )}
+
+                            {/* VERIFIED TECHNICIAN ASSIGNED BLOCK */}
+                            {b.status !== 'cancelled' && (
+                              hasPartner ? (
+                                <div className="mt-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl p-3.5">
+                                  <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+                                    <div 
+                                      className="flex items-center gap-3 cursor-pointer hover:opacity-90 active:scale-[0.98] transition-all min-w-0"
+                                      onClick={() => assignedPartner && setSelectedTechnicianForProfile(assignedPartner)}
+                                      title="Click to view Technician Profile"
+                                    >
+                                      {/* Technician Profile Bubble */}
+                                      <div className="relative shrink-0">
+                                        <div className="w-10 h-10 sm:w-11 sm:h-11 bg-indigo-600 border-2 border-white shadow-xs rounded-xl flex items-center justify-center font-black text-white uppercase text-sm">
+                                          {b.assignedPartnerName ? b.assignedPartnerName.slice(0, 2) : "P"}
+                                        </div>
+                                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                                      </div>
+
+                                      {/* Technician Professional Info */}
+                                      <div className="min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                          <p className="font-extrabold text-indigo-950 text-xs sm:text-sm leading-tight truncate">
+                                            {b.assignedPartnerName}
+                                          </p>
+                                          <span className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+                                            <ShieldCheck size={8} /> Verified
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <div className="flex items-center gap-0.5 text-amber-500 font-black text-xs">
+                                            <Star size={11} className="fill-amber-500 text-amber-500" />
+                                            <span>{assignedPartner?.rating || "4.8"}</span>
+                                          </div>
+                                          <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                          <p className="text-[10px] text-slate-500 font-bold">{assignedPartner?.review_count || "35"} Reviews</p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Action Dial Call Button */}
+                                    {b.status !== 'completed' && (
+                                      <a
+                                        href={`tel:${b.assignedPartnerPhone || '96029763'}`}
+                                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-xs w-full sm:w-auto"
+                                      >
+                                        <Phone size={12} />
+                                        <span>Call Partner</span>
+                                      </a>
+                                    )}
+                                  </div>
+
+                                  {/* Rating / Review Block */}
+                                  {b.status === 'completed' && (
+                                    <div className="mt-3 pt-3 border-t border-indigo-100">
+                                      {b.partner_rating ? (
+                                        <div className="bg-white p-3 rounded-xl border border-indigo-50 shadow-xs space-y-2">
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1.5">
+                                              <span className="text-[10px] font-black text-indigo-900 uppercase tracking-wider">Your Rating:</span>
+                                              <span className="text-xs font-black text-amber-500">{b.partner_rating} ★</span>
+                                            </div>
+                                            <div className="flex items-center gap-0.5">
+                                              {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star 
+                                                  key={star} 
+                                                  size={13} 
+                                                  className={star <= (b.partner_rating || 0) ? "fill-amber-400 text-amber-400 shrink-0" : "text-slate-200 shrink-0"} 
+                                                />
+                                              ))}
+                                            </div>
+                                          </div>
+                                          {b.partner_comment && (
+                                            <p className="text-xs text-slate-700 font-medium italic bg-slate-50/80 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
+                                              "{b.partner_comment}"
+                                            </p>
+                                          )}
+                                          {assignedPartner && (
+                                            <button
+                                              type="button"
+                                              onClick={() => setSelectedTechnicianForProfile(assignedPartner)}
+                                              className="w-full text-[10px] font-bold text-indigo-600 hover:text-indigo-800 text-center py-1 flex items-center justify-center gap-1 transition-colors"
+                                            >
+                                              <span>View Technician Full Profile & All Reviews</span>
+                                              <ChevronRight size={12} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            setSelectedBookingForReview(b);
+                                            setRatingInput(5);
+                                            setCommentInput('');
+                                          }}
+                                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs py-3 rounded-xl uppercase tracking-wider transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm animate-pulse"
+                                        >
+                                          <Star size={14} className="fill-white text-white shrink-0" />
+                                          <span>⭐ Rate Technician & Leave Feedback</span>
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                b.status !== 'completed' && (
+                                  <div className="mt-3 bg-amber-50/70 border border-amber-200/70 rounded-xl p-3 flex items-center gap-3">
+                                    <div className="w-7 h-7 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
+                                      <Loader2 size={14} className="text-amber-600 animate-spin" />
+                                    </div>
+                                    <div>
+                                      <h5 className="font-extrabold text-amber-900 text-xs">Matching with nearby technician...</h5>
+                                      <p className="text-[10px] text-amber-700 mt-0.5 font-medium">Please wait. A regional professional is reviewing your request.</p>
+                                    </div>
+                                  </div>
+                                )
+                              )
+                            )}
+
+                            {/* OTP & Cancellation Protocol */}
+                            <div className="flex gap-2.5 mt-3 pt-3 border-t border-indigo-50 flex-wrap sm:flex-nowrap">
+                              {b.otp && (b.status === 'pending' || b.status === 'accepted' || b.status === 'Forwarded') && !b.otpVerified && (
+                                <div className="flex-1 bg-indigo-50/70 border border-indigo-100 rounded-xl p-2.5 text-center flex flex-col justify-center min-w-[120px]">
+                                  <p className="text-[8px] font-black text-indigo-900 uppercase tracking-wider leading-none mb-1">
+                                    Start Service OTP
+                                  </p>
+                                  <p className="text-base font-black text-indigo-950 tracking-widest leading-none">
+                                    {b.otp}
+                                  </p>
+                                  <p className="text-[8px] text-indigo-500 font-semibold mt-1">Share with technician at doorstep</p>
+                                </div>
+                              )}
+                              {(b.status === 'pending' || b.status === 'accepted' || b.status === 'Forwarded') && !b.otpVerified && (
+                                <button
+                                  onClick={() => handleCancelBooking(b)}
+                                  className="flex-1 text-xs font-black text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all py-3 uppercase tracking-wider border border-rose-200/40 active:scale-95"
+                                >
+                                  Cancel Service Lead
+                                </button>
+                              )}
+                              {(b.status === 'in_progress' || b.otpVerified) && (
+                                <div className="w-full bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 flex items-center justify-between gap-2.5">
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                                      <CheckCircle size={15} />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-extrabold text-emerald-950 leading-tight">Service In Progress</p>
+                                      <p className="text-[10px] text-emerald-700 font-medium truncate mt-0.5">
+                                        OTP Verified • Technician started work (Cancellation locked)
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <span className="shrink-0 text-[8px] font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 px-2 py-1 rounded-md">
+                                    OTP Verified
+                                  </span>
+                                </div>
+                              )}
+                              {b.status === 'cancelled' && (
+                                <button
+                                  onClick={() => {
+                                    if (b.serviceCategory && b.serviceCategory !== 'Multiple Services') {
+                                      const match = SERVICES.find(s => s.name === b.serviceCategory);
+                                      if (match && match.subServices.length > 0) {
+                                        addToCart(match.subServices[0], b.serviceCategory);
+                                        setIsProfileOpen(false);
+                                        if ((window as any).openCartSidebar) {
+                                          (window as any).openCartSidebar();
+                                        }
+                                      } else {
+                                        setIsProfileOpen(false);
+                                      }
+                                    } else {
+                                      setIsProfileOpen(false);
+                                    }
+                                  }}
+                                  className="flex-1 text-xs font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all py-3 uppercase tracking-wider active:scale-95 text-center border border-indigo-100"
+                                >
+                                  Rebook Service
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeProfileTab === 'profile' && (
+                <div className="bg-white p-4 sm:p-6 rounded-2xl border border-indigo-100 shadow-xs space-y-5">
+                  <div className="flex items-center gap-3 border-b border-indigo-50 pb-3.5">
+                    <div className="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
+                      <UserIcon size={16} />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-indigo-950 text-sm">Personal Credentials</h4>
+                      <p className="text-[11px] text-slate-500 font-medium">Your profile updates are saved locally and dynamically synced</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Full Identity Name</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={e => setFormData((p: any) => ({ ...p, name: e.target.value }))}
+                        className="w-full bg-slate-50/80 border border-indigo-100 rounded-xl px-3.5 py-2.5 font-bold text-indigo-950 outline-none focus:border-indigo-600 focus:bg-white transition-all text-xs sm:text-sm"
+                        placeholder="Your Name"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Secure Contact Phone</label>
+                      <input
+                        type="text"
+                        value={formData.contact}
+                        onChange={e => setFormData((p: any) => ({ ...p, contact: e.target.value }))}
+                        className="w-full bg-slate-50/80 border border-indigo-100 rounded-xl px-3.5 py-2.5 font-bold text-indigo-950 outline-none focus:border-indigo-600 focus:bg-white transition-all text-xs sm:text-sm"
+                        placeholder="Your Mobile Number"
+                      />
+                    </div>
+                    <div className="sm:col-span-2 space-y-1.5">
+                      <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Street Address</label>
+                      <input
+                        type="text"
+                        value={formData.address}
+                        onChange={e => setFormData((p: any) => ({ ...p, address: e.target.value }))}
+                        className="w-full bg-slate-50/80 border border-indigo-100 rounded-xl px-3.5 py-2.5 font-bold text-indigo-950 outline-none focus:border-indigo-600 focus:bg-white transition-all text-xs sm:text-sm"
+                        placeholder="Apartment, Street No., Area"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Target City</label>
+                      <input
+                        type="text"
+                        value={formData.city}
+                        disabled
+                        className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold text-slate-500 outline-none text-xs sm:text-sm cursor-not-allowed"
+                        placeholder="Target City"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-black text-slate-500 tracking-wider">Area Pincode</label>
+                      <input
+                        type="text"
+                        value={formData.pincode}
+                        onChange={e => setFormData((p: any) => ({ ...p, pincode: e.target.value }))}
+                        className="w-full bg-slate-50/80 border border-indigo-100 rounded-xl px-3.5 py-2.5 font-bold text-indigo-950 outline-none focus:border-indigo-600 focus:bg-white transition-all text-xs sm:text-sm"
+                        placeholder="E.g. 560001"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-200/80 p-3.5 rounded-2xl flex items-center gap-2.5 text-emerald-900 text-xs font-semibold">
+                    <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                    <span>Your details are securely registered and linked to all your bookings.</span>
+                  </div>
+                </div>
+              )}
+
+              {activeProfileTab === 'referral' && (
+                <div className="space-y-4">
+                  {/* Referral Program Banner */}
+                  <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 p-5 sm:p-6 rounded-2xl shadow-md relative overflow-hidden text-white border border-indigo-500/30">
+                    <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center mb-3.5 shadow-inner">
+                      <Gift size={20} className="text-amber-300" />
+                    </div>
+
+                    <h3 className="text-base sm:text-lg font-black uppercase tracking-wide mb-1.5 relative z-10">Refer & Earn Program</h3>
+                    <p className="text-indigo-100 text-xs mb-5 relative z-10 leading-relaxed font-medium max-w-md">
+                      Invite friends to try Sofiyan Home Service! They get flat <span className="text-white font-black">₹100 DISCOUNT</span> on their first booking, and you receive <span className="text-amber-300 font-black">₹100 DISCOUNT</span> credited to your account!
+                    </p>
+
+                    {/* Code Container */}
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-center relative z-10 gap-3">
+                      <div>
+                        <p className="text-[8px] uppercase font-black text-indigo-200 tracking-wider mb-0.5">Your Referral Code</p>
+                        <span className="text-xl font-black tracking-widest text-white block">
+                          {referralCode}
+                        </span>
+                      </div>
+                      
+                      <div className="flex gap-2 w-full sm:w-auto">
+                        <button
+                          onClick={copyToClipboard}
+                          className="flex-1 sm:flex-initial text-xs font-black bg-white hover:bg-indigo-50 text-indigo-950 px-4 py-2.5 rounded-xl shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                        >
+                          <Copy size={13} />
+                          <span>{copiedReferral ? 'Copied!' : 'Copy Code'}</span>
+                        </button>
+
+                        <a
+                          href={whatsappShareUrl}
+                          target="_blank"
+                          referrerPolicy="no-referrer"
+                          className="flex-1 sm:flex-initial text-xs font-black bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                        >
+                          <Navigation size={13} className="rotate-45" />
+                          <span>WhatsApp</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Successful Referrals Tracker */}
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl border border-indigo-100 shadow-xs">
+                    <div className="flex items-center justify-between border-b border-indigo-50 pb-3 mb-3 flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="text-emerald-600" size={18} />
+                        <div>
+                          <h4 className="font-extrabold text-indigo-950 text-sm">Successful Referrals</h4>
+                          <p className="text-[10px] text-slate-500 font-medium">Monitor your invite earnings</p>
+                        </div>
+                      </div>
+                      <span className="bg-emerald-50 text-emerald-700 text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-wider border border-emerald-200">
+                        Total Earned: ₹{referralBalance}
+                      </span>
+                    </div>
+
+                    {successfulReferrals.length === 0 ? (
+                      <div className="text-center py-6 text-slate-400">
+                        <Gift size={24} className="mx-auto text-slate-300 mb-1.5" />
+                        <p className="text-xs font-bold text-slate-600">No successful referrals yet</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Earn ₹100 discount for every friend who completes a booking!</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-indigo-50">
+                        {successfulReferrals.map((r, idx) => (
+                          <div key={idx} className="py-2.5 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center font-black text-xs shrink-0">
+                                {idx + 1}
+                              </div>
+                              <div>
+                                <p className="font-bold text-indigo-950 text-xs">
+                                  {r.customerName || `Client ${idx + 1}`}
+                                </p>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                  {r.serviceCategory} • {r.date}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shrink-0">
+                              ₹100 Unlocked
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeProfileTab === 'support' && (
+                <div className="space-y-4">
+                  {/* Regional Support Center Dial */}
+                  <div className="bg-white p-5 sm:p-6 rounded-2xl border border-indigo-100 shadow-xs text-center">
+                    <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3 border border-indigo-100">
+                      <Phone size={20} />
+                    </div>
+                    <h4 className="font-black text-indigo-950 text-base">Sofiyan Regional Support Center</h4>
+                    <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed font-medium">
+                      Need help rescheduling, requesting a custom quote, or raising a complaint? Get connected directly with our team.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-2.5 justify-center mt-5">
+                      <a
+                        href={`tel:${adminRawPhone}`}
+                        className="inline-flex bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs py-3 px-5 rounded-xl items-center justify-center gap-2 transition-all shadow-xs active:scale-95 w-full sm:w-auto"
+                      >
+                        <Phone size={13} />
+                        <span>Call helpline: {formattedAdminPhone}</span>
+                      </a>
+                      
+                      <a
+                        href={whatsappAdminChatUrl}
+                        target="_blank"
+                        referrerPolicy="no-referrer"
+                        className="inline-flex bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3 px-5 rounded-xl items-center justify-center gap-2 transition-all shadow-xs active:scale-95 w-full sm:w-auto"
+                      >
+                        <Navigation size={13} className="rotate-45" />
+                        <span>Chat on WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Accordion FAQ Component Section */}
+                  <div className="bg-white p-4 sm:p-5 rounded-2xl border border-indigo-100 shadow-xs">
+                    <h4 className="font-extrabold text-indigo-950 text-sm mb-3 border-b border-indigo-50 pb-2.5">Frequently Asked Questions</h4>
+                    
+                    <div className="space-y-2">
+                      {faqs.map((faq, idx) => {
+                        const isOpen = openFaqIndex === idx;
+                        return (
+                          <div 
+                            key={idx} 
+                            className="border border-indigo-50 rounded-xl overflow-hidden bg-slate-50/40"
+                          >
+                            <button
+                              onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                              className="w-full text-left p-3 flex justify-between items-center gap-3 font-bold text-xs text-indigo-950 hover:bg-indigo-50/40 transition-colors"
+                            >
+                              <span>{faq.q}</span>
+                              <ChevronRight 
+                                size={14} 
+                                className={`text-indigo-400 transition-transform shrink-0 ${isOpen ? 'rotate-90' : ''}`} 
+                              />
+                            </button>
+                            
+                            {isOpen && (
+                              <div className="p-3 pt-0 bg-white text-xs text-slate-600 leading-relaxed font-medium">
+                                {faq.a}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Safety & Quality Badging */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs flex items-start gap-3">
+                      <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 shrink-0">
+                        <ShieldCheck size={18} />
+                      </div>
+                      <div>
+                        <h5 className="font-extrabold text-indigo-950 text-xs">Verified Professionals</h5>
+                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed font-medium">
+                          Every assigned service technician undergoes background and skill verification.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-indigo-100 shadow-xs flex items-start gap-3">
+                      <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 shrink-0">
+                        <Clock size={18} />
+                      </div>
+                      <div>
+                        <h5 className="font-extrabold text-indigo-950 text-xs">Rescheduling Flexibility</h5>
+                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed font-medium">
+                          Change your booking date or preferred slot up to 2 hours before the service begins.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const [isTrackingLocation, setIsTrackingLocation] = useState(false);
   const [isDetectingPincode, setIsDetectingPincode] = useState(false);
   const [isFetchingAreaPincode, setIsFetchingAreaPincode] = useState(false);
 
+  const [isMapPickerOpen, setIsMapPickerOpen] = useState(false);
+
   // Sync city when localStorage changes (handled globally by Layout, but sync local formData)
   useEffect(() => {
     const handleCitySync = () => {
       const city = localStorage.getItem('preferredCity') || '';
-      setFormData(prev => ({ ...prev, city }));
+      setFormData((prev: any) => ({ ...prev, city }));
     };
     window.addEventListener('cityUpdated', handleCitySync);
     return () => window.removeEventListener('cityUpdated', handleCitySync);
   }, []);
 
-  const handleTrackLocation = () => {
+  const handleTrackLocation = async () => {
     if (!navigator.geolocation) {
       alert("Location tracking is not supported by your browser.");
       return;
     }
+    
+    try {
+        const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+        if (permissionStatus.state === 'denied') {
+            alert("Location access is currently blocked. Please tap the lock icon in your address bar and allow location access.");
+            return;
+        }
+    } catch {
+        console.warn("Permissions API not supported, continuing to native request");
+    }
+
     setIsTrackingLocation(true);
+    
+    const fallbackTimeout = setTimeout(() => {
+        setIsTrackingLocation(false);
+        alert("Location request timed out. Please check your signal or enter address manually.");
+    }, 15000);
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        clearTimeout(fallbackTimeout);
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-        
-        let newPincode = formData.pincode;
-        let newArea = formData.area;
-        let newCity = formData.city;
-        
-        try {
-           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
-              headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' }
-           });
-           const data = await res.json();
-           if (data && data.address) {
-              if (data.address.postcode) {
-                  newPincode = data.address.postcode;
-                  const areaRes = await fetchAreasByPincode(newPincode);
-                  if (areaRes.success && areaRes.areas.length > 0) {
-                      newArea = areaRes.areas[0];
-                      if (areaRes.isBangalore) {
-                          newCity = 'Bangalore';
-                      } else if (newPincode.startsWith('110')) {
-                          newCity = 'Delhi';
-                      }
-                  }
-              } else {
-                  // Fallback: If no postcode is returned from OSM, use suburb/neighbourhood and India Post API
-                  const areaName = data.address.suburb || data.address.neighbourhood || data.address.residential || data.address.city_district;
-                  if (areaName) {
-                      newArea = areaName;
-                      const pins = await fetchPincodesByArea([areaName]);
-                      if (pins && pins.length > 0) {
-                          newPincode = pins[0];
-                          if (newPincode.startsWith('560')) newCity = 'Bangalore';
-                          else if (newPincode.startsWith('110')) newCity = 'Delhi';
-                      }
-                  }
-              }
-           }
-        } catch (e) {
-           console.warn("Reverse geocoding failed", e);
-        }
-
-        setFormData(prev => ({
-          ...prev,
-          lat,
-          lng,
-          locationLink: googleMapsLink,
-          pincode: newPincode || prev.pincode,
-          area: newArea || prev.area,
-          city: newCity || prev.city
-        }));
-        setIsTrackingLocation(false);
+        await handleConfirmMapLocation(lat, lng);
       },
       (error) => {
+        clearTimeout(fallbackTimeout);
         console.error("Error getting location:", error);
         setIsTrackingLocation(false);
-        alert("Unable to fetch location. Please ensure location permissions are granted.");
+        let errorMessage = "Unable to fetch exact location.";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission was denied. Please allow location access in your browser settings to use Auto-detect.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable. Please check if your device's GPS is enabled.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again in a moment.";
+            break;
+        }
+        alert(errorMessage);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 14000, maximumAge: 0 }
     );
+  };
+
+  const handleConfirmMapLocation = async (lat: number, lng: number) => {
+    setIsMapPickerOpen(false);
+    setIsTrackingLocation(true);
+    
+    const googleMapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+    
+    let newPincode = formData.pincode;
+    let newArea = formData.area;
+    let newCity = formData.city;
+    let newAddress = formData.address;
+
+    try {
+       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
+          headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' }
+       });
+       const data = await res.json();
+       
+       if (data && data.address) {
+          const addr = data.address;
+          
+          if (data.display_name) {
+              newAddress = data.display_name;
+          }
+
+          if (addr.postcode) {
+              newPincode = addr.postcode;
+          } else {
+              const match = (data.display_name || '').match(/\b\d{6}\b/);
+              if (match) newPincode = match[0];
+          }
+
+          if (newPincode && newPincode.length === 6) {
+              const areaRes = await fetchAreasByPincode(newPincode);
+              if (areaRes.success && areaRes.areas.length > 0) {
+                  newArea = areaRes.areas[0];
+                  if (areaRes.isBangalore) {
+                      newCity = 'Bangalore';
+                  } else if (newPincode.startsWith('110')) {
+                      newCity = 'Delhi';
+                  }
+              }
+          } else if (addr.suburb || addr.neighbourhood || addr.residential) {
+              const areaName = addr.suburb || addr.neighbourhood || addr.residential;
+              newArea = areaName;
+              const pins = await fetchPincodesByArea([areaName]);
+              if (pins && pins.length > 0) {
+                  newPincode = pins[0];
+                  if (newPincode.startsWith('560')) newCity = 'Bangalore';
+                  else if (newPincode.startsWith('110')) newCity = 'Delhi';
+              }
+          }
+       }
+    } catch (err) {
+       console.warn("Reverse geocoding failed", err);
+    }
+
+    setFormData((prev: any) => ({
+      ...prev,
+      lat,
+      lng,
+      locationLink: googleMapsLink,
+      pincode: newPincode || prev.pincode,
+      area: newArea || prev.area,
+      city: newCity || prev.city,
+      address: newAddress || prev.address
+    }));
+    setIsTrackingLocation(false);
   };
 
   useEffect(() => {
@@ -274,7 +1377,16 @@ export const CustomerPanel: React.FC = () => {
           .limit(10);
 
         if (!error && data) {
-          setLatestBlogs(data);
+          const resolved = await Promise.all(
+            data.map(async (b) => {
+              if (b.image_url) {
+                const signed = await getSignedAppFileUrl(b.image_url);
+                return { ...b, displayImageUrl: signed || b.image_url };
+              }
+              return { ...b, displayImageUrl: null };
+            })
+          );
+          setLatestBlogs(resolved);
         }
       } catch (err) {
         console.error('Error fetching blogs:', err);
@@ -356,7 +1468,7 @@ export const CustomerPanel: React.FC = () => {
       const savedLocation = sessionStorage.getItem('userLocation');
       if (savedLocation && !formData.city) {
         const city = savedLocation.split(',')[0].trim();
-        setFormData(prev => ({ ...prev, city: city }));
+        setFormData((prev: any) => ({ ...prev, city: city }));
       }
     }
     
@@ -364,7 +1476,7 @@ export const CustomerPanel: React.FC = () => {
       const savedLocation = sessionStorage.getItem('userLocation');
       if (savedLocation) {
         const city = savedLocation.split(',')[0].trim();
-        setFormData(prev => ({ ...prev, city: city }));
+        setFormData((prev: any) => ({ ...prev, city: city }));
       }
     };
     window.addEventListener('locationUpdated', handleLocationUpdate);
@@ -478,27 +1590,65 @@ export const CustomerPanel: React.FC = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponMessage, setCouponMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null);
 
-  const discountAmount = appliedCoupon ? Math.round((cartTotal * validCoupons[appliedCoupon]) / 100) : 0;
-  const finalTotal = cartTotal - discountAmount;
+  // Advanced Referral Calculations
+  const normalizePhone = (phoneStr: string) => {
+    if (!phoneStr) return '';
+    return phoneStr.replace(/\D/g, '').slice(-10);
+  };
+
+  const currentReferralCode = useMemo(() => {
+    return formData.contact ? `REF-${formData.contact.slice(-4)}`.toUpperCase() : '';
+  }, [formData.contact]);
+
+  const successfulReferrals = useMemo(() => {
+    if (!currentReferralCode) return [];
+    // Find bookings where b.appliedReferralCode is our referral code, excluding self-referral
+    return bookings.filter(b => 
+      b.appliedReferralCode && 
+      b.appliedReferralCode.toUpperCase() === currentReferralCode &&
+      normalizePhone(b.contactNumber || '') !== normalizePhone(formData.contact || '')
+    );
+  }, [bookings, currentReferralCode, formData.contact]);
+
+  const referralBalance = useMemo(() => {
+    return successfulReferrals.length * 100;
+  }, [successfulReferrals]);
+
+  // Pricing calculations incorporating both flat ₹100 referral coupons and referral wallet discounts
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.startsWith('REF-')) {
+      return Math.min(100, cartTotal); // flat ₹100 discount for using a friend's referral code
+    }
+    const rate = validCoupons[appliedCoupon];
+    return rate ? Math.round((cartTotal * rate) / 100) : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appliedCoupon, cartTotal]);
+
+  const referralDiscount = useReferralBalance ? Math.min(referralBalance, cartTotal - discountAmount) : 0;
+  const finalTotal = cartTotal - discountAmount - referralDiscount;
 
   const handleApplyCoupon = (codeToApply?: string) => {
       const code = (codeToApply || couponCode).trim().toUpperCase();
       if (!code) return;
 
-      if (validCoupons[code]) {
+      if (code.startsWith('REF-')) {
           setAppliedCoupon(code);
           setCouponCode(code);
-          // Link coupon to referral code for influencer tracking
-          setFormData(prev => ({ ...prev, referralCode: code }));
+          setFormData((prev: any) => ({ ...prev, referralCode: code }));
+          setCouponMessage({ text: "🎉 Referral code applied! You get flat ₹100 off on this booking!", type: 'success' });
+      } else if (validCoupons[code]) {
+          setAppliedCoupon(code);
+          setCouponCode(code);
+          setFormData((prev: any) => ({ ...prev, referralCode: code }));
           const discount = Math.round((cartTotal * validCoupons[code]) / 100);
           setCouponMessage({ text: `🎉 Yay! Coupon applied. You saved ₹${discount}!`, type: 'success' });
       } else {
-          // If not a valid discount code, we still treat it as a referral code
-          // to attribute it to an influencer, even if there's no discount
-          setAppliedCoupon(code); // We "apply" it as the code entered
+          // If not a valid discount code or referral code, we still treat it as a referral code
+          setAppliedCoupon(code);
           setCouponCode(code);
-          setFormData(prev => ({ ...prev, referralCode: code }));
-          setCouponMessage({ text: "✅ Referral code applied successfully!", type: 'success' });
+          setFormData((prev: any) => ({ ...prev, referralCode: code }));
+          setCouponMessage({ text: "✅ Code applied successfully!", type: 'success' });
       }
   };
 
@@ -506,8 +1656,19 @@ export const CustomerPanel: React.FC = () => {
       setAppliedCoupon(null);
       setCouponCode('');
       setCouponMessage(null);
-      setFormData(prev => ({ ...prev, referralCode: '' }));
+      setFormData((prev: any) => ({ ...prev, referralCode: '' }));
   };
+
+  // URL Query Parameter Listener for smart auto-applied referrals
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get('ref');
+    if (refCode) {
+      setCouponCode(refCode.toUpperCase());
+      handleApplyCoupon(refCode.toUpperCase());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookings]);
 
   const handleBookService = (sub: SubService) => {
     if (sub.name === "Gas Leak Fix and Refilling") {
@@ -625,7 +1786,7 @@ export const CustomerPanel: React.FC = () => {
         setMinDate(minDateStr);
         
         // Clear previous selections
-        setFormData(prev => ({ ...prev, date: '', time: '' }));
+        setFormData((prev: any) => ({ ...prev, date: '', time: '' }));
         setAvailableTimeSlots([]);
     }
   }, [isBookingModalOpen]);
@@ -637,14 +1798,14 @@ export const CustomerPanel: React.FC = () => {
         try {
           const areaRes = await fetchAreasByPincode(formData.pincode);
           if (areaRes.success && areaRes.areas.length > 0) {
-             setFormData(prev => ({
+             setFormData((prev: any) => ({
                ...prev,
                area: areaRes.areas[0],
                city: areaRes.isBangalore ? 'Bangalore' : (formData.pincode.startsWith('110') ? 'Delhi' : prev.city)
              }));
           }
-        } catch (e) {
-          console.warn("Could not fetch area from pin", e);
+        } catch {
+          console.warn("Could not fetch area from pin",);
         } finally {
           setIsFetchingAreaPincode(false);
         }
@@ -660,11 +1821,11 @@ export const CustomerPanel: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: any) => ({ ...prev, [name]: value }));
 
     if (name === 'date') {
         updateAvailableTimeSlots(value);
-        setFormData(prev => ({ ...prev, time: '' }));
+        setFormData((prev: any) => ({ ...prev, time: '' }));
     }
   };
 
@@ -701,9 +1862,22 @@ export const CustomerPanel: React.FC = () => {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
 
-      // 1. Upsert Customer Data
+      // 1. Upsert Customer and Save Local Profile Details
       let customerId = null;
       try {
+        // Explicitly persist contact & name details to ensure first-time bookings are recorded in local profile section immediately
+        localStorage.setItem('customerPhone', formData.contact);
+        localStorage.setItem('customer_profile', JSON.stringify({
+          name: formData.name,
+          contact: formData.contact,
+          address: formData.address,
+          area: formData.area,
+          pincode: formData.pincode,
+          city: formData.city,
+          referralCode: formData.referralCode
+        }));
+        setCustomerPhone(formData.contact);
+
         const { data: customerData, error: customerError } = await supabase
           .from('customers')
           .upsert([
@@ -721,40 +1895,76 @@ export const CustomerPanel: React.FC = () => {
         if (!customerError && customerData) {
           customerId = customerData.id;
         }
-      } catch (e) {
-        console.warn("Could not save to customers table, proceeding with booking anyway.", e);
+      } catch {
+        console.warn("Could not save to customers table, proceeding with booking anyway.",);
       }
 
       // 2. Insert Booking Data
       let bookingError;
+      
       try {
-        const result = await supabase
-          .from('bookings')
-          .insert([
-            {
-              customer_id: customerId,
-              customer_name: formData.name,
-              contact_number: formData.contact,
-              address: formData.address,
-              area: formData.area,
-              city: formData.city,
-              pin_code: formData.pincode,
-              cart_items: cart,
-              price: finalTotal,
-              date: formData.date,
-              time: formData.time,
-              status: 'pending',
-              // Additional fields for admin tracking
-              service_category: categoryName,
-              sub_service_name: subServiceName,
-              location_link: formData.locationLink,
-              lat: formData.lat,
-              lng: formData.lng,
-              discount_amount: discountAmount,
-              applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null
-            }
-          ]);
-        bookingError = result.error;
+        // Group items by category
+        const groupedCart = cart.reduce((acc, item) => {
+          const category = item.categoryName || 'General';
+          if (!acc[category]) acc[category] = [];
+          acc[category].push(item);
+          return acc;
+        }, {} as Record<string, typeof cart>);
+
+        for (const [category, items] of Object.entries(groupedCart)) {
+          let insertSuccess = false;
+          let result;
+          let trackingId = '';
+          let customUuid = '';
+          const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+          
+          // Try up to 3 times to avoid UUID collisions for our custom 4-digit ID
+          for (let attempt = 0; attempt < 3; attempt++) {
+              trackingId = Math.floor(1000 + Math.random() * 9000).toString(); // 4 digits
+              customUuid = `b0000000-0000-4000-8000-00000000${trackingId}`;
+              
+              result = await supabase
+                .from('bookings')
+                .insert([
+                  {
+                    id: customUuid,
+                    customer_id: customerId,
+                    customer_name: formData.name,
+                    contact_number: formData.contact,
+                    address: formData.address,
+                    area: formData.area,
+                    city: formData.city,
+                    pin_code: formData.pincode,
+                    cart_items: items.map((item, index) => index === 0 ? { ...item, system_otp: generatedOtp } : item),
+                    price: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                    date: formData.date,
+                    time: formData.time,
+                    status: 'pending',
+                    // Additional fields for admin tracking
+                    service_category: category,
+                    sub_service_name: items.map(i => `${i.name} (x${i.quantity})`).join(', '),
+                    location_link: formData.locationLink,
+                    lat: formData.lat,
+                    lng: formData.lng,
+                    discount_amount: 0, // Simplified for now as splitting discounts is complex
+                    applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null,
+                  }
+                ]).select('id').single();
+                
+              bookingError = result.error;
+              if (!bookingError) {
+                  insertSuccess = true;
+                  break;
+              } else if (bookingError.code !== '23505') { // If not a unique constraint violation, stop trying
+                  break;
+              }
+          }
+
+          if (insertSuccess && result && result.data) {
+            setCompletedBookingId(prev => prev ? `${prev}, ${trackingId}` : trackingId);
+            setBookingOtp(generatedOtp);
+          }
+        }
       } catch (err) {
         bookingError = err;
       }
@@ -795,7 +2005,7 @@ export const CustomerPanel: React.FC = () => {
           `Sent via Sofiyan Home Service App`;
 
         // 1. Automatic send to admin via Server API
-        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '7625046788').replace(/\+/g, '');
+        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '9196029763').replace(/\+/g, '');
         
         fetch('/api/send-whatsapp', {
           method: 'POST',
@@ -809,8 +2019,8 @@ export const CustomerPanel: React.FC = () => {
         // 2. User-initiated send (for fallback/visibility)
         const encodedMsg = encodeURIComponent(templateMsg);
         window.open(`https://wa.me/${adminPhone}?text=${encodedMsg}`, '_blank');
-      } catch (e) {
-        console.warn("WhatsApp logic failed", e);
+      } catch {
+        console.warn("WhatsApp logic failed",);
       }
 
       // Success UI
@@ -820,7 +2030,8 @@ export const CustomerPanel: React.FC = () => {
       setCustomerPhone(formData.contact);
       setCart([]); 
       
-      // NOTE: Removed local addBooking() call to strictly enforce usage of Supabase DB as the source of truth.
+      // Refetch from Supabase to update local store immediately
+      fetchBookings().catch(err => console.error("Error refetching bookings:", err));
 
     } catch (error: any) {
       console.error('Booking Error:', error);
@@ -863,15 +2074,29 @@ export const CustomerPanel: React.FC = () => {
                 <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" />
               </div>
               <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mb-3 sm:mb-4 tracking-tight">Booking Confirmed!</h2>
-              <p className="text-base sm:text-lg text-gray-600 mb-8 sm:mb-10 font-medium leading-relaxed px-4">
+              <p className="text-base sm:text-lg text-gray-600 mb-4 font-medium leading-relaxed px-4">
                 Thank you for choosing Professional Home Services. Your request has been securely processed and a partner will reach out to you shortly.
               </p>
-              <button
-                onClick={resetFlow}
-                className="px-8 sm:px-10 py-4 sm:py-5 bg-indigo-600 text-white rounded-2xl font-bold text-base sm:text-lg hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-200 active:scale-95"
-              >
-                Return to Homepage
-              </button>
+              {completedBookingId && (
+                <div className="bg-indigo-50 border-2 border-indigo-100 px-6 py-4 rounded-2xl mb-8 sm:mb-10 inline-block">
+                  <p className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Your Booking ID</p>
+                  <p className="text-xl font-black text-indigo-950 tracking-wider break-all">{completedBookingId}</p>
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={resetFlow}
+                  className="px-8 sm:px-10 py-4 sm:py-5 bg-white border-2 border-gray-200 text-gray-700 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-50 transition-all active:scale-95"
+                >
+                  Return Home
+                </button>
+                <button
+                  onClick={() => navigate('/track', { state: { bookingId: completedBookingId } })}
+                  className="px-8 sm:px-10 py-4 sm:py-5 bg-indigo-600 text-white rounded-2xl font-bold text-base sm:text-lg hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-200 active:scale-95"
+                >
+                  Track Booking
+                </button>
+              </div>
             </div>
           )}
 
@@ -899,82 +2124,10 @@ export const CustomerPanel: React.FC = () => {
                     </div>
                  </div>
 
-                 {/* Address */}
-                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-3">
-                           <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">2</span>
-                           Service Address
-                        </h3>
-                    </div>
-
-                    <div className="space-y-5">
-                       <div>
-                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Address</label>
-                         <input name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => {      if (formData.address) {          setIsDetectingPincode(true);          const foundPin = await identifyPincode(formData.address);          if (foundPin) {             setFormData(p => ({ ...p, pincode: foundPin }));                          try {                 const areaRes = await fetchAreasByPincode(foundPin);                 if (areaRes.success && areaRes.areas.length > 0) {                     setFormData(p => ({                         ...p,                         area: areaRes.areas[0],                        city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)                     }));                 }             } catch { /* ignore */ }         }         setIsDetectingPincode(false);      }  }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
-                       </div>
-                       
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">City</label>
-                            <div className="relative">
-                               <select name="city" value={formData.city} onChange={(e) => { const newCity = e.target.value; setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' })); localStorage.setItem('preferredCity', newCity); window.dispatchEvent(new Event('cityUpdated')); }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
-                                  <option value="">Select City</option>
-                                  {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                               </select>
-                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area (Tap to Select)</label>
-                            <div className="relative">
-                              {formData.city ? (
-                                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-3 bg-gray-50/50 rounded-xl border border-gray-200">
-                                      {(PREDEFINED_AREAS[formData.city] || []).map(area => (
-                                          <button
-                                              key={area}
-                                              type="button"
-                                              onClick={async () => {
-                                                  setFormData(prev => ({ ...prev, area }));
-                                                  setIsFetchingAreaPincode(true);
-                                                  try {
-                                                      const pins = await fetchPincodesByArea([area]);
-                                                      if (pins && pins.length > 0) {
-                                                          setFormData(prev => ({ ...prev, pincode: pins[0] }));
-                                                      }
-                                                  } finally {
-                                                      setIsFetchingAreaPincode(false);
-                                                  }
-                                              }}
-                                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${formData.area === area ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-gray-700 border border-gray-200 hover:border-indigo-300'}`}
-                                          >
-                                              {area}
-                                          </button>
-                                      ))}
-                                      {!(PREDEFINED_AREAS[formData.city]?.length > 0) && (
-                                          <span className="text-xs text-gray-400 p-2 font-medium">No predefined areas. Enter pincode.</span>
-                                      )}
-                                  </div>
-                              ) : (
-                                  <div className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl font-medium text-sm text-gray-400">
-                                      Select City First
-                                  </div>
-                              )}
-                            </div>
-                          </div>
-                       </div>
-
-                       <div>
-                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 flex items-center gap-2">Pincode {(isDetectingPincode || isFetchingAreaPincode) && <Loader2 size={12} className="animate-spin text-indigo-600" />}</label>
-                         <input name="pincode" value={formData.pincode} onChange={handleInputChange} disabled={isDetectingPincode || isFetchingAreaPincode} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:opacity-50 text-gray-900 font-medium" placeholder="6-digit pincode" />
-                       </div>
-                    </div>
-                 </div>
-
                  {/* Current Location */}
                  <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
+                       <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">2</span>
                        Current Location
                     </h3>
                                         <div className="relative bg-indigo-950 rounded-2xl p-5 shadow-lg border border-indigo-500/30 overflow-hidden group mb-4">
@@ -1005,17 +2158,62 @@ export const CustomerPanel: React.FC = () => {
                           <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
                           <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
                        </div>
-                       <div className="relative group/input">
-                          <MapIcon className="absolute left-4 top-3.5 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                          <input
-                            name="locationLink"
-                            value={formData.locationLink}
-                            onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
-                            placeholder="Paste Google Maps link here..."
-                           />
+                       <div className="relative group/input flex items-center">
+                              <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
+                              <input
+                                name="locationLink"
+                                value={formData.locationLink}
+                                onChange={handleInputChange}
+                                className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                                placeholder="Paste Google Maps link here..."
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setIsMapPickerOpen(true)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                              >
+                                Adjust Pin
+                              </button>
+                           </div>
+                       <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section below optional.</p>
+                    </div>
+                 </div>
+
+                 {/* Address */}
+                 <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-3">
+                           <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">3</span>
+                           Service Address
+                        </h3>
+                    </div>
+
+                    <div className="space-y-5">
+                       <div>
+                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Address</label>
+                         <input name="address" value={formData.address} onChange={handleInputChange} onBlur={async () => {      if (formData.address) {          setIsDetectingPincode(true);          const foundPin = await identifyPincode(formData.address);          if (foundPin) {             setFormData((p: any) => ({ ...p, pincode: foundPin }));                          try {                 const areaRes = await fetchAreasByPincode(foundPin);                 if (areaRes.success && areaRes.areas.length > 0) {                     setFormData((p: any) => ({                         ...p,                         area: areaRes.areas[0],                        city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)                     }));                 }             } catch { /* ignore */ }         }         setIsDetectingPincode(false);      }  }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="House/Flat No, Street, Area" />
                        </div>
-                       <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section above optional.</p>
+                       
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">City</label>
+                            <div className="relative">
+                               <select name="city" value={formData.city} onChange={(e) => { const newCity = e.target.value; setFormData((prev: any) => ({ ...prev, city: newCity, area: '', pincode: '' })); localStorage.setItem('preferredCity', newCity); window.dispatchEvent(new Event('cityUpdated')); }} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all text-gray-900 appearance-none font-medium">
+                                  <option value="">Select City</option>
+                                  {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                               </select>
+                               <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Area / Locality</label>
+                            <input name="area" value={formData.area} onChange={handleInputChange} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all text-gray-900 font-medium" placeholder="Enter your area" />
+                          </div>
+                       </div>
+                       <div>
+                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 flex items-center gap-2">Pincode {(isDetectingPincode || isFetchingAreaPincode) && <Loader2 size={12} className="animate-spin text-indigo-600" />}</label>
+                         <input name="pincode" value={formData.pincode} onChange={handleInputChange} disabled={isDetectingPincode || isFetchingAreaPincode} className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white outline-none transition-all disabled:opacity-50 text-gray-900 font-medium" placeholder="6-digit pincode" />
+                       </div>
                     </div>
                  </div>
 
@@ -1200,6 +2398,24 @@ export const CustomerPanel: React.FC = () => {
         </div>
       </Modal>
 
+      
+      {/* Sticky Header Actions */}
+      <div className="hidden sm:flex fixed top-20 right-4 sm:right-8 z-50 flex-col gap-3 pointer-events-none">
+         <button onClick={() => setIsProfileOpen(true)} className="pointer-events-auto bg-white/90 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl border border-gray-100 text-indigo-900 hover:scale-105 hover:bg-indigo-50 transition-all group">
+            <UserIcon size={22} className="group-hover:text-indigo-600 transition-colors" />
+         </button>
+         <button onClick={() => { if(cart.length > 0) setBookingStep('details' as any) }} className="pointer-events-auto bg-indigo-950 w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-900/30 border border-indigo-800 text-white hover:scale-105 transition-all relative">
+            <ShoppingCart size={20} />
+            {cart.length > 0 && (
+               <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-md animate-bounce">
+                 {cart.length}
+               </div>
+            )}
+         </button>
+      </div>
+
+      {renderProfileModal()}
+
       {/* Mobile-Friendly Urban Company Style Hero Content */}
       <div className="bg-indigo-600 sm:bg-transparent pb-8 pt-6 sm:pt-8 transition-all duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1214,13 +2430,13 @@ export const CustomerPanel: React.FC = () => {
           </div>
 
           {/* Search Bar - Repositioned Above Banner for UC Style */}
-          <div className="max-w-2xl mx-auto mb-6 sm:mb-10 relative z-30">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-indigo-400" />
+          <div className="w-full max-w-sm xs:max-w-md sm:max-w-xl md:max-w-2xl mx-auto mb-5 sm:mb-10 px-2 sm:px-0 relative z-30">
+            <div className="absolute inset-y-0 left-0 pl-5 sm:pl-6 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-400" />
             </div>
             <input
               type="text"
-              className="block w-full pl-12 pr-4 py-4 sm:py-5 border-2 border-transparent sm:border-indigo-50 rounded-2xl sm:rounded-3xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 shadow-xl shadow-indigo-600/10 sm:shadow-indigo-100/50 transition-all hover:shadow-indigo-200/50 text-gray-900 font-extrabold"
+              className="block w-full pl-11 sm:pl-14 pr-4 py-2.5 sm:py-4 border border-indigo-100 sm:border-2 sm:border-indigo-50 rounded-xl sm:rounded-3xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 shadow-md sm:shadow-xl shadow-indigo-600/5 sm:shadow-indigo-100/50 transition-all hover:shadow-indigo-200/50 text-xs sm:text-sm text-gray-950 font-bold"
               placeholder="Search for 'AC', 'Cleaning', 'Electrician'..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -1400,98 +2616,7 @@ export const CustomerPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Find a Technician Section */}
-        <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12 relative">
-          <div className="absolute inset-0 bg-indigo-50/30 rounded-[3rem] -z-10 transform -skew-y-2 scale-105"></div>
-          
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <h2 className="text-sm font-black text-indigo-500 tracking-[0.2em] uppercase mb-2">Technician Directory</h2>
-            <h3 className="text-3xl sm:text-4xl font-black text-indigo-950 uppercase italic tracking-tight mb-4">Find Local Experts</h3>
-            <p className="text-sm text-gray-500 font-medium">Enter your 6-digit Pincode to see available service professionals in your immediate area.</p>
-          </div>
 
-          <div className="max-w-md mx-auto mb-10">
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input 
-                  type="text" 
-                  placeholder="Enter Pincode (e.g. 110001)" 
-                  value={techPincode}
-                  onChange={(e) => setTechPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  onKeyDown={(e) => e.key === 'Enter' && techPincode.length === 6 && setSearchedTechPincode(techPincode)}
-                  className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none text-lg font-bold tracking-widest text-center shadow-sm"
-                />
-              </div>
-              <button 
-                onClick={() => setSearchedTechPincode(techPincode)}
-                disabled={techPincode.length !== 6}
-                className="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase tracking-wider disabled:opacity-50 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
-              >
-                Search
-              </button>
-            </div>
-          </div>
-
-          {searchedTechPincode && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h4 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <ShieldCheck className="text-green-500 w-5 h-5" /> 
-                Verified Professionals near {searchedTechPincode}
-              </h4>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {partners.filter(p => p.status === 'verified' && (p.service_pincodes || []).includes(searchedTechPincode)).length > 0 ? (
-                  partners.filter(p => p.status === 'verified' && (p.service_pincodes || []).includes(searchedTechPincode)).map(partner => (
-                    <div key={partner.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:border-indigo-200 transition-colors">
-                      <div className="absolute top-0 right-0 p-4">
-                        <div className="bg-amber-100 text-amber-700 text-xs font-black px-2 py-1 rounded-lg flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-current" /> 4.9
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 border border-indigo-100 shrink-0 group-hover:scale-105 transition-transform">
-                          <User className="w-8 h-8" />
-                        </div>
-                        <div>
-                          <h4 className="font-black text-gray-900 text-lg">{partner.name}</h4>
-                          <p className="text-xs font-bold text-gray-500 flex items-center gap-1"><Briefcase className="w-3 h-3" /> {partner.experience || '3+ years'} Exp.</p>
-                        </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Expertise</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(partner.categories || []).slice(0, 3).map((cat, i) => (
-                            <span key={i} className="text-[10px] font-bold px-2 py-1 bg-gray-50 text-gray-600 rounded-md border border-gray-100">{cat}</span>
-                          ))}
-                          {(partner.categories || []).length > 3 && (
-                            <span className="text-[10px] font-bold px-2 py-1 bg-gray-50 text-gray-600 rounded-md border border-gray-100">+{partner.categories.length - 3}</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="border-t border-gray-100 pt-4 mt-auto">
-                        <button 
-                          onClick={() => document.getElementById('hero-section')?.scrollIntoView({behavior: 'smooth'})}
-                          className="w-full bg-slate-900 hover:bg-black text-white text-xs font-black py-3 rounded-xl uppercase tracking-widest transition-colors"
-                        >
-                          Book Service Now
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300 text-center">
-                    <User className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">No professionals found</h4>
-                    <p className="text-gray-500">We couldn't find any available technicians serving pincode {searchedTechPincode} right now. Try a nearby pincode or book directly.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Sticky Cart Footer */}
         {cart.length > 0 && (
@@ -1639,8 +2764,8 @@ export const CustomerPanel: React.FC = () => {
                       className="snap-start shrink-0 w-[85vw] sm:w-[350px] bg-white rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 flex flex-col group cursor-pointer"
                     >
                       <div className="h-48 overflow-hidden relative bg-gray-50">
-                        {post.image_url ? (
-                          <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                        {(post.displayImageUrl || post.image_url) ? (
+                          <img src={post.displayImageUrl || post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                             <span className="text-gray-400 font-bold text-xl">{post.title.substring(0, 2).toUpperCase()}</span>
@@ -1828,12 +2953,25 @@ export const CustomerPanel: React.FC = () => {
               <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl w-full mb-8 shadow-sm text-left">
                 <h4 className="font-bold text-indigo-900 mb-2 text-lg">Customer Dashboard</h4>
                 <p className="text-sm text-indigo-700 mb-4">Track your booking or contact our service center directly for any assistance.</p>
+                {completedBookingId && (
+                  <div className="bg-white border-2 border-indigo-100 px-4 py-3 rounded-xl mb-4 text-center">
+                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Booking ID</p>
+                    <p className="text-base font-black text-indigo-950 break-all">{completedBookingId}</p>
+                  </div>
+                )}
+                {bookingOtp && (
+                  <div className="bg-indigo-950 border-2 border-indigo-900 px-4 py-3 rounded-xl mb-4 text-center">
+                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Service Start OTP</p>
+                    <p className="text-2xl font-black text-white tracking-[0.2em]">{bookingOtp}</p>
+                    <p className="text-[9px] text-indigo-300 mt-1 uppercase tracking-widest">Share with partner to start work</p>
+                  </div>
+                )}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a href="tel:7625046788" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
-                    <Phone size={18} /> Call Helpline (7625046788)
+                  <a href="tel:9196029763" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
+                    <Phone size={18} /> Call Helpline (9196029763)
                   </a>
-                  <button onClick={resetFlow} className="flex-1 bg-white border-2 border-indigo-200 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
-                    View My Bookings
+                  <button onClick={() => { setIsBookingModalOpen(false); navigate('/track', { state: { bookingId: completedBookingId } }) }} className="flex-1 bg-white border-2 border-indigo-200 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
+                    Track Booking
                   </button>
                 </div>
               </div>
@@ -1943,6 +3081,29 @@ export const CustomerPanel: React.FC = () => {
                             </div>
                         )}
                       </div>
+                      
+                      {referralBalance > 0 && (
+                            <div className="mt-4 p-4 bg-emerald-50/60 border border-emerald-100 rounded-3xl flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-700">
+                                        <Gift size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-emerald-800 uppercase tracking-wider">Referral Balance</p>
+                                        <p className="text-xs font-bold text-emerald-600">Available: ₹{referralBalance}</p>
+                                    </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={useReferralBalance} 
+                                        onChange={(e) => setUseReferralBalance(e.target.checked)}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+                      )}
                   </div>
 
                   <div className="mt-5 space-y-2">
@@ -1960,6 +3121,19 @@ export const CustomerPanel: React.FC = () => {
                             >
                                 <span className="font-bold text-green-700 text-xs">Discount Bonus ({appliedCoupon})</span>
                                 <span className="font-black text-green-700">-₹{discountAmount}</span>
+                            </motion.div>
+                        )}
+                      </AnimatePresence>
+                      <AnimatePresence>
+                        {referralDiscount > 0 && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="flex justify-between items-center bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100"
+                            >
+                                <span className="font-bold text-emerald-700 text-xs font-semibold">Referral Reward Discount</span>
+                                <span className="font-black text-emerald-700">-₹{referralDiscount}</span>
                             </motion.div>
                         )}
                       </AnimatePresence>
@@ -2020,141 +3194,12 @@ export const CustomerPanel: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Section 2: Service Location Card */}
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
-                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
-                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">2</span>
-                      Deployment Address
-                    </h4>
-                    
-                    <div className="space-y-8">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Operational Venue</label>
-                        <div className="relative group/input">
-                          <MapPin className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                          <input
-                            id="checkout-address"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            onBlur={async () => {
-                              if (formData.address) {
-                                  setIsDetectingPincode(true);
-                                  const foundPin = await identifyPincode(formData.address);
-                                  if (foundPin) {
-                                      setFormData(p => ({ ...p, pincode: foundPin }));
-                                      try {
-                                          const areaRes = await fetchAreasByPincode(foundPin);
-                                          if (areaRes.success && areaRes.areas.length > 0) {
-                                              setFormData(p => ({
-                                                  ...p,
-                                                  area: areaRes.areas[0],
-                                                  city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)
-                                              }));
-                                          }
-                                      } catch { /* ignore */ }
-                                  }
-                                  setIsDetectingPincode(false);
-                              }
-                            }}
-                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
-                            placeholder="House / Building / Street / Pincode"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current City</label>
-                          <div className="relative group/input">
-                              <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                              <select
-                                name="city"
-                                value={formData.city}
-                                onChange={(e) => {
-                                   const newCity = e.target.value;
-                                   setFormData(prev => ({ ...prev, city: newCity, area: '', pincode: '' }));
-                                   localStorage.setItem('preferredCity', newCity);
-                                   window.dispatchEvent(new Event('cityUpdated'));
-                                }}
-                                className="w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all appearance-none font-bold text-sm text-gray-900"
-                              >
-                                 <option value="">Select Region</option>
-                                 {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                              </select>
-                              <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area (Tap to Select)</label>
-                          <div className="relative">
-                              {formData.city ? (
-                                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-3 bg-gray-50/50 rounded-xl border-2 border-gray-100">
-                                      {(PREDEFINED_AREAS[formData.city] || []).map(area => (
-                                          <button
-                                              key={area}
-                                              type="button"
-                                              onClick={async () => {
-                                                  setFormData(prev => ({ ...prev, area }));
-                                                  setIsFetchingAreaPincode(true);
-                                                  try {
-                                                      const pins = await fetchPincodesByArea([area]);
-                                                      if (pins && pins.length > 0) {
-                                                          setFormData(prev => ({ ...prev, pincode: pins[0] }));
-                                                      }
-                                                  } finally {
-                                                      setIsFetchingAreaPincode(false);
-                                                  }
-                                              }}
-                                              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${formData.area === area ? 'bg-indigo-600 text-white shadow-md scale-[1.02]' : 'bg-white text-gray-700 border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
-                                          >
-                                              {area}
-                                          </button>
-                                      ))}
-                                      {!(PREDEFINED_AREAS[formData.city]?.length > 0) && (
-                                          <span className="text-xs text-gray-400 p-2 font-medium">No predefined areas. Enter your pincode below.</span>
-                                      )}
-                                  </div>
-                              ) : (
-                                  <div className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl font-bold text-sm text-gray-400 flex items-center gap-2">
-                                      <MapIcon className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
-                                      Select a city first
-                                  </div>
-                              )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1 flex items-center justify-between">
-                          Postal Pin-Code
-                          {(isDetectingPincode || isFetchingAreaPincode) && <span className="text-indigo-600 font-black lowercase flex items-center gap-1 animate-pulse"><Loader2 size={10} className="animate-spin" />syncing...</span>}
-                        </label>
-                        <div className="relative group/input">
-                          <MapPin className="absolute left-4 top-4 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
-                          <input
-                            name="pincode"
-                            value={formData.pincode}
-                            onChange={handleInputChange}
-                            disabled={isDetectingPincode || isFetchingAreaPincode}
-                            className="w-full pl-12 pr-4 py-4 bg-indigo-50/10 border-2 border-indigo-100/30 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all disabled:opacity-60 font-black text-indigo-950 tracking-[0.2em] text-xl"
-                            placeholder="------"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 3: Current Location Card */}
+                {/* Section 2: Current Location Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-950 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
                   <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
                     <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
-                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">3</span>
+                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">2</span>
                       Current Location
                     </h4>
                     
@@ -2164,15 +3209,22 @@ export const CustomerPanel: React.FC = () => {
                               <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
                               <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
                            </div>
-                           <div className="relative group/input">
-                              <MapIcon className="absolute left-4 top-3.5 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                           <div className="relative group/input flex items-center">
+                              <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
                               <input
                                 name="locationLink"
                                 value={formData.locationLink}
                                 onChange={handleInputChange}
-                                className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                                className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
                                 placeholder="Paste Google Maps link here..."
                               />
+                              <button
+                                type="button"
+                                onClick={() => setIsMapPickerOpen(true)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                              >
+                                Adjust Pin
+                              </button>
                            </div>
                            <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Deployment Address" section above optional.</p>
                         </div>
@@ -2254,6 +3306,135 @@ export const CustomerPanel: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Section 3: Service Location Card */}
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative bg-white border border-indigo-50 rounded-3xl p-4 sm:p-6 shadow-sm">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-[0.2em] flex items-center gap-3 mb-6">
+                      <span className="bg-indigo-950 text-white w-7 h-7 rounded-xl flex items-center justify-center text-[10px] shadow-xl shadow-indigo-100">3</span>
+                      Deployment Address
+                    </h4>
+                    
+                    <div className="space-y-8">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1">Operational Venue</label>
+                        <div className="relative group/input">
+                          <MapPin className="absolute left-4 top-4 text-indigo-200 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            id="checkout-address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            onBlur={async () => {
+                              if (formData.address) {
+                                  setIsDetectingPincode(true);
+                                  const foundPin = await identifyPincode(formData.address);
+                                  if (foundPin) {
+                                      setFormData((p: any) => ({ ...p, pincode: foundPin }));
+                                      try {
+                                          const areaRes = await fetchAreasByPincode(foundPin);
+                                          if (areaRes.success && areaRes.areas.length > 0) {
+                                              setFormData((p: any) => ({
+                                                  ...p,
+                                                  area: areaRes.areas[0],
+                                                  city: areaRes.isBangalore ? 'Bangalore' : (foundPin.startsWith('110') ? 'Delhi' : p.city)
+                                              }));
+                                          }
+                                      } catch { /* ignore */ }
+                                  }
+                                  setIsDetectingPincode(false);
+                              }
+                            }}
+                            className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-indigo-50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-black text-indigo-950 placeholder:font-normal placeholder:text-gray-300"
+                            placeholder="House / Building / Street / Pincode"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current City</label>
+                          <div className="relative group/input">
+                              <MapPin className="absolute left-3.5 top-3.5 text-gray-400 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                              <select
+                                name="city"
+                                value={formData.city}
+                                onChange={(e) => {
+                                   const newCity = e.target.value;
+                                   setFormData((prev: any) => ({ ...prev, city: newCity, area: '', pincode: '' }));
+                                   localStorage.setItem('preferredCity', newCity);
+                                   window.dispatchEvent(new Event('cityUpdated'));
+                                }}
+                                className="w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all appearance-none font-bold text-sm text-gray-900"
+                              >
+                                 <option value="">Select Region</option>
+                                 {CITY_DATA.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                              </select>
+                              <ChevronRight className="absolute right-4 top-4 rotate-90 text-gray-400 pointer-events-none" size={16} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Local Area (Tap to Select)</label>
+                          <div className="relative">
+                              {formData.city ? (
+                                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-3 bg-gray-50/50 rounded-xl border-2 border-gray-100">
+                                      {(PREDEFINED_AREAS[formData.city] || []).map(area => (
+                                          <button
+                                              key={area}
+                                              type="button"
+                                              onClick={async () => {
+                                                  setFormData((prev: any) => ({ ...prev, area }));
+                                                  setIsFetchingAreaPincode(true);
+                                                  try {
+                                                      const pins = await fetchPincodesByArea([area]);
+                                                      if (pins && pins.length > 0) {
+                                                          setFormData((prev: any) => ({ ...prev, pincode: pins[0] }));
+                                                      }
+                                                  } finally {
+                                                      setIsFetchingAreaPincode(false);
+                                                  }
+                                              }}
+                                              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${formData.area === area ? 'bg-indigo-600 text-white shadow-md scale-[1.02]' : 'bg-white text-gray-700 border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
+                                          >
+                                              {area}
+                                          </button>
+                                      ))}
+                                      {!(PREDEFINED_AREAS[formData.city]?.length > 0) && (
+                                          <span className="text-xs text-gray-400 p-2 font-medium">No predefined areas. Enter your pincode below.</span>
+                                      )}
+                                  </div>
+                              ) : (
+                                  <div className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl font-bold text-sm text-gray-400 flex items-center gap-2">
+                                      <MapIcon className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
+                                      Select a city first
+                                  </div>
+                              )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-indigo-300 uppercase tracking-widest ml-1 flex items-center justify-between">
+                          Postal Pin-Code
+                          {(isDetectingPincode || isFetchingAreaPincode) && <span className="text-indigo-600 font-black lowercase flex items-center gap-1 animate-pulse"><Loader2 size={10} className="animate-spin" />syncing...</span>}
+                        </label>
+                        <div className="relative group/input">
+                          <MapPin className="absolute left-4 top-4 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors" size={18} />
+                          <input
+                            name="pincode"
+                            value={formData.pincode}
+                            onChange={handleInputChange}
+                            disabled={isDetectingPincode || isFetchingAreaPincode}
+                            className="w-full pl-12 pr-4 py-4 bg-indigo-50/10 border-2 border-indigo-100/30 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all disabled:opacity-60 font-black text-indigo-950 tracking-[0.2em] text-xl"
+                            placeholder="------"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Section 4: Extra Details Card */}
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-300 to-indigo-600 rounded-[2rem] blur opacity-5 transition duration-1000"></div>
@@ -2312,19 +3493,396 @@ export const CustomerPanel: React.FC = () => {
           category={activeRateCardCategory}
         />
 
+        {/* Map Picker Modal */}
+        <MapPicker
+          isOpen={isMapPickerOpen}
+          onClose={() => setIsMapPickerOpen(false)}
+          onConfirm={handleConfirmMapLocation}
+          initialLat={formData.lat || undefined}
+          initialLng={formData.lng || undefined}
+        />
+
+        {/* Post-Service Rating & Review Submission Modal */}
+        <AnimatePresence>
+          {selectedBookingForReview && (() => {
+            const assignedTech = partners.find(p => p.id === selectedBookingForReview.assignedPartnerId);
+            const techName = selectedBookingForReview.assignedPartnerName || assignedTech?.name || 'Verified Technician';
+            const techRating = assignedTech?.rating || '4.9';
+            const techReviewCount = assignedTech?.review_count || 0;
+
+            const quickTags = [
+              '⏱️ Came on time',
+              '👍 Great quality work',
+              '🤝 Very polite behavior',
+              '🧹 Cleaned up after',
+              '🌟 Highly recommended',
+              '🔧 Fixed it perfectly'
+            ];
+
+            const toggleQuickTag = (tag: string) => {
+              if (commentInput.includes(tag)) {
+                setCommentInput(prev => prev.replace(tag, '').replace(/,\s*,/g, ',').replace(/^,\s*|\s*,\s*$/g, '').trim());
+              } else {
+                setCommentInput(prev => prev ? `${prev}, ${tag}` : tag);
+              }
+            };
+
+            return (
+              <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-white rounded-2xl w-full max-w-sm shadow-2xl relative overflow-hidden flex flex-col"
+                >
+                  {/* Top Header Banner with Technician Profile */}
+                  <div className="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-900 p-4 text-white relative shrink-0">
+                    <button 
+                      onClick={handleDismissReview}
+                      className="absolute right-3 top-3 text-white/70 hover:text-white p-1.5 hover:bg-white/10 rounded-full transition-all"
+                      title="Remind me later"
+                    >
+                      <X size={16} />
+                    </button>
+
+                    <div className="flex items-center gap-3 pr-6">
+                      {/* Avatar */}
+                      <div className="relative shrink-0">
+                        <div className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/30 rounded-xl flex items-center justify-center font-black text-white uppercase text-base shadow-lg">
+                          {techName.slice(0, 2)}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center">
+                          <CheckCircle size={8} className="text-white" />
+                        </span>
+                      </div>
+
+                      {/* Info */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="text-sm font-black tracking-tight text-white truncate">{techName}</h3>
+                          <span className="inline-flex items-center gap-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                            <ShieldCheck size={8} /> Verified
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-indigo-100 font-bold">
+                          <span className="flex items-center gap-0.5 text-amber-400">
+                            <Star size={9} className="fill-amber-400 text-amber-400" />
+                            {techRating}
+                          </span>
+                          <span className="w-0.5 h-0.5 bg-indigo-300/40 rounded-full"></span>
+                          <span>{techReviewCount} Reviews</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-4 overflow-y-auto space-y-4 custom-scrollbar">
+                    {/* Interactive 5-Star Selection */}
+                    <div className="flex justify-center items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRatingInput(star)}
+                          className="transition-all active:scale-90 focus:outline-none p-1"
+                        >
+                          <Star 
+                            size={36} 
+                            className={`transition-all duration-200 ${
+                              star <= ratingInput 
+                                ? "fill-amber-400 text-amber-400 drop-shadow-sm scale-110" 
+                                : "text-slate-200 hover:text-amber-200"
+                            }`} 
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Dynamic Rating Label */}
+                    <div className="text-center h-5 flex items-center justify-center mb-1">
+                      <motion.span 
+                        key={ratingInput}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`inline-block text-[10px] font-black px-3 py-1 rounded-full shadow-sm ${
+                          ratingInput === 5 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                          ratingInput === 4 ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
+                          ratingInput === 3 ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                          ratingInput === 2 ? 'bg-orange-50 text-orange-700 border border-orange-200' :
+                          'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {ratingInput === 1 ? '⭐ 1.0 - Needs Improvement' :
+                         ratingInput === 2 ? '⭐ 2.0 - Below Average' :
+                         ratingInput === 3 ? '⭐ 3.0 - Good Service' :
+                         ratingInput === 4 ? '⭐ 4.0 - Very Good' :
+                         '⭐ 5.0 - Outstanding! 😍'}
+                      </motion.span>
+                    </div>
+
+                    {/* Quick Feedback Chips */}
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block text-center">
+                        Tap to add quick feedback
+                      </label>
+                      <div className="flex flex-wrap justify-center gap-1.5">
+                        {quickTags.map((tag) => {
+                          const isSelected = commentInput.includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => toggleQuickTag(tag)}
+                              className={`text-[10px] font-bold px-2 py-1.5 rounded-lg border transition-all active:scale-95 flex items-center gap-1 ${
+                                isSelected 
+                                  ? "bg-indigo-600 text-white border-indigo-600 shadow-sm" 
+                                  : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                              }`}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Review Textarea */}
+                    <div className="space-y-1.5 pb-1">
+                      <textarea
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        placeholder="Detailed Feedback (Optional)"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white outline-none transition-all text-xs text-slate-800 font-medium h-20 resize-none leading-relaxed placeholder:text-slate-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Modal Footer Actions */}
+                  <div className="p-3 bg-white border-t border-slate-100 flex gap-2 shrink-0 pb-safe">
+                    <button
+                      type="button"
+                      onClick={handleDismissReview}
+                      className="w-1/3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-wider rounded-lg transition-all active:scale-95"
+                    >
+                      Skip
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSubmittingReview}
+                      onClick={handleSubmitReview}
+                      className="w-2/3 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 text-white font-black text-[10px] uppercase tracking-wider rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      {isSubmittingReview ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle size={14} />
+                          <span>Submit</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            );
+          })()}
+        </AnimatePresence>
+
+        {/* Technician Profile and Customer Reviews Modal */}
+        <AnimatePresence>
+          {selectedTechnicianForProfile && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl relative border border-slate-100 overflow-hidden flex flex-col max-h-[85vh] animate-slideUp"
+              >
+                {/* Header Profile Info Banner */}
+                <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 text-white relative">
+                  <button 
+                    onClick={() => setSelectedTechnicianForProfile(null)}
+                    className="absolute right-4 top-4 text-white/70 hover:text-white p-2 hover:bg-white/10 rounded-xl transition-all"
+                  >
+                    <X size={18} />
+                  </button>
+
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="w-16 h-16 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-full flex items-center justify-center font-black text-white uppercase text-xl shrink-0 shadow-lg animate-scaleIn">
+                      {selectedTechnicianForProfile.name ? selectedTechnicianForProfile.name.slice(0, 2) : "P"}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-black tracking-tight">{selectedTechnicianForProfile.name}</h3>
+                        <span className="inline-flex items-center gap-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
+                          <ShieldCheck size={8} /> Verified Partner
+                        </span>
+                      </div>
+                      <p className="text-xs text-indigo-300 font-medium mt-1">
+                        Professional Service Expert • {selectedTechnicianForProfile.city || "Gorakhpur Region"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scrollable Content Panel */}
+                <div className="p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
+                  {/* Performance Key Metrics (Flat grid style - no cards inside cards) */}
+                  <div className="grid grid-cols-4 gap-2 bg-slate-50 p-4 rounded-2xl text-center">
+                    <div>
+                      <span className="block text-lg font-black text-indigo-950 leading-none">
+                        {selectedTechnicianForProfile.rating || "4.8"} ★
+                      </span>
+                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1">
+                        Avg Rating
+                      </span>
+                    </div>
+                    <div className="border-l border-slate-200/80">
+                      <span className="block text-lg font-black text-indigo-950 leading-none">
+                        {selectedTechnicianForProfile.review_count || "0"}
+                      </span>
+                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1">
+                        Reviews
+                      </span>
+                    </div>
+                    <div className="border-l border-slate-200/80">
+                      <span className="block text-lg font-black text-indigo-950 leading-none font-mono">
+                        {selectedTechnicianForProfile.experience || "3+ Yrs"}
+                      </span>
+                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1">
+                        Experience
+                      </span>
+                    </div>
+                    <div className="border-l border-slate-200/80">
+                      <span className="block text-lg font-black text-indigo-950 leading-none">
+                        {selectedTechnicianForProfile.completedJobs || "150+"}
+                      </span>
+                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1">
+                        Jobs Done
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Technician Professional Details */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-widest border-b border-slate-100 pb-1.5">
+                      Expertise & Regional Service Boundaries
+                    </h4>
+                    <div className="space-y-2 text-xs font-semibold text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 text-center text-sm">🛠️</span>
+                        <span>
+                          <strong className="text-slate-800">Skills:</strong> {selectedTechnicianForProfile.categories?.join(', ') || 'Home Service Specialist'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-indigo-600 shrink-0" />
+                        <span>
+                          <strong className="text-slate-800">Service Area limits:</strong> {selectedTechnicianForProfile.service_areas?.join(', ') || 'All Local Regions'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer Reviews Section */}
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-black text-indigo-950 uppercase tracking-widest border-b border-slate-100 pb-1.5 flex justify-between items-center">
+                      <span>Verified Customer Reviews</span>
+                      <span className="bg-indigo-50 text-indigo-700 text-[9px] px-2 py-0.5 rounded-full font-black">
+                        {bookings.filter(b => b.assignedPartnerId === selectedTechnicianForProfile.id && b.partner_rating).length} Reviews
+                      </span>
+                    </h4>
+
+                    {/* Filtered reviews rendering list */}
+                    <div className="space-y-3.5">
+                      {(() => {
+                        const reviewsList = bookings.filter(
+                          b => b.assignedPartnerId === selectedTechnicianForProfile.id && b.partner_rating
+                        );
+
+                        const maskCustomerName = (name: string) => {
+                          if (!name) return "Verified Customer";
+                          const parts = name.trim().split(" ");
+                          if (parts.length > 1 && parts[1]) {
+                            return `${parts[0]} ${parts[1][0]}.`;
+                          }
+                          return name;
+                        };
+
+                        if (reviewsList.length === 0) {
+                          return (
+                            <div className="text-center py-8 bg-slate-50/50 rounded-2xl border border-slate-100 border-dashed">
+                              <span className="text-2xl">📝</span>
+                              <p className="text-xs text-slate-500 font-bold mt-2">No customer reviews yet</p>
+                              <p className="text-[10px] text-slate-400 font-semibold mt-1">
+                                Be the first to rate this technician once your booking is completed!
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        return reviewsList.map((rev) => (
+                          <div key={rev.id} className="bg-slate-50/40 border border-slate-100/55 p-4 rounded-2xl">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-extrabold text-slate-800 text-xs">
+                                  {maskCustomerName(rev.customerName)}
+                                </p>
+                                <p className="text-[9px] text-slate-400 font-bold mt-0.5">
+                                  Service Category: {rev.serviceCategory} • {rev.date}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star 
+                                    key={star} 
+                                    size={10} 
+                                    className={star <= (rev.partner_rating || 0) ? "fill-amber-500 text-amber-500 shrink-0" : "text-slate-200 shrink-0"} 
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            {rev.partner_comment && (
+                              <p className="text-xs text-slate-600 font-semibold italic mt-2.5 bg-white p-2.5 rounded-xl border border-slate-50 shadow-sm leading-relaxed">
+                                "{rev.partner_comment}"
+                              </p>
+                            )}
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Modal Action */}
+                <div className="p-4 bg-slate-50 border-t border-slate-100">
+                  <button
+                    onClick={() => setSelectedTechnicianForProfile(null)}
+                    className="w-full py-3.5 bg-indigo-950 hover:bg-indigo-900 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all shadow-md active:scale-95"
+                  >
+                    Close Profile
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
         {/* Floating Helpline Pill */}
         {showHelplineBanner && (
           <a 
-            href="tel:7625046788" 
-            className="fixed bottom-24 right-4 sm:right-8 z-50 flex items-center bg-white rounded-full shadow-2xl border border-gray-200 cursor-pointer animate-pulse hover:animate-none hover:scale-105 transition-all overflow-hidden"
+            href="tel:9196029763" 
+            className="helpline-container fixed bottom-24 right-4 sm:right-8 z-50 flex items-center bg-white rounded-full shadow-lg border border-indigo-100 cursor-pointer hover:scale-105 transition-all overflow-hidden p-1 pr-2.5"
+            title="Call Helpline"
           >
-            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shrink-0 m-1 shadow-sm">
-               <Phone className="w-4 h-4 text-white" />
+            <div className="w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center shrink-0 shadow-sm animate-pulse">
+               <Phone className="w-3 h-3 text-white" />
             </div>
-            <div className="pr-4 pl-1 py-1">
-              <span className="block text-[8px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-0.5">Helpline</span>
-              <span className="block text-xs font-black text-indigo-600 tracking-tight leading-none">7625046788</span>
-            </div>
+            <span className="text-[9px] font-black text-indigo-950 uppercase tracking-widest ml-1">Help</span>
           </a>
         )}
       </div>

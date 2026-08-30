@@ -7,6 +7,7 @@ import { AdminPanel } from './pages/AdminPanel';
 import { BlogPanel } from './pages/BlogPanel';
 import { BlogPost } from './pages/BlogPost';
 import RateList from './pages/RateList';
+import { TrackBooking } from './pages/TrackBooking';
 import { RoleSelectionModal } from './components/RoleSelectionModal';
 
 function AppContent() {
@@ -20,7 +21,7 @@ function AppContent() {
     sessionStorage.setItem('sofiyan_user_role', role);
     setShowRoleModal(false);
     if (role === 'technician') {
-      navigate('/partner?mode=signup');
+      navigate('/partner');
     } else {
       navigate('/');
     }
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/track" element={<TrackBooking />} />
           <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>

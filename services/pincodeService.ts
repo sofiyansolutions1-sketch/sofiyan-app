@@ -1,3 +1,4 @@
+import { PREDEFINED_PINS } from './predefinedPins';
 /**
  * Pincode-Based Discovery & Matching System Service
  * Uses the FREE India Post API: https://api.postalpincode.in/
@@ -43,47 +44,81 @@ const AREA_DICTIONARY: Record<string, { areas: string[]; isBangalore: boolean }>
  */
 export async function fetchPincodesByArea(areaNames: string[]): Promise<string[]> {
     const allPincodes = new Set<string>();
-
+    
     for (let area of areaNames) {
         area = area.trim();
         if (!area) continue;
-
+        
         // Try local static dictionary first for instant performance
-        const matchedLocal = PIN_DICTIONARY[area.toLowerCase()];
+        const matchedLocal = PIN_DICTIONARY[area.toLowerCase()] || PREDEFINED_PINS[area.toLowerCase()];
         if (matchedLocal && matchedLocal.length > 0) {
             matchedLocal.forEach(p => allPincodes.add(p));
             continue;
         }
 
-        try {
-            // Try proxy route first to bypass CORS
-            let apiRes = await fetch(`/api/pincode/postoffice/${encodeURIComponent(area)}`).catch(() => null);
+        
+        const fetchFromIndiaPost = async (searchTerm: string) => {
+            const encoded = encodeURIComponent(searchTerm);
+            console.log("Fetching pincode for:", searchTerm);
             
-            // Fallback directly to the public API if proxy is unavailable or fails
-            if (!apiRes || !apiRes.ok) {
-                apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`);
-            }
+            // Race the proxy and the direct API call for maximum speed
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
             
-            if (apiRes && apiRes.ok) {
-                const text = await apiRes.text();
-                let data;
-                try { data = JSON.parse(text); } catch { console.warn("Failed to parse", text); }
+            const fetchProxy = fetch(`/api/pincode/postoffice/${encoded}`, { signal: controller.signal })
+                .then(async res => { 
+                    if (!res.ok) throw new Error("Proxy error"); 
+                    const t = await res.text();
+                    if (t.includes('__cookie_check')) throw new Error("Cookie blocked");
+                    return JSON.parse(t);
+                });
+            const fetchDirect = fetch(`https://api.postalpincode.in/postoffice/${encoded}`, { signal: controller.signal })
+                .then(async res => { 
+                    if (!res.ok) throw new Error("Direct error"); 
+                    return res.json();
+                });
                 
-                // India Post API returns an array containing Status and PostOffice details
+            try {
+                // Whoever finishes first successfully
+                const data = await Promise.any([fetchProxy, fetchDirect]).finally(() => clearTimeout(timeoutId));
+                controller.abort(); // Cancel the slower one
+
+
+                
                 if (data && data[0] && data[0].Status === 'Success') {
                     const postOffices = data[0].PostOffice;
-                    postOffices.forEach((po: any) => {
-                        if (po.Pincode) {
-                            allPincodes.add(po.Pincode);
-                        }
-                    });
+                    return postOffices.map((po: any) => po.Pincode).filter(Boolean);
                 }
+            } catch (error) {
+               console.error("fetchFromIndiaPost error:", error);
+               return null;
             }
-        } catch (error) {
-            console.warn(`Pincode Discovery Error for area "${area}", details:`, error);
+            return null;
+        };
+
+        let foundPincodes = await fetchFromIndiaPost(area);
+        
+        // If not found, try stripping common terms like "Layout", "Phase", etc.
+        if (!foundPincodes || foundPincodes.length === 0) {
+            const simplifiedArea = area.replace(/\b(Layout|Phase|Extension|City|Block|Stage|Sector|Road)\b/gi, '').trim();
+            if (simplifiedArea && simplifiedArea.length > 2 && simplifiedArea !== area) {
+                foundPincodes = await fetchFromIndiaPost(simplifiedArea);
+            }
+        }
+        
+        // Fallback to first word if still not found
+        if (!foundPincodes || foundPincodes.length === 0) {
+            const firstWord = area.split(' ')[0];
+            if (firstWord && firstWord.length > 3 && firstWord !== area && !firstWord.toLowerCase().includes('layout')) {
+                foundPincodes = await fetchFromIndiaPost(firstWord);
+            }
+        }
+
+        if (foundPincodes) {
+            foundPincodes.forEach((p: string) => allPincodes.add(p));
         }
     }
-
+    
     // Secondary fallback in case no pincodes were fetched but we can match a substring
     if (allPincodes.size === 0) {
         for (const area of areaNames) {
@@ -123,8 +158,13 @@ export async function identifyPincode(addressText: string): Promise<string | nul
     const areasToGuess = components.slice(-3).reverse(); 
 
     for (const area of areasToGuess) {
+        
         try {
-            const apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second max per chunk
+            const apiRes = await fetch(`https://api.postalpincode.in/postoffice/${encodeURIComponent(area)}`, { signal: controller.signal })
+                .finally(() => clearTimeout(timeoutId));
+
             if (!apiRes.ok) continue;
 
             const text = await apiRes.text();
@@ -160,19 +200,26 @@ export async function fetchAreasByPincode(pincode: string): Promise<{ success: b
         return { success: true, areas: localMatch.areas, isBangalore: localMatch.isBangalore };
     }
 
+    
     try {
-        // Try proxy path first to bypass CORS
-        let apiRes = await fetch(`/api/pincode/code/${pincode}`).catch(() => null);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-        if (!apiRes || !apiRes.ok) {
-            apiRes = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
-        }
+        const fetchProxy = fetch(`/api/pincode/code/${pincode}`, { signal: controller.signal }).then(async res => {
+            if (!res.ok) throw new Error("Proxy error");
+            const t = await res.text();
+            if (t.includes('__cookie_check')) throw new Error("Cookie blocked");
+            return JSON.parse(t);
+        });
+        
+        const fetchDirect = fetch(`https://api.postalpincode.in/pincode/${pincode}`, { signal: controller.signal }).then(async res => {
+            if (!res.ok) throw new Error("Direct error");
+            return res.json();
+        });
 
-        if (!apiRes.ok) return { success: false, areas: [], isBangalore: false, error: 'API unreachable' };
+        const data = await Promise.any([fetchProxy, fetchDirect]).finally(() => clearTimeout(timeoutId));
+        controller.abort();
 
-        const text = await apiRes.text();
-        let data;
-        try { data = JSON.parse(text); } catch { console.warn("Failed to parse", text); }
         if (data && data[0] && data[0].Status === 'Success') {
             const postOffices = data[0].PostOffice || [];
             
@@ -187,12 +234,12 @@ export async function fetchAreasByPincode(pincode: string): Promise<{ success: b
                 (po.Region && po.Region.toLowerCase().includes('bangalore')) ||
                 (po.Division && po.Division.toLowerCase().includes('bangalore'))
             );
-
             return { success: true, areas, isBangalore };
         } else {
             return { success: false, areas: [], isBangalore: false, error: 'Pincode not found' };
         }
     } catch (error) {
+
         console.warn(`Error resolving Pincode ${pincode}, fallback lookup used:`, error);
         
         // If everything fails, try to see if pincode fits Delhi / Bangalore standard range

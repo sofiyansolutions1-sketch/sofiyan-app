@@ -19,6 +19,8 @@ export interface SubService {
   id: string;
   name: string;
   price: number;
+  otp?: string; // 4-digit OTP for starting job
+  otpVerified?: boolean; // True if partner has entered OTP
 }
 
 export interface CartItem extends SubService {
@@ -45,7 +47,9 @@ export interface Booking {
   subServiceName: string; // Summary string for backward compatibility
   cartItems?: CartItem[]; // Full cart details
   price: number;
-  status: 'pending' | 'accepted' | 'completed' | 'cancelled' | 'Forwarded' | 'on_hold';
+  otp?: string; // 4-digit OTP for starting job
+  otpVerified?: boolean; // True if partner has entered OTP
+  status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'Forwarded' | 'on_hold' | 'admin_review';
   assignedPartnerId?: string;
   assignedPartnerName?: string;
   assignedPartnerPhone?: string;
@@ -53,6 +57,7 @@ export interface Booking {
   commissionPaid: boolean;
   commission_screenshot?: string;
   partner_rating?: number; // Job-specific technician rating (1-5)
+  partner_comment?: string; // Feedback review comment left by customer
   createdAt: string;
   couponUsed?: string;
   discountAmount?: number;
@@ -77,6 +82,7 @@ export interface Partner {
   sub_categories?: string[];
   experience?: string;
   service_areas?: string[];
+  service_radius?: number;
   service_pincodes?: string[];
   password?: string;
   aadhar_number?: string; // Aadhaar card number

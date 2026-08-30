@@ -16,8 +16,8 @@ content = content.replace(
                 <h4 className="font-bold text-indigo-900 mb-2 text-lg">Customer Dashboard</h4>
                 <p className="text-sm text-indigo-700 mb-4">Track your booking or contact our service center directly for any assistance.</p>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a href="tel:7625046788" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
-                    <Phone size={18} /> Call Helpline (7625046788)
+                  <a href="tel:9196029763" className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition shadow-md">
+                    <Phone size={18} /> Call Helpline (9196029763)
                   </a>
                   <button onClick={resetFlow} className="flex-1 bg-white border-2 border-indigo-200 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition">
                     View My Bookings

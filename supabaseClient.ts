@@ -11,8 +11,21 @@ const getEnvValue = (key: string): string | undefined => {
   return undefined;
 };
 
-const SUPABASE_URL = getEnvValue('VITE_SUPABASE_URL') || "https://bvtqginkszmzzmetdjdm.supabase.co";
-const SUPABASE_ANON_KEY = getEnvValue('VITE_SUPABASE_ANON_KEY') || "sb_publishable_F0wwfftZVcsHQhoNStUQqw_UgPaOyYq";
+let SUPABASE_URL = getEnvValue('VITE_SUPABASE_URL') || "https://bvtqginkszmzzmetdjdm.supabase.co";
+if (SUPABASE_URL.includes('supabase-api') || SUPABASE_URL.includes('vqbnzcknflwuhbiznuim') || !SUPABASE_URL.startsWith('http')) {
+  SUPABASE_URL = "https://bvtqginkszmzzmetdjdm.supabase.co";
+}
+try {
+  new URL(SUPABASE_URL);
+} catch {
+  console.error("Invalid VITE_SUPABASE_URL:", SUPABASE_URL, "Falling back to default.");
+  SUPABASE_URL = "https://bvtqginkszmzzmetdjdm.supabase.co";
+}
+
+let SUPABASE_ANON_KEY = getEnvValue('VITE_SUPABASE_ANON_KEY') || "sb_publishable_F0wwfftZVcsHQhoNStUQqw_UgPaOyYq";
+if (SUPABASE_ANON_KEY.includes('YKSbWVBxAltMjpIxGhNAIg_Ga8B9xST') || SUPABASE_ANON_KEY === '') {
+  SUPABASE_ANON_KEY = "sb_publishable_F0wwfftZVcsHQhoNStUQqw_UgPaOyYq";
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, MapPin, Clock, Share2 } from 'lucide-react';
 import { SERVICES } from '../constants';
+import { getSignedAppFileUrl } from '../services/storageService';
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -27,10 +28,15 @@ export const BlogPost: React.FC = () => {
         .single();
 
       if (error) throw error;
-      setPost(data);
 
-      // Update SEO
       if (data) {
+        if (data.image_url) {
+          const signed = await getSignedAppFileUrl(data.image_url);
+          data.displayImageUrl = signed || data.image_url;
+        }
+        setPost(data);
+
+        // Update SEO
         document.title = `${data.title} | Sofiyan Solutions`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', data.meta_description || data.sub_heading || '');
@@ -208,9 +214,9 @@ export const BlogPost: React.FC = () => {
           </div>
         </header>
 
-        {post.image_url && (
+        {(post.displayImageUrl || post.image_url) && (
           <figure className="mb-12 rounded-2xl overflow-hidden shadow-lg border border-gray-100 relative z-10 group">
-            <img src={post.image_url} alt={post.title} className="w-full h-auto max-h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={post.displayImageUrl || post.image_url} alt={post.title} className="w-full h-auto max-h-[550px] object-cover transition-transform duration-700 group-hover:scale-105" />
           </figure>
         )}
         

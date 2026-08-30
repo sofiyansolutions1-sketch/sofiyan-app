@@ -4,7 +4,7 @@ import { ADMIN_PASSWORD } from '../constants';
 import { Booking } from '../types';
 import { Modal } from '../components/Modal';
 import { 
-  Lock, Users, Calendar, Activity, Clock, Phone, DollarSign, Loader2, Star,
+  Lock, Users, Calendar, Activity, Clock, Phone,Loader2, Star,
   Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, Share2, Map as MapIcon
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -13,7 +13,7 @@ import { PartnerManager } from '../components/PartnerManager';
 import { FollowUpManager } from '../components/FollowUpManager';
 
 export const AdminPanel: React.FC = () => {
-  const { bookings, updateBooking, partners, updatePartner } = useStore();
+  const { bookings, updateBooking, partners, updatePartner, fetchBookings, fetchPartners } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'FollowUps'>('Dashboard');
@@ -181,18 +181,32 @@ export const AdminPanel: React.FC = () => {
     }
   }, [dispatchBooking, handlePartnerSearch]);
 
+  useEffect(() => {
+    // Fresh fetch on Admin mount
+    fetchBookings().catch(err => console.error("Error fetching bookings:", err));
+    fetchPartners().catch(err => console.error("Error fetching partners:", err));
+
+    // Live update backup interval
+    const interval = setInterval(() => {
+      fetchBookings().catch(err => console.error("Error fetching bookings:", err));
+      fetchPartners().catch(err => console.error("Error fetching partners:", err));
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [fetchBookings, fetchPartners]);
+
   const completedBookings = bookings.filter(b => b.status === 'completed');
   const pendingJobs = bookings.filter(b => b.status === 'pending').length;
-  const assignedJobs = bookings.filter(b => b.status === 'Forwarded' || b.status === 'accepted').length;
+  const assignedJobs = bookings.filter(b => b.status === 'Forwarded' || b.status === 'accepted' || b.status === 'in_progress').length;
   const forwardedJobs = bookings.filter(b => b.status === 'Forwarded').length;
-  const acceptedJobs = bookings.filter(b => b.status === 'accepted').length;
+  const acceptedJobs = bookings.filter(b => b.status === 'accepted' || b.status === 'in_progress').length;
   const reviewJobs = bookings.filter(b => b.status === 'admin_review').length;
   const completedJobs = completedBookings.length;
 
   const displayedBookings = bookings.filter(b => {
     if (currentAdminTab === 'Pending') return b.status === 'pending';
     if (currentAdminTab === 'Forwarded') return b.status === 'Forwarded';
-    if (currentAdminTab === 'Accepted') return b.status === 'accepted';
+    if (currentAdminTab === 'Accepted') return b.status === 'accepted' || b.status === 'in_progress';
     if (currentAdminTab === 'Review') return b.status === 'admin_review';
     if (currentAdminTab === 'Completed') return b.status === 'completed';
     return false;
@@ -333,273 +347,171 @@ export const AdminPanel: React.FC = () => {
 
             <div className="p-4 sm:p-8 space-y-4 min-h-[500px] bg-gray-50/30">
               {displayedBookings.map((booking, index) => (
-                <div key={booking.id} className="relative bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                  
-                  {/* Customer Info Header - Compact & Simple Numbering */}
-                  <div className="p-4 border-b border-gray-50 bg-indigo-50/20">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex gap-3">
-                        <div className="text-xl font-black text-gray-900 border-r border-gray-200 pr-3 mr-1 flex items-center h-8">
-                          {index + 1}
+                <div key={booking.id} className="relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col md:flex-row">
+                    {/* Left Column: Customer & Service Base Info */}
+                    <div className="flex-1 p-5 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col">
+                        <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-700 font-bold text-lg flex items-center justify-center shrink-0">
+                                    {index + 1}
+                                </div>
+                                <div>
+                                    <h4 className="text-base font-bold text-gray-900">{booking.customerName}</h4>
+                                    <p className="text-xs font-medium text-gray-500 flex items-center gap-1 mt-0.5">
+                                        <Phone size={12} className="text-indigo-400" /> {booking.contactNumber}
+                                    </p>
+                                </div>
+                            </div>
+                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                                booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                                booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                                'bg-indigo-100 text-indigo-700'
+                            }`}>
+                                {booking.status}
+                            </span>
                         </div>
-                        <div>
-                          <h4 className="text-base font-black text-gray-900 tracking-tight leading-none mb-1">{booking.customerName}</h4>
-                          <p className="text-[11px] font-bold text-gray-400 flex items-center gap-1.5">
-                            <Phone size={10} className="text-indigo-400" /> {booking.contactNumber}
-                          </p>
+                        
+                        <div className="grid grid-cols-2 gap-4 mt-auto pt-3 border-t border-gray-50">
+                            <div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Service</p>
+                                <p className="text-xs font-bold text-gray-800 line-clamp-2">{booking.subServiceName}</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Schedule</p>
+                                <p className="text-xs font-bold text-gray-800 flex items-center gap-1">
+                                    <Calendar size={12} className="text-indigo-500" /> {booking.date}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">{booking.time}</p>
+                            </div>
+                            <div className="col-span-2">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Address & Area</p>
+                                <div className="flex items-start gap-1">
+                                    <MapPin size={12} className="text-gray-400 mt-0.5 shrink-0" />
+                                    <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                                        {booking.address ? booking.address : 'Address via Link'} 
+                                        {booking.area && <span className="font-medium text-gray-900"> • {booking.area}</span>}
+                                    </p>
+                                </div>
+                                {booking.location_link && (
+                                    <a href={booking.location_link} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-indigo-600 flex items-center gap-1 mt-1.5 hover:underline w-max">
+                                        <MapIcon size={10} /> View Map
+                                    </a>
+                                )}
+                            </div>
                         </div>
-                      </div>
-                      <div className={`px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest border ${
-                        booking.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                        booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                        'bg-indigo-100 text-indigo-700 border-indigo-200'
-                      }`}>
-                        {booking.status}
-                      </div>
                     </div>
 
-                    {/* Visible Customer Action Buttons - Slimmer */}
-                    <div className="flex gap-2">
-                      <a 
-                        href={`tel:${booking.contactNumber}`}
-                        className="flex-1 h-9 bg-indigo-600 text-white rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm hover:bg-black transition-all"
-                      >
-                        <Phone size={12} /> Call 
-                      </a>
-                      <a 
-                        href={`https://wa.me/91${booking.contactNumber}?text=${encodeURIComponent(`Hello ${booking.customerName}, regarding your booking...`)}`} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="flex-1 h-9 bg-emerald-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm hover:bg-emerald-600 transition-all"
-                      >
-                        <MessageCircle size={12} /> WhatsApp
-                      </a>
-                       <button 
-                         onClick={() => {
-                          const msg = `🆕 NEW ONLINE BOOKING\n` +
-                                     `───────────────────\n` +
-                                     `👤 Customer Info:\n` +
-                                     `Name: ${booking.customerName}\n` +
-                                     `Phone: ${booking.contactNumber}\n\n` +
-                                     `🛠️ Service Details:\n` +
-                                     `Category: ${booking.serviceCategory}\n` +
-                                     `Items: ${booking.subServiceName}\n` +
-                                     `Total Amount: ₹${booking.price}\n\n` +
-                                     `📍 Address:\n` +
-                                     `City: ${booking.city || 'Bangalore'} -\n` +
-                                     `Detail: ${booking.address || ''}\n\n` +
-                                     (booking.location_link ? `🔗 Location: ${booking.location_link}\n\n` : '') +
-                                     `⏰ Schedule:\n` +
-                                     `Date: ${booking.date}\n` +
-                                     `Time: ${booking.time}\n\n` +
-                                     `───────────────────\n` +
-                                     `Sent via Sofiyan Home Service App`;
-                          
-                          window.open(`https://wa.me/7625046788?text=${encodeURIComponent(msg)}`, '_blank');
-                        }}
-                        className="h-9 w-9 bg-indigo-50 text-indigo-700 rounded-lg flex items-center justify-center hover:bg-indigo-600 hover:text-white hover:shadow-md border border-indigo-200 transition-all shrink-0"
-                        title="Forward to Admin WhatsApp"
-                      >
-                        <Share2 size={12} />
-                      </button>
-                    </div>
-                  </div>
+                    {/* Right Column: Actions & Partner Details */}
+                    <div className="w-full md:w-80 flex flex-col bg-gray-50/50">
+                        <div className="p-5 flex-1 flex flex-col justify-center">
+                            {/* Value & Direct Contact */}
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Est. Price</p>
+                                    <p className="text-lg font-black text-emerald-600">₹{booking.price}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <a href={`tel:${booking.contactNumber}`} className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 transition-all shadow-sm" title="Call Customer">
+                                        <Phone size={14} />
+                                    </a>
+                                    <a href={`https://wa.me/91${booking.contactNumber}?text=${encodeURIComponent(`Hello ${booking.customerName}, regarding your booking...`)}`} target="_blank" rel="noreferrer" className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all shadow-sm" title="WhatsApp Customer">
+                                        <MessageCircle size={14} />
+                                    </a>
+                                    <button onClick={() => {
+                                        const msg = `🆕 NEW ONLINE BOOKING\n` +
+                                                   `───────────────────\n` +
+                                                   `👤 Customer Info:\n` +
+                                                   `Name: ${booking.customerName}\n` +
+                                                   `Phone: ${booking.contactNumber}\n\n` +
+                                                   `🛠️ Service Details:\n` +
+                                                   `Category: ${booking.serviceCategory}\n` +
+                                                   `Items: ${booking.subServiceName}\n` +
+                                                   `Total Amount: ₹${booking.price}\n\n` +
+                                                   `📍 Address:\n` +
+                                                   `City: ${booking.city || 'Bangalore'} -\n` +
+                                                   `Detail: ${booking.address || ''}\n\n` +
+                                                   (booking.location_link ? `🔗 Location: ${booking.location_link}\n\n` : '') +
+                                                   `⏰ Schedule:\n` +
+                                                   `Date: ${booking.date}\n` +
+                                                   `Time: ${booking.time}\n\n` +
+                                                   `───────────────────\n` +
+                                                   `Sent via Sofiyan Home Service App`;
+                                        window.open(`https://wa.me/9196029763?text=${encodeURIComponent(msg)}`, '_blank');
+                                    }} className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-all shadow-sm" title="Forward to Admin WhatsApp">
+                                        <Share2 size={14} />
+                                    </button>
+                                </div>
+                            </div>
 
-                  {/* Core Lead Details - Even More Compact */}
-                  <div className="p-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2">
-                         <div className="w-7 h-7 rounded-lg bg-pink-50 flex items-center justify-center text-pink-500 shrink-0">
-                           <Activity size={14} />
-                         </div>
-                         <div className="min-w-0">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Service</p>
-                           <p className="text-[11px] font-black text-gray-900 truncate">{booking.subServiceName}</p>
-                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                         <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 shrink-0">
-                           <Calendar size={14} />
-                         </div>
-                         <div className="min-w-0">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Schedule</p>
-                           <p className="text-[11px] font-black text-gray-900 truncate">{booking.date} | {booking.time}</p>
-                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                         <div className="w-7 h-7 rounded-lg bg-sky-50 flex items-center justify-center text-sky-500 shrink-0">
-                           <MapPin size={14} />
-                         </div>
-                         <div className="min-w-0 flex-1">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Address</p>
-                           <p className="text-[11px] font-black text-gray-900 leading-tight truncate">
-                             {booking.address ? `${booking.address}` : 'Address via Link'}
-                           </p>
-                           {booking.location_link && (
-                             <a 
-                               href={booking.location_link} 
-                               target="_blank" 
-                               rel="noreferrer" 
-                               className="text-[9px] font-black text-indigo-600 flex items-center gap-1 mt-1 hover:underline"
-                             >
-                               <MapIcon size={10} /> View Map
-                             </a>
-                           )}
-                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                         <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
-                           <DollarSign size={14} />
-                         </div>
-                         <div className="min-w-0">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Price</p>
-                           <p className="text-[11px] font-black text-gray-900">₹{booking.price}</p>
-                         </div>
-                      </div>
-                      <div className="col-span-2 flex items-center gap-2">
-                         <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0">
-                           <MapIcon size={14} />
-                         </div>
-                         <div className="min-w-0 flex-1">
-                           <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest">Service Area</p>
-                           <p className="text-[11px] font-black text-gray-900 leading-tight">
-                             {booking.area || booking.city || 'Not specified'}
-                           </p>
-                         </div>
-                      </div>
-                    </div>
+                            {/* Partner Details (if assigned) */}
+                            {(booking.assignedPartnerName || booking.status === 'Forwarded' || booking.status === 'accepted' || booking.status === 'in_progress') && (() => {
+                                const pt = partners.find(p => p.id === booking.assignedPartnerId || p.phone === booking.assignedPartnerPhone || p.name === booking.assignedPartnerName);
+                                return (
+                                    <div className="bg-indigo-950 rounded-xl p-3 mb-4 shadow-sm">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[9px] font-bold text-indigo-300 uppercase tracking-wider">Dispatched Tech</span>
+                                            <span className="text-[9px] font-bold text-emerald-400">{pt?.status === 'available' ? 'Active' : pt?.status || 'Dispatched'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="w-6 h-6 rounded bg-indigo-800 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                                                {booking.assignedPartnerName ? booking.assignedPartnerName.charAt(0) : 'P'}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <h5 className="text-xs font-bold text-white truncate">{booking.assignedPartnerName}</h5>
+                                                <p className="text-[10px] text-indigo-200 truncate">{booking.assignedPartnerPhone}</p>
+                                            </div>
+                                            <div className="flex gap-1.5 shrink-0">
+                                                <a href={`tel:${booking.assignedPartnerPhone}`} className="w-7 h-7 bg-white/10 hover:bg-white/20 rounded flex items-center justify-center text-white transition-colors"><Phone size={10} /></a>
+                                                <a href={`https://wa.me/91${booking.assignedPartnerPhone}?text=${encodeURIComponent(`Hello ${booking.assignedPartnerName}, job instructions for customer ${booking.customerName} located at ${booking.address}: ${booking.subServiceName}.`)}`} target="_blank" rel="noreferrer" className="w-7 h-7 bg-emerald-500 hover:bg-emerald-600 rounded flex items-center justify-center text-white transition-colors"><MessageCircle size={10} /></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
-                    {/* Forward Section - Redesigned Partner Details */}
-                    {(booking.assignedPartnerName || booking.status === 'Forwarded' || booking.status === 'accepted') && (() => {
-                      const pt = partners.find(p => p.id === booking.assignedPartnerId || p.phone === booking.assignedPartnerPhone || p.name === booking.assignedPartnerName);
-                      return (
-                        <div className="p-3.5 bg-indigo-950 text-white rounded-2xl shadow-lg border border-indigo-900 flex flex-col gap-2.5">
-                          {/* Mini Profile Header */}
-                          <div className="flex justify-between items-start pb-2 border-b border-white/10">
-                            <div className="flex items-center gap-2.5 min-w-0 relative">
-                              <div className="w-8 h-8 rounded-lg bg-white/15 text-white flex items-center justify-center font-black text-xs shrink-0 select-none">
-                                {booking.assignedPartnerName ? booking.assignedPartnerName.charAt(0) : 'P'}
-                              </div>
-                              <div className="min-w-0">
-                                <span className="text-[7.5px] font-extrabold text-indigo-300 uppercase tracking-widest block leading-none mb-0.5">Dispatched Technician</span>
-                                <h5 className="text-[11px] font-black tracking-tight leading-tight truncate text-white" title={booking.assignedPartnerName}>
-                                  {booking.assignedPartnerName}
-                                </h5>
-                              </div>
-                            </div>
-                            <div className="text-right shrink-0">
-                              <div className="flex items-center gap-0.5 justify-end">
-                                <Star size={9} className="text-yellow-400 fill-current" />
-                                <span className="text-[10px] font-black text-yellow-300">{pt?.rating?.toFixed(1) || '5.0'}</span>
-                                <span className="text-indigo-200 text-[8px]">({pt?.review_count || 0})</span>
-                              </div>
-                              <p className="text-[7.5px] font-bold uppercase tracking-wider text-emerald-400">
-                                {pt?.status === 'available' ? 'Active' : pt?.status || 'Dispatched'}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Profile Quick Stats */}
-                          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] text-indigo-100">
-                            <div>
-                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Contact Number</span>
-                              <span className="font-extrabold text-white">{booking.assignedPartnerPhone}</span>
-                            </div>
-                            <div>
-                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Expertise / Coverage</span>
-                              <span className="font-semibold text-white truncate block" title={pt?.city || booking.assignedPartnerArea}>
-                                {pt?.city || booking.assignedPartnerArea || 'Local Area'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">Expert Credentials</span>
-                              <span className="font-semibold text-white block truncate">
-                                {pt?.experience || 'Certified Pro'}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-[6.5px] font-black text-indigo-300 uppercase tracking-wider block">ID Verification</span>
-                              <span className={`font-black text-[7.5px] flex items-center gap-0.5 ${pt?.aadhar_number ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                {pt?.aadhar_number ? '🛡️ Aadhaar Verified' : '⚠️ No Document'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Action and Document Trigger links */}
-                          <div className="flex gap-2 pt-1">
-                            <a 
-                              href={`tel:${booking.assignedPartnerPhone}`}
-                              className="flex-1 h-8 bg-white hover:bg-indigo-50 text-indigo-950 rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-sm"
-                            >
-                              <Phone size={10} /> Call Now
-                            </a>
-                            <a 
-                              href={`https://wa.me/91${booking.assignedPartnerPhone}?text=${encodeURIComponent(`Hello ${booking.assignedPartnerName}, job instructions for customer ${booking.customerName} located at ${booking.address}: ${booking.subServiceName}.`)}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="flex-1 h-8 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all shadow-sm"
-                            >
-                              <MessageCircle size={10} /> WhatsApp
-                            </a>
-                            {pt?.id_proof_url && (
-                              <a 
-                                href={pt.id_proof_url} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="w-8 h-8 bg-indigo-900 hover:bg-black text-indigo-200 hover:text-white rounded-lg flex items-center justify-center border border-indigo-800 transition shadow-sm"
-                                title="View Identity Document"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                              </a>
+                            {/* Primary Action Button */}
+                            {booking.status === 'pending' && (
+                                <button onClick={() => setDispatchBooking(booking)} className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-indigo-700 transition-all shadow-sm flex items-center justify-center gap-2">
+                                    <Send size={14} /> Assign Technician
+                                </button>
                             )}
-                          </div>
+                            
+                            {(booking.status === 'Forwarded' || booking.status === 'accepted' || booking.status === 'in_progress' || booking.status === 'admin_review') && (
+                                <button onClick={() => { setSelectedRating(5); setRatingBookingId(booking.id); }} className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-emerald-700 transition-all shadow-sm flex items-center justify-center gap-2">
+                                    <CheckCircle size={14} /> Complete Job
+                                </button>
+                            )}
+                            
+                            {booking.status === 'completed' && (
+                                <div className="space-y-1.5">
+                                  <div className="w-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-between">
+                                      <span className="flex items-center gap-1.5"><CheckCircle size={14} className="text-emerald-600" /> Completed</span>
+                                      <span className="text-amber-600 font-extrabold flex items-center gap-0.5">
+                                        {booking.partner_rating ? `User Rated: ${booking.partner_rating}★` : 'Awaiting User Rating'}
+                                      </span>
+                                  </div>
+                                  {booking.partner_comment && (
+                                    <p className="text-[11px] text-gray-600 italic bg-gray-50 p-2 rounded-lg border border-gray-100 line-clamp-2">
+                                      "{booking.partner_comment}"
+                                    </p>
+                                  )}
+                                </div>
+                            )}
                         </div>
-                      );
-                    })()}
 
-                    <div className="flex justify-between gap-2 pt-1">
-                       {booking.status === 'pending' && (
-                         <button 
-                           onClick={() => setDispatchBooking(booking)} 
-                           className="flex-1 bg-indigo-900 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-md flex items-center justify-center gap-2"
-                         >
-                           <Send size={12} /> Assign Technician
-                         </button>
-                       )}
-                       {(booking.status === 'Forwarded' || booking.status === 'accepted' || booking.status === 'admin_review') && (
-                         <button 
-                           onClick={() => {
-                             setSelectedRating(5);
-                             setRatingBookingId(booking.id);
-                           }} 
-                           className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-[0.15em] hover:from-emerald-700 hover:to-green-700 transition-all shadow-md flex items-center justify-center gap-2"
-                         >
-                           <CheckCircle size={12} /> {booking.status === 'admin_review' ? 'Verify Payment & Rate' : 'Complete & Rate'}
-                         </button>
-                       )}
-                       {booking.status === 'completed' && (
-                         <div className="flex-1 bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest border border-emerald-100 flex items-center justify-center gap-2">
-                            <CheckCircle size={12} /> Done (Rated {booking.partner_rating || 5}★)
-                         </div>
-                       )}
-                       <div className="flex gap-2">
-                          <button 
-                            onClick={() => setRescheduleData({ booking, date: booking.date, time: booking.time })} 
-                            className="w-10 h-10 bg-gray-50 text-gray-400 rounded-lg hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 flex items-center justify-center"
-                            title="Reschedule"
-                          >
-                             <Calendar size={16} />
-                          </button>
-                          <button 
-                            onClick={() => handleCancelBooking(booking)} 
-                            className="w-10 h-10 bg-gray-50 text-gray-400 rounded-lg hover:text-rose-600 hover:bg-rose-50 border border-gray-100 flex items-center justify-center"
-                            title="Cancel"
-                          >
-                             <Plus className="rotate-45" size={18} />
-                          </button>
-                       </div>
+                        {/* Footer Actions */}
+                        <div className="bg-gray-100/50 px-5 py-3 border-t border-gray-100 flex justify-between items-center text-xs mt-auto">
+                            <span className="text-[10px] font-semibold text-gray-400">ID: {booking.id.startsWith('b0000000-0000-4000-8000-00000000') ? booking.id.substring(32) : booking.id.substring(0,6) + '...'}</span>
+                            <div className="flex gap-3">
+                                <button onClick={() => setRescheduleData({ booking, date: booking.date, time: booking.time })} className="text-gray-500 hover:text-indigo-600 font-bold flex items-center gap-1 transition-colors">
+                                    <Calendar size={12} /> Reschedule
+                                </button>
+                                <button onClick={() => handleCancelBooking(booking)} className="text-gray-500 hover:text-rose-600 font-bold flex items-center gap-1 transition-colors">
+                                    <Plus className="rotate-45" size={14} /> Cancel
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
               ))}
               {displayedBookings.length === 0 && (
@@ -644,7 +556,7 @@ export const AdminPanel: React.FC = () => {
                 {isSearchingPartners ? (
                     <div className="flex justify-center py-10"><Loader2 className="animate-spin text-indigo-600" size={32} /></div>
                 ) : (
-                 partnerSearchResults.map(partner => (
+                 partnerSearchResults.map((partner, index) => (
                     <div key={partner.id} className="p-5 border border-gray-100 rounded-3xl bg-white hover:bg-indigo-50/30 transition-all flex flex-col gap-4 group">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-4">

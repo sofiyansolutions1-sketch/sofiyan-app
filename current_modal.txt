@@ -1,0 +1,272 @@
+  const renderRegistrationModal = (isMandatory = false) => {
+    return (
+      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-slate-50 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col">
+          <div className="bg-white p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-800">Complete Your Profile</h2>
+              <p className="text-slate-500 text-sm mt-1">Step {regStep === 'personal' ? 1 : regStep === 'expertise' ? 2 : regStep === 'location' ? 3 : regStep === 'verify' ? 4 : 5} of 4</p>
+            </div>
+            {!isMandatory && (
+              <button onClick={() => setIsRegistrationOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full hover:bg-slate-100">
+                <X size={24} />
+              </button>
+            )}
+          </div>
+          
+          <div className="overflow-y-auto p-6 sm:p-8 flex-1">
+            {regStep === 'personal' && (
+              <div className="animate-in fade-in duration-300">
+                <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><UserIcon className="text-indigo-600" /> Personal Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">First Name *</label>
+                    <input type="text" value={regData.firstName} onChange={(e) => setRegData({...regData, firstName: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Last Name *</label>
+                    <input type="text" value={regData.lastName} onChange={(e) => setRegData({...regData, lastName: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Phone Number *</label>
+                    <input type="tel" value={regData.phone} disabled className="w-full border border-slate-200 p-3.5 rounded-xl bg-slate-100 text-slate-500 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Alternate Phone</label>
+                    <input type="tel" value={regData.altPhone || ''} onChange={(e) => setRegData({...regData, altPhone: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Gender</label>
+                    <select value={regData.gender} onChange={(e) => setRegData({...regData, gender: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm">
+                      <option>Male</option><option>Female</option><option>Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Age</label>
+                    <input type="number" value={regData.age} onChange={(e) => setRegData({...regData, age: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                  </div>
+                </div>
+                <div className="mt-8 flex justify-end">
+                  <button onClick={() => setRegStep('expertise')} disabled={!regData.firstName || !regData.lastName} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 shadow-md">Next Step</button>
+                </div>
+              </div>
+            )}
+            
+            {regStep === 'expertise' && (
+              <div className="animate-in fade-in duration-300">
+                <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><Briefcase className="text-indigo-600" /> Expertise & Experience</h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Primary Categories *</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {['Home Appliances', 'Plumber', 'Electrician', 'Carpenters', 'Cleaning & Pest Control'].map(cat => (
+                        <button 
+                          key={cat} 
+                          onClick={() => {
+                            if (regData.categories.includes(cat)) {
+                              setRegData({...regData, categories: regData.categories.filter(c => c !== cat)});
+                            } else {
+                              setRegData({...regData, categories: [...regData.categories, cat]});
+                            }
+                          }}
+                          className={`p-3 rounded-xl text-sm font-bold border transition-all ${regData.categories.includes(cat) ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Years of Experience</label>
+                    <input type="number" value={regData.experience} onChange={(e) => setRegData({...regData, experience: e.target.value})} className="w-full sm:w-1/3 border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                  </div>
+                </div>
+                <div className="flex gap-4 mt-8">
+                  <button onClick={() => setRegStep('personal')} className="flex-1 bg-slate-200 hover:bg-slate-300 py-3.5 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+                  <button onClick={() => setRegStep('location')} disabled={regData.categories.length === 0} className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 shadow-md">Next Step</button>
+                </div>
+              </div>
+            )}
+            
+            {regStep === 'location' && (
+              <div className="animate-in fade-in duration-300">
+                <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><MapPin className="text-indigo-600" /> Service Location</h3>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-wide">Choose Your City *</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {['Delhi', 'Gurgaon', 'Noida', 'Mumbai', 'Pune', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata'].map(city => (
+                      <button 
+                        key={city}
+                        onClick={() => { setRegData({...regData, city});  }}
+                        className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border ${regData.city === city ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}`}
+                      >
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+
+                  {regData.city && (
+                    <div className="animate-in fade-in duration-300">
+                  <label className="block text-[11px] font-bold text-slate-500 mb-2 mt-6 tracking-wide">SERVICE DELIVERY AREAS</label>
+                  <p className="text-sm text-slate-500 mb-4">Choose your area, select the radius, and we will find all pincodes within that range.</p>
+                  
+                  {locationError && (
+                     <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-200 mb-4 text-left shadow-sm flex items-start gap-3">
+                       <div className="bg-red-100 p-1.5 rounded-full mt-0.5"><MapPin size={16} /></div>
+                       <div><span className="font-bold">Location Mismatch:</span> {locationError}</div>
+                     </div>
+                  )}
+
+                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <MapRadiusSelector 
+                      onLocationDetected={(lat, lng, addressDetails) => {
+                        if (addressDetails?.city && regData.city) {
+                           const detectedLower = addressDetails.city.toLowerCase();
+                           const selectedLower = regData.city.toLowerCase();
+                           if (!detectedLower.includes(selectedLower) && !selectedLower.includes(detectedLower)) {
+                               setLocationError(`Your current location indicates you are in ${addressDetails.city} area, but you selected ${regData.city}. Please select ${addressDetails.city} instead.`);
+                           } else {
+                               setLocationError(null);
+                           }
+                        }
+                        setRegData(prev => ({
+                          ...prev,
+                          lat: lat,
+                          lng: lng,
+                          city: addressDetails?.city || prev.city,
+                          area: addressDetails?.area || prev.area,
+                          address: addressDetails?.address || prev.address,
+                          pincode: addressDetails?.pincode || prev.pincode
+                        }));
+                      }}
+                      onPincodesFound={(pins, lat, lng, radius, addressDetails) => {
+                        if (addressDetails?.city && regData.city) {
+                           const detectedLower = addressDetails.city.toLowerCase();
+                           const selectedLower = regData.city.toLowerCase();
+                           if (!detectedLower.includes(selectedLower) && !selectedLower.includes(detectedLower)) {
+                               setLocationError(`Your current location indicates you are in ${addressDetails.city} area, but you selected ${regData.city}. Please select ${addressDetails.city} instead.`);
+                           } else {
+                               setLocationError(null);
+                           }
+                        }
+                        setRegData({
+                            ...regData, 
+                            service_pincodes: Array.from(new Set([...regData.service_pincodes, ...pins])),
+                            lat: lat || regData.lat,
+                            lng: lng || regData.lng,
+                            service_radius: radius || regData.service_radius,
+                            city: addressDetails?.city || regData.city,
+                            area: addressDetails?.area || regData.area,
+                            address: addressDetails?.address || regData.address,
+                            pincode: addressDetails?.pincode || regData.pincode,
+                            aadharNumber: regData.aadharNumber
+                        });
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-5 bg-white border border-slate-200 rounded-2xl space-y-4 shadow-sm">
+                    <h4 className="text-[11px] font-bold text-slate-800 mb-3 tracking-wide">LOCATION DETAILS</h4>
+                    
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Full Address / Landmark *</label>
+                      <textarea placeholder="e.g. 123 Main Street, Near Park" value={regData.address} onChange={(e) => setRegData({...regData, address: e.target.value})} className="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm resize-none" rows={2} />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">City *</label>
+                        <input type="text" placeholder="e.g. Bangalore" value={regData.city} readOnly className="w-full border border-slate-200 bg-slate-100 text-slate-600 p-3 rounded-xl outline-none text-sm cursor-not-allowed" />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Area / Locality *</label>
+                        <input type="text" placeholder="e.g. Andheri East" value={regData.area} onChange={(e) => setRegData({...regData, area: e.target.value})} className="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">Pincode *</label>
+                        <input type="text" placeholder="e.g. 560001" value={regData.pincode || ''} onChange={(e) => setRegData({...regData, pincode: e.target.value})} className="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {regData.service_pincodes.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-[11px] font-bold text-slate-500 mb-3 tracking-wide">SELECTED PINCODES ({regData.service_pincodes.length})</h4>
+                      <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-4 border border-slate-200 rounded-xl bg-white shadow-inner">
+                        {regData.service_pincodes.map(pin => (
+                          <span key={pin} className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2">
+                            {pin}
+                            <button onClick={() => setRegData({...regData, service_pincodes: regData.service_pincodes.filter(p => p !== pin)})} className="text-indigo-400 hover:text-red-500 transition-colors">✕</button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                )}</div>
+                <div className="flex gap-4 pt-8">
+                  <button onClick={() => setRegStep('expertise')} className="flex-1 bg-slate-200 hover:bg-slate-300 py-3.5 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+                  <button 
+                    onClick={() => {
+                      if (regData.service_pincodes.length === 0 && regData.pincode) {
+                        setRegData({ ...regData, service_pincodes: [regData.pincode] });
+                      }
+                      setRegStep('verify');
+                    }} 
+                    disabled={!regData.city || !regData.address || !regData.pincode} 
+                    className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 shadow-md"
+                  >
+                    Next Step
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {regStep === 'verify' && (
+              <div className="animate-in fade-in duration-300">
+                <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><ShieldCheck className="text-indigo-600" /> Identity Verification</h3>
+                <div className="space-y-5">
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3">
+                    <ShieldCheck className="text-amber-600 mt-0.5 shrink-0" size={20} />
+                    <p className="text-sm text-amber-800">For security and trust, we need to verify your identity. Your details are kept strictly confidential.</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Aadhar Number *</label>
+                    <input type="text" placeholder="XXXX XXXX XXXX" value={regData.aadharNumber} onChange={(e) => setRegData({...regData, aadharNumber: e.target.value})} className="w-full border border-slate-200 p-3.5 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-mono tracking-wider" />
+                  </div>
+                </div>
+                <div className="flex gap-4 pt-8">
+                  <button onClick={() => setRegStep('location')} className="flex-1 bg-slate-200 hover:bg-slate-300 py-3.5 rounded-xl font-bold text-slate-700 transition-all">Back</button>
+                  <button onClick={handleRegistrationSubmit} disabled={regData.aadharNumber.length < 12} className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-md">Complete Registration</button>
+                </div>
+              </div>
+            )}
+            
+            {regStep === 'success' && (
+              <div className="text-center py-10 animate-in zoom-in duration-300">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                  <CheckCircle className="text-green-500 w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-3">Registration Successful!</h3>
+                <p className="text-slate-600 max-w-sm mx-auto mb-8">Your profile has been submitted for review. We will notify you once approved.</p>
+                <button onClick={() => setIsRegistrationOpen(false)} className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md">Go to Dashboard</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  const isProfileIncomplete = currentUser && (!currentUser.aadhar_number || !currentUser.categories?.length || !currentUser.city);
+
+  if (!currentUser && !isPendingSignup) {
+    return (
+      <>
+        {renderAuth()}
+      </>
+    );
+  }
+
+  if (isProfileIncomplete || isRegistrationOpen || isPendingSignup) {
+    return renderRegistrationModal(!!isProfileIncomplete || isPendingSignup);

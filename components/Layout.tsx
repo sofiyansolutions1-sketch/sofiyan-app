@@ -51,6 +51,31 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [userCity, setUserCity] = useState<string | null>(localStorage.getItem('preferredCity'));
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
+  // Synchronize cart count across layout and pages
+  const [cartCount, setCartCount] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sofiyan_cart');
+      return saved ? JSON.parse(saved).length : 0;
+    } catch {
+      return 0;
+    }
+  });
+
+  React.useEffect(() => {
+    const handleCartChange = () => {
+      try {
+        const saved = localStorage.getItem('sofiyan_cart');
+        setCartCount(saved ? JSON.parse(saved).length : 0);
+      } catch {
+        setCartCount(0);
+      }
+    };
+    window.addEventListener('sofiyan_cart_changed', handleCartChange);
+    return () => {
+      window.removeEventListener('sofiyan_cart_changed', handleCartChange);
+    };
+  }, []);
+
   // Preload City Images as early as possible
   React.useEffect(() => {
     CITY_DATA.forEach(city => {
@@ -102,20 +127,27 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Navbar - Visible on ALL pages for standardized navigation */}
       <nav className="bg-white border-b border-indigo-50 sticky top-0 z-40 shadow-sm block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
-                <div className="relative">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-2 w-full">
+            <div className="flex items-center min-w-0 flex-1 sm:flex-initial">
+              <Link to="/" className="flex items-center gap-2 group min-w-0">
+                <div className="relative shrink-0">
                   <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
                   <img 
                     src="https://i.postimg.cc/fW7TLq4Q/Whats-App-Image-2026-01-09-at-5-28-12-AM.jpg" 
                     alt="Sofiyan Home Service Solutions Logo" 
-                    className="relative w-10 h-10 rounded-lg object-cover shadow-sm border border-white/50"
+                    className="relative w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 rounded-lg object-cover shadow-sm border border-white/50 shrink-0"
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                <span className="font-black text-xl text-indigo-950 tracking-tighter uppercase">{BUSINESS_NAME}</span>
+                <div className="flex flex-col min-w-0 justify-center">
+                  <span className="font-black text-xs xs:text-sm sm:text-base md:text-xl text-indigo-950 tracking-tight uppercase truncate leading-tight">
+                    {BUSINESS_NAME}
+                  </span>
+                  <span className="hidden sm:block text-[9px] font-bold text-indigo-500 tracking-wider uppercase leading-none">
+                    Reliable Home Solutions
+                  </span>
+                </div>
               </Link>
             </div>
             
@@ -139,13 +171,40 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               </a>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="flex items-center lg:hidden gap-3 relative">
+            {/* Mobile menu button and inline controls */}
+            <div className="flex items-center lg:hidden gap-1.5 sm:gap-2 shrink-0">
+              {/* Profile Button */}
+              <button 
+                onClick={() => window.dispatchEvent(new Event('sofiyan_open_profile'))} 
+                className="bg-indigo-50/90 text-indigo-900 border border-indigo-100 hover:bg-indigo-100 p-2 sm:p-2.5 rounded-xl transition-all relative flex items-center justify-center active:scale-95 shrink-0"
+                title="Profile"
+              >
+                <Users size={16} className="text-indigo-600 sm:w-[18px] sm:h-[18px]" />
+              </button>
+
+              {/* Cart Button */}
+              <button 
+                onClick={() => window.dispatchEvent(new Event('sofiyan_open_cart'))} 
+                className="bg-indigo-950 text-white hover:bg-black p-2 sm:p-2.5 rounded-xl transition-all relative flex items-center justify-center shadow-md shadow-indigo-900/10 active:scale-95 shrink-0"
+                title="Cart / Checkout"
+              >
+                <span className="sr-only">Cart</span>
+                <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] font-black w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center rounded-full border border-white shadow-sm scale-100 animate-bounce">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Hamburger Menu */}
               <button
                 onClick={() => setIsPanelMenuOpen(!isPanelMenuOpen)}
-                className={`p-2 rounded-xl border transition-all ${isPanelMenuOpen ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-indigo-50 text-indigo-600 border-indigo-100'}`}
+                className={`p-2 sm:p-2.5 rounded-xl border transition-all active:scale-95 shrink-0 ${isPanelMenuOpen ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-indigo-50/90 text-indigo-600 border-indigo-100'}`}
               >
-                {isPanelMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                {isPanelMenuOpen ? <X size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Menu size={16} className="sm:w-[18px] sm:h-[18px]" />}
               </button>
 
               {/* Global Panel Menu Dropdown */}
@@ -282,7 +341,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <ul className="space-y-3 text-sm text-gray-600">
                 <li className="flex items-start gap-3 text-gray-900 font-medium">
                   <Phone size={16} className="text-gray-900 mt-0.5 flex-shrink-0" />
-                  <span>+91 7625046788</span>
+                  <span>+91 9196029763</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />

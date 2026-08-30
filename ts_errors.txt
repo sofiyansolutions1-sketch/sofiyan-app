@@ -1,0 +1,14 @@
+components/FollowUpManager.tsx(210,41): error TS2554: Expected 0 arguments, but got 1.
+components/FollowUpManager.tsx(225,13): error TS7022: 'response' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+components/FollowUpManager.tsx(228,32): error TS2448: Block-scoped variable 'text' used before its declaration.
+components/FollowUpManager.tsx(232,13): error TS7022: 'text' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+components/FollowUpManager.tsx(876,16): error TS2304: Cannot find name 'e'.
+components/MapRadiusSelector.tsx(8,21): error TS2307: Cannot find module 'leaflet/dist/images/marker-icon.png' or its corresponding type declarations.
+components/MapRadiusSelector.tsx(9,27): error TS2307: Cannot find module 'leaflet/dist/images/marker-icon-2x.png' or its corresponding type declarations.
+components/MapRadiusSelector.tsx(10,23): error TS2307: Cannot find module 'leaflet/dist/images/marker-shadow.png' or its corresponding type declarations.
+pages/CustomerPanel.tsx(110,22): error TS2448: Block-scoped variable 'bookings' used before its declaration.
+pages/CustomerPanel.tsx(110,22): error TS2454: Variable 'bookings' is used before being assigned.
+pages/CustomerPanel.tsx(114,15): error TS2304: Cannot find name 'updateBooking'.
+pages/CustomerPanel.tsx(126,17): error TS2304: Cannot find name 'X'.
+services/pincodeService.ts(83,44): error TS2550: Property 'any' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.
+services/pincodeService.ts(220,36): error TS2550: Property 'any' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.

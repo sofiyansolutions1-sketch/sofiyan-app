@@ -1,0 +1,8 @@
+  const renderRegistrationModal = (isMandatory = false) => {
+    return (
+      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-slate-50 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col">
+          <div className="bg-white p-6 border-b border-slate-100 flex justify-between items-center shrink-0">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-800">Complete Your Profile</h2>
+              <p className="text-slate-500 text-sm mt-1">Step {regStep === 'personal' ? 1 : regStep === 'expertise' ? 2 : regStep === 'location' ? 3 : regStep === 'verify' ? 4 : 5} of 4</p>

@@ -1,0 +1,61 @@
+components/FollowUpManager.tsx(210,41): error TS2554: Expected 0 arguments, but got 1.
+components/FollowUpManager.tsx(225,13): error TS7022: 'response' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+components/FollowUpManager.tsx(228,32): error TS2448: Block-scoped variable 'text' used before its declaration.
+components/FollowUpManager.tsx(232,13): error TS7022: 'text' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+components/FollowUpManager.tsx(876,16): error TS2304: Cannot find name 'e'.
+components/MapRadiusSelector.tsx(8,21): error TS2307: Cannot find module 'leaflet/dist/images/marker-icon.png' or its corresponding type declarations.
+components/MapRadiusSelector.tsx(9,27): error TS2307: Cannot find module 'leaflet/dist/images/marker-icon-2x.png' or its corresponding type declarations.
+components/MapRadiusSelector.tsx(10,23): error TS2307: Cannot find module 'leaflet/dist/images/marker-shadow.png' or its corresponding type declarations.
+pages/AdminPanel.tsx(203,43): error TS2367: This comparison appears to be unintentional because the types '"cancelled" | "pending" | "accepted" | "in_progress" | "completed" | "Forwarded" | "on_hold"' and '"admin_review"' have no overlap.
+pages/AdminPanel.tsx(210,46): error TS2367: This comparison appears to be unintentional because the types '"cancelled" | "pending" | "accepted" | "in_progress" | "completed" | "Forwarded" | "on_hold"' and '"admin_review"' have no overlap.
+pages/AdminPanel.tsx(479,134): error TS2367: This comparison appears to be unintentional because the types '"cancelled" | "pending" | "completed" | "on_hold"' and '"admin_review"' have no overlap.
+pages/AdminPanel.tsx(481,64): error TS2367: This comparison appears to be unintentional because the types '"accepted" | "in_progress" | "Forwarded"' and '"admin_review"' have no overlap.
+pages/AdminPanel.tsx(556,24): error TS2304: Cannot find name 'index'.
+pages/AdminPanel.tsx(557,166): error TS2304: Cannot find name 'index'.
+pages/AdminPanel.tsx(557,198): error TS2304: Cannot find name 'index'.
+pages/AdminPanel.tsx(558,29): error TS2304: Cannot find name 'index'.
+pages/CustomerPanel.tsx(838,11): error TS2552: Cannot find name 'setBookingOtp'. Did you mean 'setBookingStep'?
+pages/CustomerPanel.tsx(1816,18): error TS2552: Cannot find name 'bookingOtp'. Did you mean 'bookingStep'?
+pages/CustomerPanel.tsx(1819,85): error TS2552: Cannot find name 'bookingOtp'. Did you mean 'bookingStep'?
+pages/PartnerPanel.tsx(85,13): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(86,14): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(87,16): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(88,13): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(89,19): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(90,23): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(91,25): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(92,12): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(93,7): error TS2353: Object literal may only specify known properties, and 'address' does not exist in type 'SetStateAction<{ name: string; phone: string; pincode: string; city: string; categories: string[]; sub_categories: string[]; service_pincodes: string[]; lat: number | null; lng: number | null; service_radius: number; }>'.
+pages/PartnerPanel.tsx(93,16): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(94,12): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(95,24): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(95,53): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(95,104): error TS18047: 'currentUser' is possibly 'null'.
+pages/PartnerPanel.tsx(107,25): error TS2339: Property 'address' does not exist on type '{ name: string; phone: string; pincode: string; city: string; categories: string[]; sub_categories: string[]; service_pincodes: string[]; lat: number | null; lng: number | null; service_radius: number; }'.
+pages/PartnerPanel.tsx(115,25): error TS2345: Argument of type '{ name: string; phone: string; pincode: string; city: string; address: any; categories: string[]; sub_categories: string[]; service_pincodes: string[]; lat: number | null; lng: number | null; service_areas: string[]; ... 18 more ...; registration_fee_screenshot?: string; }' is not assignable to parameter of type 'Partner'.
+  Types of property 'id' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+pages/PartnerPanel.tsx(116,20): error TS2345: Argument of type '{ name: string; phone: string; pincode: string; city: string; address: any; categories: string[]; sub_categories: string[]; service_pincodes: string[]; lat: number | null; lng: number | null; service_areas: string[]; ... 18 more ...; registration_fee_screenshot?: string; }' is not assignable to parameter of type 'SetStateAction<Partner | null>'.
+  Type '{ name: string; phone: string; pincode: string; city: string; address: any; categories: string[]; sub_categories: string[]; service_pincodes: string[]; lat: number | null; lng: number | null; service_areas: string[]; ... 18 more ...; registration_fee_screenshot?: string; }' is not assignable to type 'Partner'.
+    Types of property 'id' are incompatible.
+      Type 'string | undefined' is not assignable to type 'string'.
+        Type 'undefined' is not assignable to type 'string'.
+pages/PartnerPanel.tsx(154,44): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+pages/PartnerPanel.tsx(238,29): error TS2345: Argument of type '{ name: string; first_name: string; last_name: string; phone: string; city: string; address: string; alt_phone: string; password: string; gender: string; age: number; experience: string; categories: string[]; ... 17 more ...; registration_fee_screenshot?: string; }' is not assignable to parameter of type 'Partner'.
+  Types of property 'lat' are incompatible.
+    Type 'number | null' is not assignable to type 'number | undefined'.
+      Type 'null' is not assignable to type 'number | undefined'.
+pages/PartnerPanel.tsx(239,24): error TS2345: Argument of type '{ name: string; first_name: string; last_name: string; phone: string; city: string; address: string; alt_phone: string; password: string; gender: string; age: number; experience: string; categories: string[]; ... 17 more ...; registration_fee_screenshot?: string; }' is not assignable to parameter of type 'SetStateAction<Partner | null>'.
+  Type '{ name: string; first_name: string; last_name: string; phone: string; city: string; address: string; alt_phone: string; password: string; gender: string; age: number; experience: string; categories: string[]; ... 17 more ...; registration_fee_screenshot?: string; }' is not assignable to type 'Partner'.
+    Types of property 'lat' are incompatible.
+      Type 'number | null' is not assignable to type 'number | undefined'.
+        Type 'null' is not assignable to type 'number | undefined'.
+pages/PartnerPanel.tsx(269,49): error TS2345: Argument of type '{ id: string; name: string; first_name: string; last_name: string; email: string; phone: string; password: string; city: string; address: string; alt_phone: string; gender: string; age: number; experience: string; ... 9 more ...; completedJobs: number; }' is not assignable to parameter of type 'Partner'.
+  Types of property 'lat' are incompatible.
+    Type 'number | null' is not assignable to type 'number | undefined'.
+      Type 'null' is not assignable to type 'number | undefined'.
+pages/PartnerPanel.tsx(690,27): error TS7006: Parameter 'value' implicitly has an 'any' type.
+services/pincodeService.ts(83,44): error TS2550: Property 'any' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.
+services/pincodeService.ts(220,36): error TS2550: Property 'any' does not exist on type 'PromiseConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.

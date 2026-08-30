@@ -19,56 +19,77 @@ interface StoreState {
   getPartner: (email: string) => Partner | undefined;
 }
 
-const mapBookingFromDB = (data: any): Booking => ({
-  id: data.id,
-  customerName: data.customer_name,
-  contactNumber: data.customer_phone || data.contact_number,
-  address: data.customer_address || data.address,
-  area: data.area || '', 
-  city: data.city,
-  location_link: data.location_link,
-  pinCode: data.pincode || data.pin_code,
-  description: '', // Not in schema
-  date: data.service_date || data.date,
-  time: data.service_time || data.time,
-  serviceCategory: data.service_category,
-  subServiceName: data.sub_service_name,
-  cartItems: data.cart_items,
-  price: data.total_price || data.price,
-  status: data.status,
-  assignedPartnerId: data.assigned_partner_id,
-  assignedPartnerName: data.assigned_partner_name,
-  assignedPartnerPhone: data.assigned_partner_phone,
-  assignedPartnerArea: data.assigned_partner_area || '', 
-  commissionPaid: data.commission_paid || false,
-  commission_screenshot: data.commission_screenshot || '',
-  createdAt: data.created_at,
-  couponUsed: data.coupon_used || '',
-  discountAmount: data.discount_amount,
-  appliedReferralCode: data.applied_referral_code
-});
+export const mapBookingFromDB = (data: any): Booking => {
+  const cartItems = data.cart_items || [];
+  const partnerComment = data.partner_comment || (cartItems[0] && cartItems[0].reviewComment) || '';
+
+  return {
+    id: data.id,
+    customerName: data.customer_name,
+    contactNumber: data.customer_phone || data.contact_number,
+    address: data.customer_address || data.address,
+    area: data.area || '', 
+    city: data.city,
+    location_link: data.location_link,
+    lat: data.lat,
+    lng: data.lng,
+    pinCode: data.pincode || data.pin_code,
+    description: '', // Not in schema
+    date: data.service_date || data.date,
+    time: data.service_time || data.time,
+    serviceCategory: data.service_category,
+    subServiceName: data.sub_service_name,
+    cartItems: cartItems,
+    price: data.total_price || data.price,
+    status: data.status,
+    assignedPartnerId: data.assigned_partner_id,
+    assignedPartnerName: data.assigned_partner_name,
+    assignedPartnerPhone: data.assigned_partner_phone,
+    assignedPartnerArea: data.assigned_partner_area || '', 
+    commissionPaid: data.commission_paid || false,
+    commission_screenshot: data.commission_screenshot || '',
+    createdAt: data.created_at,
+    couponUsed: data.coupon_used || '',
+    discountAmount: data.discount_amount,
+    appliedReferralCode: data.applied_referral_code,
+    partner_rating: data.partner_rating || undefined,
+    partner_comment: partnerComment,
+    otp: (cartItems[0] && cartItems[0].system_otp) || '',
+    otpVerified: data.status === 'in_progress'
+  };
+};
 
 const mapPrimaryPartnerFromDB = (data: any): Partner => ({
   id: data.id,
-  name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name,
-  first_name: data.first_name,
-  last_name: data.last_name,
-  email: data.email,
-  phone: data.phone,
-  password: data.password,
-  city: data.city,
-  pincode: data.pincode,
-  categories: data.categories,
-  sub_categories: data.sub_categories,
-  service_areas: data.service_areas,
-  service_pincodes: data.service_pincodes,
-  status: data.status,
-  rating: data.rating || 0,
+  name: `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.name || '',
+  first_name: data.first_name || '',
+  last_name: data.last_name || '',
+  email: data.email || '',
+  phone: data.phone || '',
+  password: data.password || '',
+  alt_phone: data.alt_phone || '',
+  gender: data.gender || 'Male',
+  age: data.age || 25,
+  experience: data.experience || '2',
+  address: data.address || '',
+  city: data.city || '',
+  pincode: data.pincode || '',
+  lat: data.lat || undefined,
+  lng: data.lng || undefined,
+  categories: Array.isArray(data.categories) ? data.categories : [],
+  sub_categories: Array.isArray(data.sub_categories) ? data.sub_categories : [],
+  service_areas: Array.isArray(data.service_areas) ? data.service_areas : ['5'],
+  service_radius: data.service_radius || 5,
+  service_pincodes: Array.isArray(data.service_pincodes) ? data.service_pincodes : [],
+  status: data.status || 'pending',
+  rating: data.rating || 5.0,
   review_count: data.review_count || 0,
   earnings: data.earnings || 0,
   completedJobs: data.completed_jobs || 0,
-  aadhar_number: data.aadhar_number,
-  id_proof_url: data.id_proof_url,
+  aadhar_number: data.aadhar_number || '',
+  id_proof_url: data.id_proof_url || '',
+  registration_fee_paid: data.registration_fee_paid || false,
+  registration_fee_screenshot: data.registration_fee_screenshot || undefined,
   partner_type: 'Primary'
 });
 
@@ -82,7 +103,6 @@ export const useStore = create<StoreState>((set, get) => ({
     const { data } = await supabase
       .from('bookings')
       .select('*')
-      .neq('status', 'cancelled')
       .order('created_at', { ascending: false });
     if (data) {
       set({ bookings: data.map(mapBookingFromDB) });
@@ -122,6 +142,15 @@ export const useStore = create<StoreState>((set, get) => ({
       bookings: state.bookings.map(b => b.id === updatedBooking.id ? updatedBooking : b)
     }));
 
+    // Embed review comment inside the first cart item's JSON if present
+    const updatedCartItems = [...(updatedBooking.cartItems || [])];
+    if (updatedCartItems.length > 0) {
+      updatedCartItems[0] = {
+        ...updatedCartItems[0],
+        reviewComment: updatedBooking.partner_comment || ''
+      };
+    }
+
     const { error } = await supabase.from('bookings').update({
         status: updatedBooking.status,
         assigned_partner_id: updatedBooking.assignedPartnerId || null,
@@ -131,7 +160,10 @@ export const useStore = create<StoreState>((set, get) => ({
         date: updatedBooking.date,
         time: updatedBooking.time,
         commission_paid: updatedBooking.commissionPaid,
-        commission_screenshot: updatedBooking.commission_screenshot || null
+        commission_screenshot: updatedBooking.commission_screenshot || null,
+        partner_rating: updatedBooking.partner_rating || null,
+        partner_comment: updatedBooking.partner_comment || null,
+        cart_items: updatedCartItems.length > 0 ? updatedCartItems : null
     }).eq('id', updatedBooking.id);
     
     if (error) {
@@ -144,25 +176,35 @@ export const useStore = create<StoreState>((set, get) => ({
   addPartner: async (newPartner: Partner) => {
     const dbPartner: any = {
       name: newPartner.name,
-      first_name: newPartner.first_name,
-      last_name: newPartner.last_name,
+      first_name: newPartner.first_name || '',
+      last_name: newPartner.last_name || '',
       email: newPartner.email || `${newPartner.phone || Date.now()}@example.com`,
       phone: newPartner.phone,
-      password: newPartner.password,
-      alt_phone: newPartner.alt_phone,
-      gender: newPartner.gender,
-      age: newPartner.age,
-      city: newPartner.city,
-      pincode: newPartner.pincode,
-      categories: newPartner.categories,
-      sub_categories: newPartner.sub_categories,
-      service_pincodes: newPartner.service_pincodes,
-      experience: newPartner.experience,
-      aadhar_number: newPartner.aadhar_number,
-      status: newPartner.status,
-      earnings: newPartner.earnings,
-      completed_jobs: newPartner.completedJobs,
-      registration_fee_paid: false
+      password: newPartner.password || '',
+      alt_phone: newPartner.alt_phone || '',
+      gender: newPartner.gender || 'Male',
+      age: newPartner.age || 25,
+      city: newPartner.city || '',
+      address: newPartner.address || '',
+      pincode: newPartner.pincode || null,
+      lat: newPartner.lat || null,
+      lng: newPartner.lng || null,
+      partner_type: 'Primary',
+      service_areas: newPartner.service_areas || ['5'],
+      service_radius: newPartner.service_radius || 5,
+      categories: newPartner.categories || [],
+      sub_categories: newPartner.sub_categories || [],
+      service_pincodes: newPartner.service_pincodes || [],
+      experience: newPartner.experience || '2',
+      aadhar_number: newPartner.aadhar_number || '',
+      id_proof_url: newPartner.id_proof_url || null,
+      status: newPartner.status || 'pending',
+      rating: newPartner.rating || 5.0,
+      review_count: newPartner.review_count || 0,
+      earnings: newPartner.earnings || 0,
+      completed_jobs: newPartner.completedJobs || 0,
+      registration_fee_paid: newPartner.registration_fee_paid || false,
+      wallet_balance: 0
     };
     
     // Only pass ID if it's a valid UUID (not our fallback "P12345...")
@@ -172,7 +214,7 @@ export const useStore = create<StoreState>((set, get) => ({
 
     let data, error;
     try {
-      const result = await supabase.from('primary_partners').insert(dbPartner).select().single();
+      const result = await supabase.from('primary_partners').upsert(dbPartner, { onConflict: 'phone' }).select().single();
       data = result.data;
       error = result.error;
     } catch (err) {
@@ -181,19 +223,19 @@ export const useStore = create<StoreState>((set, get) => ({
     
     let partnerId = newPartner.id;
     if (error) {
-       console.warn("Supabase insert failed:", error);
+       console.error("Supabase primary_partners insert failed:", error);
        throw error;
     } else if (data) {
        partnerId = data.id;
     }
     
-    const createdPartner: Partner = {
+    const createdPartner: Partner = data ? mapPrimaryPartnerFromDB(data) : {
       ...newPartner,
       id: partnerId
     };
     
     set(state => ({
-      partners: [...state.partners.filter(p => p.id !== newPartner.id), createdPartner]
+      partners: [...state.partners.filter(p => p.id !== newPartner.id && p.phone !== createdPartner.phone), createdPartner]
     }));
     
     return createdPartner;
@@ -204,43 +246,55 @@ export const useStore = create<StoreState>((set, get) => ({
      set(state => ({
        partners: state.partners.map(p => p.id === updatedPartner.id ? updatedPartner : p)
      }));
+
       let error;
       try {
-        const result = await supabase.from('primary_partners').update({
-            status: updatedPartner.status,
-            earnings: updatedPartner.earnings,
-            completed_jobs: updatedPartner.completedJobs,
-            rating: updatedPartner.rating,
-            review_count: updatedPartner.review_count,
-            name: updatedPartner.name,
-            first_name: updatedPartner.first_name,
-            last_name: updatedPartner.last_name,
-            email: updatedPartner.email,
-            phone: updatedPartner.phone,
-            password: updatedPartner.password,
-            alt_phone: updatedPartner.alt_phone,
-            gender: updatedPartner.gender,
-            age: updatedPartner.age,
-            experience: updatedPartner.experience,
-            aadhar_number: updatedPartner.aadhar_number,
-            address: updatedPartner.address,
-            pincode: updatedPartner.pincode,
-            city: updatedPartner.city,
-            categories: updatedPartner.categories,
-            sub_categories: updatedPartner.sub_categories,
-            service_pincodes: updatedPartner.service_pincodes,
-            id_proof_url: updatedPartner.id_proof_url,
-            registration_fee_paid: updatedPartner.registration_fee_paid,
-            registration_fee_screenshot: updatedPartner.registration_fee_screenshot
-        }).eq('id', updatedPartner.id);
-        error = result.error;
+        const updatePayload: any = {
+          status: updatedPartner.status,
+          earnings: updatedPartner.earnings,
+          completed_jobs: updatedPartner.completedJobs,
+          rating: updatedPartner.rating,
+          review_count: updatedPartner.review_count,
+          name: updatedPartner.name,
+          first_name: updatedPartner.first_name,
+          last_name: updatedPartner.last_name,
+          email: updatedPartner.email,
+          phone: updatedPartner.phone,
+          password: updatedPartner.password,
+          alt_phone: updatedPartner.alt_phone || '',
+          gender: updatedPartner.gender || 'Male',
+          age: updatedPartner.age || 25,
+          experience: updatedPartner.experience || '2',
+          aadhar_number: updatedPartner.aadhar_number || '',
+          address: updatedPartner.address || '',
+          pincode: updatedPartner.pincode || null,
+          lat: updatedPartner.lat || null,
+          lng: updatedPartner.lng || null,
+          service_areas: updatedPartner.service_areas || ['5'],
+          service_radius: updatedPartner.service_radius || 5,
+          city: updatedPartner.city || '',
+          categories: updatedPartner.categories || [],
+          sub_categories: updatedPartner.sub_categories || [],
+          service_pincodes: updatedPartner.service_pincodes || [],
+          id_proof_url: updatedPartner.id_proof_url || null,
+          registration_fee_paid: updatedPartner.registration_fee_paid || false,
+          registration_fee_screenshot: updatedPartner.registration_fee_screenshot || null
+        };
+
+        if (updatedPartner.id && !updatedPartner.id.startsWith('P')) {
+          const result = await supabase.from('primary_partners').update(updatePayload).eq('id', updatedPartner.id);
+          error = result.error;
+        } else {
+          const result = await supabase.from('primary_partners').upsert(updatePayload, { onConflict: 'phone' });
+          error = result.error;
+        }
       } catch (err) {
         error = err;
       }
      
      if (error) {
-        console.warn("Error updating partner in Supabase, using local state fallback:", error);
-        // Do not throw so that local state remains updated
+        console.warn("Error updating partner in Supabase:", error);
+        throw error;
      }
   },
 

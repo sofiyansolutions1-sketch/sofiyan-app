@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, ArrowRight, Loader2, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
+import { getSignedAppFileUrl } from '../services/storageService';
 
 export const BlogPanel: React.FC = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -23,7 +24,21 @@ export const BlogPanel: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setBlogs(data || []);
+      
+      if (data) {
+        const blogsWithSignedUrls = await Promise.all(
+          data.map(async (blog) => {
+            if (blog.image_url) {
+              const signed = await getSignedAppFileUrl(blog.image_url);
+              return { ...blog, displayImageUrl: signed || blog.image_url };
+            }
+            return { ...blog, displayImageUrl: null };
+          })
+        );
+        setBlogs(blogsWithSignedUrls);
+      } else {
+        setBlogs([]);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -123,8 +138,8 @@ export const BlogPanel: React.FC = () => {
               className="snap-start shrink-0 w-[85vw] sm:w-[400px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 flex flex-col group cursor-pointer"
             >
               <div className="h-64 overflow-hidden relative bg-gray-50">
-                {post.image_url ? (
-                  <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                {(post.displayImageUrl || post.image_url) ? (
+                  <img src={post.displayImageUrl || post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 font-bold text-2xl">{post.title.substring(0, 2).toUpperCase()}</span>
