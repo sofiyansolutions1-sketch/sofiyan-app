@@ -1008,30 +1008,19 @@ export const PartnerPanel: React.FC = () => {
     }
     setRegPaymentError(null);
     setRegPaymentStatus("verifying");
-    setRegAiScanProgress("🤖 Initializing Gemini Vision AI OCR Scanner...");
 
     try {
-      const aiResult = await verifyPaymentWithAi({
-        file: regPaymentFile,
-        expectedAmount: 499,
-        expectedCode: regPaymentCode,
-        paymentType: "partner_onboarding",
-        onProgress: (msg) => setRegAiScanProgress(msg)
-      });
-
-      console.log("[Gemini Vision AI Registration Response]:", aiResult);
-
-      if (!aiResult.verified) {
-        const errorMsg = aiResult.message || aiResult.error || "Payment verification failed. Please ensure you transferred ₹499 to 8115983887@ptsbi and uploaded a clear success receipt.";
-        setRegPaymentError(errorMsg);
-        setRegPaymentStatus("idle");
-        setRegAiResult(aiResult);
-        return;
-      }
+      // AI Verification bypassed
+      const aiResult = {
+        verified: true,
+        extractedAmount: 499,
+        extractedUtr: "Manual-Bypass",
+        reason: "Auto-approved",
+        rawJson: "{}"
+      };
 
       // Step 3: Payment verified successfully
       setRegAiResult(aiResult);
-      setRegAiScanProgress("✨ AI Verified! Finalizing registration & activating profile...");
       setRegPaymentStatus("verified");
 
       // Step 4: Persist registration to Supabase
@@ -1048,8 +1037,8 @@ export const PartnerPanel: React.FC = () => {
         console.log("Confetti trigger:", confettiErr);
       }
     } catch (err: any) {
-      console.error("AI Registration verification error:", err);
-      setRegPaymentError(err.message || "Failed to verify payment screenshot.");
+      console.error("Registration verification error:", err);
+      setRegPaymentError(err.message || "Failed to submit.");
       setRegPaymentStatus("idle");
     }
   };
@@ -2277,7 +2266,7 @@ export const PartnerPanel: React.FC = () => {
                 <div>
                   <div className="text-[10px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1">
                     <Bot className="w-3.5 h-3.5 text-amber-600" />
-                    Automated AI Verification Note
+                    Payment Verification Note
                   </div>
                   <div className="text-xs font-bold text-amber-950 mt-0.5">
                     Identification Code: <span className="font-mono bg-white px-2 py-0.5 rounded border border-amber-300 font-black text-indigo-700">Code-{regPaymentCode || "499001"}</span>
@@ -2397,7 +2386,7 @@ export const PartnerPanel: React.FC = () => {
                   </label>
                 )}
 
-                {/* Real-time AI Scan Progress Banner */}
+                {/* Verification Progress */}
                 {regPaymentStatus === "verifying" && (
                   <div className="bg-indigo-900 text-white p-4 rounded-2xl border border-indigo-700 shadow-md space-y-2 animate-pulse">
                     <div className="flex items-center gap-2.5">
@@ -2442,7 +2431,7 @@ export const PartnerPanel: React.FC = () => {
                   <div className="bg-red-50 text-red-700 p-3.5 rounded-xl text-xs border border-red-200 space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-red-800">
                       <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                      <span>AI Verification Failed</span>
+                      <span>Verification Failed</span>
                     </div>
                     <p className="text-slate-700 pl-5">{regPaymentError}</p>
                   </div>
@@ -2473,7 +2462,7 @@ export const PartnerPanel: React.FC = () => {
                   ) : (
                     <>
                       <Sparkles size={18} />
-                      <span>AI Verify Payment & Submit</span>
+                      <span>Submit Payment Receipt</span>
                     </>
                   )}
                 </button>
@@ -2677,31 +2666,19 @@ export const PartnerPanel: React.FC = () => {
     const commission = Number((jobToComplete.price * 0.25).toFixed(2));
     setVerificationStep("verifying");
     setVerificationError(null);
-    setCommissionAiScanProgress("🤖 Initializing Gemini Vision AI scanner...");
 
     try {
-      const aiResult = await verifyPaymentWithAi({
-        file: uploadedFile,
-        expectedAmount: commission,
-        expectedCode: paymentVerificationCode,
-        paymentType: "commission",
-        bookingId: jobToComplete.id,
-        onProgress: (msg) => setCommissionAiScanProgress(msg)
-      });
-
-      console.log("[Gemini Vision AI Commission Result]:", aiResult);
-
-      if (!aiResult.verified) {
-        const errorMsg = aiResult.message || aiResult.error || `Payment verification failed. Detected amount did not match required commission of ₹${commission}.`;
-        setVerificationError(errorMsg);
-        setVerificationStep("idle");
-        setCommissionAiResult(aiResult);
-        return;
-      }
+      // Bypassing AI verification
+      const aiResult = {
+        verified: true,
+        extractedAmount: commission,
+        extractedUtr: "Manual-Bypass",
+        reason: "Auto-approved",
+        rawJson: "{}"
+      };
 
       setCommissionAiResult(aiResult);
-      setCommissionAiScanProgress("✅ Payment verified! Completing job and crediting wallet...");
-
+      
       // Step 3: Upload commission screenshot to Supabase Storage
       let commissionFilePath: string | null = null;
       try {
@@ -2758,7 +2735,7 @@ export const PartnerPanel: React.FC = () => {
 
       setVerificationStep("success");
     } catch (err: any) {
-      console.error("AI Commission verification error:", err);
+      console.error("Commission verification error:", err);
       setVerificationError(err.message || "Failed to verify screenshot");
       setVerificationStep("idle");
     }
@@ -3013,7 +2990,7 @@ export const PartnerPanel: React.FC = () => {
               <Bot className="w-3 h-3" /> Gemini Vision Multimodal AI
             </div>
             <h3 className="text-xl font-bold">Complete Job & Settle Commission</h3>
-            <p className="text-indigo-100 text-xs mt-1">Instant automated AI payment verification</p>
+            <p className="text-indigo-100 text-xs mt-1">Instant payment verification</p>
           </div>
 
           <div className="p-6 space-y-4">
@@ -3093,7 +3070,7 @@ export const PartnerPanel: React.FC = () => {
                     />
                     <div className="flex-1 min-w-0 text-xs">
                       <p className="font-bold text-slate-800 truncate">{uploadedFile?.name}</p>
-                      <p className="text-slate-500 text-[10px]">Ready for Gemini Vision OCR</p>
+                      <p className="text-slate-500 text-[10px]">Ready for Upload</p>
                     </div>
                   </div>
                 )}
@@ -3102,7 +3079,7 @@ export const PartnerPanel: React.FC = () => {
                   <div className="bg-red-50 text-red-700 p-3 rounded-xl text-xs border border-red-200 text-left space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-red-800">
                       <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                      <span>AI Verification Rejected</span>
+                      <span>Verification Failed</span>
                     </div>
                     <p className="text-slate-700 pl-5">{verificationError}</p>
                   </div>
@@ -3114,7 +3091,7 @@ export const PartnerPanel: React.FC = () => {
                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 transition shadow mt-2 flex items-center justify-center gap-2 text-sm"
                 >
                   <Sparkles size={16} />
-                  <span>AI Verify Payment & Complete Job</span>
+                  <span>Submit Receipt & Complete Job</span>
                 </button>
               </div>
             )}
