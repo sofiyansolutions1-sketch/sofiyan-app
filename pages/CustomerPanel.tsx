@@ -12,6 +12,7 @@ import { supabase } from '../supabaseClient';
 import { getSignedAppFileUrl } from '../services/storageService';
 
 import { MapPicker } from '../components/MapPicker';
+import { NearbyTechniciansBlock } from '../components/NearbyTechniciansBlock';
 
 // Specific Customer Reviews Data
 const customerReviews = [
@@ -141,6 +142,7 @@ export const CustomerPanel: React.FC = () => {
   const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'success'>('form');
   const [bookingOtp, setBookingOtp] = useState("");
   const [completedBookingId, setCompletedBookingId] = useState<string>('');
+  const [lastBookedCategory, setLastBookedCategory] = useState<string>('');
 
   // Post-Service Review and Rating states
   const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
@@ -159,6 +161,7 @@ export const CustomerPanel: React.FC = () => {
 
   const [customerPhone, setCustomerPhone] = useState(localStorage.getItem('customerPhone') || '');
   const [showHelplineBanner, setShowHelplineBanner] = useState(false);
+  const [showNoTechnicianPopup, setShowNoTechnicianPopup] = useState(false);
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -219,19 +222,28 @@ export const CustomerPanel: React.FC = () => {
     };
     const handleOpenCart = () => {
       if (cart.length > 0) {
-        setBookingStep('details' as any);
+        setBookingStep('form');
         setIsBookingModalOpen(true); // Open the booking/cart summary modal
       } else {
         alert("Your cart is empty. Please select a service first!");
       }
     };
 
+    const handleGlobalCartUpdate = () => {
+      const saved = localStorage.getItem('sofiyan_cart');
+      if (saved) {
+        setCart(JSON.parse(saved));
+      }
+    };
+
     window.addEventListener('sofiyan_open_profile', handleOpenProfile);
     window.addEventListener('sofiyan_open_cart', handleOpenCart);
+    window.addEventListener('sofiyan_global_cart_updated', handleGlobalCartUpdate);
 
     return () => {
       window.removeEventListener('sofiyan_open_profile', handleOpenProfile);
       window.removeEventListener('sofiyan_open_cart', handleOpenCart);
+      window.removeEventListener('sofiyan_global_cart_updated', handleGlobalCartUpdate);
     };
   }, [cart]);
 
@@ -805,10 +817,10 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                                         <div className="flex items-center gap-2 mt-1">
                                           <div className="flex items-center gap-0.5 text-amber-500 font-black text-xs">
                                             <Star size={11} className="fill-amber-500 text-amber-500" />
-                                            <span>{assignedPartner?.rating || "4.8"}</span>
+                                            <span>{assignedPartner?.rating ? Number(assignedPartner.rating).toFixed(1) : "4.8"}</span>
                                           </div>
                                           <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                          <p className="text-[10px] text-slate-500 font-bold">{assignedPartner?.review_count || "35"} Reviews</p>
+                                          <p className="text-[10px] text-slate-500 font-bold">{assignedPartner?.review_count || 0} Reviews</p>
                                         </div>
                                       </div>
                                     </div>
@@ -939,9 +951,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                                       if (match && match.subServices.length > 0) {
                                         addToCart(match.subServices[0], b.serviceCategory);
                                         setIsProfileOpen(false);
-                                        if ((window as any).openCartSidebar) {
-                                          (window as any).openCartSidebar();
-                                        }
+                                        window.dispatchEvent(new Event('sofiyan_open_side_cart'));
                                       } else {
                                         setIsProfileOpen(false);
                                       }
@@ -1332,10 +1342,31 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               const areaRes = await fetchAreasByPincode(newPincode);
               if (areaRes.success && areaRes.areas.length > 0) {
                   newArea = areaRes.areas[0];
+                  let detectedCity = newCity;
                   if (areaRes.isBangalore) {
-                      newCity = 'Bangalore';
+                      detectedCity = 'Bangalore';
                   } else if (newPincode.startsWith('110')) {
-                      newCity = 'Delhi';
+                      detectedCity = 'Delhi';
+                  } else if (data.address && data.address.city) {
+                      detectedCity = data.address.city;
+                  } else if (data.address && data.address.state_district) {
+                      detectedCity = data.address.state_district;
+                  }
+
+                  // Smart validation: if the selected city doesn't match the detected one
+                  if (detectedCity && newCity) {
+                      // Normalize for comparison
+                      const normalizedDetected = detectedCity.toLowerCase();
+                      const normalizedSelected = newCity.toLowerCase();
+                      
+                      if (!normalizedDetected.includes(normalizedSelected) && !normalizedSelected.includes(normalizedDetected)) {
+                          alert(`Smart Location Update: We detected your location is in ${detectedCity}, but you selected ${newCity}. We have automatically updated your city to ${detectedCity} for accurate service assignment.`);
+                          newCity = detectedCity;
+                          localStorage.setItem('preferredCity', newCity);
+                          window.dispatchEvent(new Event('cityUpdated'));
+                      }
+                  } else if (detectedCity) {
+                      newCity = detectedCity;
                   }
               }
           } else if (addr.suburb || addr.neighbourhood || addr.residential) {
@@ -1344,8 +1375,25 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               const pins = await fetchPincodesByArea([areaName]);
               if (pins && pins.length > 0) {
                   newPincode = pins[0];
-                  if (newPincode.startsWith('560')) newCity = 'Bangalore';
-                  else if (newPincode.startsWith('110')) newCity = 'Delhi';
+                  let detectedCity = newCity;
+                  if (newPincode.startsWith('560')) detectedCity = 'Bangalore';
+                  else if (newPincode.startsWith('110')) detectedCity = 'Delhi';
+                  else if (data.address && data.address.city) detectedCity = data.address.city;
+                  
+                  // Smart validation
+                  if (detectedCity && newCity) {
+                      const normalizedDetected = detectedCity.toLowerCase();
+                      const normalizedSelected = newCity.toLowerCase();
+                      
+                      if (!normalizedDetected.includes(normalizedSelected) && !normalizedSelected.includes(normalizedDetected)) {
+                          alert(`Smart Location Update: We detected your location is in ${detectedCity}, but you selected ${newCity}. We have automatically updated your city to ${detectedCity}.`);
+                          newCity = detectedCity;
+                          localStorage.setItem('preferredCity', newCity);
+                          window.dispatchEvent(new Event('cityUpdated'));
+                      }
+                  } else if (detectedCity) {
+                      newCity = detectedCity;
+                  }
               }
           }
        }
@@ -1686,12 +1734,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         return;
     }
     addToCart(item, item.categoryName);
-    if ((window as any).openCartSidebar) {
-      (window as any).openCartSidebar();
-    } else {
-      setIsBookingModalOpen(true);
-      setBookingStep('form');
-    }
+    window.dispatchEvent(new Event('sofiyan_open_side_cart'));
     setSearchQuery(''); 
   };
   
@@ -1707,12 +1750,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           price: price
       };
       addToCart(subService, "Featured Service");
-      if ((window as any).openCartSidebar) {
-        (window as any).openCartSidebar();
-      } else {
-        setIsBookingModalOpen(true);
-        setBookingStep('form');
-      }
+      window.dispatchEvent(new Event('sofiyan_open_side_cart'));
   };
 
   const onTonnageSelect = (ton: string, price: number) => {
@@ -1724,9 +1762,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         };
         addToCart(sub, tonnagePrompt.category);
         setTonnagePrompt(null);
-        if ((window as any).openCartSidebar) {
-           (window as any).openCartSidebar();
-        }
+        window.dispatchEvent(new Event('sofiyan_open_side_cart'));
     }
   };
 
@@ -1858,9 +1894,29 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
 
     setBookingStep('loading');
 
+    // Auto-resolve Lat/Lng if not provided via MapPicker
+    let finalLat = formData.lat;
+    let finalLng = formData.lng;
+    if (!finalLat || !finalLng) {
+      try {
+        const query = `${formData.address}, ${formData.area}, ${formData.city}, ${formData.pincode}`.trim();
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          finalLat = parseFloat(data[0].lat);
+          finalLng = parseFloat(data[0].lon);
+          // Update the local state so the NearbyTechniciansBlock gets the resolved coordinates
+          setFormData(prev => ({ ...prev, lat: finalLat, lng: finalLng }));
+        }
+      } catch (err) {
+        console.warn("Auto-geocoding failed:", err);
+      }
+    }
+
     try {
       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
       const categoryName = cart.length === 1 ? cart[0].categoryName : 'Multiple Services';
+      setLastBookedCategory(categoryName);
 
       // 1. Upsert Customer and Save Local Profile Details
       let customerId = null;
@@ -1944,8 +2000,8 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                     service_category: category,
                     sub_service_name: items.map(i => `${i.name} (x${i.quantity})`).join(', '),
                     location_link: formData.locationLink,
-                    lat: formData.lat,
-                    lng: formData.lng,
+                    lat: finalLat,
+                    lng: finalLng,
                     discount_amount: 0, // Simplified for now as splitting discounts is complex
                     applied_referral_code: formData.referralCode ? formData.referralCode.toUpperCase() : null,
                   }
@@ -1973,54 +2029,70 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
          console.warn("Could not save booking to Supabase, continuing locally:", bookingError);
       }
 
-      // Forward to WhatsApp
-      try {
-        const templateMsg = `🆕 NEW ONLINE BOOKING\n` +
-          `───────────────────\n` +
-          `👤 Customer Info:\n` +
-          `Name: ${formData.name}\n` +
-          `Phone: ${formData.contact}
+            // Determine if there are nearby technicians
+      const calculateDistance = (lat1?: number | null, lon1?: number | null, lat2?: number | null, lon2?: number | null): number => {
+        if (!lat1 || !lon1 || !lat2 || !lon2) return 9999;
+        const R = 6371;
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a = 
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+          Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+        return R * c;
+      };
 
-` +
-          `🛠️ Service Details:\n` +
-          `Category: ${categoryName}\n` +
-          `Items: ${subServiceName}\n` +
-          `Total Amount: ₹${finalTotal}
+      const hasNearbyTechnician = partners.some(p => {
+        if (p.status === 'blocked' || p.status === 'pending') return false;
+        if (!p.categories?.includes(categoryName)) return false;
+        if (formData.lat && formData.lng) {
+          return calculateDistance(formData.lat, formData.lng, p.lat, p.lng) <= 10;
+        } else {
+          return p.city?.toLowerCase() === formData.city?.toLowerCase();
+        }
+      });
 
-` +
-          `📍 Address:\n` +
-          `City: ${formData.city} -\n` +
-          `Detail: ${formData.address}
+      if (!hasNearbyTechnician) {
+        setShowNoTechnicianPopup(true);
+        setShowHelplineBanner(true);
 
-` +
-          (formData.locationLink ? `🔗 Location: ${formData.locationLink}
-
-` : '') +
-          `⏰ Schedule:\n` +
-          `Date: ${formData.date}\n` +
-          `Time: ${formData.time}
-
-` +
-          `───────────────────\n` +
-          `Sent via Sofiyan Home Service App`;
-
-        // 1. Automatic send to admin via Server API
-        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
-        
-        fetch('/api/send-whatsapp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            number: adminPhone,
-            message: templateMsg
-          })
-        }).catch(err => console.error("Auto WhatsApp Error:", err));
-
-        // 2. User-initiated send (for fallback/visibility)
-        const encodedMsg = encodeURIComponent(templateMsg);
-        window.open(`https://wa.me/${adminPhone}?text=${encodedMsg}`, '_blank');
-      } catch {
-        console.warn("WhatsApp logic failed",);
+        // Forward to WhatsApp
+        try {
+          const templateMsg = `🆕 NEW ONLINE BOOKING (NO NEARBY TECH)\n` +
+            `───────────────────\n` +
+            `👤 Customer Info:\n` +
+            `Name: ${formData.name}\n` +
+            `Phone: ${formData.contact}\n\n` +
+            `🛠️ Service Details:\n` +
+            `Category: ${categoryName}\n` +
+            `Items: ${subServiceName}\n` +
+            `Total Amount: ₹${finalTotal}\n\n` +
+            `📍 Address:\n` +
+            `City: ${formData.city} -\n` +
+            `Detail: ${formData.address}\n` +
+            (formData.locationLink ? `🔗 Location: ${formData.locationLink}\n` : '') +
+            `\n⏰ Schedule:\n` +
+            `Date: ${formData.date}\n` +
+            `Time: ${formData.time}\n` +
+            `───────────────────\n` +
+            `⚠️ NO TECHNICIANS IN 10KM RADIUS!\n` +
+            `Sent via Sofiyan Home Service App`;
+  
+          // 1. Automatic send to admin via Server API
+          const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
+          
+          fetch('/api/send-whatsapp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              number: adminPhone,
+              message: templateMsg
+            })
+          }).catch(err => console.error("Auto WhatsApp Error:", err));
+        } catch {
+          console.warn("WhatsApp logic failed");
+        }
       }
 
       // Success UI
@@ -2083,7 +2155,18 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                   <p className="text-xl font-black text-indigo-950 tracking-wider break-all">{completedBookingId}</p>
                 </div>
               )}
-              <div className="flex flex-col sm:flex-row gap-4">
+              
+              {completedBookingId && (
+                <NearbyTechniciansBlock 
+                  customerLat={formData.lat} 
+                  customerLng={formData.lng} 
+                  customerCity={formData.city} 
+                  categoryName={lastBookedCategory} 
+                  bookingId={completedBookingId} 
+                />
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 <button
                   onClick={resetFlow}
                   className="px-8 sm:px-10 py-4 sm:py-5 bg-white border-2 border-gray-200 text-gray-700 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-50 transition-all active:scale-95"
@@ -2404,7 +2487,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
          <button onClick={() => setIsProfileOpen(true)} className="pointer-events-auto bg-white/90 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl border border-gray-100 text-indigo-900 hover:scale-105 hover:bg-indigo-50 transition-all group">
             <UserIcon size={22} className="group-hover:text-indigo-600 transition-colors" />
          </button>
-         <button onClick={() => { if(cart.length > 0) setBookingStep('details' as any) }} className="pointer-events-auto bg-indigo-950 w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-900/30 border border-indigo-800 text-white hover:scale-105 transition-all relative">
+         <button onClick={() => window.dispatchEvent(new Event('sofiyan_open_side_cart'))} className="pointer-events-auto bg-indigo-950 w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-900/30 border border-indigo-800 text-white hover:scale-105 transition-all relative">
             <ShoppingCart size={20} />
             {cart.length > 0 && (
                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-md animate-bounce">
@@ -2636,12 +2719,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               </div>
               <button 
                 onClick={() => {
-                  if ((window as any).openCartSidebar) {
-                    (window as any).openCartSidebar();
-                  } else {
-                    setIsBookingModalOpen(true); 
-                    setBookingStep('form');
-                  }
+                  window.dispatchEvent(new Event('sofiyan_open_side_cart'));
                 }}
                 className="bg-indigo-950 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all flex items-center gap-3 shadow-2xl shadow-indigo-300 transform active:scale-95"
               >
@@ -2917,7 +2995,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               <button onClick={() => setSelectedService(null)} className="text-gray-500 hover:text-gray-700 text-sm">Close</button>
               {cart.length > 0 && (
                 <button 
-                  onClick={() => { setSelectedService(null); setIsBookingModalOpen(true); }}
+                  onClick={() => { setSelectedService(null); window.dispatchEvent(new Event('sofiyan_open_side_cart')); }}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-green-700 transition-colors"
                 >
                   View Cart ({cartItemCount})
@@ -3735,7 +3813,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                   <div className="grid grid-cols-4 gap-2 bg-slate-50 p-4 rounded-2xl text-center">
                     <div>
                       <span className="block text-lg font-black text-indigo-950 leading-none">
-                        {selectedTechnicianForProfile.rating || "4.8"} ★
+                        {selectedTechnicianForProfile.rating ? Number(selectedTechnicianForProfile.rating).toFixed(1) : "4.8"} ★
                       </span>
                       <span className="block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1">
                         Avg Rating
@@ -3865,6 +3943,42 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                     className="w-full py-3.5 bg-indigo-950 hover:bg-indigo-900 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all shadow-md active:scale-95"
                   >
                     Close Profile
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* No Technician Popup Modal */}
+        <AnimatePresence>
+          {showNoTechnicianPopup && (
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[110] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-white rounded-3xl w-full max-w-sm shadow-2xl relative overflow-hidden flex flex-col p-6 text-center"
+              >
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                  <AlertCircle size={32} />
+                </div>
+                <h3 className="text-xl font-black text-indigo-950 mb-2">No Nearby Technicians</h3>
+                <p className="text-sm font-semibold text-slate-600 mb-6">
+                  Currently, there are no technicians available within 10km of your location. Please contact our Customer Care for immediate assistance.
+                </p>
+                <div className="space-y-3">
+                  <a 
+                    href="tel:8115983887"
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl transition-all shadow-md active:scale-95"
+                  >
+                    <Phone size={16} /> Call Customer Care
+                  </a>
+                  <button 
+                    onClick={() => setShowNoTechnicianPopup(false)}
+                    className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] uppercase tracking-widest rounded-2xl transition-all active:scale-95"
+                  >
+                    Close & Keep Waiting
                   </button>
                 </div>
               </motion.div>

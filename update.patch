@@ -1,0 +1,164 @@
+--- components/NearbyTechniciansBlock.tsx
++++ components/NearbyTechniciansBlock.tsx
+@@ -2,3 +2,3 @@
+ import { Partner, Booking } from '../types';
+-import { PhoneCall, CheckCircle, XCircle, MapPin, Star, MessageCircle, AlertCircle, Loader2 } from 'lucide-react';
++import { PhoneCall, CheckCircle, XCircle, MapPin, Star, MessageCircle, AlertCircle, Loader2, CheckSquare, Square } from 'lucide-react';
+ import { supabase } from '../supabaseClient';
+@@ -29,4 +29,4 @@
+   const [calledTechnician, setCalledTechnician] = useState<Partner | null>(null);
+-  const [showConfirmation, setShowConfirmation] = useState(false);
+-  const [didSpeak, setDidSpeak] = useState<boolean | null>(null);
+-  const [didConfirm, setDidConfirm] = useState<boolean | null>(null);
++  const [showDialog, setShowDialog] = useState(false);
++  const [technicianTalked, setTechnicianTalked] = useState<boolean>(false);
++  const [technicianConfirmed, setTechnicianConfirmed] = useState<boolean>(false);
+@@ -62,4 +62,4 @@
+     setCalledTechnician(tech);
+-    setDidSpeak(null);
+-    setDidConfirm(null);
+-    setShowConfirmation(true);
++    setTechnicianTalked(false);
++    setTechnicianConfirmed(false);
++    setShowDialog(true);
+@@ -71,4 +71,4 @@
+     setCalledTechnician(tech);
+-    setDidSpeak(null);
+-    setDidConfirm(null);
+-    setShowConfirmation(true);
++    setTechnicianTalked(false);
++    setTechnicianConfirmed(false);
++    setShowDialog(true);
+@@ -79,4 +79,4 @@
+   const handleConfirmAssignment = async () => {
+-    if (!calledTechnician || didSpeak === null || didConfirm === null) return;
++    if (!calledTechnician || !technicianTalked || !technicianConfirmed) return;
+     
+@@ -99,2 +99,14 @@
+ 
++  // Auto-assign when both checkboxes are checked
++  React.useEffect(() => {
++    let isMounted = true;
++    if (technicianTalked && technicianConfirmed && calledTechnician && !isAssigning && !assignmentSuccess) {
++      handleConfirmAssignment().then(() => {
++        if (isMounted) {
++          setShowDialog(false);
++        }
++      });
++    }
++    return () => { isMounted = false; };
++  }, [technicianTalked, technicianConfirmed]);
++
+@@ -112,3 +124,2 @@
+     <div className="mt-8 max-w-4xl mx-auto w-full text-left">
+-      {!showConfirmation ? (
+-        <>
+           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+@@ -165,56 +176,55 @@
+           </div>
+-        </>
+-      ) : (
+-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 max-w-xl mx-auto mb-8 animate-fadeIn">
+-           <div className="text-center mb-6">
+-              <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+-                 <PhoneCall className="w-8 h-8" />
+-              </div>
+-              <h3 className="text-xl font-black text-gray-900">Did you speak with {calledTechnician?.name}?</h3>
+-              <p className="text-sm text-gray-500 mt-2">Please confirm your conversation so we can assign your booking directly to this technician.</p>
+-           </div>
+-           
+-           <div className="space-y-6">
+-              <div>
+-                 <p className="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">1. Were you able to speak with them?</p>
+-                 <div className="flex gap-3">
+-                   <button onClick={() => setDidSpeak(true)} className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${didSpeak === true ? 'bg-indigo-50 border-indigo-600 text-indigo-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>Yes</button>
+-                   <button onClick={() => { setDidSpeak(false); setDidConfirm(false); }} className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${didSpeak === false ? 'bg-red-50 border-red-500 text-red-600' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>No</button>
+-                 </div>
+-              </div>
+-              
+-              {didSpeak === true && (
+-                <div className="animate-fadeIn">
+-                   <p className="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">2. Did the technician confirm they are coming?</p>
+-                   <div className="flex gap-3">
+-                     <button onClick={() => setDidConfirm(true)} className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${didConfirm === true ? 'bg-green-50 border-green-500 text-green-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>Yes, Confirmed</button>
+-                     <button onClick={() => setDidConfirm(false)} className={`flex-1 py-3 rounded-xl font-bold border-2 transition-all ${didConfirm === false ? 'bg-red-50 border-red-500 text-red-600' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>No, Busy / Refused</button>
+-                   </div>
+-                </div>
+-              )}
+-              
+-              <div className="pt-4 flex gap-3">
+-                 <button 
+-                   onClick={() => setShowConfirmation(false)} 
+-                   className="flex-1 py-3.5 bg-white border border-gray-200 text-gray-600 rounded-xl font-bold"
+-                 >
+-                   Back
+-                 </button>
+-                 
+-                 {(didSpeak === false || (didSpeak === true && didConfirm === false)) && (
+-                   <button 
+-                     onClick={() => setShowConfirmation(false)} 
+-                     className="flex-[2] py-3.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-md"
+-                   >
+-                     Try Another Technician
+-                   </button>
+-                 )}
+-                 
+-                 {didSpeak === true && didConfirm === true && (
+-                   <button 
+-                     onClick={handleConfirmAssignment} 
+-                     disabled={isAssigning}
+-                     className="flex-[2] flex justify-center items-center gap-2 py-3.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-md disabled:opacity-70"
+-                   >
+-                     {isAssigning ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+-                     Assign to {calledTechnician?.name.split(' ')[0]}
+-                   </button>
+-                 )}
+-              </div>
+-           </div>
+-        </div>
++
++      {/* Confirmation Dialog Overlay */}
++      {showDialog && (
++        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fadeIn">
++          <div className="bg-white rounded-2xl border border-gray-200 shadow-xl p-6 w-full max-w-md animate-in zoom-in-95 duration-200">
++             <div className="flex justify-between items-start mb-5">
++                <div className="flex items-center gap-3">
++                  <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
++                     <PhoneCall className="w-5 h-5" />
++                  </div>
++                  <div>
++                     <h3 className="text-lg font-black text-gray-900 leading-tight">Confirmation</h3>
++                     <p className="text-xs text-gray-500 font-medium">Assigning to {calledTechnician?.name}</p>
++                  </div>
++                </div>
++                <button onClick={() => setShowDialog(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
++                  <XCircle className="w-6 h-6" />
++                </button>
++             </div>
++             
++             <p className="text-sm text-gray-600 mb-6">
++                Please check the boxes below after returning from your call. The booking will be assigned automatically.
++             </p>
++             
++             <div className="space-y-3 mb-8">
++                <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${technicianTalked ? 'bg-indigo-50 border-indigo-600 text-indigo-900' : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300'}`}>
++                   <input type="checkbox" className="sr-only" checked={technicianTalked} onChange={(e) => setTechnicianTalked(e.target.checked)} />
++                   {technicianTalked ? <CheckSquare className="w-6 h-6 text-indigo-600" /> : <Square className="w-6 h-6 text-gray-400" />}
++                   <span className="font-bold text-sm">Technician talked</span>
++                </label>
++                
++                <label className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${technicianConfirmed ? 'bg-indigo-50 border-indigo-600 text-indigo-900' : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300'}`}>
++                   <input type="checkbox" className="sr-only" checked={technicianConfirmed} onChange={(e) => setTechnicianConfirmed(e.target.checked)} disabled={!technicianTalked} />
++                   {technicianConfirmed ? <CheckSquare className="w-6 h-6 text-indigo-600" /> : <Square className="w-6 h-6 text-gray-400" />}
++                   <span className="font-bold text-sm">Technician confirmed visit</span>
++                </label>
++             </div>
++             
++             {isAssigning && (
++               <div className="flex items-center justify-center gap-2 text-indigo-600 font-bold bg-indigo-50 py-3 rounded-xl border border-indigo-100">
++                 <Loader2 className="w-5 h-5 animate-spin" /> Assigning technician...
++               </div>
++             )}
++          </div>
++        </div>
+       )}

@@ -1,0 +1,32 @@
+--- pages/CustomerPanel.tsx
++++ pages/CustomerPanel.tsx
+@@ -1862,2 +1862,24 @@
+ 
++    // Auto-resolve Lat/Lng if not provided via MapPicker
++    let finalLat = formData.lat;
++    let finalLng = formData.lng;
++    if (!finalLat || !finalLng) {
++      try {
++        const query = `${formData.address}, ${formData.area}, ${formData.city}, ${formData.pincode}`.trim();
++        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
++        const data = await res.json();
++        if (data && data.length > 0) {
++          finalLat = parseFloat(data[0].lat);
++          finalLng = parseFloat(data[0].lon);
++          // Update the local state so the NearbyTechniciansBlock gets the resolved coordinates
++          setFormData(prev => ({ ...prev, lat: finalLat, lng: finalLng }));
++        }
++      } catch (err) {
++        console.warn("Auto-geocoding failed:", err);
++      }
++    }
++
+     try {
+       const subServiceName = cart.map(i => `${i.name} (x${i.quantity})`).join(', ');
+@@ -1949,4 +1971,4 @@
+                     location_link: formData.locationLink,
+-                    lat: formData.lat,
+-                    lng: formData.lng,
++                    lat: finalLat,
++                    lng: finalLng,
+                     discount_amount: 0, // Simplified for now as splitting discounts is complex

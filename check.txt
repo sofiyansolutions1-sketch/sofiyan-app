@@ -1,0 +1,71 @@
+      if (bookingError) {
+         console.warn("Could not save booking to Supabase, continuing locally:", bookingError);
+      }
+
+      // Forward to WhatsApp
+      try {
+        const templateMsg = `🆕 NEW ONLINE BOOKING\n` +
+          `───────────────────\n` +
+          `👤 Customer Info:\n` +
+          `Name: ${formData.name}\n` +
+          `Phone: ${formData.contact}
+
+` +
+          `🛠️ Service Details:\n` +
+          `Category: ${categoryName}\n` +
+          `Items: ${subServiceName}\n` +
+          `Total Amount: ₹${finalTotal}
+
+` +
+          `📍 Address:\n` +
+          `City: ${formData.city} -\n` +
+          `Detail: ${formData.address}
+
+` +
+          (formData.locationLink ? `🔗 Location: ${formData.locationLink}
+
+` : '') +
+          `⏰ Schedule:\n` +
+          `Date: ${formData.date}\n` +
+          `Time: ${formData.time}
+
+` +
+          `───────────────────\n` +
+          `Sent via Sofiyan Home Service App`;
+
+        // 1. Automatic send to admin via Server API
+        const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
+        
+        fetch('/api/send-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            number: adminPhone,
+            message: templateMsg
+          })
+        }).catch(err => console.error("Auto WhatsApp Error:", err));
+
+        // 2. User-initiated send (for fallback/visibility)
+        const encodedMsg = encodeURIComponent(templateMsg);
+        window.open(`https://wa.me/${adminPhone}?text=${encodedMsg}`, '_blank');
+      } catch {
+        console.warn("WhatsApp logic failed",);
+      }
+
+      // Success UI
+      setBookingStep('success');
+      sessionStorage.setItem('justBooked', 'true');
+      localStorage.setItem('customerPhone', formData.contact);
+      setCustomerPhone(formData.contact);
+      setCart([]); 
+      
+      // Refetch from Supabase to update local store immediately
+      fetchBookings().catch(err => console.error("Error refetching bookings:", err));
+
+    } catch (error: any) {
+      console.error('Booking Error:', error);
+      alert('Failed to confirm booking: ' + (error.message || 'Unknown error'));
+      setBookingStep('form');
+    }
+  };
+

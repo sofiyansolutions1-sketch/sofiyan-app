@@ -64,6 +64,17 @@ export interface Booking {
   appliedReferralCode?: string;
 }
 
+export interface CallLog {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  customerName: string;
+  customerPhone: string;
+  categoryName: string;
+  timestamp: string;
+  type: 'call' | 'whatsapp';
+}
+
 export interface Partner {
   id: string;
   name: string;

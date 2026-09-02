@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { Booking, Partner } from '../types';
+import { Booking, Partner, CallLog } from '../types';
 import { supabase } from '../supabaseClient';
 
 interface StoreState {
   bookings: Booking[];
   partners: Partner[];
+  callLogs: CallLog[];
   loading: boolean;
   initialized: boolean;
   
@@ -17,6 +18,8 @@ interface StoreState {
   addPartner: (newPartner: Partner) => Promise<Partner>;
   updatePartner: (updatedPartner: Partner) => Promise<void>;
   getPartner: (email: string) => Partner | undefined;
+  addCallLog: (log: CallLog) => void;
+  fetchCallLogs: () => void;
 }
 
 export const mapBookingFromDB = (data: any): Booking => {
@@ -96,6 +99,7 @@ const mapPrimaryPartnerFromDB = (data: any): Partner => ({
 export const useStore = create<StoreState>((set, get) => ({
   bookings: [],
   partners: [],
+  callLogs: [],
   loading: true,
   initialized: false,
 
@@ -220,7 +224,6 @@ export const useStore = create<StoreState>((set, get) => ({
         assigned_partner_id: updatedBooking.assignedPartnerId || null,
         assigned_partner_name: updatedBooking.assignedPartnerName || null,
         assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
-        assigned_partner_area: updatedBooking.assignedPartnerArea || null,
         date: updatedBooking.date,
         time: updatedBooking.time,
         commission_paid: updatedBooking.commissionPaid,
@@ -362,8 +365,32 @@ export const useStore = create<StoreState>((set, get) => ({
      }
   },
 
-  getPartner: (email: string) => get().partners.find(p => p.email === email)
+  getPartner: (email: string) => get().partners.find(p => p.email === email),
+
+  fetchCallLogs: () => {
+    try {
+      const storedLogs = localStorage.getItem('partner_call_logs');
+      if (storedLogs) {
+        set({ callLogs: JSON.parse(storedLogs) });
+      }
+    } catch (e) {
+      console.warn("Failed to parse call logs", e);
+    }
+  },
+
+  addCallLog: (log: CallLog) => {
+    set(state => {
+      const updatedLogs = [log, ...state.callLogs];
+      try {
+        localStorage.setItem('partner_call_logs', JSON.stringify(updatedLogs));
+      } catch (e) {
+        console.warn("Failed to save call logs to localStorage", e);
+      }
+      return { callLogs: updatedLogs };
+    });
+  }
 }));
 
 // Initialize the store immediately
 useStore.getState().init();
+useStore.getState().fetchCallLogs();

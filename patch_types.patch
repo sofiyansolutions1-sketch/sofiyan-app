@@ -1,0 +1,16 @@
+--- types.ts
++++ types.ts
+@@ -69,2 +69,12 @@
+ 
++export interface CallLog {
++  id: string;
++  partnerId: string;
++  partnerName: string;
++  customerName: string;
++  customerPhone: string;
++  categoryName: string;
++  timestamp: string;
++  type: 'call' | 'whatsapp';
++}
++
+ export interface Partner {

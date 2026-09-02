@@ -34,16 +34,20 @@ import {
   Copy,
   Smartphone,
   ArrowRight,
-  Bot
+  Bot,
+  PhoneCall,
+  MessageCircle
 } from "lucide-react";
 import { MapRadiusSelector } from "../components/MapRadiusSelector";
+import { PartnerRegistrationSuccess } from "./PartnerRegistrationSuccess";
 import { fetchAreasByPincode } from "../services/pincodeService";
 import { uploadAppFile, getSignedAppFileUrl } from "../services/storageService";
-import { verifyPaymentWithAi } from "../services/paymentVerificationService";
 
 // Haversine distance calculator
 const calculateDistance = (lat1?: number, lon1?: number, lat2?: number, lon2?: number): string => {
+  console.log(`[Diagnostic - PartnerPanel] calculateDistance inputs: Partner(${lat1}, ${lon1}), Lead(${lat2}, ${lon2})`);
   if (lat1 === undefined || lon1 === undefined || lat2 === undefined || lon2 === undefined) {
+    console.warn(`[Diagnostic - PartnerPanel] calculateDistance aborted due to missing coordinates.`);
     return "N/A";
   }
   const toRad = (value: number) => (value * Math.PI) / 180;
@@ -55,6 +59,20 @@ const calculateDistance = (lat1?: number, lon1?: number, lat2?: number, lon2?: n
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c;
+  
+  if (isNaN(d) || d === null) {
+    console.error(`[Diagnostic - PartnerPanel] calculateDistance result is NaN/null. Calculated d = ${d}`);
+  } else {
+    console.log(`[Diagnostic - PartnerPanel] calculateDistance output: ${d} km`);
+  }
+
+  if (d < 0.01) {
+    return "< 10 Meters";
+  }
+  if (d < 1) {
+    const meters = Math.round(d * 1000);
+    return `${meters} Meters`;
+  }
   return `${d.toFixed(1)} KM`;
 };
 
@@ -288,21 +306,21 @@ const SERVICE_CATEGORIES_DATA: ServiceCategoryOption[] = [
   }
 ];
 
-const CITIES = [
-  "Delhi",
-  "Mumbai",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Kolkata",
-  "Pune",
-  "Ahmedabad",
-  "Jaipur",
-  "Surat"
-];
+// const _CITIES = [
+//   "Delhi",
+//   "Mumbai",
+//   "Bangalore",
+//   "Hyderabad",
+//   "Chennai",
+//   "Kolkata",
+//   "Pune",
+//   "Ahmedabad",
+//   "Jaipur",
+//   "Surat"
+// ];
 
 export const PartnerPanel: React.FC = () => {
-  const { bookings, updateBooking, partners, fetchPartners, updatePartner } = useStore();
+  const { bookings, updateBooking, partners, fetchPartners, updatePartner, callLogs } = useStore();
 
   const [currentUser, setCurrentUser] = useState<Partner | null>(null);
   const [partnerAvatarUrl, setPartnerAvatarUrl] = useState<string | null>(null);
@@ -373,7 +391,7 @@ export const PartnerPanel: React.FC = () => {
     message?: string;
     reason?: string;
   } | null>(null);
-  const [regAiScanProgress, setRegAiScanProgress] = useState<string>("");
+  const [regAiScanProgress, ] = useState<string>("");
 
   const [commissionAiResult, setCommissionAiResult] = useState<{
     verified: boolean;
@@ -384,7 +402,7 @@ export const PartnerPanel: React.FC = () => {
     message?: string;
     reason?: string;
   } | null>(null);
-  const [commissionAiScanProgress, setCommissionAiScanProgress] = useState<string>("");
+  const [commissionAiScanProgress, ] = useState<string>("");
 
   const [regData, setRegData] = useState({
     firstName: "",
@@ -1869,35 +1887,13 @@ export const PartnerPanel: React.FC = () => {
           {/* STEP 3: LOCATION */}
           {regStep === "location" && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-3 uppercase tracking-wide">
-                  Choose Your City *
+              <div className="space-y-4">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide">
+                  Service Delivery Areas & Radius
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {CITIES.map(city => (
-                    <button
-                      key={city}
-                      onClick={() => setRegData({ ...regData, city })}
-                      className={`py-3 px-2 rounded-xl text-sm font-bold transition-all border ${
-                        regData.city === city
-                          ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                          : "bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50"
-                      }`}
-                    >
-                      {city}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
-              {regData.city && (
-                <div className="space-y-4">
-                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide">
-                    Service Delivery Areas & Radius
-                  </label>
-
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <MapRadiusSelector
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <MapRadiusSelector
                       onLocationDetected={async (lat, lng, addressDetails) => {
                         let finalArea = addressDetails?.area || "";
                         if (!finalArea && addressDetails?.pincode && addressDetails.pincode.length === 6) {
@@ -2002,7 +1998,6 @@ export const PartnerPanel: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              )}
 
               <div className="flex gap-4 pt-4">
                 <button
@@ -2018,7 +2013,7 @@ export const PartnerPanel: React.FC = () => {
                     }
                     setRegStep("verify");
                   }}
-                  disabled={!regData.city || !regData.address || !regData.pincode}
+                  disabled={!regData.address || !regData.pincode}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-bold transition-all disabled:opacity-50 shadow-md shadow-indigo-100"
                 >
                   Continue to Verification
@@ -2472,24 +2467,12 @@ export const PartnerPanel: React.FC = () => {
 
           {/* STEP 5: SUCCESS */}
           {regStep === "success" && (
-            <div className="text-center py-10 animate-in zoom-in duration-300">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                <CheckCircle className="text-green-500 w-10 h-10" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-800 mb-2">Registration Successful!</h3>
-              <p className="text-slate-600 max-w-sm mx-auto mb-8 text-sm">
-                Your profile has been submitted for review. You can now access your Partner Dashboard.
-              </p>
-              <button
-                onClick={() => {
-                  setIsRegistrationOpen(false);
-                  setIsPendingSignup(false);
-                }}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-md shadow-indigo-100"
-              >
-                Go to Dashboard
-              </button>
-            </div>
+            <PartnerRegistrationSuccess 
+              onComplete={() => {
+                setIsRegistrationOpen(false);
+                setIsPendingSignup(false);
+              }}
+            />
           )}
         </div>
       </div>
@@ -2498,6 +2481,7 @@ export const PartnerPanel: React.FC = () => {
 
   // Lead processing and matching
   const partnerBookings = currentUser ? bookings.filter(b => b.assignedPartnerId === currentUser.id) : [];
+  const partnerCallLogs = currentUser ? callLogs.filter(log => log.partnerId === currentUser.id) : [];
 
   const newLeads = currentUser
     ? bookings.filter(b => {
@@ -3417,7 +3401,46 @@ export const PartnerPanel: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Call History Section */}
+      <div className="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col mt-6">
+        <h2 className="text-base sm:text-lg font-black mb-4 flex items-center gap-2 text-slate-900">
+          <PhoneCall className="text-indigo-600 w-5 h-5" /> Inbound Customer Inquiries
+        </h2>
+        {partnerCallLogs.length === 0 ? (
+          <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-200/60 border-dashed">
+            <p className="text-slate-400 text-sm font-medium">No calls from customers yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {partnerCallLogs.map((log) => (
+              <div key={log.id} className="border border-slate-100 p-4 rounded-2xl bg-indigo-50/20 hover:border-indigo-200 transition shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-bold text-indigo-950">{log.customerName}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase">{log.categoryName}</p>
+                  </div>
+                  <div className={`p-2 rounded-full ${log.type === 'whatsapp' ? 'bg-[#25D366]/10 text-[#25D366]' : 'bg-indigo-100 text-indigo-600'}`}>
+                    {log.type === 'whatsapp' ? <MessageCircle size={14} /> : <PhoneCall size={14} />}
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-100/80 flex justify-between items-center text-xs">
+                  <a href={`tel:${log.customerPhone}`} className="font-mono text-indigo-700 font-bold hover:underline">
+                    {log.customerPhone}
+                  </a>
+                  <span className="text-slate-400 font-medium">
+                    {new Date(log.timestamp).toLocaleString(undefined, {
+                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
 export default PartnerPanel;
