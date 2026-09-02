@@ -42,6 +42,7 @@ import { MapRadiusSelector } from "../components/MapRadiusSelector";
 import { PartnerRegistrationSuccess } from "./PartnerRegistrationSuccess";
 import { fetchAreasByPincode } from "../services/pincodeService";
 import { uploadAppFile, getSignedAppFileUrl } from "../services/storageService";
+import { CITY_DATA } from "../constants";
 
 // Haversine distance calculator
 const calculateDistance = (lat1?: number, lon1?: number, lat2?: number, lon2?: number): string => {
@@ -1896,11 +1897,14 @@ export const PartnerPanel: React.FC = () => {
                   <MapRadiusSelector
                       onLocationDetected={async (lat, lng, addressDetails) => {
                         let finalArea = addressDetails?.area || "";
-                        if (!finalArea && addressDetails?.pincode && addressDetails.pincode.length === 6) {
+                        let detectedCity = addressDetails?.city || "";
+                        if (addressDetails?.pincode && addressDetails.pincode.length === 6) {
                           try {
                             const res = await fetchAreasByPincode(addressDetails.pincode);
                             if (res.success && res.areas.length > 0) {
-                              finalArea = res.areas[0];
+                              if (!finalArea) finalArea = res.areas[0];
+                              if (res.isBangalore) detectedCity = "Bangalore";
+                              else if (addressDetails.pincode.startsWith("110")) detectedCity = "Delhi";
                             }
                           } catch (err) {
                             console.warn("Error fetching area for pincode:", err);
@@ -1911,6 +1915,7 @@ export const PartnerPanel: React.FC = () => {
                           ...prev,
                           lat,
                           lng,
+                          city: detectedCity || prev.city,
                           area: finalArea || addressDetails?.area || prev.area,
                           address: addressDetails?.address || prev.address,
                           pincode: addressDetails?.pincode || prev.pincode
@@ -1918,11 +1923,14 @@ export const PartnerPanel: React.FC = () => {
                       }}
                       onPincodesFound={async (pins, lat, lng, radius, addressDetails) => {
                         let finalArea = addressDetails?.area || "";
-                        if (!finalArea && addressDetails?.pincode && addressDetails.pincode.length === 6) {
+                        let detectedCity = addressDetails?.city || "";
+                        if (addressDetails?.pincode && addressDetails.pincode.length === 6) {
                           try {
                             const res = await fetchAreasByPincode(addressDetails.pincode);
                             if (res.success && res.areas.length > 0) {
-                              finalArea = res.areas[0];
+                              if (!finalArea) finalArea = res.areas[0];
+                              if (res.isBangalore) detectedCity = "Bangalore";
+                              else if (addressDetails.pincode.startsWith("110")) detectedCity = "Delhi";
                             }
                           } catch (err) {
                             console.warn("Error fetching area for pincode:", err);
@@ -1935,6 +1943,7 @@ export const PartnerPanel: React.FC = () => {
                           lat: lat || prev.lat,
                           lng: lng || prev.lng,
                           service_radius: radius || prev.service_radius,
+                          city: detectedCity || prev.city,
                           area: finalArea || addressDetails?.area || prev.area,
                           address: addressDetails?.address || prev.address,
                           pincode: addressDetails?.pincode || prev.pincode
@@ -1956,7 +1965,20 @@ export const PartnerPanel: React.FC = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">City *</label>
+                        <select
+                          value={regData.city || ""}
+                          onChange={e => setRegData({ ...regData, city: e.target.value })}
+                          className="w-full border border-slate-200 bg-slate-50 p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm appearance-none"
+                        >
+                          <option value="">Select City</option>
+                          {CITY_DATA.map(c => (
+                            <option key={c.name} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wide">Area / Locality *</label>
                         <input
