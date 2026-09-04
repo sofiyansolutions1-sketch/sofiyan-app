@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { SERVICES, CITY_DATA, PREDEFINED_AREAS } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { Service, SubService, CartItem } from '../types';
@@ -54,6 +54,92 @@ const customerReviews = [
   }
 ];
 
+
+const ReviewsCarousel = () => {
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let scrollInterval: NodeJS.Timeout;
+
+    const startScroll = () => {
+      scrollInterval = setInterval(() => {
+        if (scrollRef.current) {
+          const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+          const child = scrollRef.current.children[0] as HTMLElement;
+          const scrollAmount = child ? child.offsetWidth + 24 : 300; // 24 is gap-6
+
+          if (scrollLeft + clientWidth >= scrollWidth - 10) {
+            scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          }
+        }
+      }, 3500);
+    };
+
+    startScroll();
+
+    const handleMouseEnter = () => clearInterval(scrollInterval);
+    const handleMouseLeave = () => startScroll();
+
+    const currentRef = scrollRef.current;
+    if (currentRef) {
+      currentRef.addEventListener('mouseenter', handleMouseEnter);
+      currentRef.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    return () => {
+      clearInterval(scrollInterval);
+      if (currentRef) {
+        currentRef.removeEventListener('mouseenter', handleMouseEnter);
+        currentRef.removeEventListener('mouseleave', handleMouseLeave);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="mt-28 py-20 bg-indigo-50/30 -mx-4 sm:-mx-6 lg:-mx-8 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-200/20 blur-[100px] rounded-full"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-200/20 blur-[100px] rounded-full"></div>
+      
+      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col mb-8">
+            <h2 className="text-sm font-bold text-indigo-600 uppercase tracking-widest mb-2 text-left">Customer Chronicles</h2>
+            <h3 className="text-[22px] sm:text-4xl font-bold text-gray-900 tracking-normal text-left">Voice of Excellence</h3>
+        </div>
+        <style>
+          {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
+        </style>
+        <div 
+          ref={scrollRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {customerReviews.map((review, index) => (
+             <div 
+               key={index} 
+               className="flex-none w-[280px] md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] snap-start bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md"
+             >
+                <div className="flex items-center gap-4 mb-4">
+                    <img src={review.img} alt={review.name} className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-indigo-50" />
+                    <div>
+                        <h4 className="font-bold text-gray-900 text-base sm:text-lg">{review.name}</h4>
+                        <div className="flex text-yellow-400 gap-1 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={14} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed italic line-clamp-4">"{review.text}"</p>
+             </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const featuredServicesData = [
     { name: "Premium AC Service (Split)", price: 499, img: "https://i.postimg.cc/4dh6m6X0/Whats-App-Image-2026-01-12-at-11-13-39-PM.jpg", desc: "Expert AC deep cleaning & cooling solutions by Sofiyan." },
     { name: "AC Basic Check-up/Cooling", price: 399, img: "https://i.postimg.cc/442GJpmj/Whats-App-Image-2026-01-12-at-11-13-46-PM.jpg", desc: "Quick AC diagnosis & minor repairs at your doorstep." },
@@ -92,6 +178,14 @@ const featuredServicesData = [
 
 
 
+const mainCategories = [
+    { id: "AC", name: "AC", image: "https://iili.io/nJSqYJt.png" },
+    { id: "Electrician", name: "Electrical", image: "https://iili.io/nJS1G9e.png" },
+    { id: "Plumbing", name: "Plumbing", image: "https://iili.io/nJSl9VV.png" },
+    { id: "Appliances", name: "Appliances", image: "https://iili.io/nJScxae.png" },
+    { id: "Cleaning", name: "Cleaning", image: "https://iili.io/nJSaR1t.png" }
+];
+
 const categoryList = [
     { name: "AC", image: "https://i.postimg.cc/s2SR2Pvz/Chat-GPT-Image-Mar-25-2026-06-17-17-PM.png" },
     { name: "Electrician", image: "https://i.postimg.cc/tCXRmc7V/Chat-GPT-Image-Mar-25-2026-06-17-31-PM.png" },
@@ -114,6 +208,145 @@ const getRateCardCategory = (name: string): string | null => {
   if (clean.includes('refrigerator') || clean.includes('fridge')) return 'Refrigerator';
   if (clean.includes('purifier') || clean.includes('waterpurifier') || clean.includes('ro')) return 'Water Purifier';
   return null;
+};
+
+
+const PromotionalCarousel: React.FC = () => {
+  const basePromos = [
+    { src: "https://iili.io/nJFbxOQ.png", category: "Chimney" },
+    { src: "https://iili.io/nJFbLkx.png", category: "Cleaning" },
+    { src: "https://iili.io/nJFpFcu.png", category: "AC" },
+    { src: "https://iili.io/nJFp4Hb.png", category: "WaterPurifier" },
+    { src: "https://iili.io/nJFyBgn.png", category: "WashingMachine" }
+  ];
+  // Duplicate for longer scroll before rewind
+  const promos = [...basePromos, ...basePromos]; 
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (scrollRef.current) {
+        const container = scrollRef.current;
+        const firstChild = container.firstElementChild as HTMLElement;
+        const gap = window.innerWidth < 640 ? 16 : 24;
+        const scrollAmount = firstChild ? firstChild.offsetWidth + gap : container.clientWidth / 3;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        
+        if (container.scrollLeft >= maxScroll - 10) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+      }
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="w-full mt-10 mb-8 px-4 sm:px-6 lg:px-8 max-w-[1800px] mx-auto">
+      <div className="flex flex-col mb-3 sm:mb-6">
+          <h2 className="text-[22px] sm:text-3xl font-bold text-gray-900 tracking-normal">In the spotlight</h2>
+      </div>
+      <style>
+        {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
+      </style>
+      <div 
+        ref={scrollRef} 
+        className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {promos.map((promo, i) => (
+          <div 
+            key={i} 
+            className="flex-none w-[93%] sm:w-[calc(33.333%-1rem)] snap-start relative rounded-xl overflow-hidden group cursor-pointer"
+            onClick={() => {
+              if (typeof window !== 'undefined' && (window as any).openCategoryView) {
+                (window as any).openCategoryView(promo.category);
+              } else if (typeof window !== 'undefined' && (window as any).openCategoryModal) {
+                (window as any).openCategoryModal(promo.category);
+              }
+            }}
+          >
+            <img src={promo.src} alt={`In the spotlight ${promo.category}`} className="w-full h-auto object-cover rounded-xl transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
+interface MostPopularCarouselProps {
+  onBook: (name: string, price: number) => void;
+  onSeeAll: () => void;
+}
+const MostPopularCarousel: React.FC<MostPopularCarouselProps> = ({ onBook, onSeeAll }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = window.innerWidth > 768 ? 600 : 300;
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div id="featured-services-section" className="w-full mt-12 mb-10 px-4 sm:px-6 lg:px-8 max-w-[1800px] mx-auto bg-white relative">
+      <div className="flex items-center justify-between mb-4 sm:mb-8">
+        <h2 className="text-[22px] sm:text-4xl font-bold text-gray-900 tracking-normal text-left">Appliance repair & service</h2>
+        <button 
+           onClick={onSeeAll} 
+           className="px-4 py-1.5 sm:px-5 sm:py-2 bg-white border border-gray-200 rounded-lg text-indigo-700 font-medium text-sm hover:bg-gray-50 transition-colors shrink-0"
+        >
+          See all
+        </button>
+      </div>
+      <style>
+        {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
+      </style>
+      <div className="relative group/carousel">
+        <button 
+           onClick={() => scroll('left')} 
+           className="absolute -left-5 top-[40%] -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-gray-700 hover:scale-105 transition-all opacity-0 group-hover/carousel:opacity-100 hidden sm:flex"
+        >
+           <ChevronLeft size={20} />
+        </button>
+        <button 
+           onClick={() => scroll('right')} 
+           className="absolute -right-5 top-[40%] -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-gray-700 hover:scale-105 transition-all opacity-0 group-hover/carousel:opacity-100 hidden sm:flex"
+        >
+           <ChevronRight size={20} />
+        </button>
+
+        <div 
+          ref={scrollRef} 
+          className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {featuredServicesData.map((service, index) => (
+            <div 
+              key={`${service.name}-${index}`} 
+              className="flex-none w-[170px] sm:w-[280px] lg:w-[calc(20%-1.2rem)] snap-start relative group cursor-pointer"
+              onClick={() => onBook(service.name, service.price)}
+            >
+              <div className="relative h-36 sm:h-56 w-full rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                <img src={service.img} alt={service.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" referrerPolicy="no-referrer" />
+              </div>
+              <div className="flex flex-col px-1">
+                <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-1 line-clamp-2 leading-tight" title={service.name}>{service.name}</h3>
+                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1.5">
+                   <span className="font-medium text-gray-900">★ 4.75</span>
+                   <span className="text-[10px]">●</span>
+                   <span className="text-gray-500 flex items-center gap-1"><span className="text-emerald-600 font-bold">⚡</span> Instant</span>
+                </div>
+                <span className="font-medium text-gray-900 text-sm">₹{service.price}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export const CustomerPanel: React.FC = () => {
@@ -140,6 +373,7 @@ export const CustomerPanel: React.FC = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [useReferralBalance, setUseReferralBalance] = useState(false);
   const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'success'>('form');
+  const [isSeeAllModalOpen, setIsSeeAllModalOpen] = useState(false);
   const [bookingOtp, setBookingOtp] = useState("");
   const [completedBookingId, setCompletedBookingId] = useState<string>('');
   const [lastBookedCategory, setLastBookedCategory] = useState<string>('');
@@ -165,6 +399,38 @@ export const CustomerPanel: React.FC = () => {
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentCity, setCurrentCity] = useState(localStorage.getItem('preferredCity') || 'Bangalore');
+  useEffect(() => {
+    const handleCityUpdate = () => setCurrentCity(localStorage.getItem('preferredCity') || 'Bangalore');
+    window.addEventListener('cityUpdated', handleCityUpdate);
+    return () => window.removeEventListener('cityUpdated', handleCityUpdate);
+  }, []);
+
+  const { cityUrl } = useParams<{ cityUrl?: string }>();
+  const activeCity = cityUrl ? cityUrl.charAt(0).toUpperCase() + cityUrl.slice(1).toLowerCase() : currentCity;
+
+  // SEO Update logic
+  useEffect(() => {
+    if (activeCity) {
+      document.title = `Best Home Services in ${activeCity} | AC, Plumbing, Electrician | Sofiyan`;
+      
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', `Looking for top-rated home services in ${activeCity}? Sofiyan Home Service offers expert AC repair, plumbing, electrical, and appliance repair in ${activeCity}. Book verified professionals today.`);
+      
+      let linkCanonical = document.querySelector('link[rel="canonical"]');
+      if (!linkCanonical) {
+        linkCanonical = document.createElement('link');
+        linkCanonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(linkCanonical);
+      }
+      linkCanonical.setAttribute('href', `https://www.sofiyanhomeservice.com/${activeCity.toLowerCase()}`);
+    }
+  }, [activeCity]);
   
   // Tonnage State
   const [tonnagePrompt, setTonnagePrompt] = useState<{ sub: SubService, category: string } | null>(null);
@@ -200,7 +466,7 @@ export const CustomerPanel: React.FC = () => {
       address: '',
       area: '',
       locationLink: '',
-      city: localStorage.getItem('preferredCity') || 'Bangalore',
+      city: currentCity,
       pincode: '',
       description: '',
       date: '',
@@ -2132,7 +2398,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
            </button>
         </header>
 
-        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <main className="flex-1 max-w-[1800px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
           {bookingStep === 'loading' && (
             <div className="flex flex-col items-center justify-center py-32">
               <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mb-6" />
@@ -2497,11 +2763,78 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
          </button>
       </div>
 
+      
+      {/* See All Categories Modal */}
+      <Modal
+        isOpen={isSeeAllModalOpen}
+        onClose={() => setIsSeeAllModalOpen(false)}
+        title="AC & Appliance Repair"
+        maxWidth="max-w-2xl"
+      >
+        <div className="p-4 sm:p-6 bg-white overflow-y-auto max-h-[70vh]">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Large appliances</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mb-8">
+             {['AC', 'WashingMachine', 'Refrigerator', 'Television'].map(cat => {
+                 const c = categoryList.find(x => x.name === cat);
+                 if(!c) return null;
+                 return (
+                   <div 
+                     key={c.name} 
+                     className="flex flex-col items-center gap-3 cursor-pointer group"
+                     onClick={() => {
+                        setIsSeeAllModalOpen(false);
+                        if (typeof window !== 'undefined' && (window as any).openCategoryView) {
+                            (window as any).openCategoryView(c.name);
+                        } else if (typeof window !== 'undefined' && (window as any).openCategoryModal) {
+                            (window as any).openCategoryModal(c.name);
+                        }
+                     }}
+                   >
+                     <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[#f4f5f6] rounded-[24px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] mb-1">
+                       <img src={c.image} alt={c.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                     </div>
+                     <span className="text-[13px] sm:text-[15px] font-medium text-gray-900 text-center leading-tight">{c.name === 'WashingMachine' ? 'Washing Machine' : c.name}</span>
+                   </div>
+                 )
+             })}
+          </div>
+          
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Small appliances</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mb-8">
+             {['Chimney', 'Microwave', 'WaterPurifier', 'Geyser'].map(cat => {
+                 const c = categoryList.find(x => x.name === cat);
+                 if(!c) return null;
+                 return (
+                   <div 
+                     key={c.name} 
+                     className="flex flex-col items-center gap-3 cursor-pointer group"
+                     onClick={() => {
+                        setIsSeeAllModalOpen(false);
+                        if (typeof window !== 'undefined' && (window as any).openCategoryView) {
+                            (window as any).openCategoryView(c.name);
+                        } else if (typeof window !== 'undefined' && (window as any).openCategoryModal) {
+                            (window as any).openCategoryModal(c.name);
+                        }
+                     }}
+                   >
+                     <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[#f4f5f6] rounded-[24px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] mb-1">
+                       <img src={c.image} alt={c.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                     </div>
+                     <span className="text-[13px] sm:text-[15px] font-medium text-gray-900 text-center leading-tight">{c.name === 'WaterPurifier' ? 'RO/Water Purifier' : c.name}</span>
+                   </div>
+                 )
+             })}
+          </div>
+
+          
+        </div>
+      </Modal>
+
       {renderProfileModal()}
 
       {/* Mobile-Friendly Urban Company Style Hero Content */}
       <div className="bg-indigo-600 sm:bg-transparent pb-8 pt-6 sm:pt-8 transition-all duration-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           {/* Desktop Version of Title (Hidden on small mobile) */}
           <div className="hidden sm:block text-center mb-10">
             <h1 className="text-4xl sm:text-6xl font-black text-indigo-950 mb-3 tracking-tighter uppercase leading-none">
@@ -2513,7 +2846,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           </div>
 
           {/* Search Bar - Repositioned Above Banner for UC Style */}
-          <div className="w-full max-w-sm xs:max-w-md sm:max-w-xl md:max-w-2xl mx-auto mb-5 sm:mb-10 px-2 sm:px-0 relative z-30">
+          <div className="w-full max-w-sm xs:max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto mb-5 sm:mb-10 px-2 sm:px-0 relative z-30">
             <div className="absolute inset-y-0 left-0 pl-5 sm:pl-6 flex items-center pointer-events-none">
               <Search className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-400" />
             </div>
@@ -2563,7 +2896,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           </div>
 
           {/* UC Style Promotional Banner - Tighter height for mobile above-the-fold */}
-          <div className="max-w-4xl mx-auto rounded-3xl sm:rounded-[2.5rem] overflow-hidden relative group">
+          <div className="max-w-[1400px] 2xl:max-w-[1600px] mx-auto rounded-3xl sm:rounded-[2.5rem] overflow-hidden relative group shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-indigo-950/60 to-transparent z-10"></div>
               <img 
                 src="https://i.postimg.cc/W4bqsRYV/Whats-App-Image-2026-01-09-at-5-28-14-AM-(1).jpg" 
@@ -2590,12 +2923,11 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8 sm:px-6 lg:px-8 mb-24">
+      <div className="max-w-[1800px] mx-auto px-4 py-4 sm:py-8 sm:px-6 lg:px-8 mb-24">
         {/* Explore Labels - Reduced spacing */}
         <div className="flex items-center justify-between mb-4 sm:mb-12">
             <div className="flex flex-col">
-                <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-1">Catalog</span>
-                <h3 className="text-2xl sm:text-3xl font-black text-indigo-950 uppercase tracking-tighter">Explore all services</h3>
+                <h2 className="text-[22px] sm:text-3xl font-bold text-gray-900 tracking-normal">Explore all services</h2>
             </div>
             <div className="hidden sm:flex gap-2">
                <div className="w-12 h-1 bg-indigo-600 rounded-full"></div>
@@ -2605,106 +2937,91 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         </div>
 
         {/* Categories Grid - Optimized for density like UC */}
-        {filteredCategories.length > 0 ? (
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-8">
-            {filteredCategories.map((category) => {
-              const cleanRoute = `/services/${category.name.toLowerCase().replace(/\s+/g, '-')}`;
-              return (
-              <a
-                key={category.name}
-                href={cleanRoute}
-                onClick={(e) => {
-                  if ((window as any).handleLinkClick) {
-                    (window as any).handleLinkClick(e);
-                  } else {
+        {searchQuery ? (
+          filteredCategories.length > 0 ? (
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3 sm:gap-8">
+              {filteredCategories.map((category) => {
+                const cleanRoute = `/services/${category.name.toLowerCase().replace(/\s+/g, '-')}`;
+                return (
+                <a
+                  key={category.name}
+                  href={cleanRoute}
+                  onClick={(e) => {
                     e.preventDefault();
                     if ((window as any).openCategoryView) {
                       (window as any).openCategoryView(category.name);
                     } else if ((window as any).openCategoryModal) {
                       (window as any).openCategoryModal(category.name);
                     }
-                  }
-                }}
-                className="relative group rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg h-32 sm:h-48 cursor-pointer w-full transition-all duration-300 hover:shadow-indigo-200/50 hover:scale-[1.02] block border border-indigo-50 bg-white"
-              >
-                <div className="absolute inset-0 bg-indigo-950 opacity-10 group-hover:opacity-0 transition-opacity z-10"></div>
-                <img 
-                  src={category.image} 
-                  alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90"
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-indigo-950 via-indigo-950/40 to-transparent p-2 sm:p-5 flex flex-col justify-end items-center h-full z-20">
-                  <span className="text-white font-black text-[9px] sm:text-xs tracking-widest uppercase text-center leading-tight">
-                    {category.name}
-                  </span>
-                </div>
-              </a>
-            )})}
-          </div>
-        ) : (
-          !searchQuery && (
+                  }}
+                  className="relative group rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg h-32 sm:h-48 cursor-pointer w-full transition-all duration-300 hover:shadow-indigo-200/50 hover:scale-[1.02] block border border-indigo-50 bg-white"
+                >
+                  <img 
+                     src={category.image} 
+                     alt={category.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-indigo-950 via-indigo-950/40 to-transparent p-2 sm:p-5 flex flex-col justify-end items-center h-full z-20">
+                    <span className="text-white font-black text-[9px] sm:text-xs tracking-widest uppercase text-center leading-tight">
+                      {category.name}
+                    </span>
+                  </div>
+                </a>
+              )})}
+            </div>
+          ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No categories available.</p>
             </div>
           )
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-8 max-w-5xl">
+            {mainCategories.map((category) => {
+              return (
+              <div
+                key={category.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (category.id === 'Appliances') {
+                    setIsSeeAllModalOpen(true);
+                  } else {
+                    if ((window as any).openCategoryView) {
+                      (window as any).openCategoryView(category.id);
+                    } else if ((window as any).openCategoryModal) {
+                      (window as any).openCategoryModal(category.id);
+                    }
+                  }
+                }}
+                className="flex flex-col items-center gap-3 sm:gap-5 cursor-pointer group w-full"
+              >
+                <div className="w-full aspect-[16/9] bg-[#f4f5f6] rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] overflow-hidden">
+                  <img 
+                    src={category.image} 
+                    alt={category.name}
+                    className="h-20 sm:h-28 md:h-36 lg:h-40 object-contain transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <span className="text-[15px] sm:text-[18px] md:text-[20px] font-medium text-gray-900 text-center leading-tight">
+                  {category.name}
+                </span>
+              </div>
+            )})}
+          </div>
         )}
+        
+        <PromotionalCarousel />
 
         {/* UPGRADED: Mobile-Friendly Manual Scroll Featured Services */}
-        <div id="featured-services-section" className="mt-12 mb-4 py-8 bg-white border-y border-indigo-50 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-16 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute top-0 right-0 w-16 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
-          
-          <div className="text-center mb-6 sm:mb-10 px-4">
-            <h2 className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Elite Selection</h2>
-            <h3 className="text-xl sm:text-2xl font-black text-indigo-950 tracking-tighter uppercase italic">Most Popular Services</h3>
-          </div>
-          
-          <div className="relative w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4">
-            <style>
-                {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
-            </style>
-            <div className="flex gap-4 sm:gap-6 px-4 sm:px-8 w-max">
-              {featuredServicesData.map((service, index) => (
-                <div 
-                  key={`${service.name}-${index}`} 
-                  className="snap-start flex-shrink-0 w-48 sm:w-64 bg-white rounded-[2rem] shadow-lg shadow-indigo-100/30 border border-indigo-50/50 overflow-hidden group cursor-pointer relative transition-transform"
-                >
-                  <div className="relative h-32 sm:h-40 overflow-hidden">
-                    <img src={service.img} alt={service.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" referrerPolicy="no-referrer" />
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-indigo-950 text-[8px] font-black px-2 py-1 rounded-full flex items-center shadow-lg border border-indigo-100 uppercase tracking-widest">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span> Open
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <h3 className="font-black text-indigo-950 text-xs sm:text-sm mb-1 truncate uppercase tracking-tight" title={service.name}>{service.name}</h3>
-                    <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 mb-3 h-7 overflow-hidden leading-tight uppercase tracking-wider">{service.desc}</p>
-                    <div className="flex justify-between items-center bg-indigo-50/50 p-1.5 sm:p-2 rounded-xl border border-indigo-100/50">
-                        <div className="pl-1">
-                           <p className="text-[7px] font-black text-indigo-400 uppercase tracking-widest leading-none">STARTING</p>
-                           <span className="font-black text-indigo-950 text-base sm:text-lg tracking-tighter">₹{service.price}</span>
-                        </div>
-                        <button 
-                          onClick={() => handleFeaturedBooking(service.name, service.price)}
-                          className="bg-indigo-950 text-white text-[9px] font-black px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg tracking-[0.05em] uppercase hover:bg-black transition-all shadow-md shadow-indigo-100"
-                        >
-                            Book Job
-                        </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-
+                <MostPopularCarousel onBook={handleFeaturedBooking} onSeeAll={() => setIsSeeAllModalOpen(true)} />
 
         {/* Sticky Cart Footer */}
         {cart.length > 0 && (
           <div className="fixed bottom-0 inset-x-0 z-40 bg-white/80 backdrop-blur-xl border-t border-indigo-100 shadow-[0_-20px_50px_rgba(79,70,229,0.12)] p-5 animate-slideUp">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="max-w-[1800px] mx-auto flex items-center justify-between">
               <div className="flex items-center gap-5">
                 <div className="relative">
                   <div className="absolute -inset-1 bg-indigo-600 rounded-2xl blur opacity-20 animate-pulse"></div>
@@ -2731,47 +3048,11 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         )}
 
         {/* Customer Reviews Section */}
-        <div className="mt-28 py-20 bg-indigo-50/30 -mx-4 sm:-mx-6 lg:-mx-8 border-y border-indigo-50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-200/20 blur-[100px] rounded-full"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-200/20 blur-[100px] rounded-full"></div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              <div className="text-center mb-16">
-                  <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mb-4">Customer Chronicles</h2>
-                  <h3 className="text-4xl font-black text-indigo-950 tracking-tighter uppercase italic">Voice of Excellence</h3>
-              </div>
-              <div className="relative overflow-hidden group py-4">
-                  <div className="flex space-x-4 animate-scroll w-max hover:[animation-play-state:paused]">
-                      {[...customerReviews, ...customerReviews].map((review, index) => (
-                          <div key={index} className="w-64 md:w-72 flex-shrink-0 bg-white p-5 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
-                              <div className="flex items-center gap-3 mb-3">
-                                  <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full object-cover border-2 border-indigo-50" />
-                                  <div>
-                                      <h4 className="font-bold text-gray-900 text-sm">{review.name}</h4>
-                                      <div className="flex text-yellow-400 gap-0.5">
-                                          {[...Array(5)].map((_, i) => (
-                                              <Star key={i} size={12} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} />
-                                          ))}
-                                      </div>
-                                  </div>
-                              </div>
-                              <p className="text-gray-600 text-xs leading-relaxed italic line-clamp-4">"{review.text}"</p>
-                          </div>
-                      ))}
-                  </div>
-              </div>
-          </div>
-          <style>{`
-              @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-              .animate-scroll { animation: scroll 30s linear infinite; }
-              @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-              .animate-slideUp { animation: slideUp 0.3s ease-out; }
-          `}</style>
-        </div>
+        <ReviewsCarousel />
 
         {/* Trust Metrics / Stats Section */}
         <div className="py-8 bg-blue-50/30 -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
               <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
                 Your Trusted Home Experts
@@ -2808,7 +3089,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         {/* Latest Articles Section */}
         {latestBlogs.length > 0 && (
           <div className="py-8 bg-white -mx-4 sm:-mx-6 lg:-mx-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col md:flex-row justify-between items-end mb-6">
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-4">
@@ -2898,6 +3179,373 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
             </div>
           </div>
         )}
+
+        
+        {/* Quick Links Section */}
+        {['bangalore', 'delhi', 'mumbai', 'hyderabad', 'pune', 'chennai', 'kolkata', 'ahmedabad', 'gurgaon', 'noida', 'varanasi', 'mau'].includes(activeCity.toLowerCase()) && (() => {
+          const seoKeywords = {
+            bangalore: [
+              { label: "Home Cleaning Services in Bangalore", category: "Cleaning" },
+              { label: "Electrician Services in Bangalore", category: "Electrician" },
+              { label: "Plumber Services in Bangalore", category: "Plumbing" },
+              { label: "AC Service & Repair in Bangalore", category: "AC Repair" },
+              { label: "Appliance Repair Services in Bangalore", category: "Appliances" },
+              { label: "Pest Control Services in Bangalore", category: "Pest Control" },
+              { label: "Home Painting Services in Bangalore", category: "Painting" },
+              { label: "Carpenter Services in Bangalore", category: "Carpentry" },
+              { label: "Sofa & Carpet Cleaning in Bangalore", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Bangalore", category: "Cleaning" },
+              { label: "RO & Water Purifier Service in Bangalore", category: "Appliances" },
+              { label: "Washing Machine Repair in Bangalore", category: "Appliances" },
+              { label: "Refrigerator Repair in Bangalore", category: "Appliances" },
+              { label: "Geyser Repair & Service in Bangalore", category: "Appliances" },
+              { label: "Handyman Services in Bangalore", category: "Carpentry" },
+              { label: "Home Repair & Maintenance in Bangalore", category: "Cleaning" },
+              { label: "Home Services Near Me in Bangalore", category: null }
+            ],
+            delhi: [
+              { label: "Home Cleaning Services in Delhi", category: "Cleaning" },
+              { label: "Deep Cleaning Services in Delhi", category: "Cleaning" },
+              { label: "Electrician Services in Delhi", category: "Electrician" },
+              { label: "Plumber Services in Delhi", category: "Plumbing" },
+              { label: "Emergency Plumber in Delhi", category: "Plumbing" },
+              { label: "AC Service & Repair in Delhi", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Delhi", category: "AC Repair" },
+              { label: "Appliance Repair Services in Delhi", category: "Appliances" },
+              { label: "Washing Machine Repair in Delhi", category: "Appliances" },
+              { label: "Refrigerator Repair in Delhi", category: "Appliances" },
+              { label: "Geyser Repair & Service in Delhi", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Delhi", category: "Appliances" },
+              { label: "Pest Control Services in Delhi", category: "Pest Control" },
+              { label: "Carpenter Services in Delhi", category: "Carpentry" },
+              { label: "Home Painting Services in Delhi", category: "Painting" },
+              { label: "Waterproofing Services in Delhi", category: "Painting" },
+              { label: "Sofa & Carpet Cleaning in Delhi", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Delhi", category: "Cleaning" },
+              { label: "Handyman & Home Repair Services in Delhi", category: "Carpentry" },
+              { label: "Home Services Near Me in Delhi", category: null }
+            ],
+            mumbai: [
+              { label: "Home Cleaning Services in Mumbai", category: "Cleaning" },
+              { label: "Deep Cleaning Services in Mumbai", category: "Cleaning" },
+              { label: "Electrician Services in Mumbai", category: "Electrician" },
+              { label: "Emergency Electrician in Mumbai", category: "Electrician" },
+              { label: "Plumber Services in Mumbai", category: "Plumbing" },
+              { label: "Emergency Plumber & Plumbing Repair in Mumbai", category: "Plumbing" },
+              { label: "AC Service & Repair in Mumbai", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Mumbai", category: "AC Repair" },
+              { label: "Appliance Repair Services in Mumbai", category: "Appliances" },
+              { label: "Washing Machine Repair in Mumbai", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Mumbai", category: "Appliances" },
+              { label: "Geyser Repair & Service in Mumbai", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Mumbai", category: "Appliances" },
+              { label: "Pest Control Services in Mumbai", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Mumbai", category: "Pest Control" },
+              { label: "Carpenter Services in Mumbai", category: "Carpentry" },
+              { label: "Home Painting Services in Mumbai", category: "Painting" },
+              { label: "Waterproofing Services in Mumbai", category: "Painting" },
+              { label: "Sofa & Carpet Cleaning in Mumbai", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Mumbai", category: "Cleaning" },
+              { label: "Handyman & Home Repair Services in Mumbai", category: "Carpentry" },
+              { label: "Home Services Near Me in Mumbai", category: null }
+            ],
+            hyderabad: [
+              { label: "Home Cleaning Services in Hyderabad", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Hyderabad", category: "Cleaning" },
+              { label: "Electrician Services in Hyderabad", category: "Electrician" },
+              { label: "Emergency Electrician Services in Hyderabad", category: "Electrician" },
+              { label: "Plumber Services in Hyderabad", category: "Plumbing" },
+              { label: "Emergency Plumbing & Leakage Repair in Hyderabad", category: "Plumbing" },
+              { label: "AC Service & Repair in Hyderabad", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Hyderabad", category: "AC Repair" },
+              { label: "Appliance Repair Services in Hyderabad", category: "Appliances" },
+              { label: "Washing Machine Repair in Hyderabad", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Hyderabad", category: "Appliances" },
+              { label: "Geyser Repair & Service in Hyderabad", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Hyderabad", category: "Appliances" },
+              { label: "Pest Control Services in Hyderabad", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Hyderabad", category: "Pest Control" },
+              { label: "Carpenter Services in Hyderabad", category: "Carpentry" },
+              { label: "Home Painting Services in Hyderabad", category: "Painting" },
+              { label: "Waterproofing Services in Hyderabad", category: "Painting" },
+              { label: "Sofa & Carpet Cleaning in Hyderabad", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Hyderabad", category: "Cleaning" },
+              { label: "Handyman & Home Repair Services in Hyderabad", category: "Carpentry" },
+              { label: "Home Services Near Me in Hyderabad", category: null }
+            ],
+            pune: [
+              { label: "Home Cleaning Services in Pune", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Pune", category: "Cleaning" },
+              { label: "Electrician Services in Pune", category: "Electrician" },
+              { label: "Emergency Electrician in Pune", category: "Electrician" },
+              { label: "Plumber Services in Pune", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Pune", category: "Plumbing" },
+              { label: "AC Service & Repair in Pune", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Pune", category: "AC Repair" },
+              { label: "Appliance Repair Services in Pune", category: "Appliances" },
+              { label: "Washing Machine Repair in Pune", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Pune", category: "Appliances" },
+              { label: "Geyser Repair & Service in Pune", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Pune", category: "Appliances" },
+              { label: "Pest Control Services in Pune", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Pune", category: "Pest Control" },
+              { label: "Carpenter Services in Pune", category: "Carpentry" },
+              { label: "Home Painting Services in Pune", category: "Painting" },
+              { label: "Waterproofing Services in Pune", category: "Painting" },
+              { label: "Sofa & Carpet Cleaning in Pune", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Pune", category: "Cleaning" },
+              { label: "Handyman & Home Repair Services in Pune", category: "Carpentry" },
+              { label: "Home Services Near Me in Pune", category: null }
+            ],
+            chennai: [
+              { label: "Home Cleaning Services in Chennai", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Chennai", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Chennai", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Chennai", category: "Cleaning" },
+              { label: "Electrician Services in Chennai", category: "Electrician" },
+              { label: "Emergency Electrician Services in Chennai", category: "Electrician" },
+              { label: "Plumber Services in Chennai", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Chennai", category: "Plumbing" },
+              { label: "AC Service & Repair in Chennai", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Chennai", category: "AC Repair" },
+              { label: "Appliance Repair Services in Chennai", category: "Appliances" },
+              { label: "Washing Machine Repair in Chennai", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Chennai", category: "Appliances" },
+              { label: "Geyser Repair & Service in Chennai", category: "Appliances" },
+              { label: "RO & Water Purifier Service in Chennai", category: "Appliances" },
+              { label: "TV & Electronics Repair in Chennai", category: "Appliances" },
+              { label: "Chimney Repair & Service in Chennai", category: "Appliances" },
+              { label: "Pest Control Services in Chennai", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Chennai", category: "Pest Control" },
+              { label: "Carpenter Services in Chennai", category: "Carpentry" },
+              { label: "Home Painting Services in Chennai", category: "Painting" },
+              { label: "Waterproofing Services in Chennai", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Chennai", category: "Carpentry" },
+              { label: "Home Services Near Me in Chennai", category: null }
+            ],
+            kolkata: [
+              { label: "Home Cleaning Services in Kolkata", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Kolkata", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Kolkata", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Kolkata", category: "Cleaning" },
+              { label: "Electrician Services in Kolkata", category: "Electrician" },
+              { label: "Emergency Electrician Services in Kolkata", category: "Electrician" },
+              { label: "Plumber Services in Kolkata", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Kolkata", category: "Plumbing" },
+              { label: "AC Service & Repair in Kolkata", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Kolkata", category: "AC Repair" },
+              { label: "Appliance Repair Services in Kolkata", category: "Appliances" },
+              { label: "Washing Machine Repair in Kolkata", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Kolkata", category: "Appliances" },
+              { label: "Geyser Repair & Service in Kolkata", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Kolkata", category: "Appliances" },
+              { label: "Microwave & TV Repair Services in Kolkata", category: "Appliances" },
+              { label: "Pest Control Services in Kolkata", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Kolkata", category: "Pest Control" },
+              { label: "Carpenter Services in Kolkata", category: "Carpentry" },
+              { label: "Home Painting Services in Kolkata", category: "Painting" },
+              { label: "Waterproofing Services in Kolkata", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Kolkata", category: "Carpentry" },
+              { label: "Home Services Near Me in Kolkata", category: null }
+            ],
+            ahmedabad: [
+              { label: "Home Cleaning Services in Ahmedabad", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Ahmedabad", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Ahmedabad", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Ahmedabad", category: "Cleaning" },
+              { label: "Electrician Services in Ahmedabad", category: "Electrician" },
+              { label: "Emergency Electrician Services in Ahmedabad", category: "Electrician" },
+              { label: "Plumber Services in Ahmedabad", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Ahmedabad", category: "Plumbing" },
+              { label: "AC Service & Repair in Ahmedabad", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Ahmedabad", category: "AC Repair" },
+              { label: "Appliance Repair Services in Ahmedabad", category: "Appliances" },
+              { label: "Washing Machine Repair in Ahmedabad", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Ahmedabad", category: "Appliances" },
+              { label: "Geyser Repair & Service in Ahmedabad", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Ahmedabad", category: "Appliances" },
+              { label: "TV & Electronics Repair in Ahmedabad", category: "Appliances" },
+              { label: "Pest Control Services in Ahmedabad", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Ahmedabad", category: "Pest Control" },
+              { label: "Carpenter Services in Ahmedabad", category: "Carpentry" },
+              { label: "Home Painting Services in Ahmedabad", category: "Painting" },
+              { label: "Waterproofing Services in Ahmedabad", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Ahmedabad", category: "Carpentry" },
+              { label: "Home Services Near Me in Ahmedabad", category: null }
+            ],
+            gurgaon: [
+              { label: "Home Cleaning Services in Gurgaon", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Gurgaon", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Gurgaon", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Gurgaon", category: "Cleaning" },
+              { label: "Electrician Services in Gurgaon", category: "Electrician" },
+              { label: "24x7 Emergency Electrician in Gurgaon", category: "Electrician" },
+              { label: "Plumber Services in Gurgaon", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Gurgaon", category: "Plumbing" },
+              { label: "AC Service & Repair in Gurgaon", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Gurgaon", category: "AC Repair" },
+              { label: "Appliance Repair Services in Gurgaon", category: "Appliances" },
+              { label: "Washing Machine Repair in Gurgaon", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Gurgaon", category: "Appliances" },
+              { label: "Geyser Repair & Service in Gurgaon", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Gurgaon", category: "Appliances" },
+              { label: "TV & Electronics Repair in Gurgaon", category: "Appliances" },
+              { label: "Pest Control Services in Gurgaon", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Gurgaon", category: "Pest Control" },
+              { label: "Carpenter Services in Gurgaon", category: "Carpentry" },
+              { label: "Home Painting Services in Gurgaon", category: "Painting" },
+              { label: "Waterproofing Services in Gurgaon", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Gurgaon", category: "Carpentry" },
+              { label: "Home Services Near Me in Gurgaon", category: null }
+            ],
+            noida: [
+              { label: "Home Cleaning Services in Noida", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Noida", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Noida", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Noida", category: "Cleaning" },
+              { label: "Electrician Services in Noida", category: "Electrician" },
+              { label: "Emergency Electrician Services in Noida", category: "Electrician" },
+              { label: "Plumber Services in Noida", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Noida", category: "Plumbing" },
+              { label: "AC Service & Repair in Noida", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Noida", category: "AC Repair" },
+              { label: "Appliance Repair Services in Noida", category: "Appliances" },
+              { label: "Washing Machine Repair in Noida", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Noida", category: "Appliances" },
+              { label: "Geyser Repair & Service in Noida", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Noida", category: "Appliances" },
+              { label: "TV & Electronics Repair in Noida", category: "Appliances" },
+              { label: "Pest Control Services in Noida", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Noida", category: "Pest Control" },
+              { label: "Carpenter Services in Noida", category: "Carpentry" },
+              { label: "Home Painting Services in Noida", category: "Painting" },
+              { label: "Waterproofing Services in Noida", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Noida", category: "Carpentry" },
+              { label: "Home Services Near Me in Noida", category: null }
+            ],
+            varanasi: [
+              { label: "Home Cleaning Services in Varanasi", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Varanasi", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Varanasi", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Varanasi", category: "Cleaning" },
+              { label: "Electrician Services in Varanasi", category: "Electrician" },
+              { label: "Emergency Electrician Services in Varanasi", category: "Electrician" },
+              { label: "Plumber Services in Varanasi", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Varanasi", category: "Plumbing" },
+              { label: "AC Service & Repair in Varanasi", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Varanasi", category: "AC Repair" },
+              { label: "Appliance Repair Services in Varanasi", category: "Appliances" },
+              { label: "Washing Machine Repair in Varanasi", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Varanasi", category: "Appliances" },
+              { label: "Geyser Repair & Service in Varanasi", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Varanasi", category: "Appliances" },
+              { label: "TV & Electronics Repair in Varanasi", category: "Appliances" },
+              { label: "Pest Control Services in Varanasi", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Varanasi", category: "Pest Control" },
+              { label: "Carpenter Services in Varanasi", category: "Carpentry" },
+              { label: "Home Painting Services in Varanasi", category: "Painting" },
+              { label: "Waterproofing Services in Varanasi", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Varanasi", category: "Carpentry" },
+              { label: "Home Services Near Me in Varanasi", category: null }
+            ],
+            mau: [
+              { label: "Home Cleaning Services in Mau", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Mau", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Mau", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Mau", category: "Cleaning" },
+              { label: "Electrician Services in Mau", category: "Electrician" },
+              { label: "Emergency Electrician Services in Mau", category: "Electrician" },
+              { label: "Plumber Services in Mau", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Mau", category: "Plumbing" },
+              { label: "AC Service & Repair in Mau", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Mau", category: "AC Repair" },
+              { label: "Appliance Repair Services in Mau", category: "Appliances" },
+              { label: "Washing Machine Repair in Mau", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Mau", category: "Appliances" },
+              { label: "Geyser Repair & Service in Mau", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Mau", category: "Appliances" },
+              { label: "TV & Electronics Repair in Mau", category: "Appliances" },
+              { label: "Pest Control Services in Mau", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Mau", category: "Pest Control" },
+              { label: "Carpenter Services in Mau", category: "Carpentry" },
+              { label: "Home Painting Services in Mau", category: "Painting" },
+              { label: "Waterproofing Services in Mau", category: "Painting" },
+              { label: "Handyman & Home Maintenance in Mau", category: "Carpentry" },
+              { label: "Home Repair Services in Mau", category: "Carpentry" },
+              { label: "Home Services Near Me in Mau", category: null }
+            ]
+          };
+          const currentKeywords = (seoKeywords as any)[activeCity.toLowerCase()];
+
+          return (
+            <div className="py-12 bg-white border-t border-gray-100 -mx-4 sm:-mx-6 lg:-mx-8 mt-12">
+              <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">Quick Links</h2>
+                
+                <div className="mb-10">
+                  <h3 className="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                    Provided Services Across Various Cities in India
+                  </h3>
+                  <div className="flex flex-wrap gap-x-8 gap-y-4">
+                    {CITY_DATA.map(city => (
+                      <Link 
+                        key={city.name} 
+                        to={`/${city.name.toLowerCase()}`} 
+                        onClick={() => {
+                          localStorage.setItem('preferredCity', city.name);
+                          window.dispatchEvent(new Event('cityUpdated'));
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="text-gray-600 hover:text-indigo-600 font-medium flex items-center gap-2 text-[15px] transition-colors group"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 group-hover:scale-125 transition-transform"></span>
+                        {city.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {currentKeywords && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
+                      <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                      Other Services We Offer in {activeCity}
+                    </h3>
+                    <div className="flex flex-wrap gap-x-8 gap-y-4">
+                      {currentKeywords.map((item: any) => (
+                        <Link 
+                          key={item.label} 
+                          to={`/${activeCity.toLowerCase()}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            if (item.category) {
+                              if (typeof window !== 'undefined' && (window as any).openCategoryView) {
+                                (window as any).openCategoryView(item.category);
+                              } else if (typeof window !== 'undefined' && (window as any).openCategoryModal) {
+                                (window as any).openCategoryModal(item.category);
+                              } else {
+                                const targetService = SERVICES.find(s => s.name === item.category);
+                                if (targetService) {
+                                  setSelectedService(targetService);
+                                }
+                              }
+                            }
+                          }}
+                          className="text-gray-600 hover:text-indigo-600 font-medium flex items-center gap-2 text-[15px] transition-colors group"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 group-hover:scale-125 transition-transform"></span>
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Sub-service Selection Modal */}
         <Modal
@@ -3801,7 +4449,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                         </span>
                       </div>
                       <p className="text-xs text-indigo-300 font-medium mt-1">
-                        Professional Service Expert • {selectedTechnicianForProfile.city || "Gorakhpur Region"}
+                        Professional Service Expert • {selectedTechnicianForProfile.city || "Mau Region"}
                       </p>
                     </div>
                   </div>

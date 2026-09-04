@@ -39,6 +39,7 @@ function AppContent() {
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/track" element={<TrackBooking />} />
+          <Route path="/:cityUrl" element={<CustomerPanel />} />
           <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>

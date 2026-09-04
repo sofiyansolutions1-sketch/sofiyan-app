@@ -8,6 +8,7 @@ import {
   Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, Share2, Map as MapIcon
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { getSignedAppFileUrl } from '../services/storageService';
 import { BlogManager } from '../components/BlogManager';
 import { PartnerManager } from '../components/PartnerManager';
 import { FollowUpManager } from '../components/FollowUpManager';
@@ -32,6 +33,24 @@ export const AdminPanel: React.FC = () => {
   const [showPartnersDirectory, setShowPartnersDirectory] = useState(false);
   const [directorySearchQuery, setDirectorySearchQuery] = useState('');
   const [directoryStatusFilter, setDirectoryStatusFilter] = useState<'all' | 'available' | 'busy' | 'pending' | 'on_hold' | 'blocked'>('all');
+
+  const handleViewDocument = async (idProofUrl: string) => {
+    try {
+      const parsed = JSON.parse(idProofUrl);
+      const docPath = parsed.aadhaarPhoto || parsed.profilePhoto || parsed.registrationFeeScreenshot || (parsed.businessPhotos && parsed.businessPhotos[0]);
+      if (docPath) {
+        const signedUrl = await getSignedAppFileUrl(docPath);
+        if (signedUrl) {
+          window.open(signedUrl, '_blank');
+          return;
+        }
+      }
+    } catch {
+      // If it's a plain string
+      const signedUrl = await getSignedAppFileUrl(idProofUrl);
+      if (signedUrl) window.open(signedUrl, '_blank');
+    }
+  };
 
   const [ratingBookingId, setRatingBookingId] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState<number>(5);
@@ -859,14 +878,12 @@ export const AdminPanel: React.FC = () => {
                     )}
 
                     {partner.id_proof_url ? (
-                      <a 
-                        href={partner.id_proof_url} 
-                        target="_blank" 
-                        rel="noreferrer" 
-                        className="text-indigo-600 font-black hover:underline tracking-wider uppercase text-[8px] flex items-center gap-0.5 bg-indigo-50/50 hover:bg-indigo-50 py-0.5 px-2 rounded transition"
+                      <button 
+                        onClick={() => handleViewDocument(partner.id_proof_url!)}
+                        className="text-indigo-600 font-black hover:underline tracking-wider uppercase text-[8px] flex items-center gap-0.5 bg-indigo-50/50 hover:bg-indigo-50 py-0.5 px-2 rounded transition cursor-pointer"
                       >
                         📄 View Document
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-[8px] text-gray-300 uppercase tracking-widest">No Document</span>
                     )}

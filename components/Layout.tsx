@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Phone, Mail, Home, Users, Lock, Menu, X, Facebook, Instagram, Youtube, Star, FileText } from 'lucide-react';
 import { BUSINESS_NAME, CITY_DATA } from '../constants';
 import { Modal } from './Modal';
-import { CheckCircle, MapPin, Trash2, ShoppingCart } from 'lucide-react';
+import { CheckCircle, MapPin, Trash2, ShoppingCart, Loader2, LocateFixed } from 'lucide-react';
 
 const siteContent = {
   about: {
@@ -46,10 +46,56 @@ const siteContent = {
 };
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isPanelMenuOpen, setIsPanelMenuOpen] = useState(false);
   const [activeContent, setActiveContent] = useState<keyof typeof siteContent | null>(null);
   const [userCity, setUserCity] = useState<string | null>(localStorage.getItem('preferredCity'));
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const handleUseCurrentLocation = () => {
+    setLocationError(null);
+    setIsDetectingLocation(true);
+    
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      setIsDetectingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          // Reverse geocode to get city
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
+          const data = await response.json();
+          
+          const detectedCity = data.address?.city || data.address?.town || data.address?.state_district || data.address?.county || "";
+          
+          // Check if detected city matches any in our list (case insensitive)
+          const matchedCity = CITY_DATA.find(c => detectedCity.toLowerCase().includes(c.name.toLowerCase()));
+          
+          if (matchedCity) {
+            handleCitySelect(matchedCity.name);
+          } else {
+            setLocationError("Current location is not service available");
+          }
+        } catch {
+          setLocationError("Failed to detect location. Please try again.");
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      () => {
+        setLocationError("Permission denied or unable to retrieve location");
+        setIsDetectingLocation(false);
+      },
+      { timeout: 10000 }
+    );
+  };
 
   // Synchronize cart count across layout and pages
   const [cartItems, setCartItems] = useState<any[]>(() => {
@@ -143,7 +189,74 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     localStorage.setItem('preferredCity', cityName);
     window.dispatchEvent(new Event('cityUpdated'));
     setIsCityModalOpen(false);
+    
+    // Check if we are currently on the customer panel (not admin/partner)
+    if (location.pathname === '/' || CITY_DATA.some(c => `/${c.name.toLowerCase()}` === location.pathname.toLowerCase())) {
+      navigate(`/${cityName.toLowerCase()}`);
+    }
   };
+
+  React.useEffect(() => {
+    // If URL contains a valid city, update userCity
+    const path = location.pathname.split('/')[1]?.toLowerCase();
+    if (path) {
+      const matchedCity = CITY_DATA.find(c => c.name.toLowerCase() === path);
+      if (matchedCity && userCity !== matchedCity.name) {
+        setUserCity(matchedCity.name);
+        localStorage.setItem('preferredCity', matchedCity.name);
+        window.dispatchEvent(new Event('cityUpdated'));
+      }
+    } else if (location.pathname === '/' && userCity) {
+      // Auto-redirect to city URL if user is on root and already has a preferred city
+      navigate(`/${userCity.toLowerCase()}`, { replace: true });
+    }
+  }, [location.pathname, userCity, navigate]);
+
+  // Dynamic SEO Metadata Updater
+  React.useEffect(() => {
+    const defaultTitle = "Sofiyan Home Service - Expert AC, Appliance, Plumber & Electrician";
+    const defaultDesc = "Book professional and verified technicians for AC repair, washing machine, refrigerator, plumbing, and electrical services at your doorstep.";
+    
+    let title = defaultTitle;
+    let description = defaultDesc;
+    let canonicalPath = "/";
+
+    if (userCity) {
+      title = `Best Home Services in ${userCity} | AC, Plumbing, Electrician | Sofiyan`;
+      description = `Looking for top-rated home services in ${userCity}? Sofiyan Home Service offers expert AC repair, plumbing, electrical, and appliance repair in ${userCity}. Book verified professionals today.`;
+      canonicalPath = `/${userCity.toLowerCase()}`;
+    }
+
+    // Update Document Title
+    document.title = title;
+
+    // Helper function to update or create meta tags
+    const updateMetaTag = (selector: string, attributeName: string, attributeValue: string, content: string) => {
+      let element = document.querySelector(selector);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attributeName, attributeValue);
+        document.head.appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    // Update Meta Description
+    updateMetaTag('meta[name="description"]', 'name', 'description', description);
+    
+    // Update Open Graph tags
+    updateMetaTag('meta[property="og:title"]', 'property', 'og:title', title);
+    updateMetaTag('meta[property="og:description"]', 'property', 'og:description', description);
+
+    // Update Canonical URL
+    let canonicalUrl = document.querySelector('link[rel="canonical"]');
+    if (!canonicalUrl) {
+      canonicalUrl = document.createElement('link');
+      canonicalUrl.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalUrl);
+    }
+    canonicalUrl.setAttribute('href', `${window.location.origin}${canonicalPath}`);
+  }, [userCity]);
 
   const openContent = (key: keyof typeof siteContent) => {
     setActiveContent(key);
@@ -159,7 +272,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {/* Navbar - Visible on ALL pages for standardized navigation */}
       <nav className="bg-white border-b border-indigo-50 sticky top-0 z-40 shadow-sm block">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="max-w-[1800px] mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-2 w-full">
             <div className="flex items-center min-w-0 flex-1 sm:flex-initial">
               <Link to="/" className="flex items-center gap-2 group min-w-0">
@@ -311,7 +424,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       {/* Professional Footer (Fhocket Style) */}
       <footer className="bg-white text-gray-800 pt-16 pb-8 border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             
             {/* Col 1: Brand */}
@@ -444,20 +557,50 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           isOpen={isCityModalOpen}
           onClose={() => { if (userCity) setIsCityModalOpen(false); }}
           title="Select Your City"
+          maxWidth="max-w-4xl"
         >
-           <div className="py-4">
+           <div className="py-2 sm:py-4 px-0 sm:px-4">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-black text-indigo-950 tracking-tighter uppercase mb-2">Service Location</h3>
-                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] max-w-sm mx-auto">
+                <h3 className="text-2xl sm:text-3xl font-black text-indigo-950 tracking-tighter uppercase mb-2">Service Location</h3>
+                <p className="text-[10px] sm:text-xs font-black text-indigo-400 uppercase tracking-[0.2em] max-w-md mx-auto mb-8">
                     Select your city to see available services in your area.
                 </p>
+                
+                <button 
+                  onClick={handleUseCurrentLocation}
+                  disabled={isDetectingLocation}
+                  className="w-full max-w-2xl mx-auto flex items-center justify-center gap-3 bg-indigo-50/50 hover:bg-indigo-100 text-indigo-700 py-3.5 sm:py-4 px-6 rounded-2xl font-bold text-sm sm:text-base transition-all active:scale-[0.98] disabled:opacity-70 border-2 border-dashed border-indigo-300"
+                >
+                  {isDetectingLocation ? (
+                    <Loader2 size={20} className="animate-spin text-indigo-600" />
+                  ) : (
+                    <LocateFixed size={20} className="text-indigo-600" />
+                  )}
+                  {isDetectingLocation ? 'Detecting Location...' : 'Use My Current Location'}
+                </button>
+                
+                {locationError && (
+                  <p className="text-[11px] text-red-500 font-bold mt-4 animate-fadeIn bg-red-50 py-2 px-4 rounded-xl inline-block border border-red-100">
+                    {locationError}
+                  </p>
+                )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+              
+              <div className="relative mb-6 max-w-3xl mx-auto">
+                <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-gray-50 px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Or select manually</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
                  {CITY_DATA.map(city => (
-                    <button
+                    <button 
                        key={city.name}
                        onClick={() => handleCitySelect(city.name)}
-                       className="group relative rounded-[2rem] overflow-hidden aspect-square shadow-xl shadow-indigo-100/50 border-2 border-transparent hover:border-indigo-600 transition-all transform hover:-translate-y-1 bg-indigo-50"
+                       className="group relative rounded-2xl sm:rounded-3xl overflow-hidden aspect-square shadow-lg shadow-indigo-100/50 border-2 border-transparent hover:border-indigo-600 transition-all transform hover:-translate-y-1 sm:hover:-translate-y-2 bg-indigo-50"
                     >
                        <img 
                           src={city.img} 
@@ -467,21 +610,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                           loading="eager"
                           {...({ fetchpriority: "high" } as any)}
                        />
-                       <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-indigo-900/20 to-transparent flex flex-col justify-end p-4">
+                       <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-indigo-900/20 to-transparent flex flex-col justify-end p-3 sm:p-4">
                           <p className="text-white font-black text-xs sm:text-sm tracking-widest uppercase">{city.name}</p>
-                          <div className="w-10 h-0.5 bg-indigo-500 rounded-full mt-1.5 opacity-50 group-hover:w-full transition-all duration-500"></div>
+                          <div className="w-8 h-1 bg-indigo-500 rounded-full mt-1.5 opacity-50 group-hover:w-full group-hover:opacity-100 transition-all duration-500"></div>
                        </div>
                     </button>
                  ))}
               </div>
-              <div className="mt-10 bg-indigo-950 p-6 rounded-[2rem] shadow-2xl shadow-indigo-200 border border-indigo-900 flex items-center gap-4">
-                 <div className="bg-indigo-600 p-3 rounded-2xl text-white shadow-lg">
-                    <CheckCircle size={24} />
+              <div className="mt-10 sm:mt-12 bg-indigo-950 p-6 sm:p-8 rounded-[2rem] shadow-2xl shadow-indigo-200 border border-indigo-900 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+                 <div className="bg-indigo-600 p-4 rounded-2xl text-white shadow-lg shrink-0">
+                    <CheckCircle size={32} />
                  </div>
-                 <div>
-                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-1">Operational Truth</p>
-                    <p className="text-[11px] text-white font-bold leading-relaxed italic opacity-80">
-                        "Trusted by 50,000+ elite households for unparalleled quality home maintenance."
+                 <div className="flex-1">
+                    <p className="text-[10px] sm:text-xs font-black text-indigo-400 uppercase tracking-[0.3em] mb-2">Operational Truth</p>
+                    <p className="text-xs sm:text-sm text-white font-bold leading-relaxed italic opacity-90 max-w-2xl">
+                        "Trusted by 50,000+ elite households for unparalleled quality home maintenance. We ensure verified professionals, transparent pricing, and guaranteed satisfaction."
                     </p>
                  </div>
               </div>

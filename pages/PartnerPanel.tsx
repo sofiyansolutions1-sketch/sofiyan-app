@@ -741,15 +741,6 @@ export const PartnerPanel: React.FC = () => {
     let aadhaarPathOrUrl: string | null = null;
     let regFeePathOrUrl: string | null = null;
 
-    const fileToBase64 = (file: File): Promise<string> => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = () => resolve("");
-        reader.readAsDataURL(file);
-      });
-    };
-
     // Determine current user ID or partnerId
     let authUid = partnerId;
     try {
@@ -773,7 +764,7 @@ export const PartnerPanel: React.FC = () => {
         profilePathOrUrl = result.filePath;
       } catch (err) {
         console.error("Profile photo upload failed:", err);
-        profilePathOrUrl = await fileToBase64(profilePhoto);
+        throw new Error("Failed to upload profile photo.");
       }
     }
 
@@ -791,8 +782,7 @@ export const PartnerPanel: React.FC = () => {
         businessPathsOrUrls.push(result.filePath);
       } catch (err) {
         console.error(`Shop/business photo ${i} upload failed:`, err);
-        const b64 = await fileToBase64(file);
-        if (b64) businessPathsOrUrls.push(b64);
+        throw new Error("Failed to upload shop/business photo.");
       }
     }
 
@@ -808,7 +798,7 @@ export const PartnerPanel: React.FC = () => {
         aadhaarPathOrUrl = result.filePath;
       } catch (err) {
         console.error("Aadhaar photo upload failed:", err);
-        aadhaarPathOrUrl = await fileToBase64(aadhaarPhoto);
+        throw new Error("Failed to upload Aadhaar photo.");
       }
     }
 
@@ -824,7 +814,7 @@ export const PartnerPanel: React.FC = () => {
         regFeePathOrUrl = result.filePath;
       } catch (err) {
         console.error("Registration fee receipt upload failed:", err);
-        regFeePathOrUrl = await fileToBase64(regPaymentFile);
+        throw new Error("Failed to upload registration fee receipt.");
       }
     }
 
@@ -894,6 +884,25 @@ export const PartnerPanel: React.FC = () => {
       console.log("[Onboarding Step 2 - Uploading Verification Media] Processing images with AI metadata...");
       let docsJson = isUpdating ? (currentUser.id_proof_url || "") : "";
       if (profilePhoto || shopPhoto || businessPhotos.length > 0 || aadhaarPhoto || regPaymentFile) {
+        // If updating and we have an old docsJson, delete the old files from storage
+        if (isUpdating && docsJson) {
+          try {
+            const oldDocs = JSON.parse(docsJson);
+            const pathsToDelete = [
+              oldDocs.profilePhoto,
+              ...(oldDocs.businessPhotos || []),
+              oldDocs.aadhaarPhoto,
+              oldDocs.registrationFeeScreenshot
+            ].filter(Boolean);
+            
+            for (const path of pathsToDelete) {
+              await deleteAppFile(path);
+            }
+          } catch (e) {
+            console.warn("Failed to delete old documents:", e);
+          }
+        }
+        
         docsJson = await uploadVerificationFiles(partnerId, aiVerificationData);
         console.log("[Onboarding Step 2 ✅] Verification documents encoded successfully.");
       }
