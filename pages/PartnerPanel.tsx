@@ -723,7 +723,7 @@ export const PartnerPanel: React.FC = () => {
     let profilePathOrUrl: string | null = null;
     const businessPathsOrUrls: string[] = [];
     let aadhaarPathOrUrl: string | null = null;
-    let regFeePathOrUrl: string | null = null;
+    const regFeePathOrUrl: string | null = null;
 
     // Determine current user ID or partnerId
     let authUid = partnerId;
@@ -786,22 +786,6 @@ export const PartnerPanel: React.FC = () => {
       }
     }
 
-    if (regPaymentFile) {
-      try {
-        const result = await uploadAppFile({
-          userId: authUid,
-          featureName: "partner_reg_fee",
-          itemId: partnerId,
-          file: regPaymentFile,
-          customFileName: regPaymentFile.name || "reg_fee.jpg"
-        });
-        regFeePathOrUrl = result.filePath;
-      } catch (err) {
-        console.error("Registration fee receipt upload failed:", err);
-        throw new Error("Failed to upload registration fee receipt.");
-      }
-    }
-
     return JSON.stringify({
       profilePhoto: profilePathOrUrl,
       businessPhotos: businessPathsOrUrls,
@@ -809,7 +793,6 @@ export const PartnerPanel: React.FC = () => {
       aadhaarPhoto: aadhaarPathOrUrl,
       registrationFeeScreenshot: regFeePathOrUrl,
       registrationFeeAmount: 499,
-      paymentVerificationCode: regPaymentCode,
       ai_verified: true,
       ai_utr: aiVerificationData?.extractedUtr || null,
       ai_payment_app: aiVerificationData?.paymentApp || null,
@@ -867,7 +850,7 @@ export const PartnerPanel: React.FC = () => {
 
       console.log("[Onboarding Step 2 - Uploading Verification Media] Processing images with AI metadata...");
       let docsJson = isUpdating ? (currentUser.id_proof_url || "") : "";
-      if (profilePhoto || shopPhoto || businessPhotos.length > 0 || aadhaarPhoto || regPaymentFile) {
+      if (profilePhoto || shopPhoto || businessPhotos.length > 0 || aadhaarPhoto ) {
         // If updating and we have an old docsJson, delete the old files from storage
         if (isUpdating && docsJson) {
           try {
