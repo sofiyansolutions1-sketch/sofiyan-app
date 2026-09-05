@@ -211,13 +211,15 @@ const getRateCardCategory = (name: string): string | null => {
 };
 
 
-const PromotionalCarousel: React.FC = () => {
+const PromotionalCarousel: React.FC<{onApplianceClick?: () => void}> = () => {
   const basePromos = [
-    { src: "https://iili.io/nJFbxOQ.png", category: "Chimney" },
-    { src: "https://iili.io/nJFbLkx.png", category: "Cleaning" },
-    { src: "https://iili.io/nJFpFcu.png", category: "AC" },
-    { src: "https://iili.io/nJFp4Hb.png", category: "WaterPurifier" },
-    { src: "https://iili.io/nJFyBgn.png", category: "WashingMachine" }
+    { src: "https://iili.io/nddEUI2.png", category: "AC" },
+    { src: "https://iili.io/nddM2M7.png", category: "Plumbing" },
+    { src: "https://iili.io/nddMsOx.png", category: "WashingMachine" },
+    { src: "https://iili.io/nddVrLN.png", category: "WaterPurifier" },
+    { src: "https://iili.io/nddWaQp.png", category: "Geyser" },
+    { src: "https://iili.io/nddXfcX.png", category: "Chimney" },
+    { src: "https://iili.io/nddXvxR.png", category: "Cleaning" }
   ];
   // Duplicate for longer scroll before rewind
   const promos = [...basePromos, ...basePromos]; 
@@ -2791,7 +2793,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                      }}
                    >
                      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[#f4f5f6] rounded-[24px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] mb-1">
-                       <img src={c.image} alt={c.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                       <img src={c.image} alt={c.name} className="w-full h-full object-cover scale-[1.25] transition-transform duration-500 group-hover:scale-[1.35]" />
                      </div>
                      <span className="text-[13px] sm:text-[15px] font-medium text-gray-900 text-center leading-tight">{c.name === 'WashingMachine' ? 'Washing Machine' : c.name}</span>
                    </div>
@@ -2818,7 +2820,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                      }}
                    >
                      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[#f4f5f6] rounded-[24px] overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] mb-1">
-                       <img src={c.image} alt={c.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                       <img src={c.image} alt={c.name} className="w-full h-full object-cover scale-[1.25] transition-transform duration-500 group-hover:scale-[1.35]" />
                      </div>
                      <span className="text-[13px] sm:text-[15px] font-medium text-gray-900 text-center leading-tight">{c.name === 'WaterPurifier' ? 'RO/Water Purifier' : c.name}</span>
                    </div>
@@ -2996,11 +2998,11 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                 }}
                 className="flex flex-col items-center gap-3 sm:gap-5 cursor-pointer group w-full"
               >
-                <div className="w-full aspect-[16/9] bg-[#f4f5f6] rounded-[24px] sm:rounded-[32px] p-4 sm:p-6 flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] overflow-hidden">
+                <div className="w-full aspect-[16/9] bg-[#f4f5f6] rounded-[24px] sm:rounded-[32px] flex items-center justify-center transition-transform duration-300 group-hover:bg-[#ebebeb] overflow-hidden">
                   <img 
                     src={category.image} 
                     alt={category.name}
-                    className="h-20 sm:h-28 md:h-36 lg:h-40 object-contain transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover scale-[1.25] transition-transform duration-500 group-hover:scale-[1.35]"
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
@@ -3013,7 +3015,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           </div>
         )}
         
-        <PromotionalCarousel />
+        <PromotionalCarousel onApplianceClick={() => setIsSeeAllModalOpen(true)} />
 
         {/* UPGRADED: Mobile-Friendly Manual Scroll Featured Services */}
                 <MostPopularCarousel onBook={handleFeaturedBooking} onSeeAll={() => setIsSeeAllModalOpen(true)} />

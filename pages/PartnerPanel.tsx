@@ -31,7 +31,6 @@ import {
   X,
   ChevronRight,
   Settings2,
-  Copy,
   Smartphone,
   ArrowRight,
   Bot,
@@ -376,24 +375,9 @@ export const PartnerPanel: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [paymentVerificationCode, setPaymentVerificationCode] = useState<string | null>(null);
   const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [regStep, setRegStep] = useState<"personal" | "expertise" | "location" | "verify" | "payment" | "success">("personal");
-  const [regPaymentCode, setRegPaymentCode] = useState<string | null>(null);
-  const [regPaymentFile, setRegPaymentFile] = useState<File | null>(null);
-  const [regPaymentImage, setRegPaymentImage] = useState<string | null>(null);
-  const [regPaymentStatus, setRegPaymentStatus] = useState<"idle" | "verifying" | "verified">("idle");
-  const [regPaymentError, setRegPaymentError] = useState<string | null>(null);
-  const [regCopiedUpi, setRegCopiedUpi] = useState(false);
-  const [regAiResult, setRegAiResult] = useState<{
-    verified: boolean;
-    extractedAmount?: number | null;
-    extractedUtr?: string | null;
-    extractedReceiver?: string | null;
-    paymentApp?: string | null;
-    message?: string;
-    reason?: string;
-  } | null>(null);
-  const [regAiScanProgress, ] = useState<string>("");
-
+  const [regStep, setRegStep] = useState<"personal" | "expertise" | "location" | "verify" | "success">("personal");
+  
+      
   const [commissionAiResult, setCommissionAiResult] = useState<{
     verified: boolean;
     extractedAmount?: number | null;
@@ -1029,48 +1013,7 @@ export const PartnerPanel: React.FC = () => {
     }
   };
 
-  const handleVerifyAndSubmitRegistration = async () => {
-    if (!regPaymentFile) {
-      setRegPaymentError("Please upload the payment screenshot of ₹499 registration fee.");
-      return;
-    }
-    setRegPaymentError(null);
-    setRegPaymentStatus("verifying");
-
-    try {
-      // AI Verification bypassed
-      const aiResult = {
-        verified: true,
-        extractedAmount: 499,
-        extractedUtr: "Manual-Bypass",
-        reason: "Auto-approved",
-        rawJson: "{}"
-      };
-
-      // Step 3: Payment verified successfully
-      setRegAiResult(aiResult);
-      setRegPaymentStatus("verified");
-
-      // Step 4: Persist registration to Supabase
-      await handleRegistrationSubmit(aiResult);
-
-      // Celebration Confetti
-      try {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      } catch (confettiErr) {
-        console.log("Confetti trigger:", confettiErr);
-      }
-    } catch (err: any) {
-      console.error("Registration verification error:", err);
-      setRegPaymentError(err.message || "Failed to submit.");
-      setRegPaymentStatus("idle");
-    }
-  };
-
+  
   const handleLogout = () => {
     setCurrentUser(null);
     setIsPendingSignup(false);
@@ -1571,13 +1514,13 @@ export const PartnerPanel: React.FC = () => {
           <p className="text-slate-500 mb-8 text-sm font-medium">Join our verified network of professional technicians</p>
 
           {/* Stepper Progress */}
-          <div className="flex justify-between items-center mb-8 relative px-1 sm:px-2">
+          <div className="flex justify-between items-center mb-8 relative px-1 sm:px-2 max-w-md mx-auto">
             <div className="absolute top-5 left-6 right-6 h-0.5 bg-slate-100 -z-10"></div>
 
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["personal", "expertise", "location", "verify", "payment", "success"].includes(regStep)
+                  ["personal", "expertise", "location", "verify", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1590,7 +1533,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["expertise", "location", "verify", "payment", "success"].includes(regStep)
+                  ["expertise", "location", "verify", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1603,7 +1546,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["location", "verify", "payment", "success"].includes(regStep)
+                  ["location", "verify", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1616,7 +1559,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["verify", "payment", "success"].includes(regStep)
+                  ["verify", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1624,19 +1567,6 @@ export const PartnerPanel: React.FC = () => {
                 4
               </div>
               <span className="text-[9px] sm:text-[10px] mt-2 font-bold tracking-wider text-slate-600">VERIFY</span>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["payment", "success"].includes(regStep)
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white border-2 border-slate-200 text-slate-400"
-                }`}
-              >
-                5
-              </div>
-              <span className="text-[9px] sm:text-[10px] mt-2 font-bold tracking-wider text-slate-600">REGISTRATION</span>
             </div>
           </div>
 
@@ -2230,265 +2160,19 @@ export const PartnerPanel: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (!regPaymentCode) {
-                      setRegPaymentCode(Math.floor(100000 + Math.random() * 900000).toString());
-                    }
-                    setRegStep("payment");
-                  }}
+                  onClick={() => handleRegistrationSubmit()}
                   disabled={isSubmitting || !profilePhoto || (regData.aadharNumber.length < 12 && !aadhaarPhoto)}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <span>Next: Registration Fee (₹499)</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 5: REGISTRATION FEE / PAYMENT */}
-          {regStep === "payment" && (
-            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
-              {/* Header Banner */}
-              <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-700 p-5 sm:p-6 rounded-3xl text-white relative overflow-hidden shadow-lg border border-indigo-500/30">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                    <span className="bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/20">
-                      Step 5 • Mandatory Registration
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
-                      <Sparkles className="w-3 h-3" />
-                      Instant AI Auto-Approval
-                    </span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-                    Partner Registration Fee
-                  </h3>
-                  <p className="text-indigo-100 text-xs sm:text-sm mt-1 leading-relaxed">
-                    One-time onboarding & profile background verification fee to activate your technician dashboard & start receiving high-paying local job leads instantly.
-                  </p>
-                </div>
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                <div className="flex justify-between items-center text-xs text-slate-600">
-                  <span>Technician Onboarding & Background Verification</span>
-                  <span className="font-bold text-slate-800">₹499.00</span>
-                </div>
-                <div className="flex justify-between items-center text-xs text-slate-600">
-                  <span>GST & Service Charge</span>
-                  <span className="font-bold text-emerald-600 font-mono">₹0.00 (INCLUDED)</span>
-                </div>
-                <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
-                  <span className="text-sm font-black text-slate-900">Total Payable Amount</span>
-                  <span className="text-2xl font-black text-indigo-600">₹499</span>
-                </div>
-              </div>
-
-              {/* Identification Code Badge */}
-              <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <div className="text-[10px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1">
-                    <Bot className="w-3.5 h-3.5 text-amber-600" />
-                    Payment Verification Note
-                  </div>
-                  <div className="text-xs font-bold text-amber-950 mt-0.5">
-                    Identification Code: <span className="font-mono bg-white px-2 py-0.5 rounded border border-amber-300 font-black text-indigo-700">Code-{regPaymentCode || "499001"}</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`Code-${regPaymentCode || "499001"}`);
-                    setRegCopiedUpi(true);
-                    setTimeout(() => setRegCopiedUpi(false), 2000);
-                  }}
-                  className="text-xs bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5"
-                >
-                  <Copy size={12} /> {regCopiedUpi ? "Copied!" : "Copy Code"}
-                </button>
-              </div>
-
-              {/* QR Code & Direct UPI Pay Card */}
-              <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center space-y-4">
-                <div className="inline-block p-3 border-4 border-indigo-50 rounded-2xl bg-white shadow-sm">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
-                      `upi://pay?pa=8115983887@ptsbi&pn=Sofiyan%20Home%20Services&cu=INR&am=499&tn=Code-${regPaymentCode || "499001"}`
-                    )}`}
-                    alt="Registration Fee UPI QR"
-                    className="w-48 h-48 sm:w-52 sm:h-52 object-contain mx-auto"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-800">Scan using any UPI App (GPay, PhonePe, Paytm, BHIM)</p>
-                  <p className="text-[11px] text-slate-500">₹499 & Transaction Code will auto-populate automatically</p>
-                </div>
-
-                {/* Direct UPI Mobile Link & Copy Button */}
-                <div className="pt-1 flex flex-col sm:flex-row gap-2">
-                  <a
-                    href={`upi://pay?pa=8115983887@ptsbi&pn=Sofiyan%20Home%20Services&cu=INR&am=499&tn=Code-${regPaymentCode || "499001"}`}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
-                  >
-                    <Smartphone size={16} /> Open UPI App to Pay ₹499
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText("8115983887@ptsbi");
-                      setRegCopiedUpi(true);
-                      setTimeout(() => setRegCopiedUpi(false), 2000);
-                    }}
-                    className="sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition"
-                  >
-                    <Copy size={14} /> UPI ID: 8115983887@ptsbi
-                  </button>
-                </div>
-              </div>
-
-              {/* Upload Screenshot Card */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800">Upload Payment Screenshot *</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">Attach the payment success screenshot with UTR / Reference number</p>
-                  </div>
-                  {regPaymentFile && (
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Check size={12} /> Attached
-                    </span>
-                  )}
-                </div>
-
-                {regPaymentFile ? (
-                  <div className="relative inline-flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm w-full">
-                    <img
-                      src={regPaymentImage || URL.createObjectURL(regPaymentFile)}
-                      alt="Payment Screenshot"
-                      className="w-16 h-16 rounded-xl object-cover border-2 border-indigo-200 shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-slate-800 truncate">{regPaymentFile.name}</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{(regPaymentFile.size / 1024).toFixed(1)} KB</p>
-                      <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold mt-0.5">
-                        <Check size={12} /> ₹499 Payment Receipt Attached
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRegPaymentFile(null);
-                        setRegPaymentImage(null);
-                        setRegAiResult(null);
-                        setRegPaymentError(null);
-                      }}
-                      className="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl transition shrink-0"
-                      title="Remove Screenshot"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ) : (
-                  <label className="w-full py-3.5 border-2 border-dashed border-indigo-200 bg-white rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition flex items-center justify-center gap-2 text-xs cursor-pointer">
-                    <Upload size={16} /> Choose Payment Screenshot
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={e => {
-                        if (e.target.files && e.target.files[0]) {
-                          const file = e.target.files[0];
-                          setRegPaymentFile(file);
-                          setRegPaymentImage(URL.createObjectURL(file));
-                          setRegPaymentError(null);
-                          setRegAiResult(null);
-                        }
-                      }}
-                    />
-                  </label>
-                )}
-
-                {/* Verification Progress */}
-                {regPaymentStatus === "verifying" && (
-                  <div className="bg-indigo-900 text-white p-4 rounded-2xl border border-indigo-700 shadow-md space-y-2 animate-pulse">
-                    <div className="flex items-center gap-2.5">
-                      <Loader2 className="w-5 h-5 text-indigo-300 animate-spin" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-indigo-200">
-                        ⚡ Gemini Vision AI OCR Scanner
-                      </span>
-                    </div>
-                    <p className="text-xs text-white font-medium pl-7">
-                      {regAiScanProgress || "Analyzing payment screenshot with Multimodal OCR..."}
-                    </p>
-                  </div>
-                )}
-
-                {/* AI Verified Result Card */}
-                {regAiResult && regAiResult.verified && (
-                  <div className="bg-emerald-50 border border-emerald-300 text-emerald-950 p-4 rounded-2xl space-y-1.5 shadow-sm">
-                    <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
-                      <CheckCircle className="w-4 h-4 text-emerald-600" />
-                      <span>Gemini Vision AI Verified & Approved!</span>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] pt-1">
-                      <div className="bg-white/80 p-2 rounded-lg border border-emerald-200">
-                        <span className="text-slate-500 block">Verified Amount</span>
-                        <span className="font-bold text-slate-900">₹{regAiResult.extractedAmount || 499}</span>
-                      </div>
-                      <div className="bg-white/80 p-2 rounded-lg border border-emerald-200">
-                        <span className="text-slate-500 block">Bank Ref / UTR</span>
-                        <span className="font-mono font-bold text-slate-900 truncate block">
-                          {regAiResult.extractedUtr || "Captured"}
-                        </span>
-                      </div>
-                      <div className="bg-white/80 p-2 rounded-lg border border-emerald-200 col-span-2 sm:col-span-1">
-                        <span className="text-slate-500 block">Payment App</span>
-                        <span className="font-bold text-slate-900">{regAiResult.paymentApp || "UPI"}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {regPaymentError && (
-                  <div className="bg-red-50 text-red-700 p-3.5 rounded-xl text-xs border border-red-200 space-y-1">
-                    <div className="flex items-center gap-1.5 font-bold text-red-800">
-                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                      <span>Verification Failed</span>
-                    </div>
-                    <p className="text-slate-700 pl-5">{regPaymentError}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setRegStep("verify")}
-                  className="flex-1 bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-bold text-slate-700 transition-all disabled:opacity-50"
-                  disabled={isSubmitting || regPaymentStatus === "verifying"}
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleVerifyAndSubmitRegistration}
-                  disabled={!regPaymentFile || isSubmitting || regPaymentStatus === "verifying"}
-                  className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSubmitting || regPaymentStatus === "verifying" ? (
+                  {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>AI Scanning & Submitting...</span>
+                      <span>Submitting...</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles size={18} />
-                      <span>Submit Payment Receipt</span>
+                      <span>Submit Application</span>
+                      <ArrowRight size={16} />
                     </>
                   )}
                 </button>
