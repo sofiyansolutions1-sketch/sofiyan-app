@@ -73,8 +73,18 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
           const data = await response.json();
           
-          const detectedCity = data.address?.city || data.address?.town || data.address?.state_district || data.address?.county || "";
+          let detectedCity = data.address?.city || data.address?.town || data.address?.state_district || data.address?.county || "";
           
+          // Aliases for better mapping
+          const lowerCity = detectedCity.toLowerCase();
+          if (lowerCity.includes('bengaluru')) detectedCity = 'Bangalore';
+          if (lowerCity.includes('gurugram')) detectedCity = 'Gurgaon';
+          if (lowerCity.includes('gautam buddha') || lowerCity.includes('noida')) detectedCity = 'Noida';
+          if (lowerCity.includes('bombay')) detectedCity = 'Mumbai';
+          if (lowerCity.includes('madras')) detectedCity = 'Chennai';
+          if (lowerCity.includes('calcutta')) detectedCity = 'Kolkata';
+          if (lowerCity.includes('banaras') || lowerCity.includes('kashi')) detectedCity = 'Varanasi';
+
           // Check if detected city matches any in our list (case insensitive)
           const matchedCity = CITY_DATA.find(c => detectedCity.toLowerCase().includes(c.name.toLowerCase()));
           
@@ -187,8 +197,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const handleCitySelect = (cityName: string) => {
     setUserCity(cityName);
     localStorage.setItem('preferredCity', cityName);
-    window.dispatchEvent(new Event('cityUpdated'));
-    setIsCityModalOpen(false);
     
     // Check if we are on a city-specific page and update URL
     const pathParts = location.pathname.split('/').filter(Boolean);
@@ -201,6 +209,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       pathParts[0] = cityName.toLowerCase();
       navigate('/' + pathParts.join('/'));
     }
+    
+    // Dispatch after navigation so URL is correct
+    window.dispatchEvent(new Event('cityUpdated'));
+    setIsCityModalOpen(false);
   };
 
   React.useEffect(() => {

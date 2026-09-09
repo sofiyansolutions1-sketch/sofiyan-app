@@ -7,7 +7,7 @@ import { useStore } from '../hooks/useStore';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy, Home } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy, Home, AlertCircle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getSignedAppFileUrl } from '../services/storageService';
 
@@ -499,6 +499,49 @@ export const CustomerPanel: React.FC = () => {
       lng: null as number | null
     };
   });
+
+  useEffect(() => {
+    const handleLocationDetected = (e: any) => {
+       const loc = e.detail;
+       if (loc) {
+          setFormData((prev: any) => ({
+             ...prev,
+             lat: loc.lat,
+             lng: loc.lng,
+             city: loc.city || prev.city,
+             address: loc.address || prev.address,
+             area: loc.area || prev.area,
+             pincode: loc.pincode || prev.pincode,
+             locationLink: `https://www.google.com/maps?q=${loc.lat},${loc.lng}`
+          }));
+       }
+    };
+    window.addEventListener('locationDetected', handleLocationDetected);
+    
+    const savedLoc = sessionStorage.getItem('last_detected_location');
+    if (savedLoc) {
+       try {
+         const loc = JSON.parse(savedLoc);
+         setFormData((prev: any) => {
+            if (!prev.address) {
+               return {
+                 ...prev,
+                 lat: loc.lat,
+                 lng: loc.lng,
+                 city: loc.city || prev.city,
+                 address: loc.address || prev.address,
+                 area: loc.area || prev.area,
+                 pincode: loc.pincode || prev.pincode,
+                 locationLink: `https://www.google.com/maps?q=${loc.lat},${loc.lng}`
+               };
+            }
+            return prev;
+         });
+       } catch {}
+    }
+
+    return () => window.removeEventListener('locationDetected', handleLocationDetected);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('sofiyan_cart', JSON.stringify(cart));
@@ -1572,6 +1615,13 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         clearTimeout(fallbackTimeout);
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+        
+        // If accuracy is worse than 2000 meters, it's likely an IP-based location, not GPS
+        if (accuracy > 2000) {
+            alert("Your browser provided an approximate location. For exact location, please ensure your device GPS/Location Services is turned on, or enter your address manually.");
+        }
+        
         await handleConfirmMapLocation(lat, lng);
       },
       (error) => {
@@ -1608,99 +1658,91 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
     let newAddress = formData.address;
 
     try {
-       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
-          headers: { 'User-Agent': 'sofiyan-home-service/1.0.0' }
-       });
+       const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
        const data = await res.json();
        
-       if (data && data.address) {
-          const addr = data.address;
+       if (data.error) {
+           console.warn("Geocoding API returned an error:", data.error);
+       } else if (data && data.results && data.results.length > 0) {
+          const result = data.results[0];
+          newAddress = result.formatted_address || '';
           
-          if (data.display_name) {
-              newAddress = data.display_name;
+          let detectedCity = '';
+          
+          for (const component of result.address_components) {
+              const types = component.types || [];
+              if (types.includes('postal_code')) {
+                  newPincode = component.long_name;
+              }
+              if (types.includes('locality')) {
+                  detectedCity = component.long_name;
+              } else if (!detectedCity && types.includes('administrative_area_level_2')) {
+                  detectedCity = component.long_name;
+              }
+              if (types.some(t => t.includes('sublocality') || t.includes('neighborhood') || t.includes('route'))) {
+                  if (!newArea) newArea = component.long_name;
+              }
           }
 
-          if (addr.postcode) {
-              newPincode = addr.postcode;
-          } else {
-              const match = (data.display_name || '').match(/\b\d{6}\b/);
+          if (!newPincode) {
+              const match = (newAddress || '').match(/\b\d{6}\b/);
               if (match) newPincode = match[0];
           }
 
-          if (newPincode && newPincode.length === 6) {
-              const areaRes = await fetchAreasByPincode(newPincode);
-              if (areaRes.success && areaRes.areas.length > 0) {
-                  newArea = areaRes.areas[0];
-                  let detectedCity = newCity;
-                  if (areaRes.isBangalore) {
-                      detectedCity = 'Bangalore';
-                  } else if (newPincode.startsWith('110')) {
-                      detectedCity = 'Delhi';
-                  } else if (data.address && data.address.city) {
-                      detectedCity = data.address.city;
-                  } else if (data.address && data.address.state_district) {
-                      detectedCity = data.address.state_district;
-                  }
+          if (newPincode && newPincode.startsWith('560')) detectedCity = 'Bangalore';
+          else if (newPincode && newPincode.startsWith('110')) detectedCity = 'Delhi';
 
-                  // Smart validation: if the selected city doesn't match the detected one
-                  if (detectedCity && newCity) {
-                      // Normalize for comparison
-                      const normalizedDetected = detectedCity.toLowerCase();
-                      const normalizedSelected = newCity.toLowerCase();
-                      
-                      if (!normalizedDetected.includes(normalizedSelected) && !normalizedSelected.includes(normalizedDetected)) {
-                          alert(`Smart Location Update: We detected your location is in ${detectedCity}, but you selected ${newCity}. We have automatically updated your city to ${detectedCity} for accurate service assignment.`);
-                          newCity = detectedCity;
-                          localStorage.setItem('preferredCity', newCity);
-                          window.dispatchEvent(new Event('cityUpdated'));
-                      }
-                  } else if (detectedCity) {
-                      newCity = detectedCity;
-                  }
-              }
-          } else if (addr.suburb || addr.neighbourhood || addr.residential) {
-              const areaName = addr.suburb || addr.neighbourhood || addr.residential;
-              newArea = areaName;
-              const pins = await fetchPincodesByArea([areaName]);
-              if (pins && pins.length > 0) {
-                  newPincode = pins[0];
-                  let detectedCity = newCity;
-                  if (newPincode.startsWith('560')) detectedCity = 'Bangalore';
-                  else if (newPincode.startsWith('110')) detectedCity = 'Delhi';
-                  else if (data.address && data.address.city) detectedCity = data.address.city;
+          const lowerCity = (detectedCity || '').toLowerCase();
+          if (lowerCity.includes('bengaluru')) detectedCity = 'Bangalore';
+          if (lowerCity.includes('gurugram')) detectedCity = 'Gurgaon';
+          if (lowerCity.includes('gautam buddha') || lowerCity.includes('noida')) detectedCity = 'Noida';
+          if (lowerCity.includes('bombay')) detectedCity = 'Mumbai';
+          if (lowerCity.includes('madras')) detectedCity = 'Chennai';
+          if (lowerCity.includes('calcutta')) detectedCity = 'Kolkata';
+          if (lowerCity.includes('banaras') || lowerCity.includes('kashi')) detectedCity = 'Varanasi';
+
+          if (detectedCity) {
+              const supportedCity = CITY_DATA.find(c => 
+                  detectedCity.toLowerCase().includes(c.name.toLowerCase()) ||
+                  c.name.toLowerCase().includes(detectedCity.toLowerCase())
+              );
+              
+              if (supportedCity) {
+                  newCity = supportedCity.name;
                   
-                  // Smart validation
-                  if (detectedCity && newCity) {
-                      const normalizedDetected = detectedCity.toLowerCase();
-                      const normalizedSelected = newCity.toLowerCase();
+                  if (newCity !== formData.city) {
+                      localStorage.setItem('preferredCity', newCity);
+                      window.dispatchEvent(new Event('cityUpdated'));
                       
-                      if (!normalizedDetected.includes(normalizedSelected) && !normalizedSelected.includes(normalizedDetected)) {
-                          alert(`Smart Location Update: We detected your location is in ${detectedCity}, but you selected ${newCity}. We have automatically updated your city to ${detectedCity}.`);
-                          newCity = detectedCity;
-                          localStorage.setItem('preferredCity', newCity);
-                          window.dispatchEvent(new Event('cityUpdated'));
+                      const pathParts = window.location.pathname.split('/').filter(Boolean);
+                      if (pathParts.length > 0 && CITY_DATA.some(c => c.name.toLowerCase() === pathParts[0].toLowerCase())) {
+                          pathParts[0] = newCity.toLowerCase();
+                          navigate('/' + pathParts.join('/'), { replace: true });
+                      } else if (window.location.pathname === '/') {
+                          navigate('/' + newCity.toLowerCase(), { replace: true });
                       }
-                  } else if (detectedCity) {
-                      newCity = detectedCity;
                   }
+              } else {
+                  newCity = detectedCity;
               }
           }
        }
     } catch (err) {
-       console.warn("Reverse geocoding failed", err);
+       console.warn("Geocoding failed:", err);
+    } finally {
+       // Explicitly sync to form data and immediately update the form
+       setFormData((prev: any) => ({
+         ...prev,
+         lat,
+         lng,
+         locationLink: googleMapsLink,
+         pincode: newPincode || prev.pincode || "",
+         area: newArea || prev.area || "",
+         city: newCity || prev.city || "",
+         address: newAddress || prev.address || ""
+       }));
+       setIsTrackingLocation(false);
     }
-
-    setFormData((prev: any) => ({
-      ...prev,
-      lat,
-      lng,
-      locationLink: googleMapsLink,
-      pincode: newPincode || prev.pincode,
-      area: newArea || prev.area,
-      city: newCity || prev.city,
-      address: newAddress || prev.address
-    }));
-    setIsTrackingLocation(false);
   };
 
   useEffect(() => {
@@ -2125,7 +2167,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
           if (areaRes.success && areaRes.areas.length > 0) {
              setFormData((prev: any) => ({
                ...prev,
-               area: areaRes.areas[0],
+               area: prev.area ? prev.area : areaRes.areas[0],
                city: areaRes.isBangalore ? 'Bangalore' : (formData.pincode.startsWith('110') ? 'Delhi' : prev.city)
              }));
           }
@@ -2521,7 +2563,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                             disabled={isTrackingLocation}
                             className="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50"
                           >
-                            {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'LOCKED' : 'AUTO-DETECT'}
+                            {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'DETECTED ✓' : 'AUTO-DETECT'}
                           </button>
                        </div>
                     </div>
@@ -4007,7 +4049,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                                 disabled={isTrackingLocation}
                                 className="bg-white text-indigo-950 px-5 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95 disabled:opacity-50"
                               >
-                                {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'LOCKED' : 'AUTO-DETECT'}
+                                {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'DETECTED ✓' : 'AUTO-DETECT'}
                               </button>
                            </div>
                         </div>

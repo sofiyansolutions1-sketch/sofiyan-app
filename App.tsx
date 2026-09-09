@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { SEOManager } from './components/SEOManager';
 import { Layout } from './components/Layout';
@@ -12,6 +12,7 @@ import { TrackBooking } from './pages/TrackBooking';
 import { SubServicePage } from './pages/SubServicePage';
 
 import { RoleSelectionModal } from './components/RoleSelectionModal';
+import { CITY_DATA } from './constants';
 
 function AppContent() {
   const [showRoleModal, setShowRoleModal] = useState(() => {
@@ -19,6 +20,20 @@ function AppContent() {
     return !hasSelectedRole;
   });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Request permission on load as per user request
+    if (navigator.geolocation && !sessionStorage.getItem('location_prompted')) {
+      sessionStorage.setItem('location_prompted', 'true');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          sessionStorage.setItem('userLocation', `${pos.coords.latitude},${pos.coords.longitude}`);
+        },
+        (err) => console.log('Location permission denied or timeout', err),
+        { timeout: 10000, maximumAge: 60000 }
+      );
+    }
+  }, []);
 
   const handleRoleSelect = (role: 'customer' | 'technician') => {
     sessionStorage.setItem('sofiyan_user_role', role);

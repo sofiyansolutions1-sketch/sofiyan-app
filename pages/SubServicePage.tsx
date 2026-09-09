@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { SERVICES, PREDEFINED_AREAS } from '../constants';
 import { Shield, Star, Clock, CheckCircle, Wrench, AlertTriangle, Zap, ThumbsUp, MapPin, ChevronDown, Phone, MessageCircle } from 'lucide-react';
 import { Breadcrumb } from '../components/Breadcrumb';
@@ -8,7 +8,24 @@ import { useStore } from '../hooks/useStore';
 export const SubServicePage = () => {
   const { cityUrl, serviceUrl, subServiceUrl } = useParams<{ cityUrl: string; serviceUrl: string; subServiceUrl: string }>();
   
-  const addToCart = useStore(state => state.addToCart);
+  const navigate = useNavigate();
+  const addToCart = (sub: any, categoryName: string) => {
+    try {
+      const saved = localStorage.getItem('sofiyan_cart');
+      const cart = saved ? JSON.parse(saved) : [];
+      const existing = cart.find((item: any) => item.id === sub.id);
+      let newCart;
+      if (existing) {
+        newCart = cart.map((item: any) => item.id === sub.id ? { ...item, quantity: item.quantity + 1 } : item);
+      } else {
+        newCart = [...cart, { ...sub, quantity: 1, categoryName }];
+      }
+      localStorage.setItem('sofiyan_cart', JSON.stringify(newCart));
+      window.dispatchEvent(new Event('sofiyan_cart_changed'));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // Parse URLs
   const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
@@ -47,10 +64,21 @@ export const SubServicePage = () => {
 
   const handleBookNow = () => {
     handleAddToCart();
+    // Dispatch event to open cart side UI
+    window.dispatchEvent(new Event('sofiyan_open_side_cart'));
+    
+    // Fallback for vanilla JS if needed
     if (typeof window !== 'undefined' && (window as any).renderCartSidebar) {
       (window as any).renderCartSidebar();
       const sidebar = document.getElementById('cart-sidebar');
       if (sidebar) sidebar.classList.remove('translate-x-full');
+    }
+
+    // Go back to the category page where the modal will auto-open
+    if (serviceUrl) {
+      navigate(`/${cityUrl || 'bangalore'}/${serviceUrl}`);
+    } else {
+      navigate(`/${cityUrl || 'bangalore'}`);
     }
   };
 
