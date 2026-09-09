@@ -11,13 +11,13 @@ export const ADMIN_PASSWORD = "ta7867@#";
 
 export const CITY_DATA = [
   { name: 'Bangalore', img: 'https://i.postimg.cc/Xq9y6ZC0/Chat-GPT-Image-Apr-19-2026-12-21-24-AM.png', areasCount: 27 },
+  { name: 'Lucknow', img: 'https://iili.io/n3XqGPj.jpg', areasCount: 15 },
   { name: 'Delhi', img: 'https://i.postimg.cc/RVDqpQ8c/Chat-GPT-Image-Apr-19-2026-12-41-30-AM.png', areasCount: 32 },
   { name: 'Mumbai', img: 'https://i.postimg.cc/QdYgbTg5/Chat-GPT-Image-Apr-19-2026-12-27-58-AM.png', areasCount: 36 },
   { name: 'Hyderabad', img: 'https://i.postimg.cc/59Zc2sXS/Chat-GPT-Image-Apr-19-2026-02-27-49-AM.png', areasCount: 24 },
   { name: 'Pune', img: 'https://i.postimg.cc/C5H7qsFb/Chat-GPT-Image-Apr-19-2026-02-32-39-AM.png', areasCount: 18 },
   { name: 'Chennai', img: 'https://i.postimg.cc/ryPw62cN/Chat-GPT-Image-Apr-19-2026-02-34-24-AM.png', areasCount: 22 },
   { name: 'Kolkata', img: 'https://i.postimg.cc/4NdKXNh2/Chat-GPT-Image-Apr-19-2026-02-36-38-AM.png', areasCount: 20 },
-  { name: 'Ahmedabad', img: 'https://i.postimg.cc/65FqZJm8/Chat-GPT-Image-Apr-19-2026-02-40-08-AM.png', areasCount: 15 },
   { name: 'Gurgaon', img: 'https://i.postimg.cc/sxXxYVzh/Chat-GPT-Image-Apr-19-2026-02-42-24-AM.png', areasCount: 23 },
   { name: 'Noida', img: 'https://i.postimg.cc/ZKnv3LK4/Chat-GPT-Image-Apr-19-2026-02-43-16-AM.png', areasCount: 16 },
   { name: 'Varanasi', img: 'https://i.postimg.cc/DfPYmLBD/Chat-GPT-Image-Apr-19-2026-01-17-09-PM.png', areasCount: 12 },
@@ -32,7 +32,7 @@ export const PREDEFINED_AREAS: Record<string, string[]> = {
   Chennai: ["T Nagar", "Anna Nagar", "Adyar", "Velachery", "Tambaram", "Guindy", "OMR", "Porur", "Mylapore", "Thiruvanmiyur"],
   Pune: ["Hinjewadi", "Kothrud", "Koregaon Park", "Viman Nagar", "Wakad", "Baner", "Hadapsar", "Kharadi", "Shivajinagar", "Pimpri Chinchwad"],
   Kolkata: ["Salt Lake", "New Town", "Park Street", "Ballygunge", "Dum Dum", "Jadavpur", "Garia", "Rajarhat", "Tollygunge", "Howrah"],
-  Ahmedabad: ["SG Highway", "Navrangpura", "Satellite", "Vastrapur", "Bopal", "Paldi", "Maninagar", "Prahlad Nagar", "Gota", "Thaltej"],
+  Lucknow: ["Hazratganj", "Gomti Nagar", "Alambagh", "Indira Nagar", "Aminabad", "Chowk", "Kapoorthala", "Mahanagar", "Aliganj", "Ashiyana"],
   Gurgaon: ["Cyber City", "Sohna Road", "DLF Phase 1", "DLF Phase 2", "DLF Phase 3", "Golf Course Road", "Sector 56", "Sector 14", "Palam Vihar"],
   Noida: ["Sector 18", "Sector 62", "Sector 15", "Sector 63", "Greater Noida", "Sector 137", "Sector 50", "Sector 16"],
   Varanasi: ["Ghats", "Lanka", "Godowlia", "Sigra", "Sarnath", "Cantonment", "Bhelupur", "Pandeypur", "Mahmoorganj", "Jaitpura", "Chaitganj", "Adampura"],

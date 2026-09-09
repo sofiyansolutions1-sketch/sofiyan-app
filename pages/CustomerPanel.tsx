@@ -7,10 +7,11 @@ import { useStore } from '../hooks/useStore';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy, Home } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getSignedAppFileUrl } from '../services/storageService';
 
+import { Breadcrumb } from '../components/Breadcrumb';
 import { MapPicker } from '../components/MapPicker';
 import { NearbyTechniciansBlock } from '../components/NearbyTechniciansBlock';
 
@@ -408,31 +409,51 @@ export const CustomerPanel: React.FC = () => {
     return () => window.removeEventListener('cityUpdated', handleCityUpdate);
   }, []);
 
-  const { cityUrl } = useParams<{ cityUrl?: string }>();
+  const { cityUrl, serviceUrl } = useParams<{ cityUrl?: string; serviceUrl?: string }>();
   const activeCity = cityUrl ? cityUrl.charAt(0).toUpperCase() + cityUrl.slice(1).toLowerCase() : currentCity;
 
-  // SEO Update logic
+  // Format service string properly, e.g. "ac-repair" -> "AC Repair", "plumbing" -> "Plumbing"
+  const formattedService = serviceUrl 
+    ? serviceUrl.split('-').map(word => word.toUpperCase() === 'AC' || word.toUpperCase() === 'RO' || word.toUpperCase() === 'TV' 
+      ? word.toUpperCase() 
+      : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+    : null;
+
+  // Auto-open Category Modal based on serviceUrl
   useEffect(() => {
-    if (activeCity) {
-      document.title = `Best Home Services in ${activeCity} | AC, Plumbing, Electrician | Sofiyan`;
-      
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.setAttribute('name', 'description');
-        document.head.appendChild(metaDesc);
+    if (formattedService) {
+      if (typeof window !== 'undefined' && (window as any).openCategoryView) {
+        // Find exact string match based on formatting for vanilla JS logic
+        const catMap: Record<string, string> = {
+          'ac': 'AC',
+          'ac-repair': 'AC',
+          'plumbing': 'Plumbing',
+          'washing-machine': 'WashingMachine',
+          'refrigerator': 'Refrigerator',
+          'water-purifier': 'WaterPurifier',
+          'ro-repair': 'WaterPurifier',
+          'television': 'Television',
+          'microwave': 'Microwave',
+          'geyser': 'Geyser',
+          'chimney': 'Chimney',
+          'cleaning': 'Cleaning',
+          'electrician': 'Electrician',
+          'painting': 'Painting',
+          'pest-control': 'PestControl',
+          'carpentry': 'Carpentry'
+        };
+        const mappedCategory = catMap[serviceUrl?.toLowerCase() || ''] || formattedService;
+        (window as any).openCategoryView(mappedCategory);
+      } else {
+        const targetService = SERVICES.find(s => s.name.toLowerCase() === formattedService.toLowerCase() || s.name.replace(/\s+/g, '-').toLowerCase() === serviceUrl?.toLowerCase());
+        if (targetService) {
+          setSelectedService(targetService);
+        }
       }
-      metaDesc.setAttribute('content', `Looking for top-rated home services in ${activeCity}? Sofiyan Home Service offers expert AC repair, plumbing, electrical, and appliance repair in ${activeCity}. Book verified professionals today.`);
-      
-      let linkCanonical = document.querySelector('link[rel="canonical"]');
-      if (!linkCanonical) {
-        linkCanonical = document.createElement('link');
-        linkCanonical.setAttribute('rel', 'canonical');
-        document.head.appendChild(linkCanonical);
-      }
-      linkCanonical.setAttribute('href', `https://www.sofiyanhomeservice.com/${activeCity.toLowerCase()}`);
     }
-  }, [activeCity]);
+    }, [formattedService, serviceUrl, selectedService]);
+
+  
   
   // Tonnage State
   const [tonnagePrompt, setTonnagePrompt] = useState<{ sub: SubService, category: string } | null>(null);
@@ -2832,7 +2853,12 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
         </div>
       </Modal>
 
-      {renderProfileModal()}
+            {renderProfileModal()}
+
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6">
+        <Breadcrumb />
+      </div>
 
       {/* Mobile-Friendly Urban Company Style Hero Content */}
       <div className="bg-indigo-600 sm:bg-transparent pb-8 pt-6 sm:pt-8 transition-all duration-500">
@@ -3184,7 +3210,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
 
         
         {/* Quick Links Section */}
-        {['bangalore', 'delhi', 'mumbai', 'hyderabad', 'pune', 'chennai', 'kolkata', 'ahmedabad', 'gurgaon', 'noida', 'varanasi', 'mau'].includes(activeCity.toLowerCase()) && (() => {
+        {['bangalore', 'delhi', 'mumbai', 'hyderabad', 'pune', 'chennai', 'kolkata', 'lucknow', 'gurgaon', 'noida', 'varanasi', 'mau'].includes(activeCity.toLowerCase()) && (() => {
           const seoKeywords = {
             bangalore: [
               { label: "Home Cleaning Services in Bangalore", category: "Cleaning" },
@@ -3350,30 +3376,30 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               { label: "Handyman & Home Repair Services in Kolkata", category: "Carpentry" },
               { label: "Home Services Near Me in Kolkata", category: null }
             ],
-            ahmedabad: [
-              { label: "Home Cleaning Services in Ahmedabad", category: "Cleaning" },
-              { label: "Deep Home Cleaning Services in Ahmedabad", category: "Cleaning" },
-              { label: "Bathroom & Kitchen Cleaning in Ahmedabad", category: "Cleaning" },
-              { label: "Sofa & Carpet Cleaning in Ahmedabad", category: "Cleaning" },
-              { label: "Electrician Services in Ahmedabad", category: "Electrician" },
-              { label: "Emergency Electrician Services in Ahmedabad", category: "Electrician" },
-              { label: "Plumber Services in Ahmedabad", category: "Plumbing" },
-              { label: "Emergency Plumbing & Repair in Ahmedabad", category: "Plumbing" },
-              { label: "AC Service & Repair in Ahmedabad", category: "AC Repair" },
-              { label: "AC Installation & Gas Refilling in Ahmedabad", category: "AC Repair" },
-              { label: "Appliance Repair Services in Ahmedabad", category: "Appliances" },
-              { label: "Washing Machine Repair in Ahmedabad", category: "Appliances" },
-              { label: "Refrigerator Repair & Service in Ahmedabad", category: "Appliances" },
-              { label: "Geyser Repair & Service in Ahmedabad", category: "Appliances" },
-              { label: "RO & Water Purifier Repair in Ahmedabad", category: "Appliances" },
-              { label: "TV & Electronics Repair in Ahmedabad", category: "Appliances" },
-              { label: "Pest Control Services in Ahmedabad", category: "Pest Control" },
-              { label: "Cockroach, Termite & Bed Bug Control in Ahmedabad", category: "Pest Control" },
-              { label: "Carpenter Services in Ahmedabad", category: "Carpentry" },
-              { label: "Home Painting Services in Ahmedabad", category: "Painting" },
-              { label: "Waterproofing Services in Ahmedabad", category: "Painting" },
-              { label: "Handyman & Home Repair Services in Ahmedabad", category: "Carpentry" },
-              { label: "Home Services Near Me in Ahmedabad", category: null }
+            lucknow: [
+              { label: "Home Cleaning Services in Lucknow", category: "Cleaning" },
+              { label: "Deep Home Cleaning Services in Lucknow", category: "Cleaning" },
+              { label: "Bathroom & Kitchen Cleaning in Lucknow", category: "Cleaning" },
+              { label: "Sofa & Carpet Cleaning in Lucknow", category: "Cleaning" },
+              { label: "Electrician Services in Lucknow", category: "Electrician" },
+              { label: "Emergency Electrician Services in Lucknow", category: "Electrician" },
+              { label: "Plumber Services in Lucknow", category: "Plumbing" },
+              { label: "Emergency Plumbing & Repair in Lucknow", category: "Plumbing" },
+              { label: "AC Service & Repair in Lucknow", category: "AC Repair" },
+              { label: "AC Installation & Gas Refilling in Lucknow", category: "AC Repair" },
+              { label: "Appliance Repair Services in Lucknow", category: "Appliances" },
+              { label: "Washing Machine Repair in Lucknow", category: "Appliances" },
+              { label: "Refrigerator Repair & Service in Lucknow", category: "Appliances" },
+              { label: "Geyser Repair & Service in Lucknow", category: "Appliances" },
+              { label: "RO & Water Purifier Repair in Lucknow", category: "Appliances" },
+              { label: "TV & Electronics Repair in Lucknow", category: "Appliances" },
+              { label: "Pest Control Services in Lucknow", category: "Pest Control" },
+              { label: "Cockroach, Termite & Bed Bug Control in Lucknow", category: "Pest Control" },
+              { label: "Carpenter Services in Lucknow", category: "Carpentry" },
+              { label: "Home Painting Services in Lucknow", category: "Painting" },
+              { label: "Waterproofing Services in Lucknow", category: "Painting" },
+              { label: "Handyman & Home Repair Services in Lucknow", category: "Carpentry" },
+              { label: "Home Services Near Me in Lucknow", category: null }
             ],
             gurgaon: [
               { label: "Home Cleaning Services in Gurgaon", category: "Cleaning" },
@@ -3595,7 +3621,13 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                   return (
                     <div
                       key={sub.id}
-                      className="relative p-5 pt-7 border border-indigo-50 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center group overflow-hidden"
+                      onClick={() => {
+                        const city = localStorage.getItem('preferredCity') || 'Bangalore';
+                        const srvSlug = selectedService.name.toLowerCase().replace(/\s+/g, '-');
+                        const subSlug = sub.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        window.location.href = '/' + city.toLowerCase() + '/' + srvSlug + '/' + subSlug;
+                      }}
+                      className="relative p-5 pt-7 border border-indigo-50 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center group overflow-hidden cursor-pointer"
                     >
                       {tag && (
                         <div className={`absolute top-0 left-0 ${tag.classes} text-[9px] font-black px-2.5 py-1 rounded-br-xl shadow-sm z-10 uppercase tracking-wider`}>
@@ -3618,7 +3650,7 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                         </p>
                       </div>
                       
-                      <div className="w-full sm:w-auto flex justify-end">
+                      <div className="w-full sm:w-auto flex justify-end" onClick={(e) => e.stopPropagation()}>
                         {cartItem ? (
                           <div className="flex items-center gap-3 bg-indigo-50 rounded-xl border border-indigo-100 px-2 py-1.5 shadow-inner">
                               <button onClick={() => updateQuantity(cartItem.id, -1)} className="w-8 h-8 flex items-center justify-center bg-white hover:bg-indigo-100 rounded-lg text-indigo-700 shadow-sm transition-all"><Minus size={14}/></button>

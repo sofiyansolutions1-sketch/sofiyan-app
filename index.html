@@ -869,6 +869,24 @@
         currentCategoryView = "";
       };
 
+      
+      window.goToSubService = function(categoryName, subServiceName) {
+        const city = localStorage.getItem('preferredCity') || 'Bangalore';
+        const serviceSlug = categoryName.toLowerCase().replace(/\s+/g, '-');
+        const subServiceSlug = subServiceName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        
+        // Hide modal
+        const modal = document.getElementById("full-service-modal");
+        if (modal) {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+        }
+        document.body.style.overflow = "";
+        
+        // Navigate
+        window.location.href = '/' + city.toLowerCase() + '/' + serviceSlug + '/' + subServiceSlug;
+      };
+      
       window.openCategoryView = function (categoryName) {
         currentCategoryView = categoryName;
         const modal = document.getElementById("full-service-modal");
@@ -986,7 +1004,7 @@
 
             card.innerHTML = `
                       ${badgeHtml}
-                      <div class="flex-1 pr-4">
+                      <div class="flex-1 pr-4 cursor-pointer" onclick="window.goToSubService('${categoryName}', '${service.name.replace(/'/g, "\'")}')">
                           <h4 class="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-indigo-600 transition-colors">${service.name}</h4>
                           <div class="flex items-center gap-2 mt-2">
                               <span class="font-black text-xl text-slate-900">₹${service.price}</span>
@@ -995,7 +1013,7 @@
                           </div>
                           <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1 font-medium"><i class="fas fa-history text-[8px] text-indigo-400"></i> Takes approx. 45-60 mins</p>
                       </div>
-                      <div class="flex-shrink-0">
+                      <div class="flex-shrink-0" onclick="event.stopPropagation()">
                           ${buttonHtml}
                       </div>
                   `;

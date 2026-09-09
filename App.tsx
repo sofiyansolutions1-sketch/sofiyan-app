@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { SEOManager } from './components/SEOManager';
 import { Layout } from './components/Layout';
 import { CustomerPanel } from './pages/CustomerPanel';
 import { PartnerPanel } from './pages/PartnerPanel';
@@ -8,6 +9,8 @@ import { BlogPanel } from './pages/BlogPanel';
 import { BlogPost } from './pages/BlogPost';
 import RateList from './pages/RateList';
 import { TrackBooking } from './pages/TrackBooking';
+import { SubServicePage } from './pages/SubServicePage';
+
 import { RoleSelectionModal } from './components/RoleSelectionModal';
 
 function AppContent() {
@@ -40,6 +43,8 @@ function AppContent() {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/track" element={<TrackBooking />} />
           <Route path="/:cityUrl" element={<CustomerPanel />} />
+          <Route path="/:cityUrl/:serviceUrl" element={<CustomerPanel />} />
+          <Route path="/:cityUrl/:serviceUrl/:subServiceUrl" element={<SubServicePage />} />
           <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>
@@ -50,6 +55,7 @@ function AppContent() {
 function App() {
   return (
     <Router>
+      <SEOManager />
       <AppContent />
     </Router>
   );
