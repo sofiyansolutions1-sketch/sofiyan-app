@@ -35,7 +35,10 @@ import {
   ArrowRight,
   Bot,
   PhoneCall,
-  MessageCircle
+  MessageCircle,
+  BookOpen,
+  FileText,
+  Download
 } from "lucide-react";
 import { MapRadiusSelector } from "../components/MapRadiusSelector";
 import { PartnerRegistrationSuccess } from "./PartnerRegistrationSuccess";
@@ -227,7 +230,10 @@ const mapPartnerRecord = (found: any): Partner => ({
   lat: found.lat,
   lng: found.lng,
   pincode: found.pincode || "",
-  partner_type: "Primary"
+  partner_type: "Primary",
+  subscription_status: found.subscription_status || "trial",
+  trial_start_date: found.trial_start_date || new Date().toISOString(),
+  subscription_expiry_date: found.subscription_expiry_date || ""
 });
 
 export interface ServiceCategoryOption {
@@ -375,8 +381,9 @@ export const PartnerPanel: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [paymentVerificationCode, setPaymentVerificationCode] = useState<string | null>(null);
   const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [regStep, setRegStep] = useState<"personal" | "expertise" | "location" | "verify" | "success">("personal");
-  
+  const [regStep, setRegStep] = useState<"personal" | "expertise" | "location" | "verify" | "terms" | "success">("personal");
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [termsLanguage, setTermsLanguage] = useState<"english" | "hinglish">("english");
       
   const [commissionAiResult, setCommissionAiResult] = useState<{
     verified: boolean;
@@ -409,7 +416,9 @@ export const PartnerPanel: React.FC = () => {
     address: "",
     lat: undefined as number | undefined,
     lng: undefined as number | undefined,
-    service_radius: 5
+    service_radius: 5,
+    subscription_status: "trial" as "trial" | "premium" | "expired",
+    subscription_expiry_date: ""
   });
 
   const location = useLocation();
@@ -443,6 +452,10 @@ export const PartnerPanel: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLangModal, setShowLangModal] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState("");
+  const [selectedPdfTitle, setSelectedPdfTitle] = useState("");
 
   // Restore authenticated session
   useEffect(() => {
@@ -801,7 +814,7 @@ export const PartnerPanel: React.FC = () => {
   };
 
   // ONBOARDING SUBMISSION: Direct Supabase sync with step-by-step diagnostic logging
-  const handleRegistrationSubmit = async (aiVerificationData?: any) => {
+  const handleRegistrationSubmit = async (planType: 'trial' | 'premium' = 'trial', aiVerificationData?: any) => {
     console.group("📋 [Partner Onboarding Submission Diagnostic]");
     console.log("[Onboarding Step 1 - Form Validation] Checking required fields...");
 
@@ -840,6 +853,13 @@ export const PartnerPanel: React.FC = () => {
       console.groupEnd();
       return;
     }
+    if (!termsAgreed) {
+      console.warn("[Onboarding Step 1 ⚠️] Terms & Conditions agreement not checked.");
+      alert("Please agree to the Terms & Conditions before completing your registration.");
+      setRegStep("terms");
+      console.groupEnd();
+      return;
+    }
 
     console.log("[Onboarding Step 1 ✅] Validation passed. Mode:", isUpdating ? "Update Existing" : "Create New");
     setIsSubmitting(true);
@@ -851,7 +871,6 @@ export const PartnerPanel: React.FC = () => {
       console.log("[Onboarding Step 2 - Uploading Verification Media] Processing images with AI metadata...");
       let docsJson = isUpdating ? (currentUser.id_proof_url || "") : "";
       if (profilePhoto || shopPhoto || businessPhotos.length > 0 || aadhaarPhoto ) {
-        // If updating and we have an old docsJson, delete the old files from storage
         if (isUpdating && docsJson) {
           try {
             const oldDocs = JSON.parse(docsJson);
@@ -875,6 +894,21 @@ export const PartnerPanel: React.FC = () => {
       }
 
       const combinedAddress = [regData.address, regData.area].filter(Boolean).join(", ") || regData.city;
+      const nowIso = new Date().toISOString();
+      const expiryIso = planType === 'premium'
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      let docsObj: any = {};
+      try {
+        docsObj = docsJson ? JSON.parse(docsJson) : {};
+      } catch {
+        docsObj = {};
+      }
+      docsObj.subscriptionStatus = planType;
+      docsObj.trialStartDate = nowIso;
+      docsObj.subscriptionExpiryDate = expiryIso;
+      docsJson = JSON.stringify(docsObj);
 
       const dbPartnerPayload: any = {
         name: `${regData.firstName} ${regData.lastName}`.trim(),
@@ -1478,12 +1512,122 @@ export const PartnerPanel: React.FC = () => {
     );
   };
 
+  const renderLanguageSelectionModal = () => {
+    if (!showLangModal) return null;
+    return (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[110] flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="bg-white rounded-3xl w-full max-w-md p-6 relative shadow-2xl animate-in zoom-in-95 duration-200">
+          <button
+            type="button"
+            onClick={() => setShowLangModal(false)}
+            className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 font-bold w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center transition"
+          >
+            ✕
+          </button>
+          
+          <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-4">
+            <BookOpen size={24} />
+          </div>
+
+          <h3 className="text-xl font-black text-slate-900 mb-1">Select Language</h3>
+          <p className="text-xs text-slate-500 mb-6">
+            Choose your preferred language to view the complete subscription and commission benefits PDF.
+          </p>
+
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => {
+                setShowLangModal(false);
+                setSelectedPdfUrl("/assets/aistudio/partner_subscription_benefits_english_1e39ee78.pdf");
+                setSelectedPdfTitle("English Subscription Benefits");
+                setShowPdfModal(true);
+              }}
+              className="w-full p-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/50 transition flex items-center justify-between text-left group"
+            >
+              <div>
+                <p className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition">English</p>
+                <p className="text-xs text-slate-500">View subscription plans & 0% commission benefits in English</p>
+              </div>
+              <ChevronRight size={18} className="text-slate-400 group-hover:text-indigo-600 transition" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowLangModal(false);
+                setSelectedPdfUrl("/assets/aistudio/partner_subscription_benefits_hinglish_0bf9d772.pdf");
+                setSelectedPdfTitle("Hinglish Subscription Benefits");
+                setShowPdfModal(true);
+              }}
+              className="w-full p-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/50 transition flex items-center justify-between text-left group"
+            >
+              <div>
+                <p className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition">Hindi (Hinglish)</p>
+                <p className="text-xs text-slate-500">View subscription plans & benefits in Hindi/Hinglish</p>
+              </div>
+              <ChevronRight size={18} className="text-slate-400 group-hover:text-indigo-600 transition" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPdfViewerModal = () => {
+    if (!showPdfModal) return null;
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="bg-white rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <FileText size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold">{selectedPdfTitle}</h3>
+                <p className="text-xs text-slate-400">Read details or download PDF to your device</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <a
+                href={selectedPdfUrl}
+                download
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow"
+              >
+                <Download size={14} /> Download PDF
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowPdfModal(false)}
+                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 bg-slate-100 p-4 relative overflow-hidden flex flex-col">
+            <iframe
+              src={selectedPdfUrl}
+              className="w-full h-full rounded-2xl border border-slate-300 shadow-inner bg-white"
+              title={selectedPdfTitle}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ONBOARDING MODAL
   const renderRegistrationModal = (isMandatory = false) => {
     return (
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         {renderCameraModal()}
         {renderSubCategoryModal()}
+        {renderLanguageSelectionModal()}
+        {renderPdfViewerModal()}
         <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative shadow-2xl">
           {!isMandatory && (
             <button
@@ -1500,10 +1644,10 @@ export const PartnerPanel: React.FC = () => {
           <div className="flex justify-between items-center mb-8 relative px-1 sm:px-2 max-w-md mx-auto">
             <div className="absolute top-5 left-6 right-6 h-0.5 bg-slate-100 -z-10"></div>
 
-            <div className="flex flex-col items-center">
+             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["personal", "expertise", "location", "verify", "success"].includes(regStep)
+                  ["personal", "expertise", "location", "verify", "terms", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1516,7 +1660,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["expertise", "location", "verify", "success"].includes(regStep)
+                  ["expertise", "location", "verify", "terms", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1529,7 +1673,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["location", "verify", "success"].includes(regStep)
+                  ["location", "verify", "terms", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1542,7 +1686,7 @@ export const PartnerPanel: React.FC = () => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
-                  ["verify", "success"].includes(regStep)
+                  ["verify", "terms", "success"].includes(regStep)
                     ? "bg-indigo-600 text-white"
                     : "bg-white border-2 border-slate-200 text-slate-400"
                 }`}
@@ -1550,6 +1694,19 @@ export const PartnerPanel: React.FC = () => {
                 4
               </div>
               <span className="text-[9px] sm:text-[10px] mt-2 font-bold tracking-wider text-slate-600">VERIFY</span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm text-xs font-bold ${
+                  ["terms", "success"].includes(regStep)
+                    ? "bg-indigo-600 text-white"
+                    : "bg-white border-2 border-slate-200 text-slate-400"
+                }`}
+              >
+                5
+              </div>
+              <span className="text-[9px] sm:text-[10px] mt-2 font-bold tracking-wider text-slate-600">TERMS</span>
             </div>
           </div>
 
@@ -2143,21 +2300,148 @@ export const PartnerPanel: React.FC = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleRegistrationSubmit()}
-                  disabled={isSubmitting || !profilePhoto || (regData.aadharNumber.length < 12 && !aadhaarPhoto)}
+                  onClick={() => setRegStep("terms")}
+                  disabled={!profilePhoto || (regData.aadharNumber.length < 12 && !aadhaarPhoto)}
                   className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Submit Application</span>
-                      <ArrowRight size={16} />
-                    </>
-                  )}
+                  <span>Continue to Terms & Conditions</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 5: TERMS & CONDITIONS */}
+          {regStep === "terms" && (
+            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+              <div className="text-center max-w-lg mx-auto mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold mb-2 border border-indigo-100">
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Final Step</span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900">Terms & Conditions & Commission Policy</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Please review our platform policies and commission structure in your preferred language.
+                </p>
+              </div>
+
+              {/* Language Selection Toggle */}
+              <div className="bg-slate-100 p-1.5 rounded-2xl flex max-w-xs mx-auto border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setTermsLanguage("english")}
+                  className={`flex-1 py-2.5 px-4 text-xs font-bold rounded-xl transition-all ${
+                    termsLanguage === "english"
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTermsLanguage("hinglish")}
+                  className={`flex-1 py-2.5 px-4 text-xs font-bold rounded-xl transition-all ${
+                    termsLanguage === "hinglish"
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Hinglish
+                </button>
+              </div>
+
+              {/* Terms Content Card (Exclusively selected language) */}
+              <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 space-y-4 max-h-[360px] overflow-y-auto shadow-sm text-xs sm:text-sm text-slate-700">
+                {termsLanguage === "english" ? (
+                  <div className="space-y-3 animate-in fade-in duration-200">
+                    <h4 className="font-black text-slate-900 text-base border-b border-slate-100 pb-2 flex items-center gap-2">
+                      <FileText size={18} className="text-indigo-600" />
+                      <span>About Sofiyanum Service & Lead Commission Policy</span>
+                    </h4>
+                    <p className="leading-relaxed text-slate-600">
+                      <strong>Sofiyanum Service</strong> is a trusted platform connecting service partners with genuine customer leads. For every confirmed lead provided through our platform, we charge a <strong>25% platform commission</strong> on the total service amount.
+                    </p>
+                    <div className="bg-indigo-50/70 p-3.5 rounded-2xl border border-indigo-100">
+                      <p className="font-bold text-indigo-900 mb-1">Example Calculation:</p>
+                      <p className="text-indigo-700">
+                        If you complete a service worth ₹1,000, the platform commission will be ₹250 (25%), and the remaining ₹750 will be your direct earnings before any other applicable deductions.
+                      </p>
+                    </div>
+                    <div className="space-y-2 pt-1">
+                      <p className="font-bold text-slate-900 uppercase tracking-wide text-xs">Partner Responsibilities:</p>
+                      <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
+                        <li>Respond to assigned leads promptly and initiate work as soon as booking and requirements are confirmed.</li>
+                        <li>Complete all assigned services professionally, on time, and according to customer standards.</li>
+                        <li>Maintain professional behavior, high service quality, and clear communication with customers.</li>
+                        <li>Avoid customer complaints and negative feedback by delivering reliable and satisfactory service.</li>
+                        <li>Repeated complaints, serious misconduct, or policy violations may result in partner account suspension or termination.</li>
+                      </ul>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 animate-in fade-in duration-200">
+                    <h4 className="font-black text-slate-900 text-base border-b border-slate-100 pb-2 flex items-center gap-2">
+                      <FileText size={18} className="text-indigo-600" />
+                      <span>Sofiyanum Service aur Lead Commission Policy (Hinglish)</span>
+                    </h4>
+                    <p className="leading-relaxed text-slate-600">
+                      <strong>Sofiyanum Service</strong> ek trusted platform hai jo service partners ko genuine customer leads se connect karta hai. Humare platform ke through milne wali har confirmed lead par, hum total service amount ka <strong>25% platform commission</strong> charge karte hain.
+                    </p>
+                    <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200">
+                      <p className="font-bold text-amber-900 mb-1">Udaharan (Example):</p>
+                      <p className="text-amber-800">
+                        Agar aap ₹1,000 ki service complete karte hain, toh platform commission ₹250 (25%) hoga, aur baki ₹750 aapki direct earnings hongi.
+                      </p>
+                    </div>
+                    <div className="space-y-2 pt-1">
+                      <p className="font-bold text-slate-900 uppercase tracking-wide text-xs">Partner ki Zimmedariyan (Responsibilities):</p>
+                      <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
+                        <li>Assigned leads par turant respond karein aur booking confirm hone par kaam shuru karein.</li>
+                        <li>Sabhi assigned services professional tarike se, time par aur customer ki requirements ke anusaar complete karein.</li>
+                        <li>Customers ke sath professional behavior, high service quality aur clear communication banaye rakhein.</li>
+                        <li>Reliable service provide karke customer complaints aur negative feedback se bachein.</li>
+                        <li>Baar-baar complaints ya policy violation par partner account suspend kiya ja sakta hai.</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Mandatory Agreement Checkbox */}
+              <div className="bg-slate-50 border-2 border-slate-200 p-4 rounded-2xl flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="termsAgreement"
+                  checked={termsAgreed}
+                  onChange={e => setTermsAgreed(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                />
+                <label htmlFor="termsAgreement" className="text-xs sm:text-sm text-slate-900 font-bold cursor-pointer leading-relaxed">
+                  “I agree to all Terms & Conditions.”
+                  <span className="block text-xs text-slate-500 font-normal mt-0.5">
+                    (Main Sofiyanum Service ke sabhi Terms & Conditions aur commission policy se sehmat hoon.)
+                  </span>
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setRegStep("verify")}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 py-4 rounded-xl font-bold text-slate-700 transition-all text-sm"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  disabled={!termsAgreed || isSubmitting}
+                  onClick={() => handleRegistrationSubmit("trial")}
+                  className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                >
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle size={18} />}
+                  <span>Complete & Submit Information</span>
                 </button>
               </div>
             </div>

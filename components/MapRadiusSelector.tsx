@@ -340,16 +340,16 @@ export const MapRadiusSelector: React.FC<MapRadiusSelectorProps> = ({ onPincodes
                         </label>
                         <input 
                            type="range" 
-                           min="5" 
-                           max="10" 
+                           min="1" 
+                           max="20" 
                            step="1"
                            value={radius} 
                            onChange={(e) => setRadius(parseInt(e.target.value))}
                            className="w-full h-3 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                         />
                         <div className="flex justify-between text-[10px] font-bold text-slate-400 mt-2">
-                            <span>5 km</span>
-                            <span>10 km</span>
+                            <span>1 km</span>
+                            <span>20 km</span>
                         </div>
                     </div>
                     

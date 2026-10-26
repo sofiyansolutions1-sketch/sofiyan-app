@@ -99,9 +99,12 @@
     <!-- Auth View -->
     <div id="auth-view" class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="bg-indigo-600 p-6 text-center">
-                <h2 class="text-2xl font-bold text-white">Influencer Portal</h2>
-                <p class="text-indigo-200 text-sm mt-1">Partner with Sofiyan Home Service</p>
+            <div class="bg-gradient-to-r from-indigo-700 to-purple-800 p-6 text-center text-white">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider mb-2 backdrop-blur-sm">
+                    <i class="fas fa-certificate text-amber-300"></i> Partner Program
+                </div>
+                <h2 class="text-2xl font-black text-white uppercase tracking-tight">Influencer Portal</h2>
+                <p class="text-indigo-200 text-xs mt-1">Earn Flat 25% Commission on every customer booking!</p>
             </div>
 
             <div class="p-6">
@@ -143,8 +146,17 @@
                         <input type="tel" id="signup-contact" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" placeholder="10-digit mobile number">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Create Referral Code</label>
-                        <input type="text" id="signup-referral-code" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase" placeholder="e.g. SOFIYAN20">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-sm font-bold text-gray-800">Create Unique Referral Code</label>
+                            <span class="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">25% Commission</span>
+                        </div>
+                        <input type="text" id="signup-referral-code" required class="w-full px-4 py-2.5 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase font-black text-indigo-950 tracking-wider bg-indigo-50/30" placeholder="e.g. LUCKNOW25 or YOURNAME25">
+                        <p class="text-[11px] text-gray-500 mt-1">Permanent code. Your followers will enter this code when booking. You will earn 25% commission on every booking.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-800 mb-1">Enter your UPI ID <span class="text-xs text-emerald-600 font-bold">(For Payouts)</span></label>
+                        <input type="text" id="signup-upi-id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all font-mono text-sm" placeholder="e.g. 9876543210@paytm, yourname@okhdfcbank">
+                        <p class="text-[11px] text-gray-500 mt-1">All your commission payouts will be sent directly to this UPI ID.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -214,11 +226,30 @@
                             <div class="bg-green-100 p-2.5 rounded-lg text-green-700">
                                 <i class="fas fa-wallet"></i>
                             </div>
-                            <h3 class="text-sm font-bold text-green-800">Your 20% Commission</h3>
+                            <h3 class="text-sm font-bold text-green-800">Your 25% Commission</h3>
                         </div>
                         <p class="text-4xl font-black text-green-600" id="stat-commission">₹0</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Ready Promo Caption Card (Live Broadcast from Admin) -->
+            <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-2 max-w-2xl flex-1">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-amber-100 text-amber-800 text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                            <i class="fas fa-magic text-amber-600"></i> Ready Promo Caption (Reels/Bio)
+                        </span>
+                        <span class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-bold">1-Tap Copy</span>
+                    </div>
+                    <p class="text-xs text-gray-500">Paste this ready-made caption into your Instagram Reels, YouTube Shorts description, or bio:</p>
+                    <div id="promo-caption-box" class="p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-700 whitespace-pre-wrap max-h-32 overflow-y-auto leading-relaxed select-all">
+                        Loading caption...
+                    </div>
+                </div>
+                <button onclick="copyPromoCaption()" id="btn-copy-caption" class="bg-slate-900 hover:bg-black text-white font-bold py-3 px-6 rounded-xl shadow transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider shrink-0 active:scale-95">
+                    <i class="fas fa-copy"></i> <span>Copy Instagram Caption</span>
+                </button>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -237,7 +268,7 @@
                                     <th class="px-6 py-4">Date</th>
                                     <th class="px-6 py-4">Customer</th>
                                     <th class="px-6 py-4 text-right">Booking Value</th>
-                                    <th class="px-6 py-4 text-right">Your Cut (20%)</th>
+                                    <th class="px-6 py-4 text-right">Your Cut (25%)</th>
                                 </tr>
                             </thead>
                             <tbody id="activity-table-body" class="divide-y divide-gray-100">
@@ -249,22 +280,69 @@
                 </div>
 
                 <!-- Settings Section -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-3">Settings</h3>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center justify-between">
+                            <span>Account Settings</span>
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+                                25% Partner Rate
+                            </span>
+                        </h3>
+                    </div>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Referral Code</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="settings-referral-code" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold text-indigo-700 bg-indigo-50">
+                    <!-- Permanent Referral Code Display -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-black uppercase tracking-wider text-gray-700">Your Referral Code</label>
+                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1">
+                                <i class="fas fa-lock text-[9px]"></i> Permanently Locked
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="settings-referral-code" readonly class="w-full px-4 py-2.5 border-2 border-indigo-100 rounded-xl uppercase font-mono font-black text-base text-indigo-900 bg-indigo-50/60 cursor-not-allowed select-all" title="Referral code is permanently locked for accurate attribution">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <i class="fas fa-shield-alt text-indigo-400"></i>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">Share this code with your followers. They get a discount, and you earn 20% of the booking value.</p>
+                        </div>
+                        <p class="text-[11px] text-gray-500 leading-relaxed">
+                            Referral codes cannot be changed after registration to protect your attribution and ensure zero disruption to incoming customer bookings.
+                        </p>
+                    </div>
+
+                    <!-- Payout UPI ID Section -->
+                    <div class="pt-2 border-t border-gray-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                                Enter your UPI ID <span class="text-emerald-600 font-bold">*</span>
+                            </label>
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                                Payout Receiving
+                            </span>
                         </div>
                         
-                        <button onclick="updateReferralCode()" id="btn-update-code" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2.5 px-4 rounded-lg shadow transition-colors flex justify-center items-center">
-                            Update Code
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fas fa-university text-xs text-emerald-600"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                id="settings-upi-id" 
+                                placeholder="e.g. yourname@okhdfcbank, 9876543210@paytm" 
+                                class="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all font-mono text-sm text-slate-900 font-medium"
+                            >
+                        </div>
+                        <p class="text-[11px] text-gray-500">
+                            All your 25% commission payouts will be sent to this UPI ID directly. You can update this anytime.
+                        </p>
+
+                        <button 
+                            onclick="saveUpiId()" 
+                            id="btn-save-upi" 
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all flex justify-center items-center gap-2 text-sm"
+                        >
+                            <i class="fas fa-check-circle"></i> Save UPI ID
                         </button>
-                        <div id="settings-msg" class="text-sm text-center hidden font-medium mt-2"></div>
+                        <div id="settings-msg" class="text-xs text-center hidden font-bold mt-2 p-2 rounded-lg"></div>
                     </div>
                 </div>
             </div>
@@ -327,55 +405,37 @@
             const pageName = document.getElementById('signup-page-name').value.trim().toLowerCase();
             const contact = document.getElementById('signup-contact').value.trim();
             const referralCode = document.getElementById('signup-referral-code').value.trim().toUpperCase();
+            const upiInput = document.getElementById('signup-upi-id');
+            const upiId = upiInput ? upiInput.value.trim() : '';
             const password = document.getElementById('signup-password').value;
 
             if (!pageName || !contact || !referralCode || !password) {
-                showAuthError("All fields are required.");
+                showAuthError("All required fields must be filled.");
                 return;
             }
 
             setBtnLoading('btn-signup', true, 'Create Account');
 
             try {
-                // Check if page_name exists
-                const { data: existingPage } = await supabaseClient
-                    .from('influencers')
-                    .select('id')
-                    .eq('page_name', pageName)
-                    .maybeSingle();
-                
-                if (existingPage) {
-                    throw new Error("Instagram Page Name is already registered.");
-                }
-
-                // Check if referral_code exists
-                const { data: existingCode } = await supabaseClient
-                    .from('influencers')
-                    .select('id')
-                    .eq('referral_code', referralCode)
-                    .maybeSingle();
-                
-                if (existingCode) {
-                    throw new Error("Referral Code is already taken. Please choose another.");
-                }
-
-                // Insert
-                const { data, error } = await supabaseClient
-                    .from('influencers')
-                    .insert([{
+                const res = await fetch('/api/influencers/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
                         page_name: pageName,
                         contact_number: contact,
                         referral_code: referralCode,
-                        password: password // In a real app, hash this!
-                    }])
-                    .select()
-                    .single();
+                        upi_id: upiId,
+                        password: password
+                    })
+                });
 
-                if (error) throw error;
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || "Registration failed.");
+                }
 
-                // Success
-                currentInfluencer = data;
-                localStorage.setItem('influencer_session', JSON.stringify(data));
+                currentInfluencer = data.influencer;
+                localStorage.setItem('influencer_session', JSON.stringify(data.influencer));
                 showDashboard();
 
             } catch (err) {
@@ -397,19 +457,22 @@
             setBtnLoading('btn-login', true, 'Login to Dashboard');
 
             try {
-                const { data, error } = await supabaseClient
-                    .from('influencers')
-                    .select('*')
-                    .eq('page_name', pageName)
-                    .eq('password', password)
-                    .single();
+                const res = await fetch('/api/influencers/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identifier: pageName,
+                        password: password
+                    })
+                });
 
-                if (error || !data) {
-                    throw new Error("Invalid Page Name or Password.");
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || "Invalid Page Name or Password.");
                 }
 
-                currentInfluencer = data;
-                localStorage.setItem('influencer_session', JSON.stringify(data));
+                currentInfluencer = data.influencer;
+                localStorage.setItem('influencer_session', JSON.stringify(data.influencer));
                 showDashboard();
 
             } catch (err) {
@@ -437,12 +500,96 @@
             document.getElementById('dash-welcome').textContent = `Welcome, @${currentInfluencer.page_name}`;
             document.getElementById('settings-referral-code').value = currentInfluencer.referral_code;
             
+            const upiInput = document.getElementById('settings-upi-id');
+            if (upiInput) {
+                upiInput.value = currentInfluencer.upi_id || '';
+            }
+            
+            // Set share link
+            const shareLink = `${window.location.origin}/?ref=${encodeURIComponent(currentInfluencer.referral_code)}`;
+            const shareInput = document.getElementById('share-link-input');
+            if (shareInput) shareInput.value = shareLink;
+
+            fetchCaptionTemplate();
             loadInfluencerDashboard();
         }
+
+        let activeCaptionTemplate = '';
+
+        async function fetchCaptionTemplate() {
+            try {
+                const res = await fetch('/api/influencers/caption');
+                const data = await res.json();
+                if (data.caption) {
+                    activeCaptionTemplate = data.caption;
+                    updatePromoCaptionUI();
+                }
+            } catch (err) {
+                console.warn("Could not load caption template:", err);
+            }
+        }
+
+        function updatePromoCaptionUI() {
+            if (!currentInfluencer) return;
+            const captionBox = document.getElementById('promo-caption-box');
+            if (!captionBox) return;
+
+            const code = currentInfluencer.referral_code || '';
+            const link = `${window.location.origin}/?ref=${encodeURIComponent(code)}`;
+
+            let text = activeCaptionTemplate || `🛠️ Verified AC & Home Appliance Repair in Lucknow by Sofiyan Home Service!\n\nUse my code {CODE} while booking for priority technician assignment:\n🔗 {LINK}\n\n#SofiyanHomeService #LucknowService #ACRepairLucknow #HomeAppliances`;
+
+            if (text.includes('{CODE}') || text.includes('{{CODE}}')) {
+                text = text.replace(/\{CODE\}|\{\{CODE\}\}/gi, code);
+            } else {
+                text += `\n\nUse my code: ${code}`;
+            }
+
+            if (text.includes('{LINK}') || text.includes('{{LINK}}')) {
+                text = text.replace(/\{LINK\}|\{\{LINK\}\}/gi, link);
+            } else if (link) {
+                text += `\n🔗 ${link}`;
+            }
+
+            captionBox.textContent = text;
+        }
+
+        window.copyPromoCaption = function() {
+            const captionBox = document.getElementById('promo-caption-box');
+            if (!captionBox) return;
+            navigator.clipboard.writeText(captionBox.textContent);
+            const btn = document.getElementById('btn-copy-caption');
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = `<i class="fas fa-check text-emerald-400"></i> <span>Caption Copied!</span>`;
+                setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            }
+        };
+
+        window.copyShareLink = function() {
+            const shareInput = document.getElementById('share-link-input');
+            if (!shareInput) return;
+            navigator.clipboard.writeText(shareInput.value);
+            const btn = document.getElementById('btn-copy-link');
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                }, 2000);
+            }
+        };
+
+        window.shareWhatsApp = function() {
+            if (!currentInfluencer) return;
+            const link = `${window.location.origin}/?ref=${encodeURIComponent(currentInfluencer.referral_code)}`;
+            const text = `🔥 Book trusted AC & Home Appliance Repair with Sofiyan Home Service! Use my code *${currentInfluencer.referral_code}* to get priority doorstep service: ${link}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        };
 
         window.refreshDashboard = function() {
             const icon = document.getElementById('refresh-icon');
             icon.classList.add('fa-spin');
+            fetchCaptionTemplate();
             loadInfluencerDashboard().finally(() => {
                 setTimeout(() => icon.classList.remove('fa-spin'), 500);
             });
@@ -452,30 +599,24 @@
             if (!currentInfluencer) return;
 
             try {
-                // Fetch bookings using this referral code
-                // Only count completed or accepted bookings for volume, or all? Let's fetch all that aren't cancelled
-                const { data: bookings, error } = await supabaseClient
-                    .from('bookings')
-                    .select('created_at, customer_name, total_price, status')
-                    .eq('applied_referral_code', currentInfluencer.referral_code)
-                    .neq('status', 'cancelled')
-                    .order('created_at', { ascending: false });
+                const res = await fetch(`/api/influencers/stats/${encodeURIComponent(currentInfluencer.referral_code)}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to load stats");
 
-                if (error) throw error;
-
-                const uses = bookings.length;
-                const volume = bookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
-                const commission = volume * 0.20;
+                const uses = data.total_bookings || 0;
+                const volume = data.total_volume || 0;
+                const commission = data.commission_amount || Math.round(volume * 0.25);
 
                 // Update Stats
                 document.getElementById('stat-uses').textContent = uses;
                 document.getElementById('stat-volume').textContent = `₹${volume.toLocaleString('en-IN')}`;
-                document.getElementById('stat-commission').textContent = `₹${commission.toLocaleString('en-IN', {maximumFractionDigits: 0})}`;
+                document.getElementById('stat-commission').textContent = `₹${commission.toLocaleString('en-IN')}`;
 
                 // Update Table
                 const tbody = document.getElementById('activity-table-body');
                 tbody.innerHTML = '';
 
+                const bookings = data.bookings || [];
                 if (bookings.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 text-sm">No bookings yet. Share your code to get started!</td></tr>`;
                     return;
@@ -486,11 +627,9 @@
                 
                 recentBookings.forEach(b => {
                     const date = new Date(b.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                    // Mask customer name: "Rahul" -> "Ra***"
-                    const name = b.customer_name || 'Unknown';
-                    const maskedName = name.length > 2 ? name.substring(0, 2) + '***' : name + '***';
-                    const price = Number(b.total_price) || 0;
-                    const cut = price * 0.20;
+                    const maskedName = b.customer_name || 'Customer';
+                    const price = Number(b.price) || 0;
+                    const cut = Number(b.commission) || Math.round(price * 0.25);
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50 transition-colors';
@@ -498,7 +637,7 @@
                         <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${date}</td>
                         <td class="px-6 py-4 text-sm font-medium text-gray-900">${maskedName}</td>
                         <td class="px-6 py-4 text-sm text-gray-600 text-right font-medium">₹${price.toLocaleString('en-IN')}</td>
-                        <td class="px-6 py-4 text-sm text-green-600 text-right font-bold">+₹${cut.toLocaleString('en-IN', {maximumFractionDigits: 0})}</td>
+                        <td class="px-6 py-4 text-sm text-green-600 text-right font-bold">+₹${cut.toLocaleString('en-IN')}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -508,61 +647,50 @@
             }
         }
 
-        window.updateReferralCode = async function() {
-            const newCode = document.getElementById('settings-referral-code').value.trim().toUpperCase();
+        window.saveUpiId = async function() {
+            const upiInput = document.getElementById('settings-upi-id');
+            const newUpi = (upiInput ? upiInput.value : '').trim();
             const msgDiv = document.getElementById('settings-msg');
-            
-            if (!newCode) {
-                msgDiv.textContent = "Code cannot be empty.";
-                msgDiv.className = "text-sm text-center font-medium mt-2 text-red-600 block";
+
+            if (!newUpi) {
+                msgDiv.textContent = "Please enter your UPI ID (e.g. 9876543210@paytm or name@bank).";
+                msgDiv.className = "text-xs text-center font-bold mt-2 p-2 rounded-lg bg-red-50 text-red-600 block";
                 return;
             }
 
-            if (newCode === currentInfluencer.referral_code) {
-                msgDiv.textContent = "This is already your active code.";
-                msgDiv.className = "text-sm text-center font-medium mt-2 text-gray-500 block";
+            if (!newUpi.includes('@')) {
+                msgDiv.textContent = "Invalid UPI format. Must contain '@' (e.g. mobile@paytm).";
+                msgDiv.className = "text-xs text-center font-bold mt-2 p-2 rounded-lg bg-red-50 text-red-600 block";
                 return;
             }
 
-            setBtnLoading('btn-update-code', true, 'Update Code');
+            setBtnLoading('btn-save-upi', true, '<i class="fas fa-check-circle"></i> Save UPI ID');
 
             try {
-                // Check if taken
-                const { data: existing } = await supabaseClient
-                    .from('influencers')
-                    .select('id')
-                    .eq('referral_code', newCode)
-                    .maybeSingle();
-                
-                if (existing) {
-                    throw new Error("Code is already taken by someone else.");
-                }
+                const res = await fetch('/api/influencers/upi', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: currentInfluencer.id,
+                        upi_id: newUpi
+                    })
+                });
 
-                // Update
-                const { data, error } = await supabaseClient
-                    .from('influencers')
-                    .update({ referral_code: newCode })
-                    .eq('id', currentInfluencer.id)
-                    .select()
-                    .single();
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to update UPI ID.");
 
-                if (error) throw error;
+                currentInfluencer = data.influencer;
+                localStorage.setItem('influencer_session', JSON.stringify(data.influencer));
 
-                currentInfluencer = data;
-                localStorage.setItem('influencer_session', JSON.stringify(data));
-                
-                msgDiv.textContent = "Referral code updated successfully!";
-                msgDiv.className = "text-sm text-center font-medium mt-2 text-green-600 block";
-                
-                // Refresh dashboard to reflect new code (though uses will reset to 0 for the new code)
-                loadInfluencerDashboard();
+                msgDiv.textContent = "UPI ID updated successfully! Commissions will be paid here.";
+                msgDiv.className = "text-xs text-center font-bold mt-2 p-2 rounded-lg bg-emerald-50 text-emerald-700 block";
 
             } catch (err) {
-                msgDiv.textContent = err.message || "Failed to update code.";
-                msgDiv.className = "text-sm text-center font-medium mt-2 text-red-600 block";
+                msgDiv.textContent = err.message || "Failed to update UPI ID.";
+                msgDiv.className = "text-xs text-center font-bold mt-2 p-2 rounded-lg bg-red-50 text-red-600 block";
             } finally {
-                setBtnLoading('btn-update-code', false, 'Update Code');
-                setTimeout(() => { msgDiv.classList.add('hidden'); }, 3000);
+                setBtnLoading('btn-save-upi', false, '<i class="fas fa-check-circle"></i> Save UPI ID');
+                setTimeout(() => { msgDiv.classList.add('hidden'); }, 4000);
             }
         };
 

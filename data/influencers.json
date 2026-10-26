@@ -1,0 +1,22 @@
+[
+  {
+    "id": "inf_1726700000001",
+    "page_name": "lucknow_foodie_vibes",
+    "contact_number": "9876543210",
+    "referral_code": "LUCKNOW25",
+    "password": "password123",
+    "commission_rate": 25,
+    "status": "Active",
+    "created_at": "2026-09-10T10:00:00.000Z"
+  },
+  {
+    "id": "inf_1789867791055_260",
+    "page_name": "up_lucknow_buzz",
+    "contact_number": "9876543211",
+    "referral_code": "UPLKO25",
+    "password": "testpassword",
+    "commission_rate": 25,
+    "status": "Active",
+    "created_at": "2026-09-20T01:29:51.055Z"
+  }
+]

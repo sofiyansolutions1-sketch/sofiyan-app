@@ -7,13 +7,14 @@ import { useStore } from '../hooks/useStore';
 import { Modal } from '../components/Modal';
 import { RateCardModal } from '../components/RateCardModal';
 import { identifyPincode, fetchPincodesByArea, fetchAreasByPincode } from '../services/pincodeService';
-import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy, Home, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle, MapPin, User, Phone, Star, Search, ChevronRight, ChevronLeft, Plus, Minus, Shield, ArrowRight, Trash2, FileText, Calendar, Clock, Map as MapIcon, Navigation, ShieldCheck, Lock, ShoppingCart, User as UserIcon, X, Gift, ShoppingBag, HelpCircle, Copy, Home, AlertCircle, MessageCircle, Sparkles, Award } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getSignedAppFileUrl } from '../services/storageService';
 
 import { Breadcrumb } from '../components/Breadcrumb';
 import { MapPicker } from '../components/MapPicker';
 import { NearbyTechniciansBlock } from '../components/NearbyTechniciansBlock';
+import { getServiceDossier } from '../services/serviceDossier';
 
 // Specific Customer Reviews Data
 const customerReviews = [
@@ -181,14 +182,15 @@ const featuredServicesData = [
 
 const mainCategories = [
     { id: "AC", name: "AC", image: "https://iili.io/nJSqYJt.png" },
+    { id: "Cleaning", name: "Cleaning", image: "https://iili.io/nJSaR1t.png" },
     { id: "Electrician", name: "Electrical", image: "https://iili.io/nJS1G9e.png" },
     { id: "Plumbing", name: "Plumbing", image: "https://iili.io/nJSl9VV.png" },
-    { id: "Appliances", name: "Appliances", image: "https://iili.io/nJScxae.png" },
-    { id: "Cleaning", name: "Cleaning", image: "https://iili.io/nJSaR1t.png" }
+    { id: "Appliances", name: "Appliances", image: "https://iili.io/nJScxae.png" }
 ];
 
 const categoryList = [
     { name: "AC", image: "https://i.postimg.cc/s2SR2Pvz/Chat-GPT-Image-Mar-25-2026-06-17-17-PM.png" },
+    { name: "Cleaning", image: "https://i.postimg.cc/0Np241Gb/Chat-GPT-Image-Mar-25-2026-06-16-45-PM.png" },
     { name: "Electrician", image: "https://i.postimg.cc/tCXRmc7V/Chat-GPT-Image-Mar-25-2026-06-17-31-PM.png" },
     { name: "Plumbing", image: "https://i.postimg.cc/L5vSpHhY/Chat-GPT-Image-Mar-25-2026-06-17-26-PM.png" },
     { name: "WashingMachine", image: "https://i.postimg.cc/FsBtgCL8/Chat-GPT-Image-Mar-25-2026-06-17-13-PM.png" },
@@ -197,8 +199,7 @@ const categoryList = [
     { name: "Geyser", image: "https://i.postimg.cc/GhsKVXNY/Chat-GPT-Image-Jan-13-2026-03-40-08-AM.jpg" },
     { name: "Microwave", image: "https://i.postimg.cc/yddXPjcW/Chat-GPT-Image-Mar-25-2026-06-17-03-PM.png" },
     { name: "Television", image: "https://i.postimg.cc/Ss5hbvjM/Chat-GPT-Image-Mar-26-2026-07-07-43-PM.png" },
-    { name: "Chimney", image: "https://i.postimg.cc/Gh528Qhy/Chat-GPT-Image-Mar-25-2026-06-16-57-PM.png" },
-    { name: "Cleaning", image: "https://i.postimg.cc/0Np241Gb/Chat-GPT-Image-Mar-25-2026-06-16-45-PM.png" }
+    { name: "Chimney", image: "https://i.postimg.cc/Gh528Qhy/Chat-GPT-Image-Mar-25-2026-06-16-57-PM.png" }
 ];
 
 const getRateCardCategory = (name: string): string | null => {
@@ -215,12 +216,12 @@ const getRateCardCategory = (name: string): string | null => {
 const PromotionalCarousel: React.FC<{onApplianceClick?: () => void}> = () => {
   const basePromos = [
     { src: "https://iili.io/nddEUI2.png", category: "AC" },
+    { src: "https://iili.io/nddXvxR.png", category: "Cleaning" },
     { src: "https://iili.io/nddM2M7.png", category: "Plumbing" },
     { src: "https://iili.io/nddMsOx.png", category: "WashingMachine" },
     { src: "https://iili.io/nddVrLN.png", category: "WaterPurifier" },
     { src: "https://iili.io/nddWaQp.png", category: "Geyser" },
-    { src: "https://iili.io/nddXfcX.png", category: "Chimney" },
-    { src: "https://iili.io/nddXvxR.png", category: "Cleaning" }
+    { src: "https://iili.io/nddXfcX.png", category: "Chimney" }
   ];
   // Duplicate for longer scroll before rewind
   const promos = [...basePromos, ...basePromos]; 
@@ -375,7 +376,36 @@ export const CustomerPanel: React.FC = () => {
   
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [useReferralBalance, setUseReferralBalance] = useState(false);
-  const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'success'>('form');
+  const [bookingStep, setBookingStep] = useState<'form' | 'loading' | 'whatsapp_pending' | 'success'>('form');
+  const templateMsgRef = useRef<string>('');
+  
+  useEffect(() => {
+    const checkWhatsAppReturn = () => {
+      const pending = sessionStorage.getItem('pendingWhatsAppBooking');
+      if (pending === 'true') {
+        sessionStorage.removeItem('pendingWhatsAppBooking');
+        setBookingStep('success');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkWhatsAppReturn();
+      }
+    };
+
+    const handleFocus = () => {
+      checkWhatsAppReturn();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
   const [isSeeAllModalOpen, setIsSeeAllModalOpen] = useState(false);
   const [bookingOtp, setBookingOtp] = useState("");
   const [completedBookingId, setCompletedBookingId] = useState<string>('');
@@ -1862,6 +1892,13 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
     return () => window.removeEventListener('locationUpdated', handleLocationUpdate);
   }, [isBookingModalOpen, formData.city]);
 
+  // Auto-request current location right away when customer enters checkout
+  useEffect(() => {
+    if (bookingStep === 'form' && !formData.locationLink && !formData.lat && !isTrackingLocation) {
+      handleTrackLocation();
+    }
+  }, [bookingStep]);
+
   // 1. Flatten all sub-services for Global Search & Featured Section
   const allSubServices = useMemo(() => {
     return SERVICES.flatMap(service => 
@@ -2186,6 +2223,37 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
     return () => clearTimeout(timer);
   }, [formData.pincode]);
 
+  const processMapLink = async (link: string) => {
+    if (!link || typeof link !== 'string') return;
+    const trimmed = link.trim();
+    if (trimmed.length < 5) return;
+
+    setIsTrackingLocation(true);
+    try {
+      const response = await fetch('/api/parse-maps-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: trimmed })
+      });
+      const data = await response.json();
+      if (data && data.success) {
+        setFormData((prev: any) => ({
+          ...prev,
+          address: data.address || prev.address,
+          area: data.area || prev.area,
+          pincode: data.pincode || prev.pincode,
+          city: data.city || prev.city,
+          lat: data.lat !== null && data.lat !== undefined ? data.lat : prev.lat,
+          lng: data.lng !== null && data.lng !== undefined ? data.lng : prev.lng
+        }));
+      }
+    } catch (e) {
+      console.warn("Map link parsing backend error:", e);
+    } finally {
+      setIsTrackingLocation(false);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
@@ -2193,6 +2261,10 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
     if (name === 'date') {
         updateAvailableTimeSlots(value);
         setFormData((prev: any) => ({ ...prev, time: '' }));
+    }
+
+    if (name === 'locationLink' && value.trim().length > 5) {
+        setTimeout(() => processMapLink(value), 300);
     }
   };
 
@@ -2387,52 +2459,132 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
       if (!hasNearbyTechnician) {
         setShowNoTechnicianPopup(true);
         setShowHelplineBanner(true);
-
-        // Forward to WhatsApp
-        try {
-          const templateMsg = `🆕 NEW ONLINE BOOKING (NO NEARBY TECH)\n` +
-            `───────────────────\n` +
-            `👤 Customer Info:\n` +
-            `Name: ${formData.name}\n` +
-            `Phone: ${formData.contact}\n\n` +
-            `🛠️ Service Details:\n` +
-            `Category: ${categoryName}\n` +
-            `Items: ${subServiceName}\n` +
-            `Total Amount: ₹${finalTotal}\n\n` +
-            `📍 Address:\n` +
-            `City: ${formData.city} -\n` +
-            `Detail: ${formData.address}\n` +
-            (formData.locationLink ? `🔗 Location: ${formData.locationLink}\n` : '') +
-            `\n⏰ Schedule:\n` +
-            `Date: ${formData.date}\n` +
-            `Time: ${formData.time}\n` +
-            `───────────────────\n` +
-            `⚠️ NO TECHNICIANS IN 10KM RADIUS!\n` +
-            `Sent via Sofiyan Home Service App`;
-  
-          // 1. Automatic send to admin via Server API
-          const adminPhone = ((import.meta as any).env.VITE_ADMIN_PHONE || '8115983887').replace(/\+/g, '');
-          
-          fetch('/api/send-whatsapp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              number: adminPhone,
-              message: templateMsg
-            })
-          }).catch(err => console.error("Auto WhatsApp Error:", err));
-        } catch {
-          console.warn("WhatsApp logic failed");
-        }
       }
 
-      // Success UI
-      setBookingStep('success');
-      sessionStorage.setItem('justBooked', 'true');
-      localStorage.setItem('customerPhone', formData.contact);
-      setCustomerPhone(formData.contact);
-      setCart([]); 
-      
+      // Unconditionally send professional booking details to Admin WhatsApp for every confirmed booking
+      try {
+        const leadRefId = completedBookingId || Math.floor(1000 + Math.random() * 9000).toString();
+
+        // Detailed services breakdown with What's Included and Excluded
+        const servicesBreakdownText = cart.map((item, idx) => {
+          const dossier = getServiceDossier(item.name, item.categoryName);
+          const includesList = dossier.includes && dossier.includes.length > 0 
+            ? dossier.includes.map(inc => `   ✓ ${inc}`).join('\n')
+            : '   ✓ Standard professional service by verified technician';
+          const excludesText = dossier.excludes && dossier.excludes.length > 0 
+            ? `\n   ❌ *Excludes:* ${dossier.excludes.join(', ')}` 
+            : '';
+          const durationText = dossier.timeEstimate ? `\n   ⏱️ *Est. Duration:* ${dossier.timeEstimate}` : '';
+
+          return `*${idx + 1}. ${item.name}* (Qty: ${item.quantity}) - ₹${item.price * item.quantity}` +
+                 durationText +
+                 `\n   *What's Included:*\n${includesList}${excludesText}`;
+        }).join('\n\n');
+
+        const mapsUrl = formData.locationLink || (finalLat && finalLng ? `https://www.google.com/maps?q=${finalLat},${finalLng}` : '');
+
+        const customerPhoneDigits = formData.contact.replace(/\D/g, '');
+        const customerWaLink = customerPhoneDigits.length >= 10 
+          ? `https://wa.me/91${customerPhoneDigits.slice(-10)}` 
+          : `https://wa.me/91${customerPhoneDigits}`;
+
+        const clientNotes = formData.description || formData.instructions;
+
+        const templateMsg = `💼 *NEW VERIFIED CUSTOMER BOOKING LEAD* 💼\n` +
+          `*SOFIYAN HOME SERVICES*\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+          `👤 *CUSTOMER DETAILS*\n` +
+          `• *Name:* ${formData.name}\n` +
+          `• *Contact Number:* ${formData.contact}\n` +
+          `• *Direct WhatsApp Chat:* ${customerWaLink}\n\n` +
+          `📍 *SERVICE LOCATION*\n` +
+          `• *City:* ${formData.city}\n` +
+          `• *Area / Locality:* ${formData.area || 'N/A'}\n` +
+          `• *Pincode:* ${formData.pincode || 'N/A'}\n` +
+          `• *Full Address:* ${formData.address || 'Address verified via GPS location'}\n` +
+          (mapsUrl ? `🗺️ *Live Google Maps Link (Click to Navigate):*\n${mapsUrl}\n\n` : '\n') +
+          `⏰ *APPOINTMENT SCHEDULE*\n` +
+          `• *Date:* ${formData.date}\n` +
+          `• *Time Slot:* ${formData.time}\n` +
+          (clientNotes ? `• *Customer Notes / Instructions:* ${clientNotes}\n` : '') +
+          `\n🛠️ *SERVICES BOOKED & SCOPE*\n` +
+          `─────────────────────────\n` +
+          `${servicesBreakdownText}\n` +
+          `─────────────────────────\n\n` +
+          `💰 *BILLING SUMMARY*\n` +
+          `• *Subtotal:* ₹${cartTotal}\n` +
+          (discountAmount > 0 ? `• *Discount Applied:* -₹${discountAmount} (${couponCode})\n` : '') +
+          `• *Final Amount Payable:* ₹${finalTotal}\n` +
+          `• *Payment Mode:* Pay After Service (Cash / UPI / QR)\n\n` +
+          `📋 *LEAD STATUS & ID*\n` +
+          `• *Lead Ref ID:* #${leadRefId}\n` +
+          (hasNearbyTechnician ? `🟢 *Dispatch Status:* Verified Partner Active in Area\n` : `⚠️ *Dispatch Status:* Manual Partner Allocation Required\n`) +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `_⚡ Action Required: Assign service partner and contact customer immediately._`;
+
+        const rawAdminPhone = ((import.meta as any).env?.VITE_ADMIN_PHONE || '8115983887').toString().replace(/\D/g, '');
+        const adminPhone = rawAdminPhone.startsWith('91') && rawAdminPhone.length > 10 
+          ? rawAdminPhone 
+          : '91' + rawAdminPhone.slice(-10);
+
+        templateMsgRef.current = templateMsg;
+        
+        // Also call backend API to send WhatsApp notification in background
+        fetch('/api/send-whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            number: adminPhone,
+            message: templateMsg
+          })
+        }).catch(err => console.error("Auto WhatsApp Error:", err));
+
+        const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(templateMsg)}`;
+
+        // Meta Pixel: Track genuine booking lead conversion (fired only after validation and successful booking confirmation)
+        try {
+          if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Lead', {
+              content_name: subServiceName || 'Doorstep Service Booking',
+              content_category: categoryName || 'Home Services',
+              value: Number(finalTotal) || 0,
+              currency: 'INR'
+            });
+          }
+        } catch (metaErr) {
+          console.warn('Meta Pixel Lead tracking notice:', metaErr);
+        }
+
+        // Set pending & confirmation state so user sees confirmation when returning
+        sessionStorage.setItem('pendingWhatsAppBooking', 'true');
+        sessionStorage.setItem('justBooked', 'true');
+        localStorage.setItem('customerPhone', formData.contact);
+        setCustomerPhone(formData.contact);
+        setBookingStep('whatsapp_pending');
+        setCart([]);
+
+        // Immediately trigger WhatsApp dispatch
+        let openedTab = false;
+        try {
+          const win = window.open(whatsappUrl, '_blank');
+          if (win && !win.closed && typeof win.closed !== 'undefined') {
+            openedTab = true;
+          }
+        } catch (e) {
+          openedTab = false;
+        }
+
+        // If pop-up was blocked or user is on mobile browser, directly redirect
+        if (!openedTab) {
+          window.location.href = whatsappUrl;
+        }
+      } catch (waErr) {
+        console.warn("WhatsApp notification logic failed:", waErr);
+        sessionStorage.setItem('pendingWhatsAppBooking', 'true');
+        setBookingStep('whatsapp_pending');
+        setCart([]);
+      }
+
       // Refetch from Supabase to update local store immediately
       fetchBookings().catch(err => console.error("Error refetching bookings:", err));
 
@@ -2470,6 +2622,61 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
               <p className="text-xl font-bold text-gray-600">Processing your booking securely...</p>
             </div>
           )}
+
+          {bookingStep === 'whatsapp_pending' && (() => {
+            const rawAdminPhone = ((import.meta as any).env?.VITE_ADMIN_PHONE || '8115983887').toString().replace(/\D/g, '');
+            const adminPhone = rawAdminPhone.startsWith('91') && rawAdminPhone.length > 10 ? rawAdminPhone : '91' + rawAdminPhone.slice(-10);
+            const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodeURIComponent(templateMsgRef.current || '')}`;
+
+            return (
+              <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center animate-fadeIn max-w-xl mx-auto px-4">
+                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6 shadow-inner border-4 border-emerald-100 text-emerald-600 animate-bounce">
+                  <MessageCircle size={36} />
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-black text-gray-900 mb-3 tracking-tight">Direct WhatsApp Lead Dispatched</h2>
+                <p className="text-sm sm:text-base text-gray-600 mb-6 font-medium leading-relaxed">
+                  Your booking lead has been compiled with all service inclusions, live Google Maps link, and full customer details.
+                  <br /><br />
+                  <span className="inline-block text-emerald-700 font-bold bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 text-xs sm:text-sm">
+                    Admin WhatsApp: <b>+91 81159 83887</b>
+                  </span>
+                </p>
+
+                {completedBookingId && (
+                  <div className="bg-indigo-50 border border-indigo-100 px-5 py-3 rounded-2xl mb-6">
+                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-0.5">Reference Booking ID</p>
+                    <p className="text-lg font-black text-indigo-950 tracking-wider">#{completedBookingId}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <MessageCircle size={18} />
+                    <span>Open WhatsApp Again</span>
+                  </a>
+                  <button
+                    onClick={() => setBookingStep('success')}
+                    className="flex-1 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <CheckCircle size={18} />
+                    <span>View Booking Confirmation ✓</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={resetFlow}
+                  className="mt-6 text-xs text-gray-400 hover:text-gray-600 underline font-medium"
+                >
+                  Skip / Return Home
+                </button>
+              </div>
+            );
+          })()}
 
           {bookingStep === 'success' && (
             <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center animate-fadeIn max-w-2xl mx-auto">
@@ -2567,30 +2774,69 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                           </button>
                        </div>
                     </div>
-                    <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
-                       <div className="flex items-center justify-between">
-                          <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
-                          <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                    {/* Hidden input to always maintain the location link in form state */}
+                    <input type="hidden" name="locationLink" value={formData.locationLink} />
+
+                    {formData.locationLink ? (
+                       <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-in fade-in duration-300">
+                          <div className="flex items-center gap-3.5">
+                             <div className="w-11 h-11 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
+                                <CheckCircle size={22} />
+                             </div>
+                             <div>
+                                <div className="flex items-center gap-2">
+                                   <h5 className="font-bold text-emerald-950 text-sm tracking-tight">Current Location Locked</h5>
+                                   <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Verified GPS ✓</span>
+                                </div>
+                                <p className="text-xs text-emerald-700 font-medium mt-0.5">
+                                   Live location coordinates secured for technician navigation. (Link hidden for privacy)
+                                </p>
+                             </div>
+                          </div>
+                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                             <button
+                               type="button"
+                               onClick={() => setIsMapPickerOpen(true)}
+                               className="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm"
+                             >
+                               Adjust Pin
+                             </button>
+                             <button
+                               type="button"
+                               onClick={handleTrackLocation}
+                               disabled={isTrackingLocation}
+                               className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm disabled:opacity-50"
+                             >
+                               {isTrackingLocation ? 'Detecting...' : 'Re-Detect'}
+                             </button>
+                          </div>
                        </div>
-                       <div className="relative group/input flex items-center">
-                              <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
-                              <input
-                                name="locationLink"
-                                value={formData.locationLink}
-                                onChange={handleInputChange}
-                                className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
-                                placeholder="Paste Google Maps link here..."
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setIsMapPickerOpen(true)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
-                              >
-                                Adjust Pin
-                              </button>
-                           </div>
-                       <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section below optional.</p>
-                    </div>
+                    ) : (
+                       <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
+                          <div className="flex items-center justify-between">
+                             <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
+                             <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                          </div>
+                          <div className="relative group/input flex items-center">
+                             <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
+                             <input
+                               name="locationLink"
+                               value={formData.locationLink}
+                               onChange={handleInputChange}
+                               className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                               placeholder="Paste Google Maps link here..."
+                             />
+                             <button
+                               type="button"
+                               onClick={() => setIsMapPickerOpen(true)}
+                               className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                             >
+                               Adjust Pin
+                             </button>
+                          </div>
+                          <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section below optional.</p>
+                       </div>
+                    )}
                  </div>
 
                  {/* Address */}
@@ -2678,21 +2924,53 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                         <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">{cartItemCount} Items</span>
                      </h3>
                      
-                     <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                       {cart.map(item => (
-                         <div key={item.id} className="flex justify-between items-start gap-4 p-3 hover:bg-gray-50 rounded-2xl transition-colors border border-transparent hover:border-gray-100">
-                           <div className="flex-1">
-                             <p className="font-bold text-gray-800 text-sm leading-snug">{item.name}</p>
-                             <div className="flex items-center gap-2 mt-2">
-                               <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-medium">-</button>
-                               <span className="text-xs font-black text-indigo-900 min-w-[12px] text-center">{item.quantity}</span>
-                               <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-medium">+</button>
-                               <button type="button" onClick={() => removeFromCart(item.id)} className="ml-3 text-red-500 hover:text-red-700 text-[10px] uppercase font-black tracking-widest bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors">Discard</button>
+                     <div className="space-y-4 mb-6 max-h-[52vh] overflow-y-auto pr-2 custom-scrollbar">
+                       {cart.map(item => {
+                         const dossier = getServiceDossier(item.name, item.categoryName);
+                         return (
+                           <div key={item.id} className="p-3.5 hover:bg-gray-50/90 rounded-2xl transition-all border border-gray-100 bg-white shadow-sm space-y-2.5">
+                             <div className="flex justify-between items-start gap-3">
+                               <div className="flex-1 min-w-0">
+                                 <p className="font-black text-gray-900 text-sm leading-snug">{item.name}</p>
+                                 {dossier.timeEstimate && (
+                                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md mt-1">
+                                     <Clock size={10} className="text-indigo-500" /> Takes approx. {dossier.timeEstimate}
+                                   </span>
+                                 )}
+                                 <div className="flex items-center gap-2 mt-2">
+                                   <button type="button" onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-bold">-</button>
+                                   <span className="text-xs font-black text-indigo-900 min-w-[14px] text-center">{item.quantity}</span>
+                                   <button type="button" onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 bg-white shadow-sm border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-600 font-bold">+</button>
+                                   <button type="button" onClick={() => removeFromCart(item.id)} className="ml-3 text-red-500 hover:text-red-700 text-[10px] uppercase font-black tracking-widest bg-red-50 hover:bg-red-100 px-2 py-1 rounded-md transition-colors">Discard</button>
+                                 </div>
+                               </div>
+                               <span className="font-black text-indigo-600 shrink-0 text-base">₹{item.price * item.quantity}</span>
+                             </div>
+
+                             {/* What's Included in this Service in clear text */}
+                             <div className="bg-emerald-50/60 rounded-xl p-2.5 border border-emerald-100 text-left">
+                               <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-800 mb-1.5">
+                                 <CheckCircle size={12} className="text-emerald-600 shrink-0" />
+                                 <span>What's Included:</span>
+                               </div>
+                               <ul className="text-[11px] text-emerald-950/85 space-y-1 pl-0.5">
+                                 {dossier.includes.map((inc, i) => (
+                                   <li key={i} className="flex items-start gap-1.5 leading-snug">
+                                     <span className="text-emerald-600 font-bold shrink-0">•</span>
+                                     <span>{inc}</span>
+                                   </li>
+                                 ))}
+                               </ul>
+                               {dossier.excludes && dossier.excludes.length > 0 && (
+                                 <div className="mt-2 pt-1.5 border-t border-emerald-100 text-[10px] text-gray-500">
+                                   <span className="font-bold text-rose-600 mr-1">Not Included:</span>
+                                   <span>{dossier.excludes.join(', ')}</span>
+                                 </div>
+                               )}
                              </div>
                            </div>
-                           <span className="font-black text-indigo-600 shrink-0 text-base">₹{item.price * item.quantity}</span>
-                         </div>
-                       ))}
+                         );
+                       })}
                      </div>
 
                      <div className="pt-6 border-t border-gray-100 space-y-5">
@@ -4006,30 +4284,59 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                     </h4>
                     
                     <div className="space-y-6">
-                        <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
-                           <div className="flex items-center justify-between">
-                              <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
-                              <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
-                           </div>
-                           <div className="relative group/input flex items-center">
-                              <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
-                              <input
-                                name="locationLink"
-                                value={formData.locationLink}
-                                onChange={handleInputChange}
-                                className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
-                                placeholder="Paste Google Maps link here..."
-                              />
+                        {/* Hidden input to always maintain the location link in form state */}
+                        <input type="hidden" name="locationLink" value={formData.locationLink} />
+
+                        {formData.locationLink ? (
+                           <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-in fade-in duration-300">
+                              <div className="flex items-center gap-3">
+                                 <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
+                                    <CheckCircle size={20} />
+                                 </div>
+                                 <div>
+                                    <div className="flex items-center gap-2">
+                                       <h5 className="font-bold text-emerald-950 text-xs sm:text-sm tracking-tight">Location Locked</h5>
+                                       <span className="bg-emerald-100 text-emerald-800 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">GPS Verified ✓</span>
+                                    </div>
+                                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                                       Coordinates captured for arrival. Map link hidden for privacy.
+                                    </p>
+                                 </div>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => setIsMapPickerOpen(true)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                                className="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors shadow-sm"
                               >
                                 Adjust Pin
                               </button>
                            </div>
-                           <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Deployment Address" section above optional.</p>
-                        </div>
+                        ) : (
+                           <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
+                              <div className="flex items-center justify-between">
+                                 <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
+                                 <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                              </div>
+                              <div className="relative group/input flex items-center">
+                                 <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
+                                 <input
+                                   name="locationLink"
+                                   value={formData.locationLink}
+                                   onChange={handleInputChange}
+                                   className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
+                                   placeholder="Paste Google Maps link here..."
+                                 />
+                                 <button
+                                   type="button"
+                                   onClick={() => setIsMapPickerOpen(true)}
+                                   className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                                 >
+                                   Adjust Pin
+                                 </button>
+                              </div>
+                              <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Deployment Address" section above optional.</p>
+                           </div>
+                        )}
 
                         {/* Precision detection from modal */}
                         <div className="relative bg-indigo-950 rounded-2xl p-4 shadow-lg border border-white/10">

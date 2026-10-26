@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { SEOManager } from './components/SEOManager';
 import { Layout } from './components/Layout';
 import { CustomerPanel } from './pages/CustomerPanel';
@@ -10,16 +10,24 @@ import { BlogPost } from './pages/BlogPost';
 import RateList from './pages/RateList';
 import { TrackBooking } from './pages/TrackBooking';
 import { SubServicePage } from './pages/SubServicePage';
+import { InfluencerPanel } from './pages/InfluencerPanel';
 
-import { RoleSelectionModal } from './components/RoleSelectionModal';
 import { CITY_DATA } from './constants';
 
 function AppContent() {
-  const [showRoleModal, setShowRoleModal] = useState(() => {
-    const hasSelectedRole = sessionStorage.getItem('sofiyan_user_role');
-    return !hasSelectedRole;
-  });
-  const navigate = useNavigate();
+  const location = useLocation();
+  const isInitialMount = useRef(true);
+
+  // Meta Pixel: Track PageView on SPA client-side route changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return; // Base snippet in index.html already fired the initial PageView
+    }
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'PageView');
+    }
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     // Request permission on load as per user request
@@ -35,20 +43,8 @@ function AppContent() {
     }
   }, []);
 
-  const handleRoleSelect = (role: 'customer' | 'technician') => {
-    sessionStorage.setItem('sofiyan_user_role', role);
-    setShowRoleModal(false);
-    if (role === 'technician') {
-      navigate('/partner');
-    } else {
-      navigate('/');
-    }
-  };
-
   return (
-    <>
-      {showRoleModal && <RoleSelectionModal onSelect={handleRoleSelect} />}
-      <Layout>
+    <Layout>
         <Routes>
           <Route path="/" element={<CustomerPanel />} />
           <Route path="/rate-list" element={<RateList />} />
@@ -56,6 +52,9 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/partner" element={<PartnerPanel />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/influencer" element={<InfluencerPanel />} />
+          <Route path="/influencers" element={<InfluencerPanel />} />
+          <Route path="/influencer-portal.html" element={<InfluencerPanel />} />
           <Route path="/track" element={<TrackBooking />} />
           <Route path="/:cityUrl" element={<CustomerPanel />} />
           <Route path="/:cityUrl/:serviceUrl" element={<CustomerPanel />} />
@@ -63,7 +62,6 @@ function AppContent() {
           <Route path="*" element={<CustomerPanel />} />
         </Routes>
       </Layout>
-    </>
   );
 }
 

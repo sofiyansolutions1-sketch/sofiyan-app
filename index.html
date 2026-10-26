@@ -35,6 +35,21 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.sofiyansolutions.com/" />
 
+    <!-- Meta Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '3706990099466042');
+      fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+
     <!-- Local Business Schema Markup (JSON-LD) -->
     <script type="application/ld+json">
       {
@@ -172,6 +187,10 @@
     </style>
   </head>
   <body>
+    <!-- Meta Pixel NoScript Fallback -->
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=3706990099466042&ev=PageView&noscript=1"
+    /></noscript>
     <div id="root"></div>
 
     <!-- Smart Address Matcher Modal -->
@@ -278,7 +297,7 @@
         <!-- Sidebar / Top Categories (Responsive) -->
         <div
           id="full-modal-sidebar"
-          class="flex flex-row md:flex-col w-full md:w-64 bg-white md:bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 overflow-x-auto md:overflow-y-auto custom-scrollbar flex-shrink-0 z-10"
+          class="flex flex-row md:flex-col w-full md:w-72 bg-white md:bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 overflow-x-auto md:overflow-y-auto custom-scrollbar flex-shrink-0 z-10"
         >
           <!-- Subcategory items injected here -->
         </div>
@@ -323,6 +342,115 @@
             class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-xl shadow-indigo-200 active:scale-95 text-sm uppercase tracking-wider"
           >
             Checkout <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dedicated NoBroker-style Service Options Pop-up Modal -->
+    <div
+      id="service-options-modal"
+      class="hidden fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300"
+      onclick="handleOptionsModalBackdropClick(event)"
+    >
+      <div
+        id="service-options-modal-card"
+        class="bg-white w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden relative"
+        onclick="event.stopPropagation()"
+      >
+        <!-- Mobile drag indicator -->
+        <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto my-2.5 sm:hidden"></div>
+
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-start justify-between bg-white sticky top-0 z-10">
+          <div class="pr-4">
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span id="opt-modal-category-badge" class="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">Cleaning</span>
+              <span id="opt-modal-rating-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">
+                <i class="fas fa-star text-amber-400 text-[10px]"></i> <span id="opt-modal-rating">4.8 (12K+ reviews)</span>
+              </span>
+            </div>
+            <h3 id="opt-modal-service-name" class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Service Name</h3>
+            <p id="opt-modal-service-subtitle" class="text-xs text-slate-500 mt-1 line-clamp-2">Select your preferred configuration or room size below</p>
+          </div>
+          <button
+            onclick="closeServiceOptionsModal()"
+            class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full w-9 h-9 flex items-center justify-center transition-all flex-shrink-0"
+            aria-label="Close"
+          >
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Modal Scrollable Content -->
+        <div class="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
+          <!-- Options Selection Section -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">Select Option / Configuration</h4>
+              <span class="text-[11px] text-slate-400 font-medium">Instant Add & No hidden costs</span>
+            </div>
+            <div id="opt-modal-options-list" class="space-y-2.5">
+              <!-- Dynamically populated options -->
+            </div>
+          </div>
+
+          <!-- What's Included Section -->
+          <div id="opt-modal-included-container" class="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100/80">
+            <h4 class="text-xs font-black text-emerald-900 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+              <i class="fas fa-check-circle text-emerald-600"></i> Service Includes
+            </h4>
+            <ul id="opt-modal-included-list" class="text-xs text-emerald-950 space-y-1.5 leading-relaxed pl-1">
+              <!-- Inclusions -->
+            </ul>
+          </div>
+
+          <!-- What's NOT Included Section (Optional) -->
+          <div id="opt-modal-excluded-container" class="bg-rose-50/60 rounded-2xl p-4 border border-rose-100/80 hidden">
+            <h4 class="text-xs font-black text-rose-900 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+              <i class="fas fa-times-circle text-rose-500"></i> Service Does Not Include
+            </h4>
+            <ul id="opt-modal-excluded-list" class="text-xs text-rose-950 space-y-1.5 leading-relaxed pl-1">
+              <!-- Exclusions -->
+            </ul>
+          </div>
+
+          <!-- NoBroker Assurance Badges -->
+          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center">
+              <i class="fas fa-shield-alt text-indigo-600 text-sm mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-800 leading-tight">Damage Cover</span>
+              <span class="text-[9px] text-slate-400 leading-none">Up to ₹10,000</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center">
+              <i class="fas fa-user-check text-indigo-600 text-sm mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-800 leading-tight">Verified Pros</span>
+              <span class="text-[9px] text-slate-400 leading-none">100% Background checked</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center">
+              <i class="fas fa-leaf text-emerald-600 text-sm mb-1"></i>
+              <span class="text-[10px] font-bold text-slate-800 leading-tight">Eco-Safe</span>
+              <span class="text-[9px] text-slate-400 leading-none">Pet & Child safe</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Footer Action -->
+        <div class="border-t border-slate-100 bg-white p-4 sm:p-5 flex items-center justify-between gap-4 sticky bottom-0 z-10 shadow-lg">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase font-black tracking-wider block">Selected Requirement</span>
+            <div class="flex items-baseline gap-2">
+              <span id="opt-modal-footer-price" class="text-2xl font-black text-slate-900">₹0</span>
+              <span id="opt-modal-footer-original" class="text-xs text-slate-400 line-through font-semibold hidden">₹0</span>
+              <span id="opt-modal-footer-name" class="text-xs font-bold text-indigo-600 truncate max-w-[130px] sm:max-w-[200px]">None</span>
+            </div>
+          </div>
+          <button
+            id="opt-modal-add-button"
+            onclick="confirmSelectedOption()"
+            class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-black px-6 sm:px-8 py-3.5 rounded-2xl shadow-xl shadow-indigo-200 active:scale-95 transition-all text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2 flex-shrink-0"
+          >
+            <span>Proceed & Add</span> <i class="fas fa-arrow-right text-xs"></i>
           </button>
         </div>
       </div>
@@ -678,119 +806,1481 @@
           ],
         },
         Cleaning: {
-          "Furnished House": [
-            { name: "Full Home 1BHK", price: 3499 },
-            { name: "Full Home 2BHK", price: 3899 },
-            { name: "Full Home 3BHK", price: 4799 },
-            { name: "Full Home 4BHK", price: 6199 },
-            { name: "Full Home 5BHK", price: 7299 },
+          "Full Home Cleaning": [
+            { name: "Furnished Apartment Essential", price: 3379, duration: "3h 45m", description: "Bathroom & kitchen deep cleaning; machine cleaning of floors, doors & windows; cobweb removal, ceiling & fan dusting; balcony & utility area cleaning; cabinet & furniture exterior dusting & wet wiping" },
+            { name: "Furnished Apartment Premium", price: 3859, duration: "4h 15m", description: "Everything in Essential + cupboard cleaning (interior + exterior, if empty) + cabinets interior with utensil removal" },
+            { name: "Furnished Apartment Elite", price: 4289, duration: "4h 45m", description: "Everything in Premium + sofa, carpet & mattress shampooing" },
+            { name: "Unfurnished Apartment Essential", price: 3089, duration: "3h", description: "Bathroom & kitchen deep cleaning; machine cleaning of floors, doors & windows; cobweb removal, ceiling & fan dusting" },
+            { name: "Unfurnished Apartment Premium", price: 3709, duration: "3h 40m", description: "Everything in Essential + cupboard cleaning (interior + exterior, if empty) + cabinets interior with utensil removal" },
+            { name: "Unfurnished Apartment Post Interior Work", price: 4699, duration: "6h", description: "Everything in Premium + sticker, gum & garbage removal + paint and stain removal (100% removal not guaranteed)" },
+            { name: "Furnished Villa Essential", price: 4439, duration: "5h 20m", description: "Bathroom & kitchen deep cleaning; wiping & mopping of complete floor area; cobweb removal & wall dry dusting; balcony & utility area cleaning" },
+            { name: "Furnished Villa Premium", price: 6729, duration: "5h 50m", description: "Bathroom & kitchen deep cleaning; cobweb removal & wall dry dusting; dry vacuuming of sofa, carpet & chairs; machine cleaning of floors, doors & windows; furniture & appliances dusting and wet wiping" },
+            { name: "Unfurnished Villa Essential", price: 4419, duration: "5h 20m", description: "Bathroom & kitchen deep cleaning; wiping & mopping of complete floor area; cobweb removal & wall dry dusting; balcony & utility area cleaning" },
+            { name: "Unfurnished Villa Premium", price: 5819, duration: "5h 50m", description: "Bathroom & kitchen deep cleaning; cobweb removal & wall dry dusting; wiping & mopping of complete floor area; machine cleaning of floors, doors & windows" }
           ],
-          "Unfurnished House": [
-            { name: "Full Home 1BHK", price: 3079 },
-            { name: "Full Home 2BHK", price: 3699 },
-            { name: "Full Home 3BHK", price: 4499 },
-            { name: "Full Home 4BHK", price: 5699 },
-            { name: "Full Home 5BHK", price: 6599 },
+          "Kitchen & Appliances": [
+            { name: "Occupied Kitchen – Essential", price: 1459, duration: "2h", description: "Degreasing of tiles, floor, slab & gas stove/hob; sink, under-sink, exhaust & fan dusting; floors, windows & switchboard cleaning; exterior cabinet cleaning only; utensil removal not included" },
+            { name: "Occupied Kitchen – Power Steam", price: 1959, duration: "2h 30m", description: "High-pressure steam degreasing of tiles, slabs & stove; sink, under-sink, exhaust & fan dusting; floors, windows & switchboards; utensil removal/rearrangement included; cabinets cleaned exterior & interior" },
+            { name: "Occupied Kitchen – Eco-Smart", price: 2009, duration: "2h 45m", description: "Odourless eco-smart deep clean; steam + active foam degreasing without fumes; includes everything in Power Steam (sink, cabinets, utensils, exhaust); non-corrosive and family-safe" },
+            { name: "Empty Kitchen – Essential", price: 849, duration: "1h 30m", description: "Same as Occupied Essential (exterior cabinets only, no utensil handling)" },
+            { name: "Empty Kitchen – Power Steam", price: 949, duration: "2h", description: "High-pressure steam degreasing; sink, exhaust & fan dusting; floors, windows & switchboards; exterior cabinets only; no utensil handling" },
+            { name: "Empty Kitchen – Eco-Smart", price: 1399, duration: "1h 30m", description: "Chemical-free non-toxic deep scrub with herbal surface disinfectants and floor machine wash" },
+            { name: "Single Kitchen Appliance Cleaning", price: 249, duration: "30m", description: "Dedicated deep clean for Refrigerator, Microwave/Oven, Chimney Filter, or Gas Stove" },
+            { name: "Fridge Cleaning", price: 379, duration: "45m", description: "Removing and replacing all food items; cleaning shelves and trays; wiping interior & exterior; removal of food stains, crumbs and odours" },
+            { name: "Chimney Cleaning", price: 379, duration: "1h", description: "Degreasing and stain removal of one chimney; mesh and filter deep cleaning; digital chimney cleaned on the exterior only" },
+            { name: "Utility Area Cleaning", price: 499, duration: "45m", description: "Cleaning of utility windows, appliances and floor" },
+            { name: "Microwave Cleaning", price: 189, duration: "30m", description: "Deep cleaning of exterior; wet wiping of interior; oil and food stain removal" },
+            { name: "Gas Stove Cleaning", price: 89, duration: "30m", description: "Removes grease, stains and grime from stove, burners and knobs" },
+            { name: "Kitchen Tiles & Slabs", price: 279, duration: "1h", description: "Degreases tiles & slabs and deep cleans grout" },
+            { name: "Cabinet & Trolley Cleaning", price: 899, duration: "1h 30m", description: "Cleaning inside cabinets (items removed and placed back); oil and grease removal from the exterior" },
+            { name: "Oven, Toaster & Grill", price: 379, duration: "45m", description: "Interior cleaning for crumbs and spills; exterior and back panel grease cleaning" }
           ],
-          "Furnished Bungalow Cleaning": [
-            {
-              name: "Furnished Bungalow Cleaning (1000-2000 sqft)",
-              price: 5179,
-            },
-            {
-              name: "Furnished Bungalow Cleaning (2000-3000 sqft)",
-              price: 8099,
-            },
-            {
-              name: "Furnished Bungalow Cleaning (3000-4000 sqft)",
-              price: 10879,
-            },
-            {
-              name: "Furnished Bungalow Cleaning (4000-5000 sqft)",
-              price: 12899,
-            },
-            {
-              name: "Furnished Bungalow Cleaning (5000-6000 sqft)",
-              price: 15839,
-            },
+          "Bathroom & Balcony": [
+            { name: "Bathroom – Essential Cleaning", price: 499, duration: "1h", description: "Hard water stain removal from tiles & fixtures; toilet pot, washbasin & mirror scrub; floor machine/brush wash; exhaust & cobwebs" },
+            { name: "Bathroom – Power Steam Sanitization", price: 699, duration: "1h 20m", description: "High-pressure 140°C steam jet sanitization of grout lines, commode & corners; eliminates 99.9% germs, removes mildew" },
+            { name: "Bathroom – Eco-Smart Clean", price: 599, duration: "1h 10m", description: "Plant-derived acid-free descalers, anti-allergen formulation, mirror polishing & drain bio-enzyme deodorizing" },
+            { name: "Balcony Deep Cleaning", price: 349, duration: "45m", description: "Floor jet wash / machine scrub, railing wiping, bird droppings removal, drain clearing, glass partition cleaning" },
+            { name: "Bathroom – Eco-Smart", price: 509, duration: "1h", description: "Active foam deep cleaning; removes tough stains, soap scum & grime without bleach or fumes; odourless, non-corrosive, family-safe" },
+            { name: "Bathroom – Machine", price: 479, duration: "45m", description: "Machine scrubbing of floor and tiles; removal of dirt & black spots; for tough stains and deep cleaning" },
+            { name: "Bathroom – Hands-on", price: 429, duration: "50m", description: "Manual scrubbing of tiles, taps and fittings; removes dirt and black spots" },
+            { name: "Balcony Cleaning", price: 399, duration: "45m", description: "Sweeping & mopping of floor; dusting and wiping of railings, grills and accessible walls; cobweb and loose dirt removal" }
           ],
-          "UnFurnished Bungalow Cleaning": [
-            {
-              name: "UnFurnished Bungalow Cleaning (1000-2000 sqft)",
-              price: 4899,
-            },
-            {
-              name: "UnFurnished Bungalow Cleaning (2000-3000 sqft)",
-              price: 7899,
-            },
-            {
-              name: "UnFurnished Bungalow Cleaning (3000-4000 sqft)",
-              price: 10499,
-            },
-            {
-              name: "UnFurnished Bungalow Cleaning (4000-5000 sqft)",
-              price: 12659,
-            },
-            {
-              name: "UnFurnished Bungalow Cleaning (5000-6000 sqft)",
-              price: 15579,
-            },
+          "Sofa, Carpet & Upholstery": [
+            { name: "Sofa Cleaning – Fabric", price: 699, duration: "1h", description: "3-step deep injection-extraction shampooing, high-suction moisture vacuuming, spot stain treatment" },
+            { name: "Sofa Cleaning – Leather / Leatherette", price: 799, duration: "45m", description: "Specialized pH-neutral foaming leather cleanser, microfiber dirt lift, rich conditioner buffing" },
+            { name: "Carpet / Rug Cleaning", price: 349, duration: "30m", description: "Industrial rotary machine brush shampooing, moisture suction extraction, anti-microbial deodorization" },
+            { name: "Sofa Cleaning", price: 329, duration: "1h", description: "Shampooing of the sofa seats; thorough dry and wet vacuuming; cushions not included" },
+            { name: "Sofa with Cushion Cleaning", price: 599, duration: "1h 15m", description: "Same as above, with the same number of cushions as the seats of the selected sofa" },
+            { name: "Mattress Cleaning", price: 389, duration: "45m", description: "Dry and wet vacuuming, shampooing and stain removal; hard stain removal" },
+            { name: "Cushion Cleaning", price: 169, duration: "30m", description: "Wet & dry vacuuming with shampooing; up to 5 cushions per booking; removes dust, stains & odour" },
+            { name: "Dining Table & Chairs", price: 449, duration: "45m", description: "Dry vacuuming of cushioned chairs and wet wiping of the table; chair shampooing; cleaning under table and chairs" },
+            { name: "Window Cleaning", price: 399, duration: "1h", description: "Thorough cleaning of windows" },
+            { name: "Recliner Cleaning", price: 219, duration: "30m", description: "Removes stains and spillage through dry and wet vacuuming" },
+            { name: "Sofa Cum Bed Cleaning", price: 379, duration: "1h", description: "Vacuuming and foam cleaning for dust, dirt and common stains; wood surfaces polished" },
+            { name: "Leather Sofa Shining", price: 349, duration: "45m", description: "Surface cleaning of the leather sofa; application of leather-safe polish; buffing for a glossy finish" },
+            { name: "Carpet Cleaning", price: 369, duration: "1h", description: "Removal of dust, dirt and debris; foam shampooing with a sponge; vacuuming and wiping off shampoo" }
           ],
-          "Kitchen & Bathroom": [
-            { name: "Kitchen Deep Cleaning", price: 1599 },
-            { name: "Chimney Outer Cleaning", price: 899 },
-            { name: "Chimney Full Deep Cleaning", price: 1300 },
-            { name: "Bathroom Deep Cleaning", price: 549 },
-            { name: "Toilet Cleaning Only", price: 499 },
-            { name: "Utensil Removal & Replacement", price: 399 },
-            { name: "Fridge Inside Cleaning", price: 249 },
-            { name: "Microwave Inside Cleaning", price: 149 },
+          "Book by Room": [
+            { name: "Floor Cleaning", price: 399, duration: "1h", description: "Single disc rotary floor scrubbing machine, stain buffing, wet mopping (Up to 700 sq ft options)" },
+            { name: "Living Room Cleaning", price: 759, duration: "1h", description: "Living room cleaning with Furnished and Unfurnished options (sofa wiping, floor buffing, windows)" },
+            { name: "Dining Room Cleaning", price: 569, duration: "45m", description: "Dining area floor buffing, table & chairs wiping, ceiling fan dusting (Furnished & Unfurnished options)" },
+            { name: "Bedroom Cleaning", price: 669, duration: "1h", description: "Bedroom cleaning with Furnished and Unfurnished options (wardrobe exterior, under-bed, fan)" },
+            { name: "Pooja Room Cleaning", price: 429, duration: "45m", description: "Mandir wooden/marble polishing, brassware cleaning, tile & floor deep degreasing" },
+            { name: "Store Room Cleaning", price: 569, duration: "1h", description: "Rack organizing assistance, spiderweb clearing, shelf wiping & floor wash" }
           ],
-          "Sofa Cleaning": [
-            { name: "3 seats", price: 499 },
-            { name: "4 seats", price: 649 },
-            { name: "5 seats", price: 749 },
-            { name: "6 seats", price: 899 },
-            { name: "7 seats", price: 999 },
-            { name: "8 seats", price: 1149 },
-            { name: "9 seats", price: 1249 },
-            { name: "10 seats", price: 1349 },
-            { name: "11 seats", price: 1599 },
-            { name: "12 seats", price: 1699 },
-          ],
-          "Carpet Cleaning": [
-            { name: "Extra Small (upto 25 sq ft)", price: 399 },
-            { name: "Small (upto 25-50 sq ft)", price: 599 },
-            { name: "Medium (upto 50-100 sq ft)", price: 799 },
-            { name: "Large (upto 100-150 sq ft)", price: 949 },
-            { name: "Extra Large (upto 150-200 sq ft)", price: 1099 },
-          ],
-          "Dining table & chairs cleaning": [
-            { name: "4 Seats", price: 299 },
-            { name: "5 Seats", price: 349 },
-            { name: "6 Seats", price: 399 },
-            { name: "7 Seats", price: 449 },
-            { name: "8 Seats", price: 499 },
-            { name: "9 Seats", price: 549 },
-            { name: "10 Seats", price: 599 },
-          ],
-          Mattress: [
-            { name: "Single Bed", price: 399 },
-            { name: "Double Bed", price: 699 },
-          ],
-          Others: [
-            { name: "Window Glass Cleaning (per window)", price: 149 },
-            { name: "Balcony Cleaning", price: 599 },
-            { name: "Washing Machine Drum Clean", price: 249 },
-            { name: "Wardrobe Cleaning (per unit)", price: 299 },
-            { name: "Water Tank Cleaning (1000L)", price: 749 },
-            { name: "Water Tank Cleaning (2000L)", price: 1299 },
-            { name: "Consultation", price: 249 },
-          ],
+          "Mini Services": [
+            { name: "Washbasin Cleaning", price: 59, duration: "20m", description: "Cleaning of washbasin" },
+            { name: "Exhaust Fan Cleaning", price: 69, duration: "30m", description: "Dust & grease removal" },
+            { name: "Sink & Under Sink Cleaning", price: 79, duration: "30m", description: "Cleaning sink & storage area" },
+            { name: "Mirror Cleaning", price: 49, duration: "20m", description: "Streak-free mirror cleaning" },
+            { name: "Kitchen Window Cleaning", price: 269, duration: "45m", description: "Cleaning of kitchen windows" },
+            { name: "Door Cleaning", price: 79, duration: "30m", description: "Surface cleaning of doors" },
+            { name: "Fan Cleaning", price: 45, duration: "20m", description: "Dust removal from fan" },
+            { name: "Ceiling Dusting & Cobweb", price: 179, duration: "45m", description: "Cobweb & dust removal" },
+            { name: "Utensils Removal & Replacement", price: 409, duration: "30m", description: "Handling utensils during cleaning" }
+          ]
         },
       };
 
       let currentCategoryView = "";
+
+      
+      // NoBroker-style service options catalog for Cleaning
+      window.serviceOptionsCatalog = {
+  "Furnished Apartment Essential": {
+    "subtitle": "Complete deep cleaning of furnished apartment including rooms, bathroom, kitchen, surfaces and floors.",
+    "rating": "4.80 (43.2K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep cleaning and descaling",
+      "Single-disc machine scrubbing of tiled floors, doors & window tracks",
+      "Complete ceiling dusting, cobweb removal & fan blades cleaning",
+      "Balcony & utility area wet wiping and floor wash",
+      "Exterior cabinet, wardrobe and furniture wet wiping & buffing"
+    ],
+    "excludes": [
+      "Cupboard / wardrobe interior wet wiping",
+      "Upholstery (sofa/carpet/mattress) shampooing"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "3h 45m",
+        "price": 3379
+      },
+      {
+        "name": "2 BHK",
+        "duration": "5h",
+        "price": 3759
+      },
+      {
+        "name": "3 BHK",
+        "duration": "7h",
+        "price": 4729
+      },
+      {
+        "name": "4 BHK",
+        "duration": "9h",
+        "price": 5979
+      },
+      {
+        "name": "5 BHK",
+        "duration": "10h",
+        "price": 7039
+      }
+    ]
+  },
+  "Furnished Apartment Premium": {
+    "subtitle": "Essential deep cleaning + inside empty cupboards, cabinets and utensil handling.",
+    "rating": "4.85 (31.5K+ ratings)",
+    "includes": [
+      "Everything included in Essential package",
+      "Cupboard interior & exterior deep cleaning (if empty)",
+      "Kitchen cabinets interior degreasing with utensil removal & repositioning",
+      "Sanitizing of kitchen counter, exhaust fan and splash tiles"
+    ],
+    "excludes": [
+      "Sofa, carpet and mattress fabric shampooing"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "4h 15m",
+        "price": 3859
+      },
+      {
+        "name": "2 BHK",
+        "duration": "5h 30m",
+        "price": 4239
+      },
+      {
+        "name": "3 BHK",
+        "duration": "7h 30m",
+        "price": 5209
+      },
+      {
+        "name": "4 BHK",
+        "duration": "9h 30m",
+        "price": 6459
+      },
+      {
+        "name": "5 BHK",
+        "duration": "10h 30m",
+        "price": 7519
+      }
+    ]
+  },
+  "Furnished Apartment Elite": {
+    "subtitle": "Comprehensive premium deep clean + full sofa, carpet & mattress foam shampooing.",
+    "rating": "4.88 (19.4K+ ratings)",
+    "includes": [
+      "Everything included in Premium package",
+      "Complete fabric sofa shampooing & moisture suction",
+      "Living room carpet & rug deep foam cleaning",
+      "Mattress sanitization and dust mite extraction",
+      "Tile joint steam sanitization in bathrooms"
+    ],
+    "excludes": [
+      "Wet wall washing or outdoor exterior facade cleaning"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "4h 45m",
+        "price": 4289
+      },
+      {
+        "name": "2 BHK",
+        "duration": "6h",
+        "price": 4679
+      },
+      {
+        "name": "3 BHK",
+        "duration": "8h",
+        "price": 5639
+      },
+      {
+        "name": "4 BHK",
+        "duration": "10h",
+        "price": 6889
+      },
+      {
+        "name": "5 BHK",
+        "duration": "11h",
+        "price": 7949
+      }
+    ]
+  },
+  "Unfurnished Apartment Essential": {
+    "subtitle": "Complete deep cleaning of vacant apartment before move-in or handover.",
+    "rating": "4.78 (28.1K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep descaling and degreasing",
+      "Rotary machine scrubbing of floors, doors & window sills",
+      "Cobweb removal, ceiling and fan dusting",
+      "Balcony floor wash and railing wiping"
+    ],
+    "excludes": [
+      "Wardrobe and cabinet interior cleaning"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "3h",
+        "price": 3089
+      },
+      {
+        "name": "2 BHK",
+        "duration": "4h 30m",
+        "price": 3379
+      },
+      {
+        "name": "3 BHK",
+        "duration": "6h",
+        "price": 4149
+      },
+      {
+        "name": "4 BHK",
+        "duration": "8h",
+        "price": 5299
+      },
+      {
+        "name": "5 BHK",
+        "duration": "10h",
+        "price": 5789
+      }
+    ]
+  },
+  "Unfurnished Apartment Premium": {
+    "subtitle": "Move-in deep clean including interior and exterior of all empty cupboards and cabinets.",
+    "rating": "4.82 (16.7K+ ratings)",
+    "includes": [
+      "Everything included in Essential package",
+      "Cupboard cleaning (interior + exterior, empty shelves)",
+      "Kitchen cabinets interior wiping and degreasing",
+      "All bathroom hard water scale buffing"
+    ],
+    "excludes": [
+      "Paint drops and construction cement stain removal"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "3h 40m",
+        "price": 3709
+      },
+      {
+        "name": "2 BHK",
+        "duration": "5h 40m",
+        "price": 3999
+      },
+      {
+        "name": "3 BHK",
+        "duration": "6h 40m",
+        "price": 4769
+      },
+      {
+        "name": "4 BHK",
+        "duration": "8h 40m",
+        "price": 5929
+      },
+      {
+        "name": "5 BHK",
+        "duration": "10h 40m",
+        "price": 6409
+      }
+    ]
+  },
+  "Unfurnished Apartment Post Interior Work": {
+    "subtitle": "Heavy-duty post-renovation cleaning for paint spots, tape residue and wood dust.",
+    "rating": "4.84 (12.3K+ ratings)",
+    "includes": [
+      "Everything included in Premium package",
+      "Sticker, tape gum & interior debris removal",
+      "Paint droplets and stain removal (100% removal depends on surface porosity)",
+      "Industrial high-suction fine sawdust extraction from grooves & tracks"
+    ],
+    "excludes": [
+      "Civil debris removal outside society premises"
+    ],
+    "options": [
+      {
+        "name": "1 BHK",
+        "duration": "6h",
+        "price": 4699
+      },
+      {
+        "name": "2 BHK",
+        "duration": "6h 30m",
+        "price": 5699
+      },
+      {
+        "name": "3 BHK",
+        "duration": "7h",
+        "price": 7199
+      },
+      {
+        "name": "4 BHK",
+        "duration": "7h 30m",
+        "price": 9199
+      },
+      {
+        "name": "5 BHK",
+        "duration": "8h",
+        "price": 10549
+      }
+    ]
+  },
+  "Furnished Villa Essential": {
+    "subtitle": "Deep cleaning tailored for independent houses, duplexes and villas.",
+    "rating": "4.81 (9.8K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep cleaning and sanitation",
+      "Complete floor wiping and rotary mopping of entire covered area",
+      "Cobweb removal & wall dry dusting across all floors",
+      "Balcony, staircase railing & utility area cleaning"
+    ],
+    "excludes": [
+      "Terrace pressure wash without drainage outlet"
+    ],
+    "options": [
+      {
+        "name": "Less than 1200 sq.ft",
+        "duration": "5h 20m",
+        "price": 4439
+      },
+      {
+        "name": "1200 to 2000 sq.ft",
+        "duration": "6h",
+        "price": 5779
+      },
+      {
+        "name": "2000 to 3000 sq.ft",
+        "duration": "8h",
+        "price": 11929
+      },
+      {
+        "name": "3000 to 4000 sq.ft",
+        "duration": "10h 20m",
+        "price": 14879
+      },
+      {
+        "name": "4000 to 5000 sq.ft",
+        "duration": "11h",
+        "price": 17379
+      },
+      {
+        "name": "5000 to 6000 sq.ft",
+        "duration": "11h 40m",
+        "price": 19879
+      },
+      {
+        "name": "6000 to 7000 sq.ft",
+        "duration": "12h",
+        "price": 22859
+      }
+    ]
+  },
+  "Furnished Villa Premium": {
+    "subtitle": "High-end villa cleaning with floor machine scrubbing, furniture wipe & dry vacuuming.",
+    "rating": "4.86 (8.2K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep cleaning and descaling",
+      "Cobweb removal & wall dry dusting",
+      "Dry vacuuming of sofas, carpets & cushioned chairs",
+      "Rotary machine scrubbing of floors, doors & window frames",
+      "Dusting and wet wiping of all furniture & appliances"
+    ],
+    "excludes": [
+      "Exterior building facade beyond 15 ft height"
+    ],
+    "options": [
+      {
+        "name": "Less than 1200 sq.ft",
+        "duration": "5h 50m",
+        "price": 6729
+      },
+      {
+        "name": "1200 to 2000 sq.ft",
+        "duration": "6h 30m",
+        "price": 9479
+      },
+      {
+        "name": "2000 to 3000 sq.ft",
+        "duration": "8h 30m",
+        "price": 13969
+      },
+      {
+        "name": "3000 to 4000 sq.ft",
+        "duration": "10h 50m",
+        "price": 16649
+      },
+      {
+        "name": "4000 to 5000 sq.ft",
+        "duration": "11h 30m",
+        "price": 22859
+      },
+      {
+        "name": "5000 to 6000 sq.ft",
+        "duration": "12h 10m",
+        "price": 25009
+      },
+      {
+        "name": "6000 to 7000 sq.ft",
+        "duration": "12h 30m",
+        "price": 31799
+      }
+    ]
+  },
+  "Unfurnished Villa Essential": {
+    "subtitle": "Move-in deep clean for independent villas and multi-floor houses.",
+    "rating": "4.79 (6.5K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep cleaning and scale removal",
+      "Complete floor mopping & sweeping across all levels",
+      "Cobweb removal & wall dry dusting",
+      "Balcony & utility area cleaning"
+    ],
+    "excludes": [
+      "Cabinet interior cleaning"
+    ],
+    "options": [
+      {
+        "name": "Less than 1200 sq.ft",
+        "duration": "5h 20m",
+        "price": 4419
+      },
+      {
+        "name": "1200 to 2000 sq.ft",
+        "duration": "5h 30m",
+        "price": 5739
+      },
+      {
+        "name": "2000 to 3000 sq.ft",
+        "duration": "8h",
+        "price": 11869
+      },
+      {
+        "name": "3000 to 4000 sq.ft",
+        "duration": "10h 20m",
+        "price": 13549
+      },
+      {
+        "name": "4000 to 5000 sq.ft",
+        "duration": "11h",
+        "price": 17399
+      },
+      {
+        "name": "5000 to 6000 sq.ft",
+        "duration": "11h 40m",
+        "price": 19819
+      },
+      {
+        "name": "6000 to 7000 sq.ft",
+        "duration": "12h",
+        "price": 22829
+      }
+    ]
+  },
+  "Unfurnished Villa Premium": {
+    "subtitle": "Complete villa deep scrub including machine floor wash, windows and door frames.",
+    "rating": "4.84 (5.7K+ ratings)",
+    "includes": [
+      "Bathroom & kitchen deep descaling",
+      "Cobweb removal & dry dusting of high ceilings & stairs",
+      "Machine cleaning of floors, doors & window glasses",
+      "Inside-out wipe of all empty wardrobes and storage cupboards"
+    ],
+    "excludes": [
+      "External garden pressure washing"
+    ],
+    "options": [
+      {
+        "name": "Less than 1200 sq.ft",
+        "duration": "5h 50m",
+        "price": 5819
+      },
+      {
+        "name": "1200 to 2000 sq.ft",
+        "duration": "6h 30m",
+        "price": 7319
+      },
+      {
+        "name": "2000 to 3000 sq.ft",
+        "duration": "8h 30m",
+        "price": 12209
+      },
+      {
+        "name": "3000 to 4000 sq.ft",
+        "duration": "10h 50m",
+        "price": 15439
+      },
+      {
+        "name": "4000 to 5000 sq.ft",
+        "duration": "11h 30m",
+        "price": 18469
+      },
+      {
+        "name": "5000 to 6000 sq.ft",
+        "duration": "12h 10m",
+        "price": 26869
+      },
+      {
+        "name": "6000 to 7000 sq.ft",
+        "duration": "12h 30m",
+        "price": 31829
+      }
+    ]
+  },
+  "Floor Cleaning": {
+    "subtitle": "Industrial single-disc machine scrubbing for glossy, stain-free floors.",
+    "rating": "4.76 (14.2K+ ratings)",
+    "includes": [
+      "Single-disc rotary floor scrubbing machine treatment",
+      "Grout line stain buffing and dirt removal",
+      "Final shine buffing and dry microfiber mopping"
+    ],
+    "excludes": [
+      "Marble crystallization polish (charged separately)"
+    ],
+    "options": [
+      {
+        "name": "Up to 300 sq ft",
+        "duration": "1 hr",
+        "price": 399
+      },
+      {
+        "name": "301–400 sq ft",
+        "duration": "1 hr",
+        "price": 549
+      },
+      {
+        "name": "401–500 sq ft",
+        "duration": "1 hr",
+        "price": 679
+      },
+      {
+        "name": "501–600 sq ft",
+        "duration": "1 hr 30m",
+        "price": 949
+      },
+      {
+        "name": "601–700 sq ft",
+        "duration": "1 hr 30m",
+        "price": 1249
+      }
+    ]
+  },
+  "Living Room Cleaning": {
+    "subtitle": "Targeted living room care including furniture, windows and floor buffing.",
+    "rating": "4.75 (2.2K+ ratings)",
+    "includes": [
+      "Floor scrubbing & dirt vacuuming",
+      "Ceiling fan, lights & switchboard dusting",
+      "Balcony sliding door glass cleaning"
+    ],
+    "excludes": [
+      "Chandelier dismantling"
+    ],
+    "options": [
+      {
+        "name": "Furnished Cleaning",
+        "duration": "1 hr 30m",
+        "price": 949,
+        "details": "Sofa wiping, curtain vacuuming, furniture surface care"
+      },
+      {
+        "name": "Unfurnished Cleaning",
+        "duration": "1 hr",
+        "price": 759,
+        "details": "Floor scrubbing, cobweb removal, door & window wipe"
+      }
+    ]
+  },
+  "Dining Room Cleaning": {
+    "subtitle": "Deep sanitization of dining area, chairs and floor surfaces.",
+    "rating": "4.75 (2.2K+ ratings)",
+    "includes": [
+      "Dining table top and chair frames deep wipe",
+      "Floor machine wash and skirting buffing",
+      "Ceiling fan & lighting wipe"
+    ],
+    "excludes": [
+      "Upholstery stain extraction"
+    ],
+    "options": [
+      {
+        "name": "Furnished Cleaning",
+        "duration": "1 hr",
+        "price": 759,
+        "details": "Dining table & chairs deep wipe, floor machine polish"
+      },
+      {
+        "name": "Unfurnished Cleaning",
+        "duration": "45m",
+        "price": 569,
+        "details": "Wall dry dust, floor scrub, fan wipe"
+      }
+    ]
+  },
+  "Bedroom Cleaning": {
+    "subtitle": "Complete bedroom deep clean for mattress, wardrobe exterior and floors.",
+    "rating": "4.75 (2.2K+ ratings)",
+    "includes": [
+      "Under-bed dusting and vacuuming",
+      "Wardrobe external wipe & mirror polish",
+      "Ceiling fan, switchboards & AC filter dry wipe"
+    ],
+    "excludes": [
+      "Wardrobe interior organizing"
+    ],
+    "options": [
+      {
+        "name": "Furnished Cleaning",
+        "duration": "1 hr 30m",
+        "price": 859,
+        "details": "Wardrobe wipe exterior, mattress vacuum, under bed care"
+      },
+      {
+        "name": "Unfurnished Cleaning",
+        "duration": "1 hr",
+        "price": 669,
+        "details": "Floor scrubbing, fan & switchboard deep clean"
+      }
+    ]
+  },
+  "Pooja Room Cleaning": {
+    "subtitle": "Respectful, specialized cleaning for idols, mandir wood/marble and brass.",
+    "rating": "4.83 (1.5K+ ratings)",
+    "includes": [
+      "Mandir wooden/marble polishing",
+      "Brass & bell surface cleaning",
+      "Tile oil & smoke soot mark removal"
+    ],
+    "excludes": [
+      "Moving fragile sacred deities"
+    ],
+    "options": [
+      {
+        "name": "Furnished Cleaning",
+        "duration": "1 hr",
+        "price": 569,
+        "details": "Mandir wooden/marble polishing, brassware cleaning"
+      },
+      {
+        "name": "Unfurnished Cleaning",
+        "duration": "45m",
+        "price": 429,
+        "details": "Floor & wall tile degreasing, idol area dusting"
+      }
+    ]
+  },
+  "Store Room Cleaning": {
+    "subtitle": "Dust and clutter removal for storage rooms and utility cupboards.",
+    "rating": "4.65 (850+ ratings)",
+    "includes": [
+      "High ceiling cobweb extraction",
+      "Storage shelf and rack dusting",
+      "Floor wash & cobweb removal"
+    ],
+    "excludes": [
+      "Heavy junk disposal"
+    ],
+    "options": [
+      {
+        "name": "Furnished Cleaning",
+        "duration": "1 hr 30m",
+        "price": 759,
+        "details": "Rack organizing assistance, cobweb removal, deep sweep"
+      },
+      {
+        "name": "Unfurnished Cleaning",
+        "duration": "1 hr",
+        "price": 569,
+        "details": "Floor wash, spiderweb clearing, shelf wiping"
+      }
+    ]
+  },
+  "Occupied Kitchen – Essential": {
+    "subtitle": "Standard kitchen degreasing covering tiles, slab, stove and exterior cabinets.",
+    "rating": "4.78 (18.4K+ ratings)",
+    "includes": [
+      "Degreasing of wall tiles, floor, slab & gas stove/hob",
+      "Sink, under-sink, exhaust & fan dusting",
+      "Floors, windows & switchboard cleaning",
+      "Exterior cabinet wiping"
+    ],
+    "excludes": [
+      "Utensil removal and cabinet interior cleaning"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "1h 30m",
+        "price": 1459
+      },
+      {
+        "name": "With Chimney",
+        "duration": "2h",
+        "price": 1859
+      }
+    ]
+  },
+  "Occupied Kitchen – Power Steam": {
+    "subtitle": "140°C high pressure steam degreasing + inside cabinets and utensil rearrangement.",
+    "rating": "4.86 (14.1K+ ratings)",
+    "includes": [
+      "High-pressure 140°C steam degreasing of tiles, slabs & stove",
+      "Sink, under-sink, exhaust & fan dusting",
+      "Floors, windows & switchboards deep cleaned",
+      "Utensil removal, cabinet interior wiping & careful replacement",
+      "Full exterior and interior degreasing of all cabinets"
+    ],
+    "excludes": [
+      "Appliance internal electronic repairs"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "2h 15m",
+        "price": 1959
+      },
+      {
+        "name": "With Chimney",
+        "duration": "2h 45m",
+        "price": 2359
+      }
+    ]
+  },
+  "Occupied Kitchen – Eco-Smart": {
+    "subtitle": "100% odourless, organic enzyme clean safe for baby bottles and pet utensils.",
+    "rating": "4.82 (9.3K+ ratings)",
+    "includes": [
+      "Degreasing with plant-based organic enzymes (non-toxic, no fumes)",
+      "Safe for baby utensils and sensitive food preparation areas",
+      "Complete tile, slab & hob deep clean",
+      "Sink & drain bio-enzyme deodorization"
+    ],
+    "excludes": [
+      "Acid washing (eco-friendly formulation only)"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "2h",
+        "price": 1699
+      },
+      {
+        "name": "With Chimney",
+        "duration": "2h 30m",
+        "price": 2099
+      }
+    ]
+  },
+  "Empty Kitchen – Essential": {
+    "subtitle": "Vacant kitchen deep wipe before move-in or after tenant move-out.",
+    "rating": "4.75 (11.2K+ ratings)",
+    "includes": [
+      "Complete degreasing of empty cabinets inside & out",
+      "Countertop slab scrubbing, tile descaling",
+      "Exhaust fan and switchboard wipe",
+      "Floor machine wash"
+    ],
+    "excludes": [
+      "Utensil handling (service is for empty kitchen)"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "1h 15m",
+        "price": 1199
+      },
+      {
+        "name": "With Chimney",
+        "duration": "1h 45m",
+        "price": 1599
+      }
+    ]
+  },
+  "Empty Kitchen – Power Steam": {
+    "subtitle": "140°C thermal steam sanitization for vacant kitchen cabinets and grease removal.",
+    "rating": "4.84 (8.7K+ ratings)",
+    "includes": [
+      "140°C thermal steam sanitization of oil and grease joints",
+      "Cabinet sterilization inside and out",
+      "Sink & drain pipeline steam blast",
+      "High-pressure floor and wall tile degreasing"
+    ],
+    "excludes": [
+      "Appliance electronic PCB cleaning"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "1h 45m",
+        "price": 1599
+      },
+      {
+        "name": "With Chimney",
+        "duration": "2h 15m",
+        "price": 1999
+      }
+    ]
+  },
+  "Empty Kitchen – Eco-Smart": {
+    "subtitle": "Chemical-free organic deep scrub with herbal extracts and steam.",
+    "rating": "4.80 (6.1K+ ratings)",
+    "includes": [
+      "Chemical-free non-toxic deep scrub",
+      "Herbal surface disinfectants and tile buffing",
+      "Floor machine wash & marble slab polish"
+    ],
+    "excludes": [
+      "Caustic chemical wash"
+    ],
+    "options": [
+      {
+        "name": "Without Chimney",
+        "duration": "1h 30m",
+        "price": 1399
+      },
+      {
+        "name": "With Chimney",
+        "duration": "2h",
+        "price": 1799
+      }
+    ]
+  },
+  "Single Kitchen Appliance Cleaning": {
+    "subtitle": "Dedicated standalone appliance deep cleaning and deodorization.",
+    "rating": "4.72 (8.9K+ ratings)",
+    "includes": [
+      "Food-grade sanitizing spray",
+      "Grease and burnt residue removal",
+      "Exterior polish and deodorization"
+    ],
+    "excludes": [
+      "Compressor or gas refilling"
+    ],
+    "options": [
+      {
+        "name": "Refrigerator Interior & Exterior",
+        "duration": "45m",
+        "price": 449
+      },
+      {
+        "name": "Microwave / Oven Deep Clean",
+        "duration": "30m",
+        "price": 349
+      },
+      {
+        "name": "Chimney Baffle Filter & Blower Scrub",
+        "duration": "1h",
+        "price": 599
+      },
+      {
+        "name": "Gas Stove / 4-Burner Hob Degrease",
+        "duration": "30m",
+        "price": 299
+      },
+      {
+        "name": "Water Purifier / RO Outer & Chamber",
+        "duration": "30m",
+        "price": 249
+      }
+    ]
+  },
+  "Bathroom – Essential Cleaning": {
+    "subtitle": "Hard water scale removal, commode scrubbing and tile buffing.",
+    "rating": "4.81 (38.6K+ ratings)",
+    "includes": [
+      "Hard water stain removal from tiles & chrome fixtures",
+      "Toilet pot, washbasin & mirror deep scrub",
+      "Floor machine / heavy brush wash",
+      "Exhaust fan wiping & cobweb removal"
+    ],
+    "excludes": [
+      "Replacing broken grout cement"
+    ],
+    "options": [
+      {
+        "name": "1 Bathroom",
+        "duration": "1h",
+        "price": 499
+      },
+      {
+        "name": "2 Bathrooms",
+        "duration": "1h 45m",
+        "price": 899
+      },
+      {
+        "name": "3 Bathrooms",
+        "duration": "2h 30m",
+        "price": 1299
+      },
+      {
+        "name": "4 Bathrooms",
+        "duration": "3h 15m",
+        "price": 1699
+      },
+      {
+        "name": "5 Bathrooms",
+        "duration": "4h",
+        "price": 2099
+      }
+    ]
+  },
+  "Bathroom – Power Steam Sanitization": {
+    "subtitle": "High-pressure 140°C thermal steam sanitization to kill 99.9% germs and bacteria.",
+    "rating": "4.88 (24.7K+ ratings)",
+    "includes": [
+      "High-pressure 140°C steam jet sanitization of grout lines & commode",
+      "Eliminates 99.9% germs, bacteria and removes hidden mildew",
+      "Chrome fixture descaling & high-gloss buffing",
+      "Complete mirror, basin and shower cabin descaling"
+    ],
+    "excludes": [
+      "Tile chipping repair"
+    ],
+    "options": [
+      {
+        "name": "1 Bathroom",
+        "duration": "1h 20m",
+        "price": 699
+      },
+      {
+        "name": "2 Bathrooms",
+        "duration": "2h 15m",
+        "price": 1299
+      },
+      {
+        "name": "3 Bathrooms",
+        "duration": "3h",
+        "price": 1899
+      },
+      {
+        "name": "4 Bathrooms",
+        "duration": "3h 45m",
+        "price": 2499
+      },
+      {
+        "name": "5 Bathrooms",
+        "duration": "4h 30m",
+        "price": 2999
+      }
+    ]
+  },
+  "Bathroom – Eco-Smart Clean": {
+    "subtitle": "Plant-derived acid-free descalers with natural botanical oils and active foam.",
+    "rating": "4.79 (12.3K+ ratings)",
+    "includes": [
+      "Plant-derived acid-free descalers (no corrosive fumes)",
+      "Anti-allergen formulation safe for children and senior citizens",
+      "Mirror polishing & drain bio-enzyme deodorizing",
+      "Tile scrubbing and tap shine buffing"
+    ],
+    "excludes": [
+      "Harsh hydrochloric acid"
+    ],
+    "options": [
+      {
+        "name": "1 Bathroom",
+        "duration": "1h 10m",
+        "price": 599
+      },
+      {
+        "name": "2 Bathrooms",
+        "duration": "2h",
+        "price": 1099
+      },
+      {
+        "name": "3 Bathrooms",
+        "duration": "2h 45m",
+        "price": 1599
+      },
+      {
+        "name": "4 Bathrooms",
+        "duration": "3h 30m",
+        "price": 2099
+      }
+    ]
+  },
+  "Balcony Deep Cleaning": {
+    "subtitle": "High pressure jet washing and bird droppings removal for balconies and terraces.",
+    "rating": "4.74 (16.5K+ ratings)",
+    "includes": [
+      "Floor jet wash / rotary machine scrub",
+      "Railing wiping & bird droppings removal",
+      "Drain pipe clearing & cobweb extraction",
+      "Sliding glass door cleaning (both sides where accessible)"
+    ],
+    "excludes": [
+      "Cleaning outside ledge without safety parapet"
+    ],
+    "options": [
+      {
+        "name": "1 Balcony (Up to 60 sq ft)",
+        "duration": "45m",
+        "price": 349
+      },
+      {
+        "name": "2 Balconies",
+        "duration": "1h 15m",
+        "price": 599
+      },
+      {
+        "name": "3 Balconies",
+        "duration": "1h 45m",
+        "price": 849
+      },
+      {
+        "name": "Large Balcony / Terrace (150+ sq ft)",
+        "duration": "2h",
+        "price": 1099
+      }
+    ]
+  },
+  "Sofa Cleaning – Fabric": {
+    "subtitle": "3-step injection-extraction shampooing for fabric sofas, recliners and cushions.",
+    "rating": "4.84 (29.1K+ ratings)",
+    "includes": [
+      "3-step deep injection-extraction foam shampooing",
+      "High-power moisture suction vacuuming (80% dry on departure)",
+      "Spot stain treatment & deodorization"
+    ],
+    "excludes": [
+      "Color bleeding correction on antique fabrics"
+    ],
+    "options": [
+      {
+        "name": "3 Seater Sofa",
+        "duration": "1h",
+        "price": 699
+      },
+      {
+        "name": "4 Seater Sofa",
+        "duration": "1h 15m",
+        "price": 899
+      },
+      {
+        "name": "5 Seater Sofa",
+        "duration": "1h 30m",
+        "price": 1099
+      },
+      {
+        "name": "6 Seater Sofa / L-Shape",
+        "duration": "2h",
+        "price": 1349
+      },
+      {
+        "name": "7 Seater Sofa / Sectional",
+        "duration": "2h 20m",
+        "price": 1599
+      },
+      {
+        "name": "Extra Per Cushion",
+        "duration": "15m",
+        "price": 99
+      }
+    ]
+  },
+  "Sofa Cleaning – Leather / Leatherette": {
+    "subtitle": "Gentle pH-balanced leather cleansing, moisture nourishment and protective gloss buffing.",
+    "rating": "4.80 (11.8K+ ratings)",
+    "includes": [
+      "Specialized pH-neutral foaming leather cleanser",
+      "Microfiber dirt lift & body oil extraction",
+      "Rich conditioner buffing to prevent cracking and restore soft feel"
+    ],
+    "excludes": [
+      "Tear or crack leather repair"
+    ],
+    "options": [
+      {
+        "name": "3 Seater Sofa",
+        "duration": "45m",
+        "price": 799
+      },
+      {
+        "name": "4 Seater Sofa",
+        "duration": "1h",
+        "price": 999
+      },
+      {
+        "name": "5 Seater Sofa",
+        "duration": "1h 15m",
+        "price": 1199
+      },
+      {
+        "name": "6 Seater Sofa / L-Shape",
+        "duration": "1h 40m",
+        "price": 1499
+      },
+      {
+        "name": "7 Seater Sofa / Sectional",
+        "duration": "2h",
+        "price": 1799
+      }
+    ]
+  },
+  "Carpet / Rug Cleaning": {
+    "subtitle": "Rotary shampooing, deep fibre dirt extraction and anti-microbial deodorization.",
+    "rating": "4.77 (15.3K+ ratings)",
+    "includes": [
+      "Industrial rotary machine brush shampooing",
+      "High-suction moisture extraction",
+      "Anti-microbial sanitization and freshness deodorization"
+    ],
+    "excludes": [
+      "Fringe damage reweaving"
+    ],
+    "options": [
+      {
+        "name": "Small Rug (Up to 25 sq ft)",
+        "duration": "30m",
+        "price": 349
+      },
+      {
+        "name": "Medium Carpet (25–50 sq ft)",
+        "duration": "45m",
+        "price": 549
+      },
+      {
+        "name": "Large Carpet (50–100 sq ft)",
+        "duration": "1h 15m",
+        "price": 849
+      },
+      {
+        "name": "Extra Large Carpet (100–160 sq ft)",
+        "duration": "1h 45m",
+        "price": 1249
+      }
+    ]
+  },
+  "Mattress Cleaning": {
+    "subtitle": "Dual-side sanitization, dust mite extraction and allergen removal.",
+    "rating": "4.82 (8.4K+ ratings)",
+    "includes": [
+      "High suction dust mite extraction",
+      "Targeted sweat and food stain treatment",
+      "Antibacterial sanitizing spray"
+    ],
+    "excludes": [
+      "Waterproofing treatment"
+    ],
+    "options": [
+      {
+        "name": "Single Bed",
+        "duration": "45m",
+        "price": 389
+      },
+      {
+        "name": "Double / Queen Bed",
+        "duration": "1h",
+        "price": 589
+      },
+      {
+        "name": "King Bed",
+        "duration": "1h 15m",
+        "price": 749
+      }
+    ]
+  },
+  "Dining Table & Chairs": {
+    "subtitle": "Table surface polishing and deep cushioned chair shampooing.",
+    "rating": "4.75 (5.1K+ ratings)",
+    "includes": [
+      "Dry vacuuming of chair cushions and frame wipe",
+      "Table top stain and ring mark cleaning",
+      "Sanitizing wood and glass finishes"
+    ],
+    "excludes": [
+      "Wood scratch re-polishing"
+    ],
+    "options": [
+      {
+        "name": "4 Seater Set",
+        "duration": "45m",
+        "price": 449
+      },
+      {
+        "name": "6 Seater Set",
+        "duration": "1h",
+        "price": 649
+      },
+      {
+        "name": "8 Seater Set",
+        "duration": "1h 20m",
+        "price": 849
+      }
+    ]
+  },
+  "Fridge Cleaning": {
+    "subtitle": "Complete interior shelving wash, odor neutralizer and exterior stainless shine.",
+    "rating": "4.78 (12.1K+ ratings)",
+    "includes": [
+      "Food item removal and careful replacement",
+      "Removable shelf and tray washing in warm soapy water",
+      "Interior deodorizing and freezer defrost wipe"
+    ],
+    "excludes": [
+      "Gas leak repair"
+    ],
+    "options": [
+      {
+        "name": "Single Door Refrigerator",
+        "duration": "45m",
+        "price": 379
+      },
+      {
+        "name": "Double Door Refrigerator",
+        "duration": "1h",
+        "price": 479
+      },
+      {
+        "name": "Side-by-Side Refrigerator",
+        "duration": "1h 15m",
+        "price": 649
+      }
+    ]
+  },
+  "Chimney Cleaning": {
+    "subtitle": "Baffle filter degreasing, carbon filter wipe and motor casing cleaning.",
+    "rating": "4.81 (16.9K+ ratings)",
+    "includes": [
+      "Filter removal and caustic bath degreasing",
+      "Blower wheel and interior housing clean",
+      "Outer hood glass/steel streak-free polish"
+    ],
+    "excludes": [
+      "Duct replacement"
+    ],
+    "options": [
+      {
+        "name": "Basic Cleaning (Filters & Outer)",
+        "duration": "45m",
+        "price": 379
+      },
+      {
+        "name": "Deep Degreasing with Blower Scrub",
+        "duration": "1h 15m",
+        "price": 599
+      }
+    ]
+  }
+};
+
+      window.findServiceOptions = function (serviceName) {
+        if (!serviceName) return null;
+        if (window.serviceOptionsCatalog[serviceName]) {
+          return window.serviceOptionsCatalog[serviceName];
+        }
+        const clean = serviceName.toLowerCase().replace(/[^a-z0-9]/g, "");
+        for (const key in window.serviceOptionsCatalog) {
+          if (key.toLowerCase().replace(/[^a-z0-9]/g, "") === clean) {
+            return window.serviceOptionsCatalog[key];
+          }
+        }
+        if (clean.includes("furnish") && clean.includes("apart") && clean.includes("essent")) return window.serviceOptionsCatalog["Furnished Apartment Essential"];
+        if (clean.includes("furnish") && clean.includes("apart") && clean.includes("prem")) return window.serviceOptionsCatalog["Furnished Apartment Premium"];
+        if (clean.includes("furnish") && clean.includes("apart") && clean.includes("elite")) return window.serviceOptionsCatalog["Furnished Apartment Elite"];
+        if (clean.includes("unfurnish") && clean.includes("apart") && clean.includes("essent")) return window.serviceOptionsCatalog["Unfurnished Apartment Essential"];
+        if (clean.includes("unfurnish") && clean.includes("apart") && clean.includes("prem")) return window.serviceOptionsCatalog["Unfurnished Apartment Premium"];
+        if (clean.includes("postinterior")) return window.serviceOptionsCatalog["Unfurnished Apartment Post Interior Work"];
+        if (clean.includes("furnish") && clean.includes("villa") && clean.includes("essent")) return window.serviceOptionsCatalog["Furnished Villa Essential"];
+        if (clean.includes("furnish") && clean.includes("villa") && clean.includes("prem")) return window.serviceOptionsCatalog["Furnished Villa Premium"];
+        if (clean.includes("unfurnish") && clean.includes("villa") && clean.includes("essent")) return window.serviceOptionsCatalog["Unfurnished Villa Essential"];
+        if (clean.includes("unfurnish") && clean.includes("villa") && clean.includes("prem")) return window.serviceOptionsCatalog["Unfurnished Villa Premium"];
+        if (clean.includes("floorcleaning")) return window.serviceOptionsCatalog["Floor Cleaning"];
+        if (clean.includes("livingroom")) return window.serviceOptionsCatalog["Living Room Cleaning"];
+        if (clean.includes("diningroom")) return window.serviceOptionsCatalog["Dining Room Cleaning"];
+        if (clean.includes("bedroom")) return window.serviceOptionsCatalog["Bedroom Cleaning"];
+        if (clean.includes("pooja")) return window.serviceOptionsCatalog["Pooja Room Cleaning"];
+        if (clean.includes("store")) return window.serviceOptionsCatalog["Store Room Cleaning"];
+        if (clean.includes("occupied") && clean.includes("essent")) return window.serviceOptionsCatalog["Occupied Kitchen – Essential"];
+        if (clean.includes("occupied") && clean.includes("steam")) return window.serviceOptionsCatalog["Occupied Kitchen – Power Steam"];
+        if (clean.includes("occupied") && clean.includes("eco")) return window.serviceOptionsCatalog["Occupied Kitchen – Eco-Smart"];
+        if (clean.includes("empty") && clean.includes("essent")) return window.serviceOptionsCatalog["Empty Kitchen – Essential"];
+        if (clean.includes("empty") && clean.includes("steam")) return window.serviceOptionsCatalog["Empty Kitchen – Power Steam"];
+        if (clean.includes("empty") && clean.includes("eco")) return window.serviceOptionsCatalog["Empty Kitchen – Eco-Smart"];
+        if (clean.includes("singlekitchenappliance")) return window.serviceOptionsCatalog["Single Kitchen Appliance Cleaning"];
+        if (clean.includes("fridge")) return window.serviceOptionsCatalog["Fridge Cleaning"];
+        if (clean.includes("chimney")) return window.serviceOptionsCatalog["Chimney Cleaning"];
+        if (clean.includes("bathroom") && clean.includes("steam")) return window.serviceOptionsCatalog["Bathroom – Power Steam Sanitization"];
+        if (clean.includes("bathroom") && clean.includes("eco")) return window.serviceOptionsCatalog["Bathroom – Eco-Smart Clean"];
+        if (clean.includes("bathroom")) return window.serviceOptionsCatalog["Bathroom – Essential Cleaning"];
+        if (clean.includes("balcony")) return window.serviceOptionsCatalog["Balcony Deep Cleaning"];
+        if (clean.includes("leathersofa")) return window.serviceOptionsCatalog["Sofa Cleaning – Leather / Leatherette"];
+        if (clean.includes("sofa")) return window.serviceOptionsCatalog["Sofa Cleaning – Fabric"];
+        if (clean.includes("carpet")) return window.serviceOptionsCatalog["Carpet / Rug Cleaning"];
+        if (clean.includes("mattress")) return window.serviceOptionsCatalog["Mattress Cleaning"];
+        if (clean.includes("diningtable")) return window.serviceOptionsCatalog["Dining Table & Chairs"];
+        return null;
+      };
+
+      let currentSelectedModalService = null;
+      let currentSelectedModalCategory = "Cleaning";
+      let currentSelectedServiceData = null;
+      let currentSelectedOptionIndex = 0;
+
+      window.openServiceOptionsModal = function (serviceName, categoryName) {
+        const serviceData = window.findServiceOptions(serviceName);
+        if (!serviceData || !serviceData.options || serviceData.options.length === 0) {
+          window.increaseQty("cleaning-" + serviceName.toLowerCase().replace(/[^a-z0-9]/g, "-"), 0, serviceName, categoryName || "Cleaning");
+          return;
+        }
+
+        currentSelectedModalService = serviceName;
+        currentSelectedModalCategory = categoryName || "Cleaning";
+        currentSelectedServiceData = serviceData;
+        currentSelectedOptionIndex = 0;
+
+        const modal = document.getElementById("service-options-modal");
+        const nameEl = document.getElementById("opt-modal-service-name");
+        const subtitleEl = document.getElementById("opt-modal-service-subtitle");
+        const ratingEl = document.getElementById("opt-modal-rating");
+        const includedListEl = document.getElementById("opt-modal-included-list");
+        const excludedListEl = document.getElementById("opt-modal-excluded-list");
+        const excludedContainer = document.getElementById("opt-modal-excluded-container");
+
+        if (nameEl) nameEl.textContent = serviceName;
+        if (subtitleEl) subtitleEl.textContent = serviceData.subtitle || "Select your preferred configuration or room size below";
+        if (ratingEl) ratingEl.textContent = serviceData.rating || "4.8 (12K+ reviews)";
+
+        window.renderModalOptionsList();
+
+        if (includedListEl) {
+          includedListEl.innerHTML = (serviceData.includes || [
+            "Trained and background-verified cleaning crew",
+            "Specialized machine scrubbing & industrial chemicals",
+            "Floor, surface and fixture sanitization"
+          ]).map(inc => '<li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-0.5 text-[11px] flex-shrink-0"></i> <span>' + inc + '</span></li>').join("");
+        }
+
+        if (excludedContainer && excludedListEl) {
+          if (serviceData.excludes && serviceData.excludes.length > 0) {
+            excludedContainer.classList.remove("hidden");
+            excludedListEl.innerHTML = serviceData.excludes.map(exc => '<li class="flex items-start gap-2"><i class="fas fa-times text-rose-400 mt-0.5 text-[11px] flex-shrink-0"></i> <span>' + exc + '</span></li>').join("");
+          } else {
+            excludedContainer.classList.add("hidden");
+          }
+        }
+
+        window.updateModalFooter();
+
+        if (modal) {
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+        }
+      };
+
+      window.renderModalOptionsList = function () {
+        const optionsListEl = document.getElementById("opt-modal-options-list");
+        if (!optionsListEl || !currentSelectedServiceData) return;
+
+        optionsListEl.innerHTML = "";
+        currentSelectedServiceData.options.forEach((opt, idx) => {
+          const isSelected = idx === currentSelectedOptionIndex;
+          const card = document.createElement("div");
+          card.className = "p-3.5 sm:p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 " +
+            (isSelected
+              ? "border-indigo-600 bg-indigo-50/50 shadow-sm ring-1 ring-indigo-600/30"
+              : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50/60");
+          card.onclick = () => window.selectModalOption(idx);
+
+          const originalPrice = Math.round(opt.price * 1.35);
+          const discount = 26;
+
+          const timeBadge = opt.duration
+            ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md mt-1"><i class="far fa-clock text-indigo-500 text-[10px]"></i> ' + opt.duration + '</span>'
+            : '';
+
+          const detailsText = opt.details
+            ? '<p class="text-xs text-slate-500 mt-1 leading-snug">' + opt.details + '</p>'
+            : '';
+
+          const radioIcon = isSelected
+            ? '<div class="w-5 h-5 rounded-full border-2 border-indigo-600 flex items-center justify-center bg-indigo-600 text-white flex-shrink-0"><i class="fas fa-check text-[10px]"></i></div>'
+            : '<div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center flex-shrink-0"></div>';
+
+          card.innerHTML = 
+            '<div class="flex items-start gap-3 flex-1 min-w-0">' +
+              '<div class="pt-0.5">' + radioIcon + '</div>' +
+              '<div class="flex-1 min-w-0">' +
+                '<div class="flex items-center gap-2 flex-wrap">' +
+                  '<h5 class="font-black text-slate-900 text-sm sm:text-base leading-tight">' + opt.name + '</h5>' +
+                  timeBadge +
+                '</div>' +
+                detailsText +
+              '</div>' +
+            '</div>' +
+            '<div class="text-right flex-shrink-0 pl-2">' +
+              '<div class="font-black text-slate-900 text-base sm:text-lg">₹' + opt.price.toLocaleString("en-IN") + '</div>' +
+              '<div class="flex items-center justify-end gap-1.5 mt-0.5">' +
+                '<span class="text-[11px] text-slate-400 line-through">₹' + originalPrice.toLocaleString("en-IN") + '</span>' +
+                '<span class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 rounded">' + discount + '% OFF</span>' +
+              '</div>' +
+            '</div>';
+          optionsListEl.appendChild(card);
+        });
+      };
+
+      window.selectModalOption = function (index) {
+        currentSelectedOptionIndex = index;
+        window.renderModalOptionsList();
+        window.updateModalFooter();
+      };
+
+      window.updateModalFooter = function () {
+        if (!currentSelectedServiceData) return;
+        const opt = currentSelectedServiceData.options[currentSelectedOptionIndex];
+        if (!opt) return;
+
+        const priceEl = document.getElementById("opt-modal-footer-price");
+        const origEl = document.getElementById("opt-modal-footer-original");
+        const nameEl = document.getElementById("opt-modal-footer-name");
+
+        if (priceEl) priceEl.textContent = "₹" + opt.price.toLocaleString("en-IN");
+        if (origEl) {
+          origEl.textContent = "₹" + Math.round(opt.price * 1.35).toLocaleString("en-IN");
+          origEl.classList.remove("hidden");
+        }
+        if (nameEl) nameEl.textContent = opt.name + (opt.duration ? " • " + opt.duration : "");
+      };
+
+      window.closeServiceOptionsModal = function () {
+        const modal = document.getElementById("service-options-modal");
+        if (modal) {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+        }
+      };
+
+      window.handleOptionsModalBackdropClick = function (e) {
+        if (e.target && e.target.id === "service-options-modal") {
+          window.closeServiceOptionsModal();
+        }
+      };
+
+      window.confirmSelectedOption = function () {
+        if (!currentSelectedModalService || !currentSelectedServiceData) return;
+        const opt = currentSelectedServiceData.options[currentSelectedOptionIndex];
+        if (!opt) return;
+
+        const cleanServiceName = currentSelectedModalService;
+        const cleanOptName = opt.name;
+        const optionId = "cleaning-" + (cleanServiceName + "-" + cleanOptName).toLowerCase().replace(/[^a-z0-9]/g, "-");
+        const fullDisplayName = cleanServiceName + " (" + cleanOptName + ")";
+        const price = opt.price;
+
+        if (window.addServiceToCart) {
+          window.addServiceToCart(optionId, fullDisplayName, price, "Cleaning");
+        }
+
+        window.closeServiceOptionsModal();
+        if (window.syncVanillaCartUI) {
+          window.syncVanillaCartUI();
+        }
+      };
 
       window.syncVanillaCartUI = function () {
         window.updateCartBadge();
@@ -869,24 +2359,6 @@
         currentCategoryView = "";
       };
 
-      
-      window.goToSubService = function(categoryName, subServiceName) {
-        const city = localStorage.getItem('preferredCity') || 'Bangalore';
-        const serviceSlug = categoryName.toLowerCase().replace(/\s+/g, '-');
-        const subServiceSlug = subServiceName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        
-        // Hide modal
-        const modal = document.getElementById("full-service-modal");
-        if (modal) {
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-        }
-        document.body.style.overflow = "";
-        
-        // Navigate
-        window.location.href = '/' + city.toLowerCase() + '/' + serviceSlug + '/' + subServiceSlug;
-      };
-      
       window.openCategoryView = function (categoryName) {
         currentCategoryView = categoryName;
         const modal = document.getElementById("full-service-modal");
@@ -906,43 +2378,205 @@
         sidebar.innerHTML = "";
         content.innerHTML = "";
 
+        let normalizedCategoryName = categoryName;
+        if (categoryName && categoryName.toLowerCase().includes("clean")) {
+          normalizedCategoryName = "Cleaning";
+        }
+        const isCleaning = normalizedCategoryName === "Cleaning";
+
         const categoryData =
-          window.masterServicesData[categoryName] ||
+          window.masterServicesData[normalizedCategoryName] ||
           window.masterServicesData["Electrician"];
         const subcategories = Object.keys(categoryData);
 
         if (subcategories.length === 0) return;
 
+        // Cleaning category specific logos mapping
+        const cleaningLogos = {
+          "Full Home Cleaning": "https://iili.io/nvKSTrJ.png",
+          "Kitchen & Appliances": "https://iili.io/nvKwocN.png",
+          "Bathroom & Balcony": "https://iili.io/nvKjUG4.png",
+          "Sofa, Carpet & Upholstery": "https://iili.io/nvKh2UP.png",
+          "Book by Room": "https://iili.io/nvKEpkJ.png",
+          "Mini Services": "https://iili.io/nvKGg4t.png"
+        };
+
+        const getCleaningLogo = function (name) {
+          if (cleaningLogos[name]) return cleaningLogos[name];
+          const n = (name || "").toLowerCase();
+          if (n.includes("full") || n.includes("home")) return "https://iili.io/nvKSTrJ.png";
+          if (n.includes("kitchen") || n.includes("appliance")) return "https://iili.io/nvKwocN.png";
+          if (n.includes("bathroom") || n.includes("balcony")) return "https://iili.io/nvKjUG4.png";
+          if (n.includes("sofa") || n.includes("carpet") || n.includes("upholstery")) return "https://iili.io/nvKh2UP.png";
+          if (n.includes("room")) return "https://iili.io/nvKEpkJ.png";
+          if (n.includes("mini")) return "https://iili.io/nvKGg4t.png";
+          return "https://iili.io/nvKSTrJ.png";
+        };
+
+        // Shared handler for selecting and scrolling to category
+        window.selectCleaningCategory = function (targetSubcat) {
+          // 1. Update sidebar buttons
+          const sideBtns = sidebar.querySelectorAll("button[data-subcat]");
+          sideBtns.forEach((btn) => {
+            const isMatch = btn.getAttribute("data-subcat") === targetSubcat;
+            if (isMatch) {
+              btn.className = "flex-shrink-0 md:w-full text-left px-3.5 py-3 md:py-3.5 border-b-2 md:border-b-0 border-indigo-600 text-indigo-700 font-black transition-all whitespace-nowrap md:whitespace-normal duration-300 flex items-center gap-3 group rounded-xl md:rounded-none bg-indigo-50/90 md:border-l-4 shadow-xs";
+            } else {
+              btn.className = "flex-shrink-0 md:w-full text-left px-3.5 py-3 md:py-3.5 border-b-2 md:border-b-0 border-transparent text-slate-600 hover:bg-slate-100/70 md:border-l-4 md:border-l-transparent hover:text-slate-900 font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 flex items-center gap-3 group rounded-xl md:rounded-none";
+            }
+          });
+
+          // 2. Update top category grid cards
+          const topCards = content.querySelectorAll("button[data-top-cat]");
+          topCards.forEach((card) => {
+            const isMatch = card.getAttribute("data-top-cat") === targetSubcat;
+            if (isMatch) {
+              card.className = "top-cat-card group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 shadow-sm cursor-pointer bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/20";
+            } else {
+              card.className = "top-cat-card group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 hover:shadow-sm cursor-pointer bg-slate-50/70 border-slate-200 hover:border-indigo-300 hover:bg-white";
+            }
+          });
+
+          // 3. Smooth scroll to corresponding section
+          const section = document.getElementById(`section-${targetSubcat.replace(/\s+/g, "-")}`);
+          if (section) {
+            const targetTop = section.offsetTop - content.offsetTop;
+            content.scrollTo({
+              top: Math.max(0, targetTop - 10),
+              behavior: "smooth"
+            });
+          }
+        };
+
         // Render Sidebar
         subcategories.forEach((subcat, index) => {
           const btn = document.createElement("button");
-          // Responsive classes: flex-shrink-0 for mobile horizontal scroll, w-full for desktop vertical list
-          btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 ${index === 0 ? "bg-indigo-50/50 text-indigo-700 border-indigo-600 md:border-l-4" : "text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent"}`;
-          btn.textContent = subcat;
-          btn.onclick = () => {
-            // Update active state
-            Array.from(sidebar.children).forEach((c) => {
-              c.className =
-                "flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent";
-            });
-            btn.className =
-              "flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4";
-
-            // Scroll to section
-            const section = document.getElementById(
-              `section-${subcat.replace(/\s+/g, "-")}`,
-            );
-            if (section) {
-              content.scrollTo({
-                top: section.offsetTop - content.offsetTop,
-                behavior: "smooth",
+          if (isCleaning) {
+            const logoUrl = getCleaningLogo(subcat);
+            btn.setAttribute("data-subcat", subcat);
+            btn.className = `flex-shrink-0 md:w-full text-left px-3.5 py-3 md:py-3.5 border-b-2 md:border-b-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 flex items-center gap-3 group rounded-xl md:rounded-none ${
+              index === 0
+                ? "bg-indigo-50/90 text-indigo-700 border-indigo-600 md:border-l-4 font-black shadow-xs"
+                : "text-slate-600 hover:bg-slate-100/70 md:border-l-4 md:border-l-transparent hover:text-slate-900"
+            }`;
+            btn.innerHTML = `
+              <div class="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white p-1 border border-slate-200/80 shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                <img src="${logoUrl}" alt="${subcat}" class="w-full h-full object-contain" />
+              </div>
+              <span class="text-xs md:text-sm font-bold tracking-tight leading-snug">${subcat}</span>
+            `;
+            btn.onclick = () => {
+              window.selectCleaningCategory(subcat);
+            };
+          } else {
+            btn.className = `flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 ${index === 0 ? "bg-indigo-50/50 text-indigo-700 border-indigo-600 md:border-l-4" : "text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent"}`;
+            btn.textContent = subcat;
+            btn.onclick = () => {
+              Array.from(sidebar.children).forEach((c) => {
+                c.className =
+                  "flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-transparent text-sm font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 text-slate-500 hover:bg-slate-50 md:border-l-4 md:border-l-transparent";
               });
-            }
-          };
+              btn.className =
+                "flex-shrink-0 md:w-full text-left px-5 py-4 border-b-2 md:border-b-0 md:border-r-0 border-indigo-600 text-indigo-700 transition-all whitespace-nowrap md:whitespace-normal duration-300 bg-indigo-50/50 md:border-l-4";
+
+              const section = document.getElementById(
+                `section-${subcat.replace(/\s+/g, "-")}`,
+              );
+              if (section) {
+                content.scrollTo({
+                  top: section.offsetTop - content.offsetTop,
+                  behavior: "smooth",
+                });
+              }
+            };
+          }
           sidebar.appendChild(btn);
         });
 
-        // Render Content
+        // For Cleaning Category: Render Top Visual Categories Grid (all 6 visible with logos)
+        if (isCleaning) {
+          const topCategoriesContainer = document.createElement("div");
+          topCategoriesContainer.id = "cleaning-main-categories-grid";
+          topCategoriesContainer.className = "bg-white rounded-3xl p-4 sm:p-5 shadow-xs border border-slate-200/80 mb-6";
+          
+          let cardsHtml = `
+            <div class="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-900">Explore Cleaning Categories</h4>
+              </div>
+              <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                6 Categories
+              </span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+          `;
+
+          subcategories.forEach((subcat, idx) => {
+            const logo = getCleaningLogo(subcat);
+            const isFirst = idx === 0;
+            cardsHtml += `
+              <button 
+                type="button" 
+                data-top-cat="${subcat}"
+                onclick="window.selectCleaningCategory('${subcat.replace(/'/g, "\\'")}')"
+                class="top-cat-card group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer ${
+                  isFirst 
+                    ? 'bg-indigo-50/90 border-indigo-500 shadow-sm ring-2 ring-indigo-500/20' 
+                    : 'bg-slate-50/70 border-slate-200 hover:border-indigo-300 hover:bg-white hover:shadow-sm'
+                }"
+              >
+                <div class="w-14 h-14 sm:w-16 sm:h-16 mb-2 rounded-2xl bg-white p-1.5 shadow-xs border border-slate-200/80 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
+                  <img src="${logo}" alt="${subcat}" class="w-full h-full object-contain" />
+                </div>
+                <span class="text-[11px] sm:text-xs font-black text-slate-800 leading-snug tracking-tight line-clamp-2">
+                  ${subcat}
+                </span>
+                <span class="text-[9px] font-semibold text-slate-400 mt-1">
+                  ${(categoryData[subcat] || []).length} services
+                </span>
+              </button>
+            `;
+          });
+
+          cardsHtml += `</div>`;
+          topCategoriesContainer.innerHTML = cardsHtml;
+          content.appendChild(topCategoriesContainer);
+
+          // Scroll sync to update active category while scrolling
+          content.onscroll = () => {
+            let activeCat = subcategories[0];
+            for (let i = 0; i < subcategories.length; i++) {
+              const sec = document.getElementById(`section-${subcategories[i].replace(/\s+/g, "-")}`);
+              if (sec) {
+                const secRelativeTop = sec.offsetTop - content.offsetTop - content.scrollTop;
+                if (secRelativeTop <= 80) {
+                  activeCat = subcategories[i];
+                }
+              }
+            }
+            // Update sidebar buttons without triggering scroll
+            const sideBtns = sidebar.querySelectorAll("button[data-subcat]");
+            sideBtns.forEach((btn) => {
+              const isMatch = btn.getAttribute("data-subcat") === activeCat;
+              btn.className = isMatch
+                ? "flex-shrink-0 md:w-full text-left px-3.5 py-3 md:py-3.5 border-b-2 md:border-b-0 border-indigo-600 text-indigo-700 font-black transition-all whitespace-nowrap md:whitespace-normal duration-300 flex items-center gap-3 group rounded-xl md:rounded-none bg-indigo-50/90 md:border-l-4 shadow-xs"
+                : "flex-shrink-0 md:w-full text-left px-3.5 py-3 md:py-3.5 border-b-2 md:border-b-0 border-transparent text-slate-600 hover:bg-slate-100/70 md:border-l-4 md:border-l-transparent hover:text-slate-900 font-bold transition-all whitespace-nowrap md:whitespace-normal duration-300 flex items-center gap-3 group rounded-xl md:rounded-none";
+            });
+            // Update top cards without triggering scroll
+            const topCards = content.querySelectorAll("button[data-top-cat]");
+            topCards.forEach((card) => {
+              const isMatch = card.getAttribute("data-top-cat") === activeCat;
+              card.className = isMatch
+                ? "top-cat-card group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 shadow-sm cursor-pointer bg-indigo-50/90 border-indigo-500 ring-2 ring-indigo-500/20"
+                : "top-cat-card group relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 hover:shadow-sm cursor-pointer bg-slate-50/70 border-slate-200 hover:border-indigo-300 hover:bg-white";
+            });
+          };
+        } else {
+          content.onscroll = null;
+        }
+
+        // Render Content Sections
         subcategories.forEach((subcat) => {
           const section = document.createElement("div");
           section.id = `section-${subcat.replace(/\s+/g, "-")}`;
@@ -950,15 +2584,29 @@
 
           const sectionTitle = document.createElement("div");
           sectionTitle.className =
-            "sticky top-0 bg-white/80 backdrop-blur-md py-3 px-4 -mx-4 mb-4 z-10 border-b border-slate-100 flex items-center gap-2";
-          sectionTitle.innerHTML = `<div class="w-1.5 h-5 bg-indigo-600 rounded-full"></div><h3 class="font-black text-slate-900 uppercase tracking-tight">${subcat}</h3>`;
+            "sticky top-0 bg-white/95 backdrop-blur-md py-3 px-4 -mx-4 mb-4 z-10 border-b border-slate-100 flex items-center justify-between shadow-xs";
+          if (isCleaning) {
+            const catLogo = getCleaningLogo(subcat);
+            sectionTitle.innerHTML = `
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-white p-0.5 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                  <img src="${catLogo}" alt="${subcat}" class="w-full h-full object-contain" />
+                </div>
+                <h3 class="font-black text-slate-900 uppercase tracking-tight text-base sm:text-lg">${subcat}</h3>
+              </div>
+              <span class="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                ${categoryData[subcat].length} Services
+              </span>
+            `;
+          } else {
+            sectionTitle.innerHTML = `<div class="w-1.5 h-5 bg-indigo-600 rounded-full"></div><h3 class="font-black text-slate-900 uppercase tracking-tight">${subcat}</h3>`;
+          }
           section.appendChild(sectionTitle);
 
           const servicesList = document.createElement("div");
           servicesList.className = "grid grid-cols-1 gap-4";
 
           categoryData[subcat].forEach((service, index) => {
-            // Generate a unique ID if not present
             const serviceId =
               service.id ||
               `${categoryName}-${subcat}-${service.name}`
@@ -976,7 +2624,6 @@
             card.className =
               "relative bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-all flex justify-between items-center group overflow-hidden";
 
-            // Add pseudo-random badge
             const hasBadge = (index + subcat.length) % 3 === 0;
             const badgeHtml = hasBadge
               ? `<div class="absolute top-0 left-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[9px] font-black px-2 py-0.5 rounded-br-lg shadow-sm z-[5]">⭐ BESTSELLER</div>`
@@ -986,44 +2633,79 @@
             const discount = 26;
 
             let buttonHtml = "";
-            if (qty > 0) {
+            const hasCleaningOptions = categoryName === "Cleaning" && window.findServiceOptions && window.findServiceOptions(service.name);
+
+            if (hasCleaningOptions) {
+              let serviceCartQty = 0;
+              if (window.getReactCart) {
+                const reactCart = window.getReactCart();
+                const cleanName = service.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+                const matchedItems = reactCart.filter(i => 
+                  i.categoryName === "Cleaning" && 
+                  (i.name.toLowerCase().replace(/[^a-z0-9]/g, "").includes(cleanName) || 
+                   i.id.includes(service.name.toLowerCase().replace(/[^a-z0-9]/g, "-")))
+                );
+                serviceCartQty = matchedItems.reduce((acc, item) => acc + item.quantity, 0);
+              }
+
+              if (serviceCartQty > 0) {
+                buttonHtml = `
+                  <button onclick="window.openServiceOptionsModal('${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-4 py-2 bg-indigo-50 border-2 border-indigo-600 text-indigo-700 font-black rounded-xl hover:bg-indigo-100 shadow-sm transition-all h-11 uppercase text-xs tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-check text-[10px] text-emerald-600"></i> ${serviceCartQty} Added <i class="fas fa-plus text-[10px] ml-1"></i>
+                  </button>
+                `;
+              } else {
+                buttonHtml = `
+                  <button onclick="window.openServiceOptionsModal('${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-6 py-2.5 bg-white border-2 border-indigo-600 text-indigo-700 font-black rounded-xl hover:border-indigo-700 hover:bg-indigo-50 shadow-sm transition-all h-11 uppercase text-xs tracking-wider flex items-center gap-1.5">
+                    ADD <i class="fas fa-sliders-h text-[10px] text-indigo-500"></i>
+                  </button>
+                `;
+              }
+            } else if (qty > 0) {
               buttonHtml = `
-                          <div class="flex items-center bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 overflow-hidden h-11 ring-2 ring-indigo-50">
-                              <button onclick="decreaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">-</button>
-                              <span class="w-8 text-center font-black text-white text-sm flex items-center justify-center">${qty}</span>
-                              <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">+</button>
-                          </div>
-                      `;
+                <div class="flex items-center bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200 overflow-hidden h-11 ring-2 ring-indigo-50">
+                  <button onclick="decreaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">-</button>
+                  <span class="w-8 text-center font-black text-white text-sm flex items-center justify-center">${qty}</span>
+                  <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="w-9 h-full flex items-center justify-center text-white font-black hover:bg-indigo-700 transition-colors">+</button>
+                </div>
+              `;
             } else {
               buttonHtml = `
-                          <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-7 py-2.5 bg-white border-2 border-indigo-100 text-indigo-700 font-black rounded-xl hover:border-indigo-600 hover:bg-indigo-50 shadow-sm transition-all h-11 uppercase text-xs tracking-wider">
-                              ADD
-                          </button>
-                      `;
+                <button onclick="increaseQty('${serviceId}', ${service.price}, '${service.name.replace(/'/g, "\\'")}', '${categoryName}')" class="px-7 py-2.5 bg-white border-2 border-indigo-100 text-indigo-700 font-black rounded-xl hover:border-indigo-600 hover:bg-indigo-50 shadow-sm transition-all h-11 uppercase text-xs tracking-wider">
+                  ADD
+                </button>
+              `;
             }
 
+            const durationText = service.duration || "45-60 mins";
+            const durationHtml = `<div class="mt-2 text-xs text-slate-500 font-medium flex items-center gap-1.5"><i class="far fa-clock text-indigo-600"></i> Takes approx. <span class="font-bold text-slate-800">${durationText}</span></div>`;
+
+            const whatsIncludedHtml = service.description
+              ? `<div class="mt-2.5 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs text-slate-700 leading-relaxed"><span class="font-bold text-indigo-700">What’s Included:</span> ${service.description}</div>`
+              : "";
+
             card.innerHTML = `
-                      ${badgeHtml}
-                      <div class="flex-1 pr-4 cursor-pointer" onclick="window.goToSubService('${categoryName}', '${service.name.replace(/'/g, "\'")}')">
-                          <h4 class="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-indigo-600 transition-colors">${service.name}</h4>
-                          <div class="flex items-center gap-2 mt-2">
-                              <span class="font-black text-xl text-slate-900">₹${service.price}</span>
-                              <span class="text-xs text-slate-400 line-through">₹${originalPrice}</span>
-                              <span class="bg-green-50 text-green-600 text-[10px] font-black px-1.5 py-0.5 rounded border border-green-100 uppercase tracking-tighter">${discount}% OFF</span>
-                          </div>
-                          <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1 font-medium"><i class="fas fa-history text-[8px] text-indigo-400"></i> Takes approx. 45-60 mins</p>
-                      </div>
-                      <div class="flex-shrink-0" onclick="event.stopPropagation()">
-                          ${buttonHtml}
-                      </div>
-                  `;
+              ${badgeHtml}
+              <div class="flex-1 pr-4">
+                <h4 class="font-black text-slate-900 text-base leading-tight mb-1 group-hover:text-indigo-600 transition-colors">${service.name}</h4>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="font-black text-xl text-slate-900">₹${service.price}</span>
+                  <span class="text-xs text-slate-400 line-through">₹${originalPrice}</span>
+                  <span class="bg-green-50 text-green-600 text-[10px] font-black px-1.5 py-0.5 rounded border border-green-100 uppercase tracking-tighter">${discount}% OFF</span>
+                </div>
+                ${durationHtml}
+                ${whatsIncludedHtml}
+              </div>
+              <div class="flex-shrink-0">
+                ${buttonHtml}
+              </div>
+            `;
             servicesList.appendChild(card);
           });
 
           section.appendChild(servicesList);
           content.appendChild(section);
         });
-
       };
     </script>
     <script type="module" src="/index.tsx"></script>

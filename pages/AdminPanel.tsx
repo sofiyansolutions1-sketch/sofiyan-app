@@ -4,20 +4,22 @@ import { ADMIN_PASSWORD } from '../constants';
 import { Booking } from '../types';
 import { Modal } from '../components/Modal';
 import { 
-  Lock, Users, Calendar, Activity, Clock, Phone,Loader2, Star,
-  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, Share2, Map as MapIcon
+  Lock, Users, Calendar, Activity, Clock, Phone, Loader2, Star,
+  Search, Send, MapPin, CheckCircle, FileSpreadsheet, Plus, MessageCircle, Share2, Map as MapIcon,
+  Sparkles, Award, TrendingUp, Eye, EyeOff, CheckCircle2
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { getSignedAppFileUrl } from '../services/storageService';
 import { BlogManager } from '../components/BlogManager';
 import { PartnerManager } from '../components/PartnerManager';
 import { FollowUpManager } from '../components/FollowUpManager';
+import { InfluencerManager } from '../components/InfluencerManager';
 
 export const AdminPanel: React.FC = () => {
   const { bookings, updateBooking, partners, updatePartner, fetchBookings, fetchPartners } = useStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'FollowUps'>('Dashboard');
+  const [mainTab, setMainTab] = useState<'Dashboard' | 'BlogManager' | 'PartnerManagement' | 'FollowUps' | 'InfluencerManagement'>('Dashboard');
   
   const [rescheduleData, setRescheduleData] = useState<{ booking: Booking | null, date: string, time: string }>({ 
     booking: null, date: '', time: '' 
@@ -33,6 +35,11 @@ export const AdminPanel: React.FC = () => {
   const [showPartnersDirectory, setShowPartnersDirectory] = useState(false);
   const [directorySearchQuery, setDirectorySearchQuery] = useState('');
   const [directoryStatusFilter, setDirectoryStatusFilter] = useState<'all' | 'available' | 'busy' | 'pending' | 'on_hold' | 'blocked'>('all');
+
+  // Influencer stats from bookings
+  const influencerBookings = bookings.filter(b => !!b.appliedReferralCode);
+  const influencerSales = influencerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+  const influencerCommissions = Math.round(influencerSales * 0.25);
 
   const handleViewDocument = async (idProofUrl: string) => {
     try {
@@ -214,21 +221,137 @@ export const AdminPanel: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchBookings, fetchPartners]);
 
+  // Tracking viewed/clicked leads (stored in localStorage)
+  const [viewedLeadIds, setViewedLeadIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('admin_viewed_lead_ids');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const markLeadAsViewed = (bookingId: string) => {
+    if (!viewedLeadIds.includes(bookingId)) {
+      const updated = [...viewedLeadIds, bookingId];
+      setViewedLeadIds(updated);
+      try {
+        localStorage.setItem('admin_viewed_lead_ids', JSON.stringify(updated));
+      } catch {}
+    }
+  };
+
+  const toggleLeadViewed = (e: React.MouseEvent, bookingId: string) => {
+    e.stopPropagation();
+    const updated = viewedLeadIds.includes(bookingId)
+      ? viewedLeadIds.filter(id => id !== bookingId)
+      : [...viewedLeadIds, bookingId];
+    setViewedLeadIds(updated);
+    try {
+      localStorage.setItem('admin_viewed_lead_ids', JSON.stringify(updated));
+    } catch {}
+  };
+
+  const markAllLeadsAsViewed = () => {
+    const allIds = bookings.map(b => b.id);
+    setViewedLeadIds(allIds);
+    try {
+      localStorage.setItem('admin_viewed_lead_ids', JSON.stringify(allIds));
+    } catch {}
+  };
+
+  const [leadSearchTerm, setLeadSearchTerm] = useState('');
+
+  // Helper: check if a lead has been assigned to a technician
+  const isAssigned = (b: Booking) => {
+    return b.status === 'Forwarded' || !!b.assignedPartnerId || !!b.assignedPartnerName;
+  };
+
   const completedBookings = bookings.filter(b => b.status === 'completed');
-  const pendingJobs = bookings.filter(b => b.status === 'pending').length;
-  const assignedJobs = bookings.filter(b => b.status === 'Forwarded' || b.status === 'accepted' || b.status === 'in_progress').length;
-  const forwardedJobs = bookings.filter(b => b.status === 'Forwarded').length;
+  // Pending jobs are only those not yet assigned to any technician
+  const pendingJobs = bookings.filter(b => (b.status === 'pending' || !b.status) && !isAssigned(b)).length;
+  // Dispatched jobs include all that have been assigned
+  const forwardedJobs = bookings.filter(b => (b.status === 'Forwarded' || isAssigned(b)) && b.status !== 'completed' && b.status !== 'accepted' && b.status !== 'in_progress').length;
+  const assignedJobs = bookings.filter(b => isAssigned(b) || b.status === 'accepted' || b.status === 'in_progress').length;
   const acceptedJobs = bookings.filter(b => b.status === 'accepted' || b.status === 'in_progress').length;
   const reviewJobs = bookings.filter(b => b.status === 'admin_review').length;
   const completedJobs = completedBookings.length;
 
+  const unreadPendingCount = bookings.filter(b => (b.status === 'pending' || !b.status) && !isAssigned(b) && !viewedLeadIds.includes(b.id)).length;
+
+  const formatInquiryTime = (createdAt?: string, date?: string, time?: string) => {
+    if (createdAt) {
+      try {
+        const d = new Date(createdAt);
+        if (!isNaN(d.getTime())) {
+          const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+          const dateStr = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+          
+          const diffMs = Date.now() - d.getTime();
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHours = Math.floor(diffMins / 60);
+          const diffDays = Math.floor(diffHours / 24);
+
+          let relative = '';
+          if (diffMins < 1) relative = 'Just now';
+          else if (diffMins < 60) relative = `${diffMins}m ago`;
+          else if (diffHours < 24) relative = `${diffHours}h ago`;
+          else relative = `${diffDays}d ago`;
+
+          return { dateStr, timeStr, relative, full: `${dateStr}, ${timeStr}` };
+        }
+      } catch {}
+    }
+    return {
+      dateStr: date || 'Recent',
+      timeStr: time || '',
+      relative: 'New',
+      full: `${date || 'Recent'} ${time || ''}`
+    };
+  };
+
   const displayedBookings = bookings.filter(b => {
-    if (currentAdminTab === 'Pending') return b.status === 'pending';
-    if (currentAdminTab === 'Forwarded') return b.status === 'Forwarded';
-    if (currentAdminTab === 'Accepted') return b.status === 'accepted' || b.status === 'in_progress';
-    if (currentAdminTab === 'Review') return b.status === 'admin_review';
-    if (currentAdminTab === 'Completed') return b.status === 'completed';
-    return false;
+    // 1. Tab-based status filter: Assigned leads automatically leave Pending and move to Dispatched!
+    let matchesTab = false;
+    if (currentAdminTab === 'Pending') {
+      matchesTab = (b.status === 'pending' || !b.status) && !isAssigned(b);
+    } else if (currentAdminTab === 'Forwarded') {
+      matchesTab = (b.status === 'Forwarded' || isAssigned(b)) && b.status !== 'completed' && b.status !== 'accepted' && b.status !== 'in_progress';
+    } else if (currentAdminTab === 'Accepted') {
+      matchesTab = b.status === 'accepted' || b.status === 'in_progress';
+    } else if (currentAdminTab === 'Review') {
+      matchesTab = b.status === 'admin_review';
+    } else if (currentAdminTab === 'Completed') {
+      matchesTab = b.status === 'completed';
+    }
+
+    if (!matchesTab) return false;
+
+    // 2. Search filter
+    if (leadSearchTerm.trim()) {
+      const q = leadSearchTerm.trim().toLowerCase();
+      const name = (b.customerName || '').toLowerCase();
+      const phone = (b.contactNumber || '').toLowerCase();
+      const service = (b.subServiceName || b.serviceCategory || '').toLowerCase();
+      const area = (b.area || b.city || b.address || '').toLowerCase();
+      const id = (b.id || '').toLowerCase();
+      return name.includes(q) || phone.includes(q) || service.includes(q) || area.includes(q) || id.includes(q);
+    }
+
+    return true;
+  });
+
+  // Sort: Latest leads strictly at the top, older ones go down
+  displayedBookings.sort((a, b) => {
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    if (timeB !== timeA) return timeB - timeA;
+
+    const dateA = a.date ? new Date(`${a.date} ${a.time || '00:00'}`).getTime() : 0;
+    const dateB = b.date ? new Date(`${b.date} ${b.time || '00:00'}`).getTime() : 0;
+    if (dateB !== dateA) return dateB - dateA;
+
+    return (b.id || '').localeCompare(a.id || '');
   });
 
   if (!isAuthenticated) {
@@ -265,6 +388,12 @@ export const AdminPanel: React.FC = () => {
         </div>
         <div className="flex flex-row w-full md:w-auto gap-2 sm:gap-3">
             <button 
+              onClick={() => setMainTab('InfluencerManagement')}
+              className="flex-1 md:flex-none justify-center bg-purple-50 text-purple-700 px-3 sm:px-4 py-3 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-purple-600 hover:text-white transition shadow-sm border border-purple-200 flex items-center gap-2 text-center"
+            >
+                <Sparkles size={14} className="shrink-0 text-amber-500" /> <span>Influencers Hub</span>
+            </button>
+            <button 
               onClick={() => setShowPartnersDirectory(true)}
               className="flex-1 md:flex-none justify-center bg-indigo-50 text-indigo-700 px-3 sm:px-4 py-3 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-sm border border-indigo-100 flex items-center gap-2 text-center"
             >
@@ -278,6 +407,11 @@ export const AdminPanel: React.FC = () => {
 
       <div className="flex space-x-1 mb-6 sm:mb-10 bg-gray-100 p-1 rounded-2xl w-full md:w-fit overflow-x-auto scrollbar-hide">
         <button onClick={() => setMainTab('Dashboard')} className={`flex-shrink-0 py-2.5 px-4 sm:px-6 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'Dashboard' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Operational</button>
+        <button onClick={() => setMainTab('InfluencerManagement')} className={`flex-shrink-0 py-2.5 px-4 sm:px-6 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 ${mainTab === 'InfluencerManagement' ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-md' : 'text-purple-700 bg-purple-50 hover:bg-purple-100'}`}>
+          <Sparkles size={13} className={mainTab === 'InfluencerManagement' ? 'text-amber-300' : 'text-purple-600'} />
+          <span>Influencers</span>
+          <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-black ${mainTab === 'InfluencerManagement' ? 'bg-amber-400 text-gray-950' : 'bg-purple-200 text-purple-900'}`}>25%</span>
+        </button>
         <button onClick={() => setMainTab('FollowUps')} className={`flex-shrink-0 py-2.5 px-4 sm:px-6 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'FollowUps' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Follow-ups</button>
         <button onClick={() => setMainTab('BlogManager')} className={`flex-shrink-0 py-2.5 px-4 sm:px-6 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'BlogManager' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Marketing</button>
         <button onClick={() => setMainTab('PartnerManagement')} className={`flex-shrink-0 py-2.5 px-4 sm:px-6 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${mainTab === 'PartnerManagement' ? 'bg-white text-gray-950 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Supply</button>
@@ -286,6 +420,7 @@ export const AdminPanel: React.FC = () => {
       {mainTab === 'FollowUps' && <FollowUpManager />}
       {mainTab === 'BlogManager' && <BlogManager />}
       {mainTab === 'PartnerManagement' && <PartnerManager />}
+      {mainTab === 'InfluencerManagement' && <InfluencerManager />}
 
       {mainTab === 'Dashboard' && (
         <div className="space-y-10">
@@ -324,18 +459,57 @@ export const AdminPanel: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-            <div className="px-5 sm:px-8 py-6 sm:py-8 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 bg-gradient-to-r from-gray-50 to-white">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter text-gray-900">Lead Registry</h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">Incoming Service Traffic</p>
+            <div className="px-5 sm:px-8 py-6 sm:py-8 border-b border-gray-100 flex flex-col gap-4 bg-gradient-to-r from-gray-50 to-white">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter text-gray-900">Lead Registry</h3>
+                    {unreadPendingCount > 0 && (
+                      <span className="inline-flex items-center gap-1.5 bg-rose-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm animate-pulse">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                        {unreadPendingCount} NEW UNSEEN
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">
+                    Real-Time Service Traffic • Sorted Newest First • Auto-Dispatched
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:flex-none">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                    <input 
+                      type="text"
+                      placeholder="Search name, phone, area, ID..."
+                      value={leadSearchTerm}
+                      onChange={e => setLeadSearchTerm(e.target.value)}
+                      className="w-full sm:w-64 pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                    />
+                  </div>
+
+                  {unreadPendingCount > 0 && (
+                    <button
+                      onClick={markAllLeadsAsViewed}
+                      className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-xl transition-colors border border-emerald-200 flex items-center gap-1.5 shrink-0 shadow-sm"
+                      title="Mark all new inquiries as viewed"
+                    >
+                      <Eye size={12} />
+                      <span>Mark All Seen</span>
+                    </button>
+                  )}
+                </div>
               </div>
               
-              <div className="flex bg-white rounded-2xl p-1 border border-gray-200 w-full md:w-auto overflow-x-auto scrollbar-hide">
+              <div className="flex bg-white rounded-2xl p-1 border border-gray-200 w-full overflow-x-auto scrollbar-hide">
                 <button 
                     onClick={() => setCurrentAdminTab('Pending')} 
-                    className={`whitespace-nowrap px-4 sm:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${currentAdminTab === 'Pending' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
+                    className={`whitespace-nowrap px-4 sm:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${currentAdminTab === 'Pending' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-gray-500 hover:text-indigo-600'}`}
                 >
-                    New Leads ({pendingJobs})
+                    <span>New Leads ({pendingJobs})</span>
+                    {unreadPendingCount > 0 && (
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    )}
                 </button>
                 <button 
                     onClick={() => setCurrentAdminTab('Forwarded')} 
@@ -365,29 +539,128 @@ export const AdminPanel: React.FC = () => {
             </div>
 
             <div className="p-4 sm:p-8 space-y-4 min-h-[500px] bg-gray-50/30">
-              {displayedBookings.map((booking, index) => (
-                <div key={booking.id} className="relative bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col md:flex-row">
-                    {/* Left Column: Customer & Service Base Info */}
-                    <div className="flex-1 p-5 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-700 font-bold text-lg flex items-center justify-center shrink-0">
-                                    {index + 1}
-                                </div>
-                                <div>
-                                    <h4 className="text-base font-bold text-gray-900">{booking.customerName}</h4>
-                                    <p className="text-xs font-medium text-gray-500 flex items-center gap-1 mt-0.5">
-                                        <Phone size={12} className="text-indigo-400" /> {booking.contactNumber}
-                                    </p>
-                                </div>
-                            </div>
-                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                                booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                                'bg-indigo-100 text-indigo-700'
-                            }`}>
-                                {booking.status}
-                            </span>
+              {displayedBookings.map((booking, index) => {
+                const isUnseen = !viewedLeadIds.includes(booking.id);
+                const inquiryInfo = formatInquiryTime(booking.createdAt, booking.date, booking.time);
+
+                return (
+                <div 
+                  key={booking.id} 
+                  onClick={() => markLeadAsViewed(booking.id)}
+                  className={`relative rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col cursor-pointer ${
+                    isUnseen 
+                      ? 'border-rose-400 bg-white shadow-md border-l-8 border-l-rose-500 ring-2 ring-rose-400/20 hover:shadow-lg' 
+                      : 'border-emerald-400 bg-emerald-50/10 shadow-sm border-l-8 border-l-emerald-500 ring-1 ring-emerald-400/30 hover:shadow-md'
+                  }`}
+                >
+                    {/* Top Status Banner: Prominently displaying SEEN or UNSEEN */}
+                    {isUnseen ? (
+                      <div className="bg-gradient-to-r from-rose-50 via-amber-50 to-orange-50 border-b border-rose-200/80 px-4 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600"></span>
+                          </span>
+                          <span className="text-[11px] font-black uppercase tracking-wider text-rose-700">
+                            🔴 NEW LEAD (UNSEEN)
+                          </span>
+                          <span className="text-[10px] font-medium text-rose-500 hidden sm:inline">
+                            • Click anywhere on this lead to mark as SEEN
+                          </span>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markLeadAsViewed(booking.id);
+                          }} 
+                          className="px-3 py-1 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all"
+                        >
+                          <Eye size={12} className="text-emerald-600" /> Mark as Seen
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-b border-emerald-200 px-4 py-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0"></span>
+                          <span className="text-[11px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
+                            <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                            SEEN BY ADMIN
+                          </span>
+                          <span className="text-[10px] font-medium text-emerald-700 hidden sm:inline">
+                            • Reviewed & Checked
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-sm flex items-center gap-1 ring-1 ring-emerald-500">
+                            <CheckCircle2 size={12} className="text-white" /> SEEN
+                          </span>
+                          <button 
+                            type="button"
+                            onClick={(e) => toggleLeadViewed(e, booking.id)} 
+                            className="text-[10px] font-bold text-gray-400 hover:text-gray-700 hover:underline px-1.5 py-0.5 transition-colors"
+                            title="Mark as unseen again"
+                          >
+                            Mark Unseen
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Content Columns Wrapper */}
+                    <div className="flex flex-col md:flex-row flex-1">
+                      {/* Left Column: Customer & Service Base Info */}
+                      <div className="flex-1 p-5 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col">
+                          <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
+                              <div className="flex items-center gap-3">
+                                  <div className={`w-10 h-10 rounded-full font-bold text-lg flex items-center justify-center shrink-0 ${
+                                    isUnseen 
+                                      ? 'bg-rose-600 text-white shadow-md shadow-rose-200 animate-pulse' 
+                                      : 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
+                                  }`}>
+                                      {index + 1}
+                                  </div>
+                                  <div>
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="text-base font-black text-gray-900">{booking.customerName}</h4>
+                                        {isUnseen ? (
+                                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-rose-500 text-white shadow-sm animate-pulse">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                                            NEW INQUIRY (UNSEEN)
+                                          </span>
+                                        ) : (
+                                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-200">
+                                            <CheckCircle2 size={12} className="text-white" /> SEEN
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="text-xs font-semibold text-gray-600 flex items-center gap-1 mt-0.5">
+                                          <Phone size={12} className="text-indigo-400" /> {booking.contactNumber}
+                                      </p>
+                                  </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                                    booking.status === 'pending' || !booking.status ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                    booking.status === 'completed' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' :
+                                    'bg-indigo-100 text-indigo-700 border border-indigo-200'
+                                }`}>
+                                    {booking.status || 'Pending'}
+                                </span>
+                              </div>
+                          </div>
+
+                        {/* Inquiry Timestamp Callout */}
+                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 mb-3 flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 text-slate-700 text-xs">
+                            <Clock size={13} className="text-indigo-600 shrink-0" />
+                            <span className="font-semibold text-[11px] text-gray-500">Inquiry Received:</span>
+                            <span className="font-black text-[11px] text-slate-900">{inquiryInfo.full}</span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            {inquiryInfo.relative}
+                          </span>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4 mt-auto pt-3 border-t border-gray-50">
@@ -396,7 +669,7 @@ export const AdminPanel: React.FC = () => {
                                 <p className="text-xs font-bold text-gray-800 line-clamp-2">{booking.subServiceName}</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Schedule</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Appointment Schedule</p>
                                 <p className="text-xs font-bold text-gray-800 flex items-center gap-1">
                                     <Calendar size={12} className="text-indigo-500" /> {booking.date}
                                 </p>
@@ -416,6 +689,19 @@ export const AdminPanel: React.FC = () => {
                                         <MapIcon size={10} /> View Map
                                     </a>
                                 )}
+                                {booking.appliedReferralCode && (
+                                    <div className="mt-3 pt-2 border-t border-purple-100 flex flex-wrap items-center justify-between gap-2 bg-purple-50/80 px-3 py-1.5 rounded-lg border border-purple-200/70">
+                                        <div className="flex items-center gap-1.5">
+                                            <Sparkles size={12} className="text-purple-600 shrink-0" />
+                                            <span className="text-[11px] font-bold text-purple-900">
+                                                Influencer Code: <span className="font-black text-purple-700 bg-white px-1.5 py-0.5 rounded border border-purple-200">{booking.appliedReferralCode}</span>
+                                            </span>
+                                        </div>
+                                        <span className="text-[11px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                          25% Comm: ₹{Math.round((Number(booking.price) || 0) * 0.25).toLocaleString('en-IN')}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -430,13 +716,27 @@ export const AdminPanel: React.FC = () => {
                                     <p className="text-lg font-black text-emerald-600">₹{booking.price}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <a href={`tel:${booking.contactNumber}`} className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 transition-all shadow-sm" title="Call Customer">
+                                    <a 
+                                      href={`tel:${booking.contactNumber}`} 
+                                      onClick={() => markLeadAsViewed(booking.id)}
+                                      className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 transition-all shadow-sm" 
+                                      title="Call Customer"
+                                    >
                                         <Phone size={14} />
                                     </a>
-                                    <a href={`https://wa.me/91${booking.contactNumber}?text=${encodeURIComponent(`Hello ${booking.customerName}, regarding your booking...`)}`} target="_blank" rel="noreferrer" className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all shadow-sm" title="WhatsApp Customer">
+                                    <a 
+                                      href={`https://wa.me/91${booking.contactNumber}?text=${encodeURIComponent(`Hello ${booking.customerName}, regarding your booking...`)}`} 
+                                      target="_blank" 
+                                      rel="noreferrer" 
+                                      onClick={() => markLeadAsViewed(booking.id)}
+                                      className="w-9 h-9 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all shadow-sm" 
+                                      title="WhatsApp Customer"
+                                    >
                                         <MessageCircle size={14} />
                                     </a>
-                                    <button onClick={() => {
+                                    <button 
+                                      onClick={() => {
+                                        markLeadAsViewed(booking.id);
                                         const msg = `🆕 NEW ONLINE BOOKING\n` +
                                                    `───────────────────\n` +
                                                    `👤 Customer Info:\n` +
@@ -490,13 +790,26 @@ export const AdminPanel: React.FC = () => {
 
                             {/* Primary Action Button */}
                             {booking.status === 'pending' && (
-                                <button onClick={() => setDispatchBooking(booking)} className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-indigo-700 transition-all shadow-sm flex items-center justify-center gap-2">
+                                <button 
+                                  onClick={() => {
+                                    markLeadAsViewed(booking.id);
+                                    setDispatchBooking(booking);
+                                  }} 
+                                  className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-indigo-700 transition-all shadow-sm flex items-center justify-center gap-2"
+                                >
                                     <Send size={14} /> Assign Technician
                                 </button>
                             )}
                             
                             {(booking.status === 'Forwarded' || booking.status === 'accepted' || booking.status === 'in_progress' || booking.status === 'admin_review') && (
-                                <button onClick={() => { setSelectedRating(5); setRatingBookingId(booking.id); }} className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-emerald-700 transition-all shadow-sm flex items-center justify-center gap-2">
+                                <button 
+                                  onClick={() => { 
+                                    markLeadAsViewed(booking.id);
+                                    setSelectedRating(5); 
+                                    setRatingBookingId(booking.id); 
+                                  }} 
+                                  className="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-wide hover:bg-emerald-700 transition-all shadow-sm flex items-center justify-center gap-2"
+                                >
                                     <CheckCircle size={14} /> Complete Job
                                 </button>
                             )}
@@ -522,17 +835,30 @@ export const AdminPanel: React.FC = () => {
                         <div className="bg-gray-100/50 px-5 py-3 border-t border-gray-100 flex justify-between items-center text-xs mt-auto">
                             <span className="text-[10px] font-semibold text-gray-400">ID: {booking.id.startsWith('b0000000-0000-4000-8000-00000000') ? booking.id.substring(32) : booking.id.substring(0,6) + '...'}</span>
                             <div className="flex gap-3">
-                                <button onClick={() => setRescheduleData({ booking, date: booking.date, time: booking.time })} className="text-gray-500 hover:text-indigo-600 font-bold flex items-center gap-1 transition-colors">
+                                <button 
+                                  onClick={() => {
+                                    markLeadAsViewed(booking.id);
+                                    setRescheduleData({ booking, date: booking.date, time: booking.time });
+                                  }} 
+                                  className="text-gray-500 hover:text-indigo-600 font-bold flex items-center gap-1 transition-colors"
+                                >
                                     <Calendar size={12} /> Reschedule
                                 </button>
-                                <button onClick={() => handleCancelBooking(booking)} className="text-gray-500 hover:text-rose-600 font-bold flex items-center gap-1 transition-colors">
+                                <button 
+                                  onClick={() => {
+                                    markLeadAsViewed(booking.id);
+                                    handleCancelBooking(booking);
+                                  }} 
+                                  className="text-gray-500 hover:text-rose-600 font-bold flex items-center gap-1 transition-colors"
+                                >
                                     <Plus className="rotate-45" size={14} /> Cancel
                                 </button>
                             </div>
                         </div>
                     </div>
+                  </div>
                 </div>
-              ))}
+              ); })}
               {displayedBookings.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
@@ -632,6 +958,7 @@ export const AdminPanel: React.FC = () => {
                                 const waText = `✨ *SOFIYAN HOME SERVICE - JOB ALERT* ✨\n\nHello *${partner.name}*, you have been assigned to a new booking!\n\n📋 *JOB & CUSTOMER DETAILS*\n👤 *Customer Name:* ${dispatchBooking?.customerName}\n📞 *Customer Phone:* ${dispatchBooking?.contactNumber || 'Not available'}\n🛠️ *Service:* ${dispatchBooking?.subServiceName}\n⏰ *Schedule:* ${dispatchBooking?.date} | ${dispatchBooking?.time}\n📍 *Address:* ${dispatchBooking?.address}, ${dispatchBooking?.city} (${dispatchBooking?.pinCode})\n🗺️ *Map Link:* ${dispatchBooking?.location_link ? dispatchBooking.location_link : 'Not provided'}\n\n💵 *Pay Out:* ₹${dispatchBooking?.price}\n\n🚀 *Please contact the customer immediately to confirm your visit.*`;
                                 window.open(`https://wa.me/91${partner.phone}?text=${encodeURIComponent(waText)}`, '_blank');
                                 if (dispatchBooking) {
+                                  markLeadAsViewed(dispatchBooking.id);
                                   updateBooking({ 
                                     ...dispatchBooking, 
                                     status: 'Forwarded', 

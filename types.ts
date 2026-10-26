@@ -107,4 +107,7 @@ export interface Partner {
   completedJobs: number;
   registration_fee_paid?: boolean;
   registration_fee_screenshot?: string;
+  subscription_status?: 'trial' | 'premium' | 'expired';
+  trial_start_date?: string;
+  subscription_expiry_date?: string;
 }

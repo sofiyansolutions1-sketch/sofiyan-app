@@ -329,10 +329,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <NavLink to="/blogs" icon={<FileText size={18} />} label="Blogs" />
               <NavLink to="/partner" icon={<Users size={18} />} label="Partner" />
               <NavLink to="/admin" icon={<Lock size={18} />} label="Admin" />
-              <a href="/influencer-portal.html" className="flex items-center space-x-1 text-white bg-indigo-950 hover:bg-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-100">
+              <Link to="/influencer" className="flex items-center space-x-1 text-white bg-indigo-950 hover:bg-black px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-100">
                 <Star size={14} className="text-amber-400 fill-amber-400" />
                 <span>Influencer</span>
-              </a>
+              </Link>
             </div>
 
             {/* Mobile menu button and inline controls */}
@@ -412,8 +412,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Our Blogs</span>
                           </Link>
 
-                          <a 
-                            href="/influencer-portal.html" 
+                          <Link 
+                            to="/influencer" 
                             onClick={() => setIsPanelMenuOpen(false)}
                             className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-indigo-50 transition-colors group"
                           >
@@ -421,7 +421,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                                   <Star size={16} />
                               </div>
                               <span className="text-xs font-black text-indigo-950 uppercase tracking-widest">Influencer Portal</span>
-                          </a>
+                          </Link>
                       </div>
                       <div className="bg-indigo-950 p-4">
                           <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1">Navigation Center</p>
