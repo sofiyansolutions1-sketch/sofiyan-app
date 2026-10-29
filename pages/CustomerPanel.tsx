@@ -15,6 +15,7 @@ import { Breadcrumb } from '../components/Breadcrumb';
 import { MapPicker } from '../components/MapPicker';
 import { NearbyTechniciansBlock } from '../components/NearbyTechniciansBlock';
 import { getServiceDossier } from '../services/serviceDossier';
+import { extractCoordsFromMapLink } from '../services/geoService';
 
 // Specific Customer Reviews Data
 const customerReviews = [
@@ -1606,6 +1607,8 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
   const [isFetchingAreaPincode, setIsFetchingAreaPincode] = useState(false);
 
   const [isMapPickerOpen, setIsMapPickerOpen] = useState(false);
+  const [showManualMapInput, setShowManualMapInput] = useState(false);
+  const [showAutoDetectGps, setShowAutoDetectGps] = useState(false);
 
   // Sync city when localStorage changes (handled globally by Layout, but sync local formData)
   useEffect(() => {
@@ -2038,7 +2041,6 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
     }
     const rate = validCoupons[appliedCoupon];
     return rate ? Math.round((cartTotal * rate) / 100) : 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedCoupon, cartTotal]);
 
   const referralDiscount = useReferralBalance ? Math.min(referralBalance, cartTotal - discountAmount) : 0;
@@ -2083,7 +2085,6 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
       setCouponCode(refCode.toUpperCase());
       handleApplyCoupon(refCode.toUpperCase());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookings]);
 
   const handleBookService = (sub: SubService) => {
@@ -2751,92 +2752,122 @@ Directly book trusted services at your doorstep. Safe & reliable!`;
                        <span className="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-xl flex items-center justify-center text-sm font-black border border-indigo-100">2</span>
                        Current Location
                     </h3>
-                                        <div className="relative bg-indigo-950 rounded-2xl p-5 shadow-lg border border-indigo-500/30 overflow-hidden group mb-4">
-                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                       <div className="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
-                       <div className="relative flex flex-col sm:flex-row items-center justify-between gap-5">
-                          <div className="flex items-center gap-4">
-                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-indigo-300 ring-1 ring-white/20 shadow-inner">
-                                <Navigation size={22} className={isTrackingLocation ? "animate-spin text-white" : "group-hover:scale-110 transition-transform"} />
-                             </div>
-                             <div>
-                                <h5 className="font-bold text-white text-sm tracking-tight mb-1">Use Current Location</h5>
-                                <p className="text-[10px] text-indigo-300 font-medium leading-relaxed max-w-[200px]">One click to automatically fill your area & pincode.</p>
-                             </div>
-                          </div>
-                          <button 
-                            type="button"
-                            onClick={handleTrackLocation} 
-                            disabled={isTrackingLocation}
-                            className="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50"
-                          >
-                            {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'DETECTED ✓' : 'AUTO-DETECT'}
-                          </button>
-                       </div>
-                    </div>
+
                     {/* Hidden input to always maintain the location link in form state */}
                     <input type="hidden" name="locationLink" value={formData.locationLink} />
 
-                    {formData.locationLink ? (
-                       <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-in fade-in duration-300">
-                          <div className="flex items-center gap-3.5">
-                             <div className="w-11 h-11 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
-                                <CheckCircle size={22} />
+                    <div className="space-y-4">
+                       {/* 1. Manual Google Maps Link Button & Hidden-by-default Input Field */}
+                       {!showManualMapInput ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowManualMapInput(true)}
+                            className="w-full flex items-center justify-center gap-2.5 py-4 px-6 bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 font-black text-xs uppercase tracking-widest rounded-2xl border-2 border-dashed border-indigo-300 transition-all shadow-sm active:scale-95 group"
+                          >
+                            <MapPin size={18} className="text-indigo-600 group-hover:scale-110 transition-transform" />
+                            <span>📍 Paste Google Maps Link Manually</span>
+                          </button>
+                       ) : (
+                          <div className="p-4 bg-indigo-50/60 rounded-2xl border border-indigo-200 flex flex-col gap-3 animate-in fade-in duration-200">
+                             <div className="flex items-center justify-between">
+                                <label className="text-[10px] font-black text-indigo-700 uppercase tracking-widest flex items-center gap-1.5 ml-1">
+                                   <MapIcon size={14} className="text-indigo-600" />
+                                   Google Maps Location Link
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowManualMapInput(false)}
+                                  className="text-[10px] font-bold text-gray-400 hover:text-gray-600 uppercase tracking-wider"
+                                >
+                                   Hide
+                                </button>
                              </div>
-                             <div>
-                                <div className="flex items-center gap-2">
-                                   <h5 className="font-bold text-emerald-950 text-sm tracking-tight">Current Location Locked</h5>
-                                   <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Verified GPS ✓</span>
-                                </div>
-                                <p className="text-xs text-emerald-700 font-medium mt-0.5">
-                                   Live location coordinates secured for technician navigation. (Link hidden for privacy)
+                             <div className="relative group/input flex items-center">
+                                <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
+                                <input
+                                  name="locationLink"
+                                  value={formData.locationLink}
+                                  onChange={(e) => {
+                                     handleInputChange(e);
+                                     const coords = extractCoordsFromMapLink(e.target.value);
+                                     if (coords) {
+                                        setFormData((prev: any) => ({
+                                           ...prev,
+                                           lat: coords.lat,
+                                           lng: coords.lng
+                                        }));
+                                     }
+                                  }}
+                                  className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-100 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-400 text-xs sm:text-sm"
+                                  placeholder="Paste customer's Google Maps link here..."
+                                  autoFocus
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setIsMapPickerOpen(true)}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
+                                >
+                                  Adjust Pin
+                                </button>
+                             </div>
+                             {formData.locationLink && (
+                                <p className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1.5 ml-1">
+                                   <CheckCircle size={13} className="text-emerald-600 shrink-0" />
+                                   <span>Maps location linked successfully. (Service Address below is optional)</span>
                                 </p>
+                             )}
+                          </div>
+                       )}
+
+                       {/* 2. Existing GPS Location Functionality - Hidden by default as requested */}
+                       <div className="pt-1">
+                          {!showAutoDetectGps ? (
+                             <button
+                               type="button"
+                               onClick={() => setShowAutoDetectGps(true)}
+                               className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-indigo-600 transition-colors py-1 px-1"
+                             >
+                                <Navigation size={13} className="text-indigo-500" />
+                                <span>Or use Current Location (GPS Auto-detect)</span>
+                             </button>
+                          ) : (
+                             <div className="space-y-3">
+                                <div className="relative bg-indigo-950 rounded-2xl p-5 shadow-lg border border-indigo-500/30 overflow-hidden group">
+                                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                   <div className="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
+                                   <div className="relative flex flex-col sm:flex-row items-center justify-between gap-5">
+                                      <div className="flex items-center gap-4">
+                                         <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-indigo-300 ring-1 ring-white/20 shadow-inner">
+                                            <Navigation size={22} className={isTrackingLocation ? "animate-spin text-white" : "group-hover:scale-110 transition-transform"} />
+                                         </div>
+                                         <div>
+                                            <h5 className="font-bold text-white text-sm tracking-tight mb-1">Use Current Location</h5>
+                                            <p className="text-[10px] text-indigo-300 font-medium leading-relaxed max-w-[200px]">One click to automatically fill your area & pincode.</p>
+                                         </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                         <button 
+                                           type="button"
+                                           onClick={handleTrackLocation} 
+                                           disabled={isTrackingLocation}
+                                           className="w-full sm:w-auto bg-indigo-500 hover:bg-indigo-400 text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 shadow-[0_0_20px_rgba(99,102,241,0.3)] border border-indigo-400/50"
+                                         >
+                                           {isTrackingLocation ? 'DETECTING...' : formData.locationLink ? 'DETECTED ✓' : 'AUTO-DETECT'}
+                                         </button>
+                                         <button
+                                           type="button"
+                                           onClick={() => setShowAutoDetectGps(false)}
+                                           className="text-[10px] font-bold text-indigo-300 hover:text-white px-2 py-1"
+                                         >
+                                           ✕
+                                         </button>
+                                      </div>
+                                   </div>
+                                </div>
                              </div>
-                          </div>
-                          <div className="flex items-center gap-2 self-end sm:self-auto">
-                             <button
-                               type="button"
-                               onClick={() => setIsMapPickerOpen(true)}
-                               className="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm"
-                             >
-                               Adjust Pin
-                             </button>
-                             <button
-                               type="button"
-                               onClick={handleTrackLocation}
-                               disabled={isTrackingLocation}
-                               className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors shadow-sm disabled:opacity-50"
-                             >
-                               {isTrackingLocation ? 'Detecting...' : 'Re-Detect'}
-                             </button>
-                          </div>
+                          )}
                        </div>
-                    ) : (
-                       <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex flex-col gap-3">
-                          <div className="flex items-center justify-between">
-                             <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-1">Maps Location Link (Optional)</label>
-                             <span className="text-[8px] font-bold text-white bg-indigo-600 px-2 py-0.5 rounded-full">RECOMMENDED</span>
-                          </div>
-                          <div className="relative group/input flex items-center">
-                             <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-300 group-focus-within/input:text-indigo-600 transition-colors pointer-events-none" size={18} />
-                             <input
-                               name="locationLink"
-                               value={formData.locationLink}
-                               onChange={handleInputChange}
-                               className="w-full pl-12 pr-28 py-3.5 bg-white border-2 border-indigo-50 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900 placeholder:font-normal placeholder:text-gray-300"
-                               placeholder="Paste Google Maps link here..."
-                             />
-                             <button
-                               type="button"
-                               onClick={() => setIsMapPickerOpen(true)}
-                               className="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm"
-                             >
-                               Adjust Pin
-                             </button>
-                          </div>
-                          <p className="text-[10px] text-indigo-400 font-medium italic">* Providing a location link makes the "Service Address" section below optional.</p>
-                       </div>
-                    )}
+                    </div>
                  </div>
 
                  {/* Address */}

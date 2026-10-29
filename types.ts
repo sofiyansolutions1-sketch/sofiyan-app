@@ -49,7 +49,7 @@ export interface Booking {
   price: number;
   otp?: string; // 4-digit OTP for starting job
   otpVerified?: boolean; // True if partner has entered OTP
-  status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'Forwarded' | 'on_hold' | 'admin_review';
+  status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'Forwarded' | 'on_hold' | 'admin_review' | 'pending_quotation';
   assignedPartnerId?: string;
   assignedPartnerName?: string;
   assignedPartnerPhone?: string;

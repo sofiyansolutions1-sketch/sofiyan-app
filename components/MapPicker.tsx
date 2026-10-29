@@ -64,7 +64,6 @@ export const MapPicker: React.FC<MapPickerProps> = ({ isOpen, onClose, onConfirm
            handleCurrentLocation();
        }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialLat, initialLng]);
 
   if (!isOpen) return null;

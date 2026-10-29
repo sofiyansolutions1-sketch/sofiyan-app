@@ -17,7 +17,6 @@ export const TrackBooking: React.FC = () => {
       setBookingId(location.state.bookingId);
       handleSearch(location.state.bookingId);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
   const handleSearch = async (searchId: string = bookingId) => {

@@ -14,6 +14,7 @@ interface StoreState {
   init: () => Promise<void>;
   
   addBooking: () => Promise<void>;
+  createBooking: (newBooking: Booking) => Promise<Booking>;
   updateBooking: (updatedBooking: Booking) => Promise<void>;
   addPartner: (newPartner: Partner) => Promise<Partner>;
   updatePartner: (updatedPartner: Partner) => Promise<void>;
@@ -37,7 +38,7 @@ export const mapBookingFromDB = (data: any): Booking => {
     lat: data.lat,
     lng: data.lng,
     pinCode: data.pincode || data.pin_code,
-    description: '', // Not in schema
+    description: data.description || '',
     date: data.service_date || data.date,
     time: data.service_time || data.time,
     serviceCategory: data.service_category,
@@ -205,6 +206,80 @@ export const useStore = create<StoreState>((set, get) => ({
       await get().fetchBookings(); 
   },
 
+  createBooking: async (newBooking: Booking): Promise<Booking> => {
+    const isValidUUID = (val?: string | null): boolean => {
+      if (!val || typeof val !== 'string') return false;
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+    };
+
+    let bookingId = newBooking.id;
+    if (!isValidUUID(bookingId)) {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        bookingId = crypto.randomUUID();
+      } else {
+        const randHex = Math.floor(1000 + Math.random() * 9000).toString();
+        bookingId = `00000000-0000-4000-8000-${Date.now().toString(16).padStart(12, '0').slice(-12)}`;
+      }
+    }
+
+    const sanitizedPartnerId = isValidUUID(newBooking.assignedPartnerId) ? newBooking.assignedPartnerId : null;
+    const finalBooking: Booking = {
+      ...newBooking,
+      id: bookingId,
+      assignedPartnerId: sanitizedPartnerId || undefined
+    };
+
+    // Optimistically update local Zustand store so UI updates instantly
+    set(state => ({
+      bookings: [finalBooking, ...state.bookings.filter(b => b.id !== bookingId)]
+    }));
+
+    try {
+      const priceNum = Number(finalBooking.price) || 0;
+      const { data, error } = await supabase.from('bookings').insert([{
+        id: bookingId,
+        customer_id: null,
+        customer_name: finalBooking.customerName,
+        contact_number: finalBooking.contactNumber,
+        address: finalBooking.address || 'Address via Link',
+        area: finalBooking.area || '',
+        city: finalBooking.city || 'Mau',
+        pin_code: finalBooking.pinCode || '',
+        date: finalBooking.date,
+        time: finalBooking.time,
+        service_category: finalBooking.serviceCategory || 'Cleaning',
+        sub_service_name: finalBooking.subServiceName || finalBooking.serviceCategory || 'General Service',
+        description: finalBooking.description || null,
+        location_link: finalBooking.location_link || null,
+        lat: finalBooking.lat || null,
+        lng: finalBooking.lng || null,
+        price: priceNum,
+        status: finalBooking.status || 'pending',
+        assigned_partner_id: sanitizedPartnerId,
+        assigned_partner_name: finalBooking.assignedPartnerName || null,
+        assigned_partner_phone: finalBooking.assignedPartnerPhone || null,
+        assigned_partner_area: finalBooking.assignedPartnerArea || null,
+        cart_items: finalBooking.cartItems || []
+      }]).select().single();
+
+      if (error) {
+        console.warn('createBooking Supabase notice:', error.message || error);
+        throw error;
+      } else if (data) {
+        const mapped = mapBookingFromDB(data);
+        set(state => ({
+          bookings: [mapped, ...state.bookings.filter(b => b.id !== mapped.id)]
+        }));
+        return mapped;
+      }
+    } catch (err: any) {
+      console.error('Error inserting booking in Supabase:', err);
+      throw err;
+    }
+
+    return finalBooking;
+  },
+
   updateBooking: async (updatedBooking: Booking) => {
     set(state => ({
       bookings: state.bookings.map(b => b.id === updatedBooking.id ? updatedBooking : b)
@@ -219,9 +294,21 @@ export const useStore = create<StoreState>((set, get) => ({
       };
     }
 
+const isValidUUID = (val?: string | null): boolean => {
+  if (!val || typeof val !== 'string') return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+};
+
+    const sanitizedPartnerId = isValidUUID(updatedBooking.assignedPartnerId) ? updatedBooking.assignedPartnerId : null;
+
     const { error } = await supabase.from('bookings').update({
         status: updatedBooking.status,
-        assigned_partner_id: updatedBooking.assignedPartnerId || null,
+        price: updatedBooking.price !== undefined ? updatedBooking.price : 0,
+        description: updatedBooking.description || null,
+        location_link: updatedBooking.location_link || null,
+        service_category: updatedBooking.serviceCategory || null,
+        sub_service_name: updatedBooking.subServiceName || null,
+        assigned_partner_id: sanitizedPartnerId,
         assigned_partner_name: updatedBooking.assignedPartnerName || null,
         assigned_partner_phone: updatedBooking.assignedPartnerPhone || null,
         date: updatedBooking.date,
